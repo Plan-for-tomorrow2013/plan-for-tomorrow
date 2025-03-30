@@ -1,0 +1,119 @@
+{
+  "id": "25587b3c-3c9c-4171-9885-c8b065bcf8d2",
+  "address": "55 Cuzco Street, South Coogee",
+  "council": "Randwick",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-03-29T00:18:14.857Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.261414080514,
+      "latitude": -33.93460066241
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "250604",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "0.5"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "9.5",
+            "Units": "m"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "796157",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "428623",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Layer Class": "250-299",
+            "Lot Size": "275",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Scenic Protection Land",
+          "attributes": {
+            "OBJECTID": "5244",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Class": "Scenic Protection Area",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": []
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1743207527140_2025 Women's Cap Prem - Draft Draw.pdf",
+      "originalName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-29T00:18:47.141Z",
+      "size": 287213
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-03-29T00:19:00.341Z",
+    "updatedAt": "2025-03-29T00:19:00.341Z"
+  }
+}

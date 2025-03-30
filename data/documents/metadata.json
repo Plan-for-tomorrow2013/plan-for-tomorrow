@@ -1,0 +1,144 @@
+[
+  {
+    "id": "482627ec-8daa-4cae-af04-44e5da9b88cf",
+    "title": "CDC Dual Occupancy",
+    "description": "Pre-Prepared Assessment",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:14:23.402Z",
+        "filename": "482627ec-8daa-4cae-af04-44e5da9b88cf-v1.pdf",
+        "originalName": "cdc-dual-occupancy.pdf",
+        "size": 574,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:14:23.402Z",
+    "updatedAt": "2025-03-28T13:14:23.402Z",
+    "isActive": true
+  },
+  {
+    "id": "8e041434-dc38-4272-80ff-a08b051d50a3",
+    "title": "Chapter X - Dual Occupancy",
+    "path": "/initial-assessment/pre-prepared",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:19:07.975Z",
+        "filename": "8e041434-dc38-4272-80ff-a08b051d50a3-v1.docx",
+        "originalName": "Chapter X - Dual Occupancy.docx",
+        "size": 31277,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:19:07.975Z",
+    "updatedAt": "2025-03-28T13:19:07.975Z",
+    "isActive": true
+  },
+  {
+    "id": "3462dbcf-9c99-413f-a87d-cafa2ad7c23f",
+    "title": "TEST",
+    "path": "/initial-assessment/pre-prepared",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:23:45.995Z",
+        "filename": "3462dbcf-9c99-413f-a87d-cafa2ad7c23f-v1.pdf",
+        "originalName": "cdc-dual-occupancy.pdf",
+        "size": 574,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:23:45.995Z",
+    "updatedAt": "2025-03-28T13:23:45.995Z",
+    "isActive": true
+  },
+  {
+    "id": "71e978dc-1000-4a1c-ac35-80edd0a60248",
+    "title": "CDC Dwelling Assessment",
+    "path": "/initial-assessment/pre-prepared/cdc-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:50:11.097Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v1.pdf",
+        "originalName": "CDC Dwelling Assessment.pdf",
+        "size": 574,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-30T04:52:52.062Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v2.pdf",
+        "originalName": "ATLReport (1).pdf",
+        "size": 21383,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-03-28T13:50:11.097Z",
+    "updatedAt": "2025-03-30T04:52:52.062Z",
+    "isActive": true
+  },
+  {
+    "id": "b6af6b2b-ce51-418c-855b-cca4434f151d",
+    "title": "CDC Dual Occupancy",
+    "path": "/initial-assessment/pre-prepared/cdc-dual-occupancy",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:51:20.001Z",
+        "filename": "b6af6b2b-ce51-418c-855b-cca4434f151d-v1.docx",
+        "originalName": "CDC Dwelling.docx",
+        "size": 31277,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-30T09:25:56.377Z",
+        "filename": "b6af6b2b-ce51-418c-855b-cca4434f151d-v2.pdf",
+        "originalName": "Invoice INV-2127.pdf",
+        "size": 57200,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-03-28T13:51:20.001Z",
+    "updatedAt": "2025-03-30T09:25:56.377Z",
+    "isActive": true
+  },
+  {
+    "id": "459f90ca-34a4-4309-9459-91abaa0b0c41",
+    "title": "CDC Secondary",
+    "path": "/initial-assessment/pre-prepared/cdc-secondary-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:51:37.467Z",
+        "filename": "459f90ca-34a4-4309-9459-91abaa0b0c41-v1.pdf",
+        "originalName": "Receipt-2084-2253.pdf",
+        "size": 309881,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:51:37.467Z",
+    "updatedAt": "2025-03-28T13:51:37.467Z",
+    "isActive": true
+  }
+]

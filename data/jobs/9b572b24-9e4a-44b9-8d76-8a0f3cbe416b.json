@@ -1,0 +1,217 @@
+{
+  "id": "9b572b24-9e4a-44b9-8d76-8a0f3cbe416b",
+  "address": "17 Hillview Avenue Bankstown",
+  "council": "Canterbury-Bankstown",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-03-26T04:48:31.234Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.044362937587,
+      "latitude": -33.913681024645
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "249628",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/23/2023",
+            "Amendment": "Null",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "OBJECTID": "229901",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Layer Class": "0.5-0.54",
+            "Floor Space Ratio": "0.5",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "313732",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Maximum Building Height": "9",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "9",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "789091",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "412825",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/14/2024",
+            "Amendment": "Null",
+            "Layer Class": "450-474",
+            "Lot Size": "450",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "193851",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/23/2023",
+            "Amendment": "Null",
+            "Map Type": "CAP",
+            "Type": "Clause Application",
+            "Class": "Area 1",
+            "Description": "Clauses of the LEP Apply",
+            "Label": "Area 1",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "certificate-of-title": {
+      "filename": "certificate-of-title_1742975598606_Invoice INV-2120.pdf",
+      "originalName": "Invoice INV-2120.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-26T07:53:18.607Z",
+      "size": 57934
+    },
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1742975565386_250260.pdf",
+      "originalName": "250260.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-26T07:52:45.387Z",
+      "size": 177808
+    },
+    "survey-plan": {
+      "filename": "survey-plan_1742975548217_Invoice INV-2120.pdf",
+      "originalName": "Invoice INV-2120.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-26T07:52:28.218Z",
+      "size": 57934
+    },
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report_1743175775355_CDC Secondary Dwelling.pdf",
+      "originalName": "CDC Secondary Dwelling.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-28T15:29:35.357Z",
+      "size": 19
+    }
+  },
+  "initialAssessment": {
+    "jobId": "9b572b24-9e4a-44b9-8d76-8a0f3cbe416b",
+    "uploadedDocuments": {
+      "certificate-of-title": {
+        "originalName": "Invoice INV-2120.pdf",
+        "uploadedAt": "2025-03-26T07:53:18.607Z"
+      },
+      "10-7-certificate": {
+        "originalName": "250260.pdf",
+        "uploadedAt": "2025-03-26T07:52:45.387Z"
+      },
+      "survey-plan": {
+        "originalName": "Invoice INV-2120.pdf",
+        "uploadedAt": "2025-03-26T07:52:28.218Z"
+      }
+    },
+    "selectedTab": "manual",
+    "status": "paid",
+    "createdAt": "2025-03-27T00:17:36.090Z",
+    "updatedAt": "2025-03-27T00:17:36.112Z",
+    "type": "cdc-dual-occupancy",
+    "purchasedAssessment": "cdc-secondary-dwelling"
+  },
+  "manualSubmission": {
+    "developmentType": "Dual Occupancy",
+    "additionalNotes": "acvevwevwe",
+    "status": "payment",
+    "updatedAt": "2025-03-26T07:44:56.058Z"
+  }
+}

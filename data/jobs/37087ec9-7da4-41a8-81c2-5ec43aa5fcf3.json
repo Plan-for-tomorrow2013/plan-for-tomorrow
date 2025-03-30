@@ -1,0 +1,151 @@
+{
+  "id": "37087ec9-7da4-41a8-81c2-5ec43aa5fcf3",
+  "address": "322 Norton Street Leichhardt",
+  "council": "Inner West",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-03-28T00:51:41.542Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.155874687785,
+      "latitude": -33.876216976846
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "268832",
+            "EPI Name": "Inner West Local Environmental Plan 2022",
+            "LGA Name": "INNER WEST",
+            "Published Date": "11/22/2024",
+            "Commenced Date": "11/22/2024",
+            "Currency Date": "11/22/2024",
+            "Amendment": "Map Amendment No 2",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio Additional Controls",
+          "attributes": {
+            "Legislative Area": "Area 1",
+            "Legislative Clause": "Clause 4.4 A"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "Null"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "1"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "771253",
+            "EPI Name": "Inner West Local Environmental Plan 2022",
+            "LGA Name": "INNER WEST",
+            "Published Date": "4/28/2023",
+            "Commenced Date": "4/28/2023",
+            "Currency Date": "11/22/2024",
+            "Amendment": "Map Amendment No 1",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Local Centre",
+            "Zone": "E1",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "32579",
+            "EPI Name": "Inner West Local Environmental Plan 2022",
+            "LGA Name": "INNER WEST",
+            "Published Date": "11/22/2024",
+            "Commenced Date": "11/22/2024",
+            "Currency Date": "11/22/2024",
+            "Amendment": "Map Amendment No 2",
+            "Class": "Class 5",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": [
+        {
+          "layer": "Additional Permitted Uses",
+          "attributes": {
+            "OBJECTID": "61390",
+            "EPI Name": "Inner West Local Environmental Plan 2022",
+            "LGA Name": "INNER WEST",
+            "Published Date": "4/28/2023",
+            "Commenced Date": "4/28/2023",
+            "Currency Date": "11/22/2024",
+            "Amendment": "Map Amendment No 1",
+            "LABEL": "51",
+            "Code": "51",
+            "Legislative Clause": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Key Sites",
+          "attributes": {
+            "OBJECTID": "28059",
+            "EPI Name": "Inner West Local Environmental Plan 2022",
+            "LGA Name": "INNER WEST",
+            "Published Date": "11/22/2024",
+            "Commenced Date": "11/22/2024",
+            "Currency Date": "11/22/2024",
+            "Amendment": "Map Amendment No 2",
+            "Class": "Key Sites",
+            "Label": "Area 1",
+            "Legislative Clause": "Clauses 4.3C, 4.4, 6.14, 6.15",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "initialAssessmentStatus": "completed",
+  "purchasedAssessment": "cdc-secondary-dwelling",
+  "documents": {
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report_1743173827543_CDC Dual Occupancy.pdf",
+      "originalName": "CDC Dual Occupancy.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-28T14:57:07.545Z",
+      "size": 19
+    },
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1743174238532_ATLReport.pdf",
+      "originalName": "ATLReport.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-28T15:03:58.534Z",
+      "size": 21383
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "purchasedAssessment": "cdc-dual-occupancy",
+    "type": "custom",
+    "createdAt": "2025-03-28T15:04:11.482Z",
+    "updatedAt": "2025-03-28T15:04:11.482Z"
+  }
+}

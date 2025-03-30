@@ -1,0 +1,343 @@
+{
+  "id": "d06df8ea-b371-490a-9230-0bbad92a2eaa",
+  "address": "458 Bells Line of Road, Kurmond",
+  "council": "Hawkesbury",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-03-25T04:55:45.338Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.696134842325,
+      "latitude": -33.552389900923
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "20",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "2/28/2019",
+            "Commenced Date": "2/28/2019",
+            "Currency Date": "2/28/2019",
+            "Amendment": "State Environmental Planning Policy (Sydney Region Growth Centres) Amendment (Miscellaneous) 2019",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "792892",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "7/7/2023",
+            "Commenced Date": "7/7/2023",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Map Amendment No 4",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Primary Production",
+            "Zone": "RU1",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "244402",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "9/30/2021",
+            "Commenced Date": "9/30/2021",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Amendment No 29",
+            "Maximum Building Height": "10",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "10",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "311121",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "12/22/2021",
+            "Commenced Date": "6/30/2022",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Amendment No 31",
+            "Layer Class": "10-49.9",
+            "Lot Size": "10",
+            "Units": "ha",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "3636",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "9/21/2012",
+            "Commenced Date": "9/21/2012",
+            "Currency Date": "2/28/2019",
+            "Amendment": "Null",
+            "Class": "Class 5",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Terrestrial Biodiversity",
+          "attributes": {
+            "OBJECTID": "84782",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "9/21/2012",
+            "Commenced Date": "9/21/2012",
+            "Currency Date": "2/28/2019",
+            "Amendment": "Null",
+            "Class": "Significant Vegetation",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "91737",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "9/21/2012",
+            "Commenced Date": "9/21/2012",
+            "Currency Date": "1/16/2015",
+            "Amendment": "Null",
+            "Map Type": "LAV",
+            "Type": "Minimum Lot Size for a Lot Averaging Subdivision",
+            "Class": "2.5 ha",
+            "Description": "2.5 ha",
+            "Label": "2.5 ha",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "debug": [
+        {
+          "layer": "Local Environmental Plan",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Layer Class",
+            "Legislative Area",
+            "Legislative Clause",
+            "Legislative Value",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "20",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "2/28/2019",
+            "Commenced Date": "2/28/2019",
+            "Currency Date": "2/28/2019",
+            "Amendment": "State Environmental Planning Policy (Sydney Region Growth Centres) Amendment (Miscellaneous) 2019",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "MAP_NAME",
+            "Land Use",
+            "Zone",
+            "Purpose",
+            "Additional Controls",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "792892",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "7/7/2023",
+            "Commenced Date": "7/7/2023",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Map Amendment No 4",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Primary Production",
+            "Zone": "RU1",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Maximum Building Height",
+            "Units",
+            "Additional Controls",
+            "Legislative Clause",
+            "EPI Type",
+            "SHAPE",
+            "MAX_B_H_M",
+            "MAX_B_H_RL"
+          ],
+          "sampleData": {
+            "OBJECTID": "244402",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "9/30/2021",
+            "Commenced Date": "9/30/2021",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Amendment No 29",
+            "Maximum Building Height": "10",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "10",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Layer Class",
+            "Lot Size",
+            "Units",
+            "Additional Controls",
+            "Legislative Clause",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "311121",
+            "EPI Name": "Hawkesbury Local Environmental Plan 2012",
+            "LGA Name": "HAWKESBURY",
+            "Published Date": "12/22/2021",
+            "Commenced Date": "6/30/2022",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Amendment No 31",
+            "Layer Class": "10-49.9",
+            "Lot Size": "10",
+            "Units": "ha",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio",
+          "fields": [],
+          "sampleData": null
+        },
+        {
+          "layer": "Heritage",
+          "fields": [],
+          "sampleData": null
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1743026033084_Updated Contract_compressed.pdf",
+      "originalName": "Updated Contract_compressed.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-26T21:53:53.133Z",
+      "size": 14910652
+    },
+    "certificate-of-title": {
+      "filename": "certificate-of-title_1742972568955_2025 Women's Cap Prem - Draft Draw.pdf",
+      "originalName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-26T07:02:48.956Z",
+      "size": 287213
+    },
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report_1743221514523_2025 Women's Cap Prem - Draft Draw.pdf",
+      "originalName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-29T04:11:54.525Z",
+      "size": 287213
+    }
+  },
+  "initialAssessment": {
+    "jobId": "d06df8ea-b371-490a-9230-0bbad92a2eaa",
+    "uploadedDocuments": {
+      "10-7-certificate": {
+        "originalName": "Updated Contract_compressed.pdf",
+        "uploadedAt": "2025-03-26T21:53:53.133Z"
+      },
+      "certificate-of-title": {
+        "originalName": "2025 Women's Cap Prem - Draft Draw.pdf",
+        "uploadedAt": "2025-03-26T07:02:48.956Z"
+      }
+    },
+    "selectedTab": "manual",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:11:29.685Z",
+    "updatedAt": "2025-03-29T04:11:29.685Z",
+    "type": "custom",
+    "purchasedAssessment": "cdc-dual-occupancy"
+  }
+}

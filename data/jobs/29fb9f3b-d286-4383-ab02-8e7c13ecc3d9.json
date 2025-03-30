@@ -1,0 +1,148 @@
+{
+  "id": "29fb9f3b-d286-4383-ab02-8e7c13ecc3d9",
+  "address": "1 Meyler Close Little Bay",
+  "council": "Randwick",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-03-27T20:43:38.988Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.246930570922,
+      "latitude": -33.981882056213
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "250604",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "0.75"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "321824",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Maximum Building Height": "8",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "8",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Heritage",
+          "attributes": {
+            "OBJECTID": "193365",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "12/8/2023",
+            "Amendment": "Amendment No 9",
+            "Heritage Type": "Conservation Area - Aboriginal",
+            "Item Number": "AH1",
+            "Item Name": "Aboriginal objects and Aboriginal place of heritage significance within the Former Prince Henry Hospital site",
+            "Significance": "State",
+            "Legislative Clause": "Clause 5.10",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Heritage",
+          "attributes": {
+            "OBJECTID": "193427",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "12/8/2023",
+            "Amendment": "Amendment No 9",
+            "Heritage Type": "Conservation Area - General",
+            "Item Number": "C6",
+            "Item Name": "Prince Henry Hospital Site",
+            "Significance": "State",
+            "Legislative Clause": "Clause 5.10",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "795910",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "General Residential",
+            "Zone": "R1",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": []
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1743108238426_A506023_02_AL-52072_02.pdf",
+      "originalName": "A506023_02_AL-52072_02.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-27T20:43:58.428Z",
+      "size": 31649
+    },
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report_1743222227341_ATLReport (1).pdf",
+      "originalName": "ATLReport (1).pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-29T04:23:47.342Z",
+      "size": 21383
+    }
+  },
+  "initialAssessment": {
+    "status": "completed",
+    "type": "custom",
+    "developmentType": "AB",
+    "additionalInfo": "",
+    "formData": {
+      "developmentType": "ABC",
+      "additionalInfo": ""
+    },
+    "createdAt": "2025-03-29T04:22:34.588Z",
+    "updatedAt": "2025-03-29T04:22:34.588Z"
+  }
+}

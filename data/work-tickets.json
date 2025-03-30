@@ -1,0 +1,263 @@
+[
+  {
+    "id": "3ff11d97-8b80-477c-9441-bf541c79764d",
+    "jobId": "cf0df1ae-5703-4d86-9813-91206329876f",
+    "jobAddress": "128 EBLEY STREET BONDI JUNCTION",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T00:34:59.887Z",
+    "customAssessment": {
+      "developmentType": "Test the workflow to tickets",
+      "additionalInfo": "test",
+      "documents": {
+        "certificate107": "CDC Dwelling.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "CDC Secondary Dwelling (2).pdf",
+      "uploadedAt": "2025-03-29T00:48:32.481Z"
+    }
+  },
+  {
+    "id": "4f936d3e-2d47-4c81-9cab-3e71143a08e6",
+    "jobId": "7ec65841-5304-49d3-9c90-57e92c8aad48",
+    "jobAddress": " 43 FARMBOROUGH RD, UNANDERRA",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T00:59:31.603Z",
+    "customAssessment": {
+      "developmentType": "TEST for workflow",
+      "additionalInfo": "abcdefg",
+      "documents": {
+        "certificateOfTitle": "CDC Dwelling Assessment.pdf",
+        "certificate107": "CDC Dwelling.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "ATLReport.pdf",
+      "uploadedAt": "2025-03-29T01:00:12.021Z"
+    }
+  },
+  {
+    "id": "5211af4c-9dc7-4ccb-88e4-7bcc30e198b2",
+    "jobId": "dd31da90-8a6c-41c6-a9b2-d9587f712a0e",
+    "jobAddress": "23 Curtis Road, Chester Hill",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T01:18:29.707Z",
+    "customAssessment": {
+      "developmentType": "x",
+      "additionalInfo": "yza",
+      "documents": {
+        "certificate107": "CDC Secondary Dwelling (2).pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "ATLReport.pdf",
+      "uploadedAt": "2025-03-29T01:18:46.660Z",
+      "returnedAt": "2025-03-29T01:30:32.395Z"
+    }
+  },
+  {
+    "id": "baa7c65d-6c1a-41bc-aa12-47d18665d89d",
+    "jobId": "d06df8ea-b371-490a-9230-0bbad92a2eaa",
+    "jobAddress": "458 Bells Line of Road, Kurmond",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:11:29.681Z",
+    "customAssessment": {
+      "developmentType": "x",
+      "additionalInfo": "y",
+      "documents": {
+        "certificateOfTitle": "2025 Women's Cap Prem - Draft Draw.pdf",
+        "certificate107": "Updated Contract_compressed.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:11:50.674Z",
+      "returnedAt": "2025-03-29T04:11:54.526Z"
+    }
+  },
+  {
+    "id": "5eab2f80-b67a-4bb7-beae-90894cee2943",
+    "jobId": "0f8e90df-e3aa-4683-8fa9-cd809012fed0",
+    "jobAddress": "334 NORTON STREET LEICHHARDT",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:19:04.280Z",
+    "customAssessment": {
+      "developmentType": "abcd",
+      "additionalInfo": "efgh",
+      "documents": {
+        "certificateOfTitle": "Invoice INV-2127.pdf",
+        "certificate107": "ATLReport.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "CDC Dwelling.docx",
+      "uploadedAt": "2025-03-29T04:23:01.509Z",
+      "returnedAt": "2025-03-29T04:23:04.539Z"
+    }
+  },
+  {
+    "id": "57cd34eb-41d0-4c5e-96f5-a2ce3b5e41b2",
+    "jobId": "29fb9f3b-d286-4383-ab02-8e7c13ecc3d9",
+    "jobAddress": "1 Meyler Close Little Bay",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:22:34.584Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "A506023_02_AL-52072_02.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "ATLReport (1).pdf",
+      "uploadedAt": "2025-03-29T04:23:45.187Z",
+      "returnedAt": "2025-03-29T04:23:47.343Z"
+    }
+  },
+  {
+    "id": "1a5ce690-0b12-4f1b-91cb-27590b14ca80",
+    "jobId": "2e61a624-bbec-487a-9bba-bbc2eff22fa2",
+    "jobAddress": "17 Jane Street Randwick",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:26:23.382Z",
+    "customAssessment": {
+      "developmentType": "1",
+      "additionalInfo": "2",
+      "documents": {
+        "certificate107": "ATLReport (1).pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:26:45.095Z",
+      "returnedAt": "2025-03-29T04:26:48.611Z"
+    }
+  },
+  {
+    "id": "bb145cc8-99d2-46ed-8397-ee7fab0e6f92",
+    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
+    "jobAddress": "3 Arilla Street Nowra ",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:29:31.665Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "ATLReport (1).pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "ATLReport (1).pdf",
+      "uploadedAt": "2025-03-29T04:29:51.149Z",
+      "returnedAt": "2025-03-29T04:29:57.477Z"
+    }
+  },
+  {
+    "id": "5beb7b80-2dd3-424a-8f7d-c37be6846ac6",
+    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
+    "jobAddress": "3 Arilla Street Nowra ",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:33:08.355Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "x",
+      "documents": {
+        "certificate107": "ATLReport (1).pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:33:45.405Z",
+      "returnedAt": "2025-03-29T04:33:51.526Z"
+    }
+  },
+  {
+    "id": "2cbe121a-761a-4714-b247-17d0c1e0ee93",
+    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
+    "jobAddress": "3 Arilla Street Nowra ",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:36:52.687Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "ATLReport (1).pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:37:08.492Z",
+      "returnedAt": "2025-03-29T04:37:13.277Z"
+    }
+  },
+  {
+    "id": "d5ed2af0-8d94-4bc2-b04b-00b8f9bc117a",
+    "jobId": "80138e20-a2b3-4dbc-babe-2c3f02e128ea",
+    "jobAddress": "17 Hillview Avenue, Bankstown",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:38:10.083Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "ATLReport.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:38:26.366Z",
+      "returnedAt": "2025-03-29T04:38:30.558Z"
+    }
+  },
+  {
+    "id": "c2b5793b-912e-4d0a-b8ec-38b4bf11739d",
+    "jobId": "6f2a67cd-74f7-4e62-929f-c0c49dbd2f45",
+    "jobAddress": "42 Grand View Parade, Lake Heights",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:49:38.697Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "CDC Dwelling.docx"
+      }
+    },
+    "completedDocument": {
+      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
+      "uploadedAt": "2025-03-29T04:49:54.678Z",
+      "returnedAt": "2025-03-29T04:50:02.023Z"
+    }
+  },
+  {
+    "id": "0083ce6d-5060-4722-99f8-e6ae58c95469",
+    "jobId": "c6d17816-803e-4477-b17b-280cab9d2f85",
+    "jobAddress": "2 Thorne Avenue Pendle Hill",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-29T04:58:13.559Z",
+    "customAssessment": {
+      "developmentType": "a",
+      "additionalInfo": "b",
+      "documents": {
+        "certificate107": "CDC Secondary Dwelling.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "ATLReport (1).pdf",
+      "uploadedAt": "2025-03-29T04:58:30.923Z",
+      "returnedAt": "2025-03-29T04:58:36.541Z"
+    }
+  }
+]

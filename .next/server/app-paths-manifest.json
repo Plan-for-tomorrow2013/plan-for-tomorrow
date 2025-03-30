@@ -1,0 +1,7 @@
+{
+  "/dashboard/page": "app/dashboard/page.js",
+  "/initial-assessment/page": "app/initial-assessment/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/document-store/page": "app/admin/document-store/page.js",
+  "/admin/initial-assessment/page": "app/admin/initial-assessment/page.js"
+}

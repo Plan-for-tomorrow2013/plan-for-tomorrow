@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { FileText, Menu, FileCheck, BellRing, ClipboardCheck } from 'lucide-react'
+import { FileText, Menu, FileCheck, BellRing, ClipboardCheck, BookOpen } from 'lucide-react'
 
 export default function AdminLayout({
   children,
@@ -16,11 +16,6 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const navItems = [
-    {
-      title: 'Document Store',
-      href: '/admin/document-store',
-      icon: FileText
-    },
     {
       title: 'Work Tickets',
       href: '/admin/work-tickets',
@@ -36,9 +31,18 @@ export default function AdminLayout({
       href: '/admin/announcements',
       icon: BellRing
     },
-    // Add more nav items here as we expand the admin section
+    {
+      title: 'Report Writer',
+      href: '/admin/report-writer',
+      icon: FileText
+    },
+    {
+      title: 'Knowledge Base',
+      href: '/admin/knowledge-base',
+      icon: BookOpen
+    }, // Add more nav items here as we expand the admin section
   ]
-
+  
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Top Bar */}

@@ -7,14 +7,16 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { documentService } from '@/lib/services/documentService'
 import { Document, DocumentVersion } from '@/types/documents'
+import { AssessmentType, DEFAULT_ASSESSMENT_TYPES } from '@/types/assessments'
 import { toast } from '@/components/ui/use-toast'
-import { FileText, History, Upload, Trash2 } from 'lucide-react'
+import { FileText, History, Upload, Trash2, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import {
   Select,
@@ -39,26 +41,14 @@ interface AdminDocument extends Document {
   isEditing?: boolean
 }
 
-const AVAILABLE_PATHS = [
-  { 
-    value: '/initial-assessment/pre-prepared/cdc-dwelling', 
-    label: 'CDC Dwelling Assessment',
-    id: 'cdc-dwelling'
-  },
-  { 
-    value: '/initial-assessment/pre-prepared/cdc-dual-occupancy', 
-    label: 'CDC Dual Occupancy Assessment',
-    id: 'cdc-dual-occupancy'
-  },
-  { 
-    value: '/initial-assessment/pre-prepared/cdc-secondary-dwelling', 
-    label: 'CDC Secondary Dwelling Assessment',
-    id: 'cdc-secondary-dwelling'
-  }
-]
-
 export default function AdminInitialAssessmentPage() {
   const [documents, setDocuments] = useState<AdminDocument[]>([])
+  const [customPaths, setCustomPaths] = useState<AssessmentType[]>([])
+  const [newAssessmentDialog, setNewAssessmentDialog] = useState(false)
+  const [newAssessment, setNewAssessment] = useState({
+    label: '',
+    id: ''
+  })
   const [newDocument, setNewDocument] = useState({
     title: '',
     path: '',
@@ -68,8 +58,11 @@ export default function AdminInitialAssessmentPage() {
   const [versionHistory, setVersionHistory] = useState<DocumentVersion[]>([])
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
 
+  const AVAILABLE_PATHS = [...DEFAULT_ASSESSMENT_TYPES, ...customPaths]
+
   useEffect(() => {
     loadDocuments()
+    loadCustomPaths()
   }, [])
 
   useEffect(() => {
@@ -91,6 +84,70 @@ export default function AdminInitialAssessmentPage() {
       toast({
         title: 'Error',
         description: 'Failed to load documents',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  const loadCustomPaths = async () => {
+    try {
+      const response = await fetch('/api/assessment-types')
+      if (response.ok) {
+        const data = await response.json()
+        setCustomPaths(data.customTypes || [])
+      }
+    } catch (error) {
+      console.error('Error loading custom assessment types:', error)
+    }
+  }
+
+  const handleAddAssessment = async () => {
+    if (!newAssessment.label) return
+
+    const id = newAssessment.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    const assessmentType: AssessmentType = {
+      id: id,
+      value: `/initial-assessment/pre-prepared/${id}`,
+      label: newAssessment.label,
+      description: `Complying Development Certificate for ${newAssessment.label.toLowerCase()}`,
+      documentId: id,
+      version: 1,
+      file: `/documents/${id}.pdf`
+    }
+
+    console.log('Attempting to create assessment type:', assessmentType)
+
+    try {
+      const response = await fetch('/api/assessment-types', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentType),
+      })
+
+      const data = await response.json()
+      console.log('API response:', data)
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save assessment type')
+      }
+
+      const updatedPaths = [...customPaths, assessmentType]
+      setCustomPaths(updatedPaths)
+      
+      setNewAssessment({ label: '', id: '' })
+      setNewAssessmentDialog(false)
+      
+      toast({
+        title: 'Success',
+        description: 'New assessment type added successfully'
+      })
+    } catch (error) {
+      console.error('Error saving assessment type:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to save assessment type',
         variant: 'destructive'
       })
     }
@@ -199,16 +256,49 @@ export default function AdminInitialAssessmentPage() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-4">Administration Document Store</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-semibold">Initial Assessment Document Management</h1>
+          <Dialog open={newAssessmentDialog} onOpenChange={setNewAssessmentDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Assessment Type
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Assessment Type</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Assessment Name</label>
+                  <Input
+                    placeholder="e.g., CDC Commercial Assessment"
+                    value={newAssessment.label}
+                    onChange={(e) => setNewAssessment(prev => ({ ...prev, label: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={handleAddAssessment}
+                  disabled={!newAssessment.label}
+                >
+                  Add Assessment
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
         <p className="text-muted-foreground">
-          Manage documents and assessment templates across different sections of the application.
+          Manage CDC assessment templates and related documents for different dwelling types.
         </p>
       </div>
 
       {/* Upload Form */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Upload New Document</CardTitle>
+          <CardTitle>Upload New Assessment Template</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -273,134 +363,59 @@ export default function AdminInitialAssessmentPage() {
         </CardContent>
       </Card>
 
-      {/* Document List */}
-      <div className="space-y-6">
-        {AVAILABLE_PATHS.map((pathGroup) => {
-          const pathDocuments = documents.filter(doc => doc.path === pathGroup.value)
-          if (pathDocuments.length === 0) return null
+      {/* Assessment Tiles */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {AVAILABLE_PATHS.map((assessment) => {
+          const doc = documents.find(d => d.path === assessment.value)
+          // Get the latest version by finding the one with the highest version number
+          const latestVersion = doc?.versions?.reduce<DocumentVersion | null>((latest, current) => 
+            (latest?.version || 0) < current.version ? current : latest
+          , null);
 
           return (
-            <div key={pathGroup.value}>
-              <h2 className="text-lg font-semibold mb-4">{pathGroup.label}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pathDocuments.map((doc) => (
-                  <Card key={doc.id}>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-lg">{doc.title}</CardTitle>
-                          <p className="text-sm text-muted-foreground">
-                            Version {doc.currentVersion}
-                          </p>
-                          {doc.versions.length > 0 && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              <FileText className="h-4 w-4 inline mr-1" />
-                              {doc.versions[doc.versions.length - 1].originalName}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewVersions(doc)}
-                              >
-                                <History className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Version History</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                {versionHistory.map((version) => (
-                                  <div
-                                    key={version.version}
-                                    className="flex items-center justify-between p-2 border rounded"
-                                  >
-                                    <div>
-                                      <p className="font-medium">Version {version.version}</p>
-                                      <p className="text-sm text-muted-foreground">
-                                        {new Date(version.uploadedAt).toLocaleDateString()}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <FileText className="h-4 w-4" />
-                                      <span className="text-sm">{version.originalName}</span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Input
-                            type="file"
-                            accept=".pdf,.doc,.docx"
-                            className="hidden"
-                            id={`file-${doc.id}`}
-                            onChange={(e) => {
-                              const file = e.target.files?.[0]
-                              if (file) handleUpdateDocument(doc, file)
-                            }}
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
-                          >
-                            <Upload className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Document</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete "{doc.title}"? This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-500 hover:bg-red-700"
-                                  onClick={() => handleDeleteDocument(doc)}
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-sm text-muted-foreground">
-                        Last Updated: {new Date(doc.updatedAt).toLocaleDateString()}
-                      </div>
-                      {doc.required && (
-                        <div className="mt-2 text-sm font-medium text-orange-600">
-                          Required Document
-                        </div>
-                      )}
-                      {doc.adminOnly && (
-                        <div className="mt-2 text-sm font-medium text-blue-600">
-                          Admin Only
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+            <div key={assessment.value} className="bg-white rounded-lg p-6">
+              <h3 className="font-medium">{assessment.label.replace(' Assessment', '')}</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Complying Development Certificate for a {assessment.label.toLowerCase().replace(' assessment', '')}
+              </p>
+              <div className="mt-2">
+                {doc ? (
+                  <>
+                    <div className="flex items-center text-sm text-green-600">
+                      <span>Document Available</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500 mt-2">
+                      <FileText className="h-4 w-4 mr-2" />
+                      <span>{latestVersion?.originalName || 'No filename available'}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      Version {doc.currentVersion} • Last Updated: {doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString() : 'N/A'}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <span>No document uploaded</span>
+                  </div>
+                )}
               </div>
+              <input
+                type="file"
+                id={`file-${assessment.id}`}
+                className="hidden"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file && doc) {
+                    handleUpdateDocument(doc, file)
+                  }
+                }}
+              />
+              <Button 
+                className="w-full mt-4 bg-[#0F172A] hover:bg-[#0F172A]/90 text-white"
+                onClick={() => document.getElementById(`file-${assessment.id}`)?.click()}
+              >
+                Replace Document
+              </Button>
             </div>
           )
         })}

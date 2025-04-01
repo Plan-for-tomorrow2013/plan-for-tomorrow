@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { DocumentStore } from "@/components/DocumentStore"
 import { DocumentUpload } from "@/components/DocumentUpload"
-import { Document } from "@/lib/services/documentService"
+import { Document } from "@/types/documents"
 import { paymentService } from "@/lib/services/paymentService"
 import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
@@ -23,7 +23,7 @@ export default function ReportWriterPage() {
     setShowUploadDialog(false)
     toast({
       title: "Document Selected",
-      description: `Selected ${document.name} for report generation`
+      description: `Selected ${document.title} for report generation`
     })
   }
 
@@ -48,7 +48,7 @@ export default function ReportWriterPage() {
         type,
         metadata: {
           documentId: selectedDocument?.id,
-          documentName: selectedDocument?.name
+          documentName: selectedDocument?.title
         }
       })
 
@@ -167,10 +167,10 @@ export default function ReportWriterPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{selectedDocument.type}</Badge>
-                    <span className="text-sm">{selectedDocument.name}</span>
+                    <span className="text-sm">{selectedDocument.title}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Uploaded on {selectedDocument.uploadedAt.toLocaleDateString()}
+                    Last updated: {new Date(selectedDocument.updatedAt).toLocaleDateString()}
                   </p>
                 </div>
               ) : (

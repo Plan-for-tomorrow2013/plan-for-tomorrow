@@ -10,22 +10,9 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Document Store</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Manage pre-prepared assessment documents that will be available for users to download.
-          </p>
-          <a 
-            href="/admin/document-store" 
-            className="text-sm text-blue-500 hover:text-blue-700"
-          >
-            Go to Document Store →
-          </a>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-2">Work Tickets</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            View and manage work tickets for custom assessments and other tasks.
+            View and manage work tickets for initial assessments & reports and other tasks.
           </p>
           <a 
             href="/admin/work-tickets" 
@@ -45,6 +32,32 @@ export default function AdminPage() {
             className="text-sm text-blue-500 hover:text-blue-700"
           >
             Go to Initial Assessment →
+          </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Report Writer</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage report writer submissions from users.
+          </p>
+          <a 
+            href="/admin/report-writer" 
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to Report Writer →
+          </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Knowledge Base</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage the knowledge base.
+          </p>
+          <a 
+            href="/admin/knowledge-base" 
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to Knowledge Base →
           </a>
         </div>
 

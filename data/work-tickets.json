@@ -259,5 +259,25 @@
       "uploadedAt": "2025-03-29T04:58:30.923Z",
       "returnedAt": "2025-03-29T04:58:36.541Z"
     }
+  },
+  {
+    "id": "19a0b7a2-52c1-4fd7-a688-08fc234ecd66",
+    "jobId": "1eac3438-7171-4646-9a39-30fae26d5e57",
+    "jobAddress": "2 Thorne Avenue, Pendle Hill",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-03-30T22:23:41.410Z",
+    "customAssessment": {
+      "developmentType": "Dual Occupancy",
+      "additionalInfo": "sdvpinrbpiernbepr",
+      "documents": {
+        "certificate107": "Microsoft.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "CDC Secondary Dwelling.pdf",
+      "uploadedAt": "2025-03-30T22:24:12.186Z",
+      "returnedAt": "2025-03-30T22:24:14.837Z"
+    }
   }
 ]

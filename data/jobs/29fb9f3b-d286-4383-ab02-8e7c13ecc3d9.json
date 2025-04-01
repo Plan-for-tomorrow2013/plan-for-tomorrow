@@ -131,6 +131,13 @@
       "type": "application/pdf",
       "uploadedAt": "2025-03-29T04:23:47.342Z",
       "size": 21383
+    },
+    "survey-plan": {
+      "filename": "survey-plan_1743457290221_20220502145832937.pdf",
+      "originalName": "20220502145832937.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-03-31T21:41:30.222Z",
+      "size": 98765
     }
   },
   "initialAssessment": {

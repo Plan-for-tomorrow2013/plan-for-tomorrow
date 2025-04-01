@@ -9,15 +9,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useJobs } from '@/hooks/useJobs'
 import Link from 'next/link'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Document, DOCUMENT_TYPES, PrePreparedAssessment } from '@/types/documents'
+import { Document, DOCUMENT_TYPES, DocumentVersion } from '@/types/documents'
+import { PrePreparedAssessment, DEFAULT_ASSESSMENT_TYPES } from '@/types/assessments'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from '@/components/ui/use-toast'
 import { documentService } from '@/lib/services/documentService'
+import { WorkTicket } from '@/types/workTickets'
+
+// Debug flag - set to true to enable console logging
+const DEBUG = true
+
+const debugLog = (...args: any[]) => {
+  if (DEBUG) {
+    console.log('[PrePrepared]', ...args)
+  }
+}
 
 interface DocumentWithStatus extends Document {
   status: 'uploaded' | 'pending' | 'required'
+  value?: string
   uploadedFile?: {
     filename: string
     originalName: string
@@ -37,55 +49,32 @@ interface JobFormData {
   [key: string]: CustomAssessmentForm
 }
 
-interface WorkTicket {
-  id: string
-  jobId: string
-  jobAddress: string
-  ticketType: 'custom-assessment' | 'pre-prepared-assessment'
-  status: 'pending' | 'in-progress' | 'completed'
-  createdAt: string
-  customAssessment?: {
-    developmentType: string
-    additionalInfo: string
-    documents: {
-      certificateOfTitle?: string
-      surveyPlan?: string
-      certificate107?: string
-    }
-  }
-  completedDocument?: {
-    fileName: string
-    uploadedAt: string
-    returnedAt?: string
-  }
-}
-
 const PRE_PREPARED_TYPES: PrePreparedAssessment[] = [
   {
     id: 'cdc-dwelling',
-    title: 'CDC Dwelling',
+    value: '/initial-assessment/pre-prepared/cdc-dwelling',
+    label: 'CDC Dwelling',
     description: 'Complying Development Certificate for a new dwelling',
     file: '/documents/cdc-dwelling.pdf',
     documentId: 'cdc-dwelling',
-    path: '/initial-assessment/pre-prepared/cdc-dwelling',
     version: 1
   },
   {
     id: 'cdc-dual-occupancy',
-    title: 'CDC Dual Occupancy',
+    value: '/initial-assessment/pre-prepared/cdc-dual-occupancy',
+    label: 'CDC Dual Occupancy',
     description: 'Complying Development Certificate for dual occupancy',
     file: '/documents/cdc-dual-occupancy.pdf',
     documentId: 'cdc-dual-occupancy',
-    path: '/initial-assessment/pre-prepared/cdc-dual-occupancy',
     version: 1
   },
   {
     id: 'cdc-secondary-dwelling',
-    title: 'CDC Secondary Dwelling',
+    value: '/initial-assessment/pre-prepared/cdc-secondary-dwelling',
+    label: 'CDC Secondary Dwelling',
     description: 'Complying Development Certificate for a secondary dwelling',
     file: '/documents/cdc-secondary-dwelling.pdf',
     documentId: 'cdc-secondary-dwelling',
-    path: '/initial-assessment/pre-prepared/cdc-secondary-dwelling',
     version: 1
   }
 ]
@@ -100,8 +89,11 @@ export default function InitialAssessmentPage() {
   const [formData, setFormData] = useState<JobFormData>({})
   const [showPaymentButton, setShowPaymentButton] = useState(false)
   const [paymentComplete, setPaymentComplete] = useState<Record<string, boolean>>({})
-  const [purchasedAssessments, setPurchasedAssessments] = useState<Record<string, string | undefined>>({})
+  const [purchasedAssessments, setPurchasedAssessments] = useState<Record<string, boolean>>({})
   const [workTickets, setWorkTickets] = useState<WorkTicket[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Set initial job ID from URL if present
   useEffect(() => {
@@ -152,7 +144,7 @@ export default function InitialAssessmentPage() {
           if (jobData.initialAssessment?.status === 'paid' && jobData.initialAssessment?.purchasedAssessment) {
             setPurchasedAssessments(prev => ({
               ...prev,
-              [selectedJobId]: jobData.initialAssessment.purchasedAssessment
+              [selectedJobId]: true
             }))
           }
         })
@@ -514,8 +506,8 @@ export default function InitialAssessmentPage() {
       // Simulate payment process
       await new Promise(resolve => setTimeout(resolve, 1000))
 
-      const document = allDocuments.find(doc => doc.path === assessment.path)
-      if (!document) {
+      const doc = documents.find(d => d.value === assessment.value || d.path === assessment.value)
+      if (!doc) {
         toast({
           title: "Error",
           description: "Document not found",
@@ -530,7 +522,7 @@ export default function InitialAssessmentPage() {
       
       // Create a simple PDF file with the assessment title
       const blob = new Blob(['Assessment Document'], { type: 'application/pdf' })
-      const file = new File([blob], `${assessment.title}.pdf`, { type: 'application/pdf' })
+      const file = new File([blob], `${assessment.label.replace(' Assessment', '')}.pdf`, { type: 'application/pdf' })
       formData.append('file', file)
 
       const documentResponse = await fetch(`/api/jobs/${selectedJobId}/documents/upload`, {
@@ -563,7 +555,7 @@ export default function InitialAssessmentPage() {
       // Update local state
       setPurchasedAssessments(prev => ({
         ...prev,
-        [selectedJobId]: assessment.id
+        [selectedJobId]: true
       }))
 
       // Refresh the documents list
@@ -666,7 +658,7 @@ export default function InitialAssessmentPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold">{doc.title}</h3>
-                <p className="text-sm text-gray-500">{doc.path}</p>
+                <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
               </div>
               <Check className="h-5 w-5 text-green-500" />
             </div>
@@ -703,7 +695,7 @@ export default function InitialAssessmentPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">{doc.title}</h3>
-              <p className="text-sm text-gray-500">{doc.path}</p>
+              <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
             </div>
             {doc.status === 'uploaded' ? (
               <Check className="h-5 w-5 text-green-500" />
@@ -877,68 +869,187 @@ export default function InitialAssessmentPage() {
     )
   }
 
-  const renderPrePreparedContent = () => {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {PRE_PREPARED_TYPES.map((assessment) => {
-          const uploadedDoc = allDocuments.find(doc => doc.path === assessment.path)
-          const isPurchased = selectedJobId && purchasedAssessments[selectedJobId] === assessment.id
+  const handlePurchase = async (ticket: WorkTicket) => {
+    try {
+      debugLog('Purchasing assessment from ticket:', {
+        id: ticket.id,
+        type: ticket.prePreparedAssessment?.assessmentType,
+        documentId: ticket.prePreparedAssessment?.documentId
+      })
+      
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-          if (isPurchased) {
-            return (
-              <div
-                key={assessment.id}
-                className="border rounded-lg p-4 bg-green-50"
-              >
-                <div className="text-center py-4">
-                  <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                  <h4 className="font-medium mb-2">Thank you for your payment!</h4>
-                  <p className="text-sm text-gray-600 mb-4">
-                    The assessment document has been added to your document store.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => handleDownload('initial-assessment-report')}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download Assessment
-                  </Button>
-                </div>
-              </div>
-            )
+      setPurchasedAssessments(prev => ({
+        ...prev,
+        [ticket.id]: true
+      }))
+
+      toast({
+        title: 'Success',
+        description: 'Assessment purchased successfully'
+      })
+    } catch (error) {
+      console.error('Error purchasing assessment:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to purchase assessment',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  // Load work tickets and poll for updates
+  useEffect(() => {
+    const loadWorkTickets = async (isPolling = false) => {
+      try {
+        setError(null)
+        // Only show loading state on initial load
+        if (!isPolling) {
+          setLoading(true)
+        }
+        debugLog('Starting to fetch work tickets...')
+        
+        const response = await fetch('/api/work-tickets')
+        debugLog('API Response status:', response.status, response.ok)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch work tickets')
+        }
+        
+        const tickets = await response.json()
+        debugLog('Raw API response:', tickets.length, 'tickets')
+
+        // First, filter out any non-pre-prepared tickets immediately
+        const onlyPrePrepared = tickets.filter((t: WorkTicket) => t.ticketType === 'pre-prepared-assessment')
+        debugLog('Pre-prepared tickets:', onlyPrePrepared.length)
+        
+        // Then filter for completed and valid tickets
+        const validTickets = onlyPrePrepared.filter((t: WorkTicket) => {
+          const isCompleted = t.status === 'completed'
+          const hasDocument = !!t.completedDocument
+          const isReturned = !!t.completedDocument?.returnedAt
+          const hasAssessmentType = !!t.prePreparedAssessment?.assessmentType
+
+          const isValid = isCompleted && hasDocument && isReturned && hasAssessmentType
+
+          if (!isValid) {
+            debugLog('Filtered out ticket:', {
+              id: t.id,
+              status: t.status,
+              failedChecks: {
+                status: !isCompleted ? 'not completed' : null,
+                document: !hasDocument ? 'no document' : null,
+                returned: !isReturned ? 'not returned' : null,
+                assessmentType: !hasAssessmentType ? 'no assessment type' : null
+              }
+            })
           }
 
-          return (
-            <div
-              key={assessment.id}
-              className="border rounded-lg p-4 hover:border-blue-500 transition-colors"
-            >
-              <h4 className="font-medium mb-2">{assessment.title}</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                {assessment.description}
-              </p>
-              
-              <div className="space-y-2">
-                {uploadedDoc && (
-                  <>
-                    <div className="flex items-center text-green-600">
-                      <Check className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Document Available</span>
-                    </div>
-                    {uploadedDoc.versions.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <FileText className="h-4 w-4" />
-                          {uploadedDoc.versions[uploadedDoc.versions.length - 1].originalName}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Version {uploadedDoc.currentVersion} • Last Updated: {new Date(uploadedDoc.updatedAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
+          return isValid
+        })
+
+        debugLog('Valid tickets after filtering:', {
+          total: tickets.length,
+          prePrepared: onlyPrePrepared.length,
+          valid: validTickets.length,
+          tickets: validTickets.map((t: WorkTicket) => ({
+            id: t.id,
+            type: t.prePreparedAssessment?.assessmentType,
+            status: t.status
+          }))
+        })
+
+        // Only update state if the tickets have actually changed
+        const ticketsChanged = JSON.stringify(validTickets) !== JSON.stringify(workTickets)
+        if (ticketsChanged) {
+          debugLog('Updating work tickets state - tickets have changed')
+          setWorkTickets(validTickets)
+        } else {
+          debugLog('No change in work tickets - skipping state update')
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        debugLog('Error loading work tickets:', {
+          error,
+          message: errorMessage
+        })
+        setError(errorMessage)
+        toast({
+          title: 'Error',
+          description: 'Failed to load assessment types',
+          variant: 'destructive'
+        })
+      } finally {
+        if (!isPolling) {
+          setLoading(false)
+        }
+        debugLog('Finished loading work tickets')
+      }
+    }
+
+    // Initial load
+    loadWorkTickets(false)
+    
+    // Set up polling with a shorter interval in debug mode
+    const interval = setInterval(() => {
+      debugLog('Polling for work ticket updates...')
+      loadWorkTickets(true)
+    }, DEBUG ? 2000 : 30000) // Reduced to 2 seconds in debug mode for faster updates
+    
+    return () => {
+      debugLog('Component unmounting, clearing interval')
+      clearInterval(interval)
+    }
+  }, [workTickets]) // Added workTickets to dependencies to properly compare changes
+
+  const renderPrePreparedContent = () => {
+    if (loading) {
+      return (
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border rounded-lg p-6">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    if (error) {
+      return (
+        <div className="container mx-auto p-6">
+          <h1 className="text-2xl font-semibold mb-4">Pre-Prepared Assessments</h1>
+          <div className="p-6 text-red-500">{error}</div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold mb-4">Pre-Prepared Assessments</h1>
+          <p className="text-muted-foreground">
+            Choose from our selection of pre-prepared assessment templates for common development types.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Default assessment types */}
+          {DEFAULT_ASSESSMENT_TYPES.map((assessment) => (
+            <Card key={assessment.value}>
+              <CardHeader>
+                <CardTitle>{assessment.label}</CardTitle>
+                <CardDescription>{assessment.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
                 <Button 
                   className="w-full"
                   onClick={() => handlePrePreparedPurchase(assessment)}
@@ -946,10 +1057,69 @@ export default function InitialAssessmentPage() {
                 >
                   Purchase Assessment
                 </Button>
-              </div>
-            </div>
-          )
-        })}
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Custom assessment types from work tickets */}
+          {workTickets.map((ticket) => {
+            if (!ticket.prePreparedAssessment) return null
+            const isPurchased = purchasedAssessments[ticket.id]
+
+            if (isPurchased) {
+              return (
+                <Card key={ticket.id} className="bg-green-50">
+                  <CardHeader>
+                    <CardTitle>{ticket.prePreparedAssessment.assessmentType}</CardTitle>
+                    <CardDescription>
+                      Complying Development Certificate for {ticket.prePreparedAssessment.assessmentType.toLowerCase()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-4">
+                      <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 mb-4">
+                        Assessment purchased successfully
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => handleDownload('initial-assessment-report')}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Download Assessment
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            }
+
+            return (
+              <Card key={ticket.id}>
+                <CardHeader>
+                  <CardTitle>{ticket.prePreparedAssessment.assessmentType}</CardTitle>
+                  <CardDescription>
+                    Complying Development Certificate for {ticket.prePreparedAssessment.assessmentType.toLowerCase()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center text-sm text-green-600 mb-4">
+                    <FileText className="h-4 w-4 mr-2" />
+                    <span>Document Available</span>
+                  </div>
+                  <Button 
+                    className="w-full"
+                    onClick={() => handlePurchase(ticket)}
+                    disabled={!selectedJobId}
+                  >
+                    Purchase Assessment
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
       </div>
     )
   }

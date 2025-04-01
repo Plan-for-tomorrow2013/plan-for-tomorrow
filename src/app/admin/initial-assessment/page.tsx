@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { documentService } from '@/lib/services/documentService'
 import { Document, DocumentVersion } from '@/types/documents'
 import { AssessmentType, DEFAULT_ASSESSMENT_TYPES } from '@/types/assessments'
+import { WorkTicket } from '@/types/workTickets'
 import { toast } from '@/components/ui/use-toast'
 import { FileText, History, Upload, Trash2, Plus } from 'lucide-react'
 import {
@@ -43,37 +44,20 @@ interface AdminDocument extends Document {
 
 export default function AdminInitialAssessmentPage() {
   const [documents, setDocuments] = useState<AdminDocument[]>([])
-  const [customPaths, setCustomPaths] = useState<AssessmentType[]>([])
+  const [workTickets, setWorkTickets] = useState<WorkTicket[]>([])
   const [newAssessmentDialog, setNewAssessmentDialog] = useState(false)
   const [newAssessment, setNewAssessment] = useState({
     label: '',
-    id: ''
-  })
-  const [newDocument, setNewDocument] = useState({
-    title: '',
-    path: '',
     id: ''
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [versionHistory, setVersionHistory] = useState<DocumentVersion[]>([])
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
 
-  const AVAILABLE_PATHS = [...DEFAULT_ASSESSMENT_TYPES, ...customPaths]
-
   useEffect(() => {
     loadDocuments()
-    loadCustomPaths()
+    loadWorkTickets()
   }, [])
-
-  useEffect(() => {
-    const selectedPath = AVAILABLE_PATHS.find(p => p.value === newDocument.path)
-    if (selectedPath) {
-      setNewDocument(prev => ({
-        ...prev,
-        id: selectedPath.id
-      }))
-    }
-  }, [newDocument.path])
 
   const loadDocuments = async () => {
     try {
@@ -89,65 +73,87 @@ export default function AdminInitialAssessmentPage() {
     }
   }
 
-  const loadCustomPaths = async () => {
+  const loadWorkTickets = async () => {
     try {
-      const response = await fetch('/api/assessment-types')
+      const response = await fetch('/api/work-tickets')
       if (response.ok) {
-        const data = await response.json()
-        setCustomPaths(data.customTypes || [])
+        const tickets = await response.json()
+        setWorkTickets(tickets.filter((t: WorkTicket) => t.ticketType === 'pre-prepared-assessment'))
       }
     } catch (error) {
-      console.error('Error loading custom assessment types:', error)
+      console.error('Error loading work tickets:', error)
     }
   }
 
   const handleAddAssessment = async () => {
-    if (!newAssessment.label) return
-
-    const id = newAssessment.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-    const assessmentType: AssessmentType = {
-      id: id,
-      value: `/initial-assessment/pre-prepared/${id}`,
-      label: newAssessment.label,
-      description: `Complying Development Certificate for ${newAssessment.label.toLowerCase()}`,
-      documentId: id,
-      version: 1,
-      file: `/documents/${id}.pdf`
-    }
-
-    console.log('Attempting to create assessment type:', assessmentType)
+    if (!newAssessment.label || !selectedFile) return
 
     try {
-      const response = await fetch('/api/assessment-types', {
+      // First, upload the document to the document store
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+      formData.append('metadata', JSON.stringify({
+        title: newAssessment.label,
+        type: 'pre-prepared-assessment',
+        category: 'ASSESSMENT'
+      }))
+
+      const uploadResponse = await fetch('/api/documents', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload document')
+      }
+
+      const uploadResult = await uploadResponse.json()
+      const documentId = uploadResult.id
+
+      // Create a work ticket for the pre-prepared assessment
+      const id = newAssessment.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      const workTicketResponse = await fetch('/api/work-tickets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(assessmentType),
+        body: JSON.stringify({
+          jobId: 'admin', // Special case for admin-created assessments
+          jobAddress: 'System',
+          ticketType: 'pre-prepared-assessment',
+          status: 'completed', // Set as completed immediately
+          prePreparedAssessment: {
+            assessmentType: newAssessment.label,
+            documentId: documentId
+          },
+          completedDocument: {
+            fileName: selectedFile.name,
+            uploadedAt: new Date().toISOString(),
+            returnedAt: new Date().toISOString() // Mark as immediately available
+          }
+        })
       })
 
-      const data = await response.json()
-      console.log('API response:', data)
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to save assessment type')
+      if (!workTicketResponse.ok) {
+        throw new Error('Failed to create work ticket')
       }
 
-      const updatedPaths = [...customPaths, assessmentType]
-      setCustomPaths(updatedPaths)
+      const workTicket = await workTicketResponse.json()
+      setWorkTickets(prev => [...prev, workTicket])
       
       setNewAssessment({ label: '', id: '' })
+      setSelectedFile(null)
       setNewAssessmentDialog(false)
-      
+
       toast({
         title: 'Success',
-        description: 'New assessment type added successfully'
+        description: 'Assessment type added successfully'
       })
     } catch (error) {
-      console.error('Error saving assessment type:', error)
+      console.error('Error adding assessment:', error)
       toast({
         title: 'Error',
-        description: 'Failed to save assessment type',
+        description: 'Failed to add assessment type',
         variant: 'destructive'
       })
     }
@@ -157,44 +163,6 @@ export default function AdminInitialAssessmentPage() {
     const file = event.target.files?.[0]
     if (file) {
       setSelectedFile(file)
-    }
-  }
-
-  const handleUpload = async () => {
-    if (!selectedFile || !newDocument.title || !newDocument.path) return
-
-    const formData = new FormData()
-    formData.append('file', selectedFile)
-    formData.append('metadata', JSON.stringify({
-      title: newDocument.title,
-      path: newDocument.path,
-      id: newDocument.id
-    }))
-
-    try {
-      const response = await fetch('/api/documents', {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!response.ok) throw new Error('Failed to upload document')
-
-      const result = await response.json()
-      setDocuments(prev => [...prev, result])
-      setNewDocument({ title: '', path: '', id: '' })
-      setSelectedFile(null)
-      
-      toast({
-        title: 'Success',
-        description: 'Document uploaded successfully'
-      })
-    } catch (error) {
-      console.error('Error uploading document:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to upload document',
-        variant: 'destructive'
-      })
     }
   }
 
@@ -235,19 +203,46 @@ export default function AdminInitialAssessmentPage() {
     }
   }
 
-  const handleDeleteDocument = async (document: Document) => {
+  const handleSetAvailable = async (ticket: WorkTicket) => {
     try {
-      await documentService.deleteDocument(document.id)
-      setDocuments(prev => prev.filter(doc => doc.id !== document.id))
+      // Update the work ticket to mark it as completed and available
+      const response = await fetch(`/api/work-tickets/${ticket.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'completed',
+          completedDocument: {
+            ...ticket.completedDocument,
+            fileName: ticket.prePreparedAssessment?.assessmentType + '.pdf',
+            uploadedAt: new Date().toISOString(),
+            returnedAt: new Date().toISOString()
+          }
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update work ticket')
+      }
+
+      // Refresh the work tickets list
+      const updatedTicketsResponse = await fetch('/api/work-tickets')
+      if (!updatedTicketsResponse.ok) {
+        throw new Error('Failed to fetch updated tickets')
+      }
+      const updatedTickets = await updatedTicketsResponse.json()
+      setWorkTickets(updatedTickets)
+
       toast({
         title: 'Success',
-        description: 'Document deleted successfully'
+        description: 'Assessment is now available'
       })
     } catch (error) {
-      console.error('Error deleting document:', error)
+      console.error('Error setting assessment available:', error)
       toast({
         title: 'Error',
-        description: 'Failed to delete document',
+        description: 'Failed to make assessment available',
         variant: 'destructive'
       })
     }
@@ -278,11 +273,24 @@ export default function AdminInitialAssessmentPage() {
                     onChange={(e) => setNewAssessment(prev => ({ ...prev, label: e.target.value }))}
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Assessment Document</label>
+                  <Input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleFileSelect}
+                  />
+                  {selectedFile && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {selectedFile.name}
+                    </p>
+                  )}
+                </div>
               </div>
               <DialogFooter>
                 <Button
                   onClick={handleAddAssessment}
-                  disabled={!newAssessment.label}
+                  disabled={!newAssessment.label || !selectedFile}
                 >
                   Add Assessment
                 </Button>
@@ -295,88 +303,27 @@ export default function AdminInitialAssessmentPage() {
         </p>
       </div>
 
-      {/* Upload Form */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Upload New Assessment Template</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Document Title
-            </label>
-            <Input
-              placeholder="Enter document title"
-              value={newDocument.title}
-              onChange={(e) => setNewDocument(prev => ({ ...prev, title: e.target.value }))}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Document Location
-            </label>
-            <Select
-              value={newDocument.path}
-              onValueChange={(value) => setNewDocument(prev => ({ ...prev, path: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select where this document should appear" />
-              </SelectTrigger>
-              <SelectContent>
-                {AVAILABLE_PATHS.map((path) => (
-                  <SelectItem key={path.value} value={path.value}>
-                    {path.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Document File
-            </label>
-            <div className="flex items-center gap-4">
-              <Input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileSelect}
-                className="flex-1"
-              />
-              {selectedFile && (
-                <span className="text-sm text-muted-foreground">
-                  Selected: {selectedFile.name}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <Button 
-            onClick={handleUpload}
-            disabled={!newDocument.title || !newDocument.path || !selectedFile}
-            className="w-full"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Document
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Assessment Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {AVAILABLE_PATHS.map((assessment) => {
-          const doc = documents.find(d => d.path === assessment.value)
-          // Get the latest version by finding the one with the highest version number
+        {[...DEFAULT_ASSESSMENT_TYPES, ...workTickets.map(ticket => ({
+          id: ticket.id,
+          value: `/initial-assessment/pre-prepared/${ticket.id}`,
+          label: ticket.prePreparedAssessment?.assessmentType || 'Unknown Assessment',
+          description: `Complying Development Certificate for ${ticket.prePreparedAssessment?.assessmentType?.toLowerCase() || 'unknown type'}`,
+          documentId: ticket.prePreparedAssessment?.documentId || '',
+          version: 1,
+          ticket: ticket // Pass the full ticket for the Set Available button
+        }))].map(assessment => {
+          const doc = documents.find(d => d.id === assessment.documentId)
           const latestVersion = doc?.versions?.reduce<DocumentVersion | null>((latest, current) => 
             (latest?.version || 0) < current.version ? current : latest
-          , null);
+          , null)
 
           return (
-            <div key={assessment.value} className="bg-white rounded-lg p-6">
+            <div key={assessment.value} className="bg-white rounded-lg p-6 border">
               <h3 className="font-medium">{assessment.label.replace(' Assessment', '')}</h3>
               <p className="text-sm text-gray-500 mt-1">
-                Complying Development Certificate for a {assessment.label.toLowerCase().replace(' assessment', '')}
+                {assessment.description}
               </p>
               <div className="mt-2">
                 {doc ? (
@@ -398,24 +345,29 @@ export default function AdminInitialAssessmentPage() {
                   </div>
                 )}
               </div>
-              <input
-                type="file"
-                id={`file-${assessment.id}`}
-                className="hidden"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file && doc) {
-                    handleUpdateDocument(doc, file)
-                  }
-                }}
-              />
-              <Button 
-                className="w-full mt-4 bg-[#0F172A] hover:bg-[#0F172A]/90 text-white"
-                onClick={() => document.getElementById(`file-${assessment.id}`)?.click()}
-              >
-                Replace Document
-              </Button>
+              <div className="mt-4 space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    const doc = documents.find(d => d.id === assessment.documentId)
+                    if (doc) {
+                      handleUpdateDocument(doc, selectedFile || new File([], ''))
+                    }
+                  }}
+                >
+                  Replace Document
+                </Button>
+                {/* Only show Set Available button for work tickets that aren't completed */}
+                {'ticket' in assessment && assessment.ticket && assessment.ticket.status !== 'completed' && (
+                  <Button 
+                    className="w-full"
+                    onClick={() => handleSetAvailable(assessment.ticket)}
+                  >
+                    Set Available
+                  </Button>
+                )}
+              </div>
             </div>
           )
         })}

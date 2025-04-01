@@ -1,6 +1,7 @@
 export interface DocumentVersion {
   version: number
   uploadedAt: string
+  updatedAt?: string // Added for version history
   filename: string
   originalName: string
   size: number
@@ -11,6 +12,7 @@ export interface Document {
   id: string
   title: string
   path: string // Where the document should appear in the app (e.g., '/initial-assessment/pre-prepared')
+  value?: string // Added for compatibility with assessment types
   type: string
   category: string
   versions: DocumentVersion[]

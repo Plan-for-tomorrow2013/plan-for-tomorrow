@@ -16,30 +16,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/page.js"
     ],
-    "/admin/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/page.js"
-    ],
-    "/admin/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/layout.js"
-    ],
-    "/admin/initial-assessment/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/initial-assessment/page.js"
-    ],
     "/initial-assessment/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/initial-assessment/page.js"
     ],
-    "/admin/report-writer/page": [
+    "/initial-assessment/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/report-writer/page.js"
+      "static/chunks/app/initial-assessment/layout.js"
+    ],
+    "/knowledge-base/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/knowledge-base/page.js"
+    ],
+    "/report-writer/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/report-writer/page.js"
     ],
     "/jobs/page": [
       "static/chunks/webpack.js",
@@ -51,10 +46,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/jobs/[id]/page.js"
     ],
-    "/jobs/[id]/document-store/page": [
+    "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/jobs/[id]/document-store/page.js"
+      "static/chunks/app/not-found.js"
     ]
   }
 }

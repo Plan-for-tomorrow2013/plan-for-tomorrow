@@ -263,6 +263,10 @@ export default function AdminReportWriterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {AVAILABLE_PATHS.map((assessment) => {
           const doc = documents.find(d => d.path === assessment.value)
+          // Get the latest version by finding the one with the highest version number
+          const latestVersion = doc?.versions?.reduce<DocumentVersion | null>((latest, current) => 
+            (latest?.version || 0) < current.version ? current : latest
+          , null);
           
           return (
             <div key={assessment.value} className="bg-white rounded-lg p-6">
@@ -270,20 +274,31 @@ export default function AdminReportWriterPage() {
               <p className="text-sm text-gray-500 mt-1">
                 Professional report template for {assessment.label.toLowerCase()}
               </p>
-              <div className="flex items-center text-sm text-green-600 mt-2">
-                <span>Document Available</span>
-              </div>
-              <div className="flex items-center text-sm text-gray-500 mt-2">
-                <FileText className="h-4 w-4 mr-2" />
-                {doc?.versions[0]?.originalName || 'No document uploaded'}
-              </div>
-              <div className="text-sm text-gray-500 mt-1">
-                Version {doc?.currentVersion || '1'} • Last Updated: {doc?.updatedAt ? new Date(doc.updatedAt).toLocaleDateString() : 'N/A'}
+              <div className="mt-2">
+                {doc ? (
+                  <>
+                    <div className="flex items-center text-sm text-green-600">
+                      <span>Document Available</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500 mt-2">
+                      <FileText className="h-4 w-4 mr-2" />
+                      <span>{latestVersion?.originalName || 'No filename available'}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      Version {doc.currentVersion} • Last Updated: {doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString() : 'N/A'}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <span>No document uploaded</span>
+                  </div>
+                )}
               </div>
               <input
                 type="file"
                 id={`file-${assessment.id}`}
                 className="hidden"
+                accept=".pdf,.doc,.docx"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
                   if (file && doc) {

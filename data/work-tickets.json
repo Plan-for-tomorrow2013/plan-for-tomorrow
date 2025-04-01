@@ -279,5 +279,148 @@
       "uploadedAt": "2025-03-30T22:24:12.186Z",
       "returnedAt": "2025-03-30T22:24:14.837Z"
     }
+  },
+  {
+    "id": "c6fe3f83-1d8b-4db3-9001-1598c9fc9880",
+    "jobId": "5fc889a2-2ff8-4d20-ae63-8a339a8fafff",
+    "jobAddress": "5 Courtland Avenue Tahmoor",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-01T06:36:36.126Z",
+    "customAssessment": {
+      "developmentType": "rberbneob",
+      "additionalInfo": "erberb",
+      "documents": {
+        "certificate107": "Quote QU1009.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "DRAFT-Dwelling 01.pdf",
+      "uploadedAt": "2025-04-01T06:37:05.589Z",
+      "returnedAt": "2025-04-01T06:37:07.692Z"
+    }
+  },
+  {
+    "id": "cfbc04bb-6032-49ec-b019-986cd84d51b2",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T09:26:52.025Z",
+    "prePreparedAssessment": {
+      "assessmentType": "CDC Wollondilly Assessment",
+      "documentId": "98edfc93-a0d0-45af-92ac-67f5480ca1b3"
+    }
+  },
+  {
+    "id": "865626b5-4e0c-4e82-ae68-f02ad8aad125",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T09:27:59.667Z",
+    "prePreparedAssessment": {
+      "assessmentType": "TEST",
+      "documentId": "47ec9fc5-990b-45a7-b157-3144574b91a6"
+    }
+  },
+  {
+    "id": "62b29eee-05a7-4907-a07a-024eb86994cd",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T09:36:00.490Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Cumberland",
+      "documentId": "2bd346f2-35d5-4c74-b815-a8b569fd64b9"
+    }
+  },
+  {
+    "id": "f1ac7a12-1236-4ea1-9405-ae537038b000",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T09:42:31.205Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Penrith",
+      "documentId": "5a0d8ea6-f6b5-4b19-9033-8adf80d1630e"
+    }
+  },
+  {
+    "id": "fe20cbad-b41f-42a0-bcad-e2e3dc8d45ee",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-01T09:45:13.824Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Fairfield",
+      "documentId": "c907fe62-c980-42f6-9cd7-c2c30faff861"
+    },
+    "completedDocument": {
+      "fileName": "Fairfield.pdf",
+      "uploadedAt": "2025-04-01T09:52:19.574Z",
+      "returnedAt": "2025-04-01T09:52:19.574Z"
+    }
+  },
+  {
+    "id": "040118ce-411f-4318-a0d1-138d181749d8",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-01T10:28:12.049Z",
+    "prePreparedAssessment": {
+      "assessmentType": "ABCD",
+      "documentId": "cc6c04f7-b8b4-47e0-8bda-4aefcc27362d"
+    },
+    "completedDocument": {
+      "fileName": "ABCD.pdf",
+      "uploadedAt": "2025-04-01T10:29:32.378Z",
+      "returnedAt": "2025-04-01T10:29:32.378Z"
+    }
+  },
+  {
+    "id": "c989a763-9a6f-40e1-9249-1edfb70b82f5",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T10:36:15.446Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Testing -pre-prepared works as expected",
+      "documentId": "9b889484-2f63-43a8-93de-5be5c3bb7ff0"
+    }
+  },
+  {
+    "id": "d3a79c87-b89d-4c02-b2f3-0bfeffb450a2",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-01T10:44:31.364Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Terrace",
+      "documentId": "bd020788-b772-48b5-90d3-94d2db5bbb41"
+    }
+  },
+  {
+    "id": "a63d7886-67a1-4345-ba4a-7080f3abd264",
+    "jobId": "admin",
+    "jobAddress": "System",
+    "ticketType": "pre-prepared-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-01T10:52:02.049Z",
+    "prePreparedAssessment": {
+      "assessmentType": "Set Available",
+      "documentId": "82544bec-e3eb-41ad-ac22-91b96d276e77"
+    },
+    "completedDocument": {
+      "fileName": "Set Available.pdf",
+      "uploadedAt": "2025-04-01T10:52:12.444Z",
+      "returnedAt": "2025-04-01T10:52:12.444Z"
+    }
   }
 ]

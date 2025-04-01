@@ -1,0 +1,128 @@
+{
+  "id": "5fc889a2-2ff8-4d20-ae63-8a339a8fafff",
+  "address": "5 Courtland Avenue Tahmoor",
+  "council": "Wollondilly",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-04-01T06:35:48.709Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.593893728496,
+      "latitude": -34.224254509539
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "276505",
+            "EPI Name": "Wollondilly Local Environmental Plan 2011",
+            "LGA Name": "WOLLONDILLY",
+            "Published Date": "3/7/2025",
+            "Commenced Date": "3/7/2025",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Map Amendment No 11",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "9",
+            "Units": "m"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "803367",
+            "EPI Name": "Wollondilly Local Environmental Plan 2011",
+            "LGA Name": "WOLLONDILLY",
+            "Published Date": "12/15/2023",
+            "Commenced Date": "12/15/2023",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Wollondilly Local Environmental Plan (Precincts—Western Parkland City) (Map Amendment No 1)",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Medium Density Residential",
+            "Zone": "R3",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "436458",
+            "EPI Name": "Wollondilly Local Environmental Plan 2011",
+            "LGA Name": "WOLLONDILLY",
+            "Published Date": "12/15/2023",
+            "Commenced Date": "12/15/2023",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Wollondilly Local Environmental Plan (Precincts—Western Parkland City) (Map Amendment No 1)",
+            "Layer Class": "900-999",
+            "Lot Size": "975",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "210281",
+            "EPI Name": "Wollondilly Local Environmental Plan 2011",
+            "LGA Name": "WOLLONDILLY",
+            "Published Date": "3/7/2025",
+            "Commenced Date": "3/7/2025",
+            "Currency Date": "3/7/2025",
+            "Amendment": "Map Amendment No 11",
+            "Map Type": "SMRA",
+            "Type": "Metropolitan Rural Area",
+            "Class": "Metropolitan Rural Area",
+            "Description": "Null",
+            "Label": "Null",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1743489391197_Quote QU1009.pdf",
+      "originalName": "Quote QU1009.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-01T06:36:31.199Z",
+      "size": 51652
+    },
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report_1743489456158_CDC Secondary Dwelling.pdf",
+      "originalName": "CDC Secondary Dwelling.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-01T06:37:36.159Z",
+      "size": 19
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-01T06:36:36.139Z",
+    "updatedAt": "2025-04-01T06:36:36.139Z",
+    "purchasedAssessment": "cdc-secondary-dwelling"
+  }
+}

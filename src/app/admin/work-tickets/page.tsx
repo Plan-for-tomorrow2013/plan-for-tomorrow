@@ -23,7 +23,8 @@ export default function WorkTicketsPage() {
           throw new Error('Failed to fetch work tickets')
         }
         const data = await response.json()
-        setTickets(data)
+        // Filter out pre-prepared assessments
+        setTickets(data.filter((ticket: WorkTicket) => ticket.ticketType !== 'pre-prepared-assessment'))
       } catch (error) {
         console.error('Error fetching work tickets:', error)
         setError('Failed to load work tickets')
@@ -149,89 +150,85 @@ export default function WorkTicketsPage() {
         backHref="/admin"
       />
       
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {tickets.map((ticket) => (
-          <Card key={ticket.id}>
-            <CardHeader>
+          <Card key={ticket.id} className="hover:shadow-md transition-shadow">
+            <CardHeader className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-base">
                     {ticket.ticketType === 'custom-assessment' ? 'Custom Assessment' : 'Pre-Prepared Assessment'}
                   </CardTitle>
-                  <p className="text-sm text-gray-500">{ticket.jobAddress}</p>
+                  <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
                 </div>
                 <Badge className={getStatusColor(ticket.status)}>
                   {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="p-4">
+              <div className="space-y-3">
                 {ticket.customAssessment && (
                   <>
                     <div>
-                      <h3 className="font-medium mb-2">Development Details</h3>
-                      <p className="text-sm mb-1">
+                      <h3 className="font-medium text-sm mb-1">Development Details</h3>
+                      <p className="text-xs mb-1">
                         <strong>Type:</strong> {ticket.customAssessment.developmentType}
                       </p>
-                      <p className="text-sm">
-                        <strong>Additional Info:</strong> {ticket.customAssessment.additionalInfo}
+                      <p className="text-xs truncate">
+                        <strong>Info:</strong> {ticket.customAssessment.additionalInfo}
                       </p>
                     </div>
                     <div>
-                      <h3 className="font-medium mb-2">Attached Documents</h3>
-                      <div className="space-y-2">
+                      <h3 className="font-medium text-sm mb-1">Documents</h3>
+                      <div className="space-y-1">
                         {ticket.customAssessment.documents.certificateOfTitle && (
-                          <div className="flex items-center text-sm">
-                            <FileText className="h-4 w-4 mr-2" />
-                            <span>Certificate of Title: {ticket.customAssessment.documents.certificateOfTitle}</span>
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Title: {ticket.customAssessment.documents.certificateOfTitle}</span>
                           </div>
                         )}
                         {ticket.customAssessment.documents.surveyPlan && (
-                          <div className="flex items-center text-sm">
-                            <FileText className="h-4 w-4 mr-2" />
-                            <span>Survey Plan: {ticket.customAssessment.documents.surveyPlan}</span>
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Plan: {ticket.customAssessment.documents.surveyPlan}</span>
                           </div>
                         )}
                         {ticket.customAssessment.documents.certificate107 && (
-                          <div className="flex items-center text-sm">
-                            <FileText className="h-4 w-4 mr-2" />
-                            <span>10.7 Certificate: {ticket.customAssessment.documents.certificate107}</span>
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">10.7: {ticket.customAssessment.documents.certificate107}</span>
                           </div>
                         )}
                       </div>
                     </div>
                   </>
                 )}
-                <div className="border-t pt-4 mt-4">
-                  <h3 className="font-medium mb-2">Completed Assessment</h3>
+                <div className="border-t pt-2">
+                  <h3 className="font-medium text-sm mb-1">Completed Assessment</h3>
                   {ticket.completedDocument ? (
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm">
-                          <FileText className="h-4 w-4 mr-2" />
-                          <span>{ticket.completedDocument.fileName}</span>
+                        <div className="flex items-center text-xs">
+                          <FileText className="h-3 w-3 mr-1" />
+                          <span className="truncate">{ticket.completedDocument.fileName}</span>
                         </div>
                         {!ticket.completedDocument.returnedAt && (
                           <Button
                             size="sm"
                             onClick={() => handleReturnDocument(ticket.id)}
-                            className="flex items-center"
+                            className="flex items-center h-6 text-xs"
                           >
-                            <Bell className="h-4 w-4 mr-2" />
-                            Add to Document Store
+                            <Bell className="h-3 w-3 mr-1" />
+                            Add
                           </Button>
                         )}
                       </div>
                       {ticket.completedDocument.returnedAt && (
-                        <div className="text-sm text-gray-500">
-                          <p>Document added to:</p>
-                          <ul className="list-disc list-inside mt-1">
-                            <li>Initial Assessment Document Store</li>
-                            <li>Job Document Store</li>
-                          </ul>
-                          <p className="mt-2">
-                            Added: {new Date(ticket.completedDocument.returnedAt).toLocaleString()}
+                        <div className="text-xs text-gray-500">
+                          <p>Added to stores</p>
+                          <p className="text-[10px]">
+                            {new Date(ticket.completedDocument.returnedAt).toLocaleString()}
                           </p>
                         </div>
                       )}
@@ -239,9 +236,9 @@ export default function WorkTicketsPage() {
                   ) : (
                     <div>
                       <label htmlFor={`file-upload-${ticket.id}`} className="cursor-pointer">
-                        <div className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-800">
-                          <Upload className="h-4 w-4" />
-                          <span>Upload Completed Assessment</span>
+                        <div className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800">
+                          <Upload className="h-3 w-3" />
+                          <span>Upload Assessment</span>
                         </div>
                       </label>
                       <input
@@ -259,9 +256,9 @@ export default function WorkTicketsPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="h-4 w-4 mr-2" />
-                  <span>Created: {new Date(ticket.createdAt).toLocaleString()}</span>
+                <div className="flex items-center text-xs text-gray-500">
+                  <Clock className="h-3 w-3 mr-1" />
+                  <span>{new Date(ticket.createdAt).toLocaleString()}</span>
                 </div>
               </div>
             </CardContent>

@@ -10,7 +10,6 @@ import { useJobs } from '@/hooks/useJobs'
 import Link from 'next/link'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Document, DOCUMENT_TYPES, DocumentVersion } from '@/types/documents'
-import { PrePreparedAssessment, DEFAULT_ASSESSMENT_TYPES } from '@/types/assessments'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -49,36 +48,6 @@ interface JobFormData {
   [key: string]: CustomAssessmentForm
 }
 
-const PRE_PREPARED_TYPES: PrePreparedAssessment[] = [
-  {
-    id: 'cdc-dwelling',
-    value: '/initial-assessment/pre-prepared/cdc-dwelling',
-    label: 'CDC Dwelling',
-    description: 'Complying Development Certificate for a new dwelling',
-    file: '/documents/cdc-dwelling.pdf',
-    documentId: 'cdc-dwelling',
-    version: 1
-  },
-  {
-    id: 'cdc-dual-occupancy',
-    value: '/initial-assessment/pre-prepared/cdc-dual-occupancy',
-    label: 'CDC Dual Occupancy',
-    description: 'Complying Development Certificate for dual occupancy',
-    file: '/documents/cdc-dual-occupancy.pdf',
-    documentId: 'cdc-dual-occupancy',
-    version: 1
-  },
-  {
-    id: 'cdc-secondary-dwelling',
-    value: '/initial-assessment/pre-prepared/cdc-secondary-dwelling',
-    label: 'CDC Secondary Dwelling',
-    description: 'Complying Development Certificate for a secondary dwelling',
-    file: '/documents/cdc-secondary-dwelling.pdf',
-    documentId: 'cdc-secondary-dwelling',
-    version: 1
-  }
-]
-
 export default function InitialAssessmentPage() {
   const router = useRouter()
   const { jobs } = useJobs()
@@ -89,11 +58,13 @@ export default function InitialAssessmentPage() {
   const [formData, setFormData] = useState<JobFormData>({})
   const [showPaymentButton, setShowPaymentButton] = useState(false)
   const [paymentComplete, setPaymentComplete] = useState<Record<string, boolean>>({})
-  const [purchasedAssessments, setPurchasedAssessments] = useState<Record<string, boolean>>({})
   const [workTickets, setWorkTickets] = useState<WorkTicket[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  // Separate state for custom section
+  const [customAssessmentComplete, setCustomAssessmentComplete] = useState<Record<string, boolean>>({})
 
   // Set initial job ID from URL if present
   useEffect(() => {
@@ -135,14 +106,6 @@ export default function InitialAssessmentPage() {
               workTicket) {
             console.log('Setting payment complete - work ticket found or payment status is paid')
             setPaymentComplete(prev => ({
-              ...prev,
-              [selectedJobId]: true
-            }))
-          }
-
-          // Handle pre-prepared assessment
-          if (jobData.initialAssessment?.status === 'paid' && jobData.initialAssessment?.purchasedAssessment) {
-            setPurchasedAssessments(prev => ({
               ...prev,
               [selectedJobId]: true
             }))
@@ -458,125 +421,83 @@ export default function InitialAssessmentPage() {
 
   // Add download function
   const handleDownload = async (documentId: string) => {
-    if (!selectedJobId) return
-
     try {
-      const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`)
+      if (!selectedJobId) {
+        toast({
+          title: "Error",
+          description: "Please select a job first",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // For initial assessment report, always try to download from job documents first
+      if (documentId === 'initial-assessment-report') {
+        const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
+        if (!response.ok) {
+          throw new Error('Failed to download document');
+        }
+
+        // Get the filename from the Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'assessment-report.pdf';
+
+        // Create a blob from the response
+        const blob = await response.blob();
+        
+        // Create a download link and trigger it
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast({
+          title: "Success",
+          description: "Document downloaded successfully"
+        });
+        return;
+      }
+
+      // Handle other document downloads
+      const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
       if (!response.ok) {
-        throw new Error('Failed to download document')
+        throw new Error('Failed to download document');
       }
 
       // Get the filename from the Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition')
-      const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'document.pdf'
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'document.pdf';
 
       // Create a blob from the response
-      const blob = await response.blob()
+      const blob = await response.blob();
       
       // Create a download link and trigger it
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Success",
+        description: "Document downloaded successfully"
+      });
     } catch (error) {
-      console.error('Error downloading document:', error)
+      console.error('Error downloading document:', error);
       toast({
         title: "Error",
         description: "Failed to download document. Please try again.",
         variant: "destructive"
-      })
+      });
     }
-  }
-
-  const handlePrePreparedPurchase = async (assessment: PrePreparedAssessment) => {
-    if (!selectedJobId) {
-      toast({
-        title: "Error",
-        description: "Please select a job first",
-        variant: "destructive"
-      })
-      return
-    }
-
-    try {
-      // Simulate payment process
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      const doc = documents.find(d => d.value === assessment.value || d.path === assessment.value)
-      if (!doc) {
-        toast({
-          title: "Error",
-          description: "Document not found",
-          variant: "destructive"
-        })
-        return
-      }
-
-      // Create a new document in the job's document store
-      const formData = new FormData()
-      formData.append('documentId', 'initial-assessment-report')
-      
-      // Create a simple PDF file with the assessment title
-      const blob = new Blob(['Assessment Document'], { type: 'application/pdf' })
-      const file = new File([blob], `${assessment.label.replace(' Assessment', '')}.pdf`, { type: 'application/pdf' })
-      formData.append('file', file)
-
-      const documentResponse = await fetch(`/api/jobs/${selectedJobId}/documents/upload`, {
-        method: 'POST',
-        body: formData
-      })
-
-      if (!documentResponse.ok) {
-        throw new Error('Failed to create document')
-      }
-
-      // Update the job data to store the purchase
-      const updateResponse = await fetch(`/api/jobs/${selectedJobId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          initialAssessment: {
-            status: 'paid',
-            purchasedAssessment: assessment.id
-          }
-        })
-      })
-
-      if (!updateResponse.ok) {
-        throw new Error('Failed to update job status')
-      }
-
-      // Update local state
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [selectedJobId]: true
-      }))
-
-      // Refresh the documents list
-      await fetchJobDocuments()
-
-      // Trigger automatic download
-      await handleDownload('initial-assessment-report')
-
-      toast({
-        title: "Success",
-        description: "Assessment document has been added to your document store",
-      })
-    } catch (error) {
-      console.error('Error purchasing assessment:', error)
-      toast({
-        title: "Error",
-        description: "Failed to purchase assessment",
-        variant: "destructive"
-      })
-    }
-  }
+  };
 
   const handleFileUpload = async (documentId: string, file: File) => {
     if (!selectedJobId) {
@@ -677,7 +598,7 @@ export default function InitialAssessmentPage() {
                 <Button
                   variant="outline"
                   className="mt-4 w-full"
-                  onClick={() => handleDownload(doc.id)}
+                  onClick={() => handleDownload('initial-assessment-report')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Assessment
@@ -750,6 +671,7 @@ export default function InitialAssessmentPage() {
     )
   }
 
+  // Add renderCustomAssessmentForm function
   const renderCustomAssessmentForm = () => {
     const currentJobPaymentComplete = selectedJobId ? paymentComplete[selectedJobId] : false
     console.log('Render state:', {
@@ -776,6 +698,16 @@ export default function InitialAssessmentPage() {
                 : "We are processing your initial assessment."
               }
             </p>
+            {assessmentReturned && (
+              <Button 
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={() => handleDownload('initial-assessment-report')}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Download Assessment
+              </Button>
+            )}
           </div>
         </div>
       )
@@ -869,305 +801,6 @@ export default function InitialAssessmentPage() {
     )
   }
 
-  const handlePurchase = async (ticket: WorkTicket) => {
-    try {
-      debugLog('Purchasing assessment from ticket:', {
-        id: ticket.id,
-        type: ticket.prePreparedAssessment?.assessmentType,
-        documentId: ticket.prePreparedAssessment?.documentId
-      })
-      
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [ticket.id]: true
-      }))
-
-      toast({
-        title: 'Success',
-        description: 'Assessment purchased successfully'
-      })
-    } catch (error) {
-      console.error('Error purchasing assessment:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to purchase assessment',
-        variant: 'destructive'
-      })
-    }
-  }
-
-  // Load work tickets and poll for updates
-  useEffect(() => {
-    const loadWorkTickets = async (isPolling = false) => {
-      try {
-        setError(null)
-        // Only show loading state on initial load
-        if (!isPolling) {
-          setLoading(true)
-        }
-        debugLog('Starting to fetch work tickets...')
-        
-        const response = await fetch('/api/work-tickets')
-        debugLog('API Response status:', response.status, response.ok)
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch work tickets')
-        }
-        
-        const tickets = await response.json()
-        debugLog('Raw API response:', tickets.length, 'tickets')
-
-        // First, filter out any non-pre-prepared tickets immediately
-        const onlyPrePrepared = tickets.filter((t: WorkTicket) => t.ticketType === 'pre-prepared-assessment')
-        debugLog('Pre-prepared tickets:', onlyPrePrepared.length)
-        
-        // Then filter for completed and valid tickets
-        const validTickets = onlyPrePrepared.filter((t: WorkTicket) => {
-          const isCompleted = t.status === 'completed'
-          const hasDocument = !!t.completedDocument
-          const isReturned = !!t.completedDocument?.returnedAt
-          const hasAssessmentType = !!t.prePreparedAssessment?.assessmentType
-
-          const isValid = isCompleted && hasDocument && isReturned && hasAssessmentType
-
-          if (!isValid) {
-            debugLog('Filtered out ticket:', {
-              id: t.id,
-              status: t.status,
-              failedChecks: {
-                status: !isCompleted ? 'not completed' : null,
-                document: !hasDocument ? 'no document' : null,
-                returned: !isReturned ? 'not returned' : null,
-                assessmentType: !hasAssessmentType ? 'no assessment type' : null
-              }
-            })
-          }
-
-          return isValid
-        })
-
-        debugLog('Valid tickets after filtering:', {
-          total: tickets.length,
-          prePrepared: onlyPrePrepared.length,
-          valid: validTickets.length,
-          tickets: validTickets.map((t: WorkTicket) => ({
-            id: t.id,
-            type: t.prePreparedAssessment?.assessmentType,
-            status: t.status
-          }))
-        })
-
-        // Only update state if the tickets have actually changed
-        const ticketsChanged = JSON.stringify(validTickets) !== JSON.stringify(workTickets)
-        if (ticketsChanged) {
-          debugLog('Updating work tickets state - tickets have changed')
-          setWorkTickets(validTickets)
-        } else {
-          debugLog('No change in work tickets - skipping state update')
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        debugLog('Error loading work tickets:', {
-          error,
-          message: errorMessage
-        })
-        setError(errorMessage)
-        toast({
-          title: 'Error',
-          description: 'Failed to load assessment types',
-          variant: 'destructive'
-        })
-      } finally {
-        if (!isPolling) {
-          setLoading(false)
-        }
-        debugLog('Finished loading work tickets')
-      }
-    }
-
-    // Initial load
-    loadWorkTickets(false)
-    
-    // Set up polling with a shorter interval in debug mode
-    const interval = setInterval(() => {
-      debugLog('Polling for work ticket updates...')
-      loadWorkTickets(true)
-    }, DEBUG ? 2000 : 30000) // Reduced to 2 seconds in debug mode for faster updates
-    
-    return () => {
-      debugLog('Component unmounting, clearing interval')
-      clearInterval(interval)
-    }
-  }, [workTickets]) // Added workTickets to dependencies to properly compare changes
-
-  const renderPrePreparedContent = () => {
-    if (loading) {
-      return (
-        <div className="container mx-auto p-6 max-w-7xl">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="border rounded-lg p-6">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    if (error) {
-      return (
-        <div className="container mx-auto p-6">
-          <h1 className="text-2xl font-semibold mb-4">Pre-Prepared Assessments</h1>
-          <div className="p-6 text-red-500">{error}</div>
-        </div>
-      )
-    }
-
-    return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold mb-4">Pre-Prepared Assessments</h1>
-          <p className="text-muted-foreground">
-            Choose from our selection of pre-prepared assessment templates for common development types.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Default assessment types */}
-          {DEFAULT_ASSESSMENT_TYPES.map((assessment) => (
-            <Card key={assessment.value}>
-              <CardHeader>
-                <CardTitle>{assessment.label}</CardTitle>
-                <CardDescription>{assessment.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  className="w-full"
-                  onClick={() => handlePrePreparedPurchase(assessment)}
-                  disabled={!selectedJobId}
-                >
-                  Purchase Assessment
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Custom assessment types from work tickets */}
-          {workTickets.map((ticket) => {
-            if (!ticket.prePreparedAssessment) return null
-            const isPurchased = purchasedAssessments[ticket.id]
-
-            if (isPurchased) {
-              return (
-                <Card key={ticket.id} className="bg-green-50">
-                  <CardHeader>
-                    <CardTitle>{ticket.prePreparedAssessment.assessmentType}</CardTitle>
-                    <CardDescription>
-                      Complying Development Certificate for {ticket.prePreparedAssessment.assessmentType.toLowerCase()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-4">
-                      <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 mb-4">
-                        Assessment purchased successfully
-                      </p>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => handleDownload('initial-assessment-report')}
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        Download Assessment
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            }
-
-            return (
-              <Card key={ticket.id}>
-                <CardHeader>
-                  <CardTitle>{ticket.prePreparedAssessment.assessmentType}</CardTitle>
-                  <CardDescription>
-                    Complying Development Certificate for {ticket.prePreparedAssessment.assessmentType.toLowerCase()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center text-sm text-green-600 mb-4">
-                    <FileText className="h-4 w-4 mr-2" />
-                    <span>Document Available</span>
-                  </div>
-                  <Button 
-                    className="w-full"
-                    onClick={() => handlePurchase(ticket)}
-                    disabled={!selectedJobId}
-                  >
-                    Purchase Assessment
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
-  // Add a function to fetch job documents
-  const fetchJobDocuments = async () => {
-    if (!selectedJobId) {
-      setDocuments([])
-      return
-    }
-
-    try {
-      const response = await fetch(`/api/jobs/${selectedJobId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch job details')
-      }
-      const jobData = await response.json()
-      
-      // Initialize documents with their status
-      const updatedDocuments = DOCUMENT_TYPES.map(doc => {
-        const uploadedFile = jobData.documents?.[doc.id]
-        return {
-          ...doc,
-          status: uploadedFile ? 'uploaded' as const : 'required' as const,
-          uploadedFile: uploadedFile ? {
-            filename: uploadedFile.filename,
-            originalName: uploadedFile.originalName,
-            type: uploadedFile.type,
-            uploadedAt: uploadedFile.uploadedAt,
-            size: uploadedFile.size
-          } : undefined
-        }
-      })
-      
-      setDocuments(updatedDocuments)
-      setDocumentError(null)
-    } catch (err) {
-      console.error('Error fetching documents:', err)
-      setDocumentError('Failed to load documents')
-      setDocuments([])
-    }
-  }
-
-  // Update the useEffect to use the fetchJobDocuments function
-  useEffect(() => {
-    fetchJobDocuments()
-  }, [selectedJobId])
-
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="mb-8">
@@ -1208,7 +841,6 @@ export default function InitialAssessmentPage() {
               <TabsList className="w-full grid grid-cols-3 h-12">
                 <TabsTrigger value="ai-chatbot" className="data-[state=active]:bg-white">AI Chatbot</TabsTrigger>
                 <TabsTrigger value="custom-assessment" className="data-[state=active]:bg-white">Custom Assessment</TabsTrigger>
-                <TabsTrigger value="pre-prepared" className="data-[state=active]:bg-white">Pre-Prepared</TabsTrigger>
               </TabsList>
               
               <div className="p-6">
@@ -1223,10 +855,6 @@ export default function InitialAssessmentPage() {
                 
                 <TabsContent value="custom-assessment" className="mt-0">
                   {renderCustomAssessmentForm()}
-                </TabsContent>
-                
-                <TabsContent value="pre-prepared" className="mt-0">
-                  {renderPrePreparedContent()}
                 </TabsContent>
               </div>
             </Tabs>

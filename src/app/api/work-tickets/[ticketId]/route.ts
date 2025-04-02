@@ -78,4 +78,39 @@ export async function PATCH(
       { status: 500 }
     )
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { ticketId: string } }
+) {
+  try {
+    const { ticketId } = params
+
+    // Read existing tickets
+    const tickets = await readWorkTickets()
+
+    // Find the ticket to delete
+    const ticketIndex = tickets.findIndex((t: any) => t.id === ticketId)
+    if (ticketIndex === -1) {
+      return NextResponse.json(
+        { error: 'Ticket not found' },
+        { status: 404 }
+      )
+    }
+
+    // Remove the ticket
+    tickets.splice(ticketIndex, 1)
+
+    // Save updated tickets
+    await writeWorkTickets(tickets)
+
+    return NextResponse.json({ message: 'Ticket deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting work ticket:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete work ticket' },
+      { status: 500 }
+    )
+  }
 } 

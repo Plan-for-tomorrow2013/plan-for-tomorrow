@@ -301,126 +301,177 @@
     }
   },
   {
-    "id": "cfbc04bb-6032-49ec-b019-986cd84d51b2",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T09:26:52.025Z",
-    "prePreparedAssessment": {
-      "assessmentType": "CDC Wollondilly Assessment",
-      "documentId": "98edfc93-a0d0-45af-92ac-67f5480ca1b3"
+    "id": "8188a9d4-f27d-43b5-b36a-7cf91e62a92a",
+    "jobId": "89c397a7-a87c-4c20-93ae-682e68585902",
+    "jobAddress": "13 Hillview Avenue Bankstown ",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-02T07:09:43.913Z",
+    "customAssessment": {
+      "developmentType": "testing work tickets",
+      "additionalInfo": "testing work tickets",
+      "documents": {
+        "certificate107": "BASIX.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "Assessor QA Reveiw Procedure_2024.pdf",
+      "uploadedAt": "2025-04-02T07:32:37.996Z",
+      "returnedAt": "2025-04-02T07:33:21.217Z"
     }
   },
   {
-    "id": "865626b5-4e0c-4e82-ae68-f02ad8aad125",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T09:27:59.667Z",
-    "prePreparedAssessment": {
-      "assessmentType": "TEST",
-      "documentId": "47ec9fc5-990b-45a7-b157-3144574b91a6"
+    "id": "7b27f104-5103-42e7-8fd4-7e1ae80b1e56",
+    "jobId": "7216f8e2-8911-4476-8dae-3f7fc416a724",
+    "jobAddress": "82 Fingal Avenue Glenhaven",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-02T07:14:44.621Z",
+    "customAssessment": {
+      "developmentType": "Test work ticket",
+      "additionalInfo": "test work ticket",
+      "documents": {
+        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
+      "uploadedAt": "2025-04-02T07:33:13.723Z",
+      "returnedAt": "2025-04-02T07:33:26.137Z"
     }
   },
   {
-    "id": "62b29eee-05a7-4907-a07a-024eb86994cd",
+    "id": "10ae45db-48ec-43a1-a222-69c56e68b3f3",
+    "jobId": "d5c5ed99-f960-4055-8b15-e3fed86206f1",
+    "jobAddress": "36 Spurwood Rd, Turramurra",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-02T07:18:18.581Z",
+    "customAssessment": {
+      "developmentType": "Testing work tickets",
+      "additionalInfo": "Testing work tickets",
+      "documents": {
+        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
+      "uploadedAt": "2025-04-02T07:38:16.229Z",
+      "returnedAt": "2025-04-02T07:38:23.718Z"
+    }
+  },
+  {
+    "id": "37a2b1e5-4bd8-4e87-83b4-5bf0ac52dd26",
+    "jobId": "0d0ac235-bf4f-4e99-9bc8-bb277e9e5111",
+    "jobAddress": "4 KANIMBLA ST, KATOOMBA",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-02T07:25:17.992Z",
+    "customAssessment": {
+      "developmentType": "TEST work ticket",
+      "additionalInfo": "TEST work ticket",
+      "documents": {
+        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
+      "uploadedAt": "2025-04-02T07:42:35.510Z",
+      "returnedAt": "2025-04-02T07:42:49.342Z"
+    }
+  },
+  {
+    "id": "160cb039-33b9-42d3-b3be-81fb2d5444fd",
+    "jobId": "e5193ff2-321f-452d-8578-db4720682d9c",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-02T08:59:40.133Z",
+    "customAssessment": {
+      "developmentType": "9 Viola Place, Greystanes",
+      "additionalInfo": "XYZ",
+      "documents": {
+        "certificate107": "ATLReport.pdf"
+      }
+    },
+    "completedDocument": {
+      "fileName": "DRAFT-Dwelling 01.pdf",
+      "uploadedAt": "2025-04-02T09:00:01.595Z",
+      "returnedAt": "2025-04-02T09:00:06.196Z"
+    }
+  },
+  {
+    "id": "254ba632-f55f-4ee1-bf4c-5f73143bc743",
     "jobId": "admin",
     "jobAddress": "System",
     "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T09:36:00.490Z",
+    "status": "completed",
+    "createdAt": "2025-04-02T09:00:53.968Z",
     "prePreparedAssessment": {
       "assessmentType": "Cumberland",
-      "documentId": "2bd346f2-35d5-4c74-b815-a8b569fd64b9"
+      "documentId": "7006a487-5f14-4711-8e97-9c33eda1016a"
+    },
+    "completedDocument": {
+      "fileName": "Cumberland.pdf",
+      "uploadedAt": "2025-04-02T10:06:57.523Z",
+      "returnedAt": "2025-04-02T10:06:57.523Z"
     }
   },
   {
-    "id": "f1ac7a12-1236-4ea1-9405-ae537038b000",
+    "id": "46776bff-733b-42db-8f02-80d355f817ab",
     "jobId": "admin",
     "jobAddress": "System",
     "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T09:42:31.205Z",
+    "status": "completed",
+    "createdAt": "2025-04-02T09:04:42.954Z",
     "prePreparedAssessment": {
       "assessmentType": "Penrith",
-      "documentId": "5a0d8ea6-f6b5-4b19-9033-8adf80d1630e"
-    }
-  },
-  {
-    "id": "fe20cbad-b41f-42a0-bcad-e2e3dc8d45ee",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-01T09:45:13.824Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Fairfield",
-      "documentId": "c907fe62-c980-42f6-9cd7-c2c30faff861"
+      "documentId": "98f93534-d025-4ac5-b2dd-98369d25af39"
     },
     "completedDocument": {
-      "fileName": "Fairfield.pdf",
-      "uploadedAt": "2025-04-01T09:52:19.574Z",
-      "returnedAt": "2025-04-01T09:52:19.574Z"
+      "fileName": "Penrith.pdf",
+      "uploadedAt": "2025-04-02T10:06:45.035Z",
+      "returnedAt": "2025-04-02T10:06:45.035Z"
     }
   },
   {
-    "id": "040118ce-411f-4318-a0d1-138d181749d8",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
+    "id": "d284bbde-6b9d-467d-b88d-320124dc377d",
+    "jobId": "c22b925e-4612-462b-a868-34bc3af2d6ec",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "custom-assessment",
     "status": "completed",
-    "createdAt": "2025-04-01T10:28:12.049Z",
-    "prePreparedAssessment": {
-      "assessmentType": "ABCD",
-      "documentId": "cc6c04f7-b8b4-47e0-8bda-4aefcc27362d"
+    "createdAt": "2025-04-02T10:07:52.448Z",
+    "customAssessment": {
+      "developmentType": "XYZ",
+      "additionalInfo": "ABC",
+      "documents": {
+        "certificate107": "DRAFT-Dwelling 01 (2).pdf"
+      }
     },
     "completedDocument": {
-      "fileName": "ABCD.pdf",
-      "uploadedAt": "2025-04-01T10:29:32.378Z",
-      "returnedAt": "2025-04-01T10:29:32.378Z"
+      "fileName": "CDC Secondary Dwelling.pdf",
+      "uploadedAt": "2025-04-02T10:08:06.774Z",
+      "returnedAt": "2025-04-02T10:08:08.888Z"
     }
   },
   {
-    "id": "c989a763-9a6f-40e1-9249-1edfb70b82f5",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T10:36:15.446Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Testing -pre-prepared works as expected",
-      "documentId": "9b889484-2f63-43a8-93de-5be5c3bb7ff0"
-    }
-  },
-  {
-    "id": "d3a79c87-b89d-4c02-b2f3-0bfeffb450a2",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-01T10:44:31.364Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Terrace",
-      "documentId": "bd020788-b772-48b5-90d3-94d2db5bbb41"
-    }
-  },
-  {
-    "id": "a63d7886-67a1-4345-ba4a-7080f3abd264",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
+    "id": "70d48c37-23d7-4f51-9fda-1452e6ea08ab",
+    "jobId": "272561a5-b60e-4b71-9c66-93746a4e362f",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "custom-assessment",
     "status": "completed",
-    "createdAt": "2025-04-01T10:52:02.049Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Set Available",
-      "documentId": "82544bec-e3eb-41ad-ac22-91b96d276e77"
+    "createdAt": "2025-04-02T11:33:31.190Z",
+    "customAssessment": {
+      "developmentType": "xyz",
+      "additionalInfo": "123",
+      "documents": {
+        "certificate107": "ATLReport.pdf"
+      }
     },
     "completedDocument": {
-      "fileName": "Set Available.pdf",
-      "uploadedAt": "2025-04-01T10:52:12.444Z",
-      "returnedAt": "2025-04-01T10:52:12.444Z"
+      "fileName": "Penrith (3).pdf",
+      "uploadedAt": "2025-04-02T11:33:44.835Z",
+      "returnedAt": "2025-04-02T11:33:46.444Z"
     }
   }
 ]

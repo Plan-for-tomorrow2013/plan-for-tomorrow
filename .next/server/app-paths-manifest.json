@@ -1,14 +1,12 @@
 {
-  "/not-found": "app/not-found.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/announcements/route": "app/api/announcements/route.js",
+  "/jobs/page": "app/jobs/page.js",
+  "/jobs/[id]/document-store/page": "app/jobs/[id]/document-store/page.js",
+  "/api/jobs/[id]/documents/[documentId]/download/route": "app/api/jobs/[id]/documents/[documentId]/download/route.js",
+  "/api/jobs/[id]/route": "app/api/jobs/[id]/route.js",
   "/api/jobs/route": "app/api/jobs/route.js",
   "/api/documents/route": "app/api/documents/route.js",
   "/api/work-tickets/route": "app/api/work-tickets/route.js",
-  "/api/jobs/[id]/route": "app/api/jobs/[id]/route.js",
-  "/knowledge-base/page": "app/knowledge-base/page.js",
-  "/report-writer/page": "app/report-writer/page.js",
-  "/jobs/page": "app/jobs/page.js",
-  "/jobs/[id]/page": "app/jobs/[id]/page.js",
-  "/initial-assessment/page": "app/initial-assessment/page.js"
+  "/initial-assessment/page": "app/initial-assessment/page.js",
+  "/admin/initial-assessment/page": "app/admin/initial-assessment/page.js",
+  "/admin/work-tickets/page": "app/admin/work-tickets/page.js"
 }

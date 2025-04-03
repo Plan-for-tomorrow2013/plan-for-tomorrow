@@ -1,477 +1,52 @@
 [
   {
-    "id": "3ff11d97-8b80-477c-9441-bf541c79764d",
-    "jobId": "cf0df1ae-5703-4d86-9813-91206329876f",
-    "jobAddress": "128 EBLEY STREET BONDI JUNCTION",
+    "id": "8cf6db8d-a836-4baf-ab39-78b3ac555c5b",
+    "jobId": "5ccb2c6f-79d9-4e3a-9ea4-fa7e1c7909d4",
+    "jobAddress": "9 Viola Place, Greystanes",
     "ticketType": "custom-assessment",
     "status": "completed",
-    "createdAt": "2025-03-29T00:34:59.887Z",
+    "createdAt": "2025-04-03T09:08:32.407Z",
     "customAssessment": {
-      "developmentType": "Test the workflow to tickets",
-      "additionalInfo": "test",
+      "developmentType": "123",
+      "additionalInfo": "456",
       "documents": {
-        "certificate107": "CDC Dwelling.pdf"
+        "certificate107": "Penrith (1) (2).pdf"
       }
     },
     "completedDocument": {
-      "fileName": "CDC Secondary Dwelling (2).pdf",
-      "uploadedAt": "2025-03-29T00:48:32.481Z"
+      "fileName": "ATLReport (2).pdf",
+      "uploadedAt": "2025-04-03T09:08:45.352Z",
+      "returnedAt": "2025-04-03T09:08:46.854Z"
     }
   },
   {
-    "id": "4f936d3e-2d47-4c81-9cab-3e71143a08e6",
-    "jobId": "7ec65841-5304-49d3-9c90-57e92c8aad48",
-    "jobAddress": " 43 FARMBOROUGH RD, UNANDERRA",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T00:59:31.603Z",
-    "customAssessment": {
-      "developmentType": "TEST for workflow",
-      "additionalInfo": "abcdefg",
-      "documents": {
-        "certificateOfTitle": "CDC Dwelling Assessment.pdf",
-        "certificate107": "CDC Dwelling.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "ATLReport.pdf",
-      "uploadedAt": "2025-03-29T01:00:12.021Z"
-    }
-  },
-  {
-    "id": "5211af4c-9dc7-4ccb-88e4-7bcc30e198b2",
-    "jobId": "dd31da90-8a6c-41c6-a9b2-d9587f712a0e",
-    "jobAddress": "23 Curtis Road, Chester Hill",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T01:18:29.707Z",
-    "customAssessment": {
-      "developmentType": "x",
-      "additionalInfo": "yza",
-      "documents": {
-        "certificate107": "CDC Secondary Dwelling (2).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "ATLReport.pdf",
-      "uploadedAt": "2025-03-29T01:18:46.660Z",
-      "returnedAt": "2025-03-29T01:30:32.395Z"
-    }
-  },
-  {
-    "id": "baa7c65d-6c1a-41bc-aa12-47d18665d89d",
-    "jobId": "d06df8ea-b371-490a-9230-0bbad92a2eaa",
+    "id": "712558ac-7812-438b-a1db-14115070126f",
+    "jobId": "f42b0cbe-04e6-48fb-8965-d6ebab4ffd0d",
     "jobAddress": "458 Bells Line of Road, Kurmond",
     "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:11:29.681Z",
+    "status": "pending",
+    "createdAt": "2025-04-03T09:09:24.307Z",
     "customAssessment": {
-      "developmentType": "x",
-      "additionalInfo": "y",
+      "developmentType": "123",
+      "additionalInfo": "456",
       "documents": {
-        "certificateOfTitle": "2025 Women's Cap Prem - Draft Draw.pdf",
-        "certificate107": "Updated Contract_compressed.pdf"
+        "certificate107": "Penrith (1) (2).pdf"
       }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:11:50.674Z",
-      "returnedAt": "2025-03-29T04:11:54.526Z"
     }
   },
   {
-    "id": "5eab2f80-b67a-4bb7-beae-90894cee2943",
-    "jobId": "0f8e90df-e3aa-4683-8fa9-cd809012fed0",
-    "jobAddress": "334 NORTON STREET LEICHHARDT",
+    "id": "743c5338-e398-4976-b5e4-848078a4582c",
+    "jobId": "6e22c407-65bc-45a6-93b4-8be116328ac2",
+    "jobAddress": "9 Viola place, Greystanes",
     "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:19:04.280Z",
+    "status": "pending",
+    "createdAt": "2025-04-03T09:26:01.129Z",
     "customAssessment": {
-      "developmentType": "abcd",
-      "additionalInfo": "efgh",
+      "developmentType": "123",
+      "additionalInfo": "456",
       "documents": {
-        "certificateOfTitle": "Invoice INV-2127.pdf",
-        "certificate107": "ATLReport.pdf"
+        "certificate107": "Penrith (1) (2).pdf"
       }
-    },
-    "completedDocument": {
-      "fileName": "CDC Dwelling.docx",
-      "uploadedAt": "2025-03-29T04:23:01.509Z",
-      "returnedAt": "2025-03-29T04:23:04.539Z"
-    }
-  },
-  {
-    "id": "57cd34eb-41d0-4c5e-96f5-a2ce3b5e41b2",
-    "jobId": "29fb9f3b-d286-4383-ab02-8e7c13ecc3d9",
-    "jobAddress": "1 Meyler Close Little Bay",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:22:34.584Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "A506023_02_AL-52072_02.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "ATLReport (1).pdf",
-      "uploadedAt": "2025-03-29T04:23:45.187Z",
-      "returnedAt": "2025-03-29T04:23:47.343Z"
-    }
-  },
-  {
-    "id": "1a5ce690-0b12-4f1b-91cb-27590b14ca80",
-    "jobId": "2e61a624-bbec-487a-9bba-bbc2eff22fa2",
-    "jobAddress": "17 Jane Street Randwick",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:26:23.382Z",
-    "customAssessment": {
-      "developmentType": "1",
-      "additionalInfo": "2",
-      "documents": {
-        "certificate107": "ATLReport (1).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:26:45.095Z",
-      "returnedAt": "2025-03-29T04:26:48.611Z"
-    }
-  },
-  {
-    "id": "bb145cc8-99d2-46ed-8397-ee7fab0e6f92",
-    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
-    "jobAddress": "3 Arilla Street Nowra ",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:29:31.665Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "ATLReport (1).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "ATLReport (1).pdf",
-      "uploadedAt": "2025-03-29T04:29:51.149Z",
-      "returnedAt": "2025-03-29T04:29:57.477Z"
-    }
-  },
-  {
-    "id": "5beb7b80-2dd3-424a-8f7d-c37be6846ac6",
-    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
-    "jobAddress": "3 Arilla Street Nowra ",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:33:08.355Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "x",
-      "documents": {
-        "certificate107": "ATLReport (1).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:33:45.405Z",
-      "returnedAt": "2025-03-29T04:33:51.526Z"
-    }
-  },
-  {
-    "id": "2cbe121a-761a-4714-b247-17d0c1e0ee93",
-    "jobId": "756bd584-616b-492b-bad1-439523666e6b",
-    "jobAddress": "3 Arilla Street Nowra ",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:36:52.687Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "ATLReport (1).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:37:08.492Z",
-      "returnedAt": "2025-03-29T04:37:13.277Z"
-    }
-  },
-  {
-    "id": "d5ed2af0-8d94-4bc2-b04b-00b8f9bc117a",
-    "jobId": "80138e20-a2b3-4dbc-babe-2c3f02e128ea",
-    "jobAddress": "17 Hillview Avenue, Bankstown",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:38:10.083Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "ATLReport.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:38:26.366Z",
-      "returnedAt": "2025-03-29T04:38:30.558Z"
-    }
-  },
-  {
-    "id": "c2b5793b-912e-4d0a-b8ec-38b4bf11739d",
-    "jobId": "6f2a67cd-74f7-4e62-929f-c0c49dbd2f45",
-    "jobAddress": "42 Grand View Parade, Lake Heights",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:49:38.697Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "CDC Dwelling.docx"
-      }
-    },
-    "completedDocument": {
-      "fileName": "2025 Women's Cap Prem - Draft Draw.pdf",
-      "uploadedAt": "2025-03-29T04:49:54.678Z",
-      "returnedAt": "2025-03-29T04:50:02.023Z"
-    }
-  },
-  {
-    "id": "0083ce6d-5060-4722-99f8-e6ae58c95469",
-    "jobId": "c6d17816-803e-4477-b17b-280cab9d2f85",
-    "jobAddress": "2 Thorne Avenue Pendle Hill",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-29T04:58:13.559Z",
-    "customAssessment": {
-      "developmentType": "a",
-      "additionalInfo": "b",
-      "documents": {
-        "certificate107": "CDC Secondary Dwelling.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "ATLReport (1).pdf",
-      "uploadedAt": "2025-03-29T04:58:30.923Z",
-      "returnedAt": "2025-03-29T04:58:36.541Z"
-    }
-  },
-  {
-    "id": "19a0b7a2-52c1-4fd7-a688-08fc234ecd66",
-    "jobId": "1eac3438-7171-4646-9a39-30fae26d5e57",
-    "jobAddress": "2 Thorne Avenue, Pendle Hill",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-03-30T22:23:41.410Z",
-    "customAssessment": {
-      "developmentType": "Dual Occupancy",
-      "additionalInfo": "sdvpinrbpiernbepr",
-      "documents": {
-        "certificate107": "Microsoft.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "CDC Secondary Dwelling.pdf",
-      "uploadedAt": "2025-03-30T22:24:12.186Z",
-      "returnedAt": "2025-03-30T22:24:14.837Z"
-    }
-  },
-  {
-    "id": "c6fe3f83-1d8b-4db3-9001-1598c9fc9880",
-    "jobId": "5fc889a2-2ff8-4d20-ae63-8a339a8fafff",
-    "jobAddress": "5 Courtland Avenue Tahmoor",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-01T06:36:36.126Z",
-    "customAssessment": {
-      "developmentType": "rberbneob",
-      "additionalInfo": "erberb",
-      "documents": {
-        "certificate107": "Quote QU1009.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "DRAFT-Dwelling 01.pdf",
-      "uploadedAt": "2025-04-01T06:37:05.589Z",
-      "returnedAt": "2025-04-01T06:37:07.692Z"
-    }
-  },
-  {
-    "id": "8188a9d4-f27d-43b5-b36a-7cf91e62a92a",
-    "jobId": "89c397a7-a87c-4c20-93ae-682e68585902",
-    "jobAddress": "13 Hillview Avenue Bankstown ",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T07:09:43.913Z",
-    "customAssessment": {
-      "developmentType": "testing work tickets",
-      "additionalInfo": "testing work tickets",
-      "documents": {
-        "certificate107": "BASIX.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "Assessor QA Reveiw Procedure_2024.pdf",
-      "uploadedAt": "2025-04-02T07:32:37.996Z",
-      "returnedAt": "2025-04-02T07:33:21.217Z"
-    }
-  },
-  {
-    "id": "7b27f104-5103-42e7-8fd4-7e1ae80b1e56",
-    "jobId": "7216f8e2-8911-4476-8dae-3f7fc416a724",
-    "jobAddress": "82 Fingal Avenue Glenhaven",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T07:14:44.621Z",
-    "customAssessment": {
-      "developmentType": "Test work ticket",
-      "additionalInfo": "test work ticket",
-      "documents": {
-        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
-      "uploadedAt": "2025-04-02T07:33:13.723Z",
-      "returnedAt": "2025-04-02T07:33:26.137Z"
-    }
-  },
-  {
-    "id": "10ae45db-48ec-43a1-a222-69c56e68b3f3",
-    "jobId": "d5c5ed99-f960-4055-8b15-e3fed86206f1",
-    "jobAddress": "36 Spurwood Rd, Turramurra",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T07:18:18.581Z",
-    "customAssessment": {
-      "developmentType": "Testing work tickets",
-      "additionalInfo": "Testing work tickets",
-      "documents": {
-        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
-      "uploadedAt": "2025-04-02T07:38:16.229Z",
-      "returnedAt": "2025-04-02T07:38:23.718Z"
-    }
-  },
-  {
-    "id": "37a2b1e5-4bd8-4e87-83b4-5bf0ac52dd26",
-    "jobId": "0d0ac235-bf4f-4e99-9bc8-bb277e9e5111",
-    "jobAddress": "4 KANIMBLA ST, KATOOMBA",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T07:25:17.992Z",
-    "customAssessment": {
-      "developmentType": "TEST work ticket",
-      "additionalInfo": "TEST work ticket",
-      "documents": {
-        "certificate107": "Tania Hannaford - Tier 3 Review.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "Tania Hannaford - Tier 3 Review.pdf",
-      "uploadedAt": "2025-04-02T07:42:35.510Z",
-      "returnedAt": "2025-04-02T07:42:49.342Z"
-    }
-  },
-  {
-    "id": "160cb039-33b9-42d3-b3be-81fb2d5444fd",
-    "jobId": "e5193ff2-321f-452d-8578-db4720682d9c",
-    "jobAddress": "9 Viola Place, Greystanes",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T08:59:40.133Z",
-    "customAssessment": {
-      "developmentType": "9 Viola Place, Greystanes",
-      "additionalInfo": "XYZ",
-      "documents": {
-        "certificate107": "ATLReport.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "DRAFT-Dwelling 01.pdf",
-      "uploadedAt": "2025-04-02T09:00:01.595Z",
-      "returnedAt": "2025-04-02T09:00:06.196Z"
-    }
-  },
-  {
-    "id": "254ba632-f55f-4ee1-bf4c-5f73143bc743",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T09:00:53.968Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Cumberland",
-      "documentId": "7006a487-5f14-4711-8e97-9c33eda1016a"
-    },
-    "completedDocument": {
-      "fileName": "Cumberland.pdf",
-      "uploadedAt": "2025-04-02T10:06:57.523Z",
-      "returnedAt": "2025-04-02T10:06:57.523Z"
-    }
-  },
-  {
-    "id": "46776bff-733b-42db-8f02-80d355f817ab",
-    "jobId": "admin",
-    "jobAddress": "System",
-    "ticketType": "pre-prepared-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T09:04:42.954Z",
-    "prePreparedAssessment": {
-      "assessmentType": "Penrith",
-      "documentId": "98f93534-d025-4ac5-b2dd-98369d25af39"
-    },
-    "completedDocument": {
-      "fileName": "Penrith.pdf",
-      "uploadedAt": "2025-04-02T10:06:45.035Z",
-      "returnedAt": "2025-04-02T10:06:45.035Z"
-    }
-  },
-  {
-    "id": "d284bbde-6b9d-467d-b88d-320124dc377d",
-    "jobId": "c22b925e-4612-462b-a868-34bc3af2d6ec",
-    "jobAddress": "9 Viola Place, Greystanes",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T10:07:52.448Z",
-    "customAssessment": {
-      "developmentType": "XYZ",
-      "additionalInfo": "ABC",
-      "documents": {
-        "certificate107": "DRAFT-Dwelling 01 (2).pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "CDC Secondary Dwelling.pdf",
-      "uploadedAt": "2025-04-02T10:08:06.774Z",
-      "returnedAt": "2025-04-02T10:08:08.888Z"
-    }
-  },
-  {
-    "id": "70d48c37-23d7-4f51-9fda-1452e6ea08ab",
-    "jobId": "272561a5-b60e-4b71-9c66-93746a4e362f",
-    "jobAddress": "9 Viola Place, Greystanes",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-02T11:33:31.190Z",
-    "customAssessment": {
-      "developmentType": "xyz",
-      "additionalInfo": "123",
-      "documents": {
-        "certificate107": "ATLReport.pdf"
-      }
-    },
-    "completedDocument": {
-      "fileName": "Penrith (3).pdf",
-      "uploadedAt": "2025-04-02T11:33:44.835Z",
-      "returnedAt": "2025-04-02T11:33:46.444Z"
     }
   }
 ]

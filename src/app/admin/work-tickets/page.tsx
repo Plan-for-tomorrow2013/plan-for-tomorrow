@@ -85,6 +85,8 @@ export default function WorkTicketsPage() {
 
   const handleReturnDocument = async (ticketId: string) => {
     try {
+      console.log('Starting document return for ticket:', ticketId)
+      
       const response = await fetch('/api/work-tickets/return', {
         method: 'POST',
         headers: {
@@ -93,25 +95,30 @@ export default function WorkTicketsPage() {
         body: JSON.stringify({ ticketId }),
       })
 
+      const result = await response.json()
+      console.log('Received response:', result)
+
       if (!response.ok) {
-        throw new Error('Failed to return document')
+        console.log('Response not ok:', response.status)
+        throw new Error(result.error || 'Failed to return document')
       }
 
-      const updatedTicket = await response.json()
+      console.log('Updating tickets with result:', result)
       setTickets(tickets.map(ticket => 
-        ticket.id === ticketId ? updatedTicket : ticket
+        ticket.id === ticketId ? result.ticket : ticket
       ))
 
+      console.log('Showing success toast with message:', result.message)
       toast({
-        title: 'Document processed successfully',
-        description: 'The assessment document has been added to the document store.',
+        title: 'Success',
+        description: result.message || 'The assessment document has been added to the document store.'
       })
     } catch (error) {
       console.error('Error returning document:', error)
       toast({
-        title: 'Error processing document',
-        description: 'Failed to process the document. Please try again.',
-        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to process the document. Please try again.',
+        variant: 'destructive'
       })
     }
   }

@@ -37,14 +37,19 @@ export async function POST(request: Request) {
       )
     }
 
-    // Get the completed document file path
-    const completedDocPath = path.join(
-      process.cwd(),
-      'public',
-      'documents',
-      'completed-assessments',
-      `${ticketId}-${ticket.completedDocument.fileName}`
-    )
+    // Get the completed document file path based on ticket type
+    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
+    const completedDocPath = ticket.ticketType === 'custom-assessment'
+      ? path.join(
+          baseDocumentsDir,
+          'custom',
+          `${ticketId}-${ticket.completedDocument.fileName}`
+        )
+      : path.join(
+          baseDocumentsDir,
+          'pre-prepared',
+          `${ticket.prePreparedAssessment?.documentId}-${ticket.completedDocument.fileName}`
+        )
 
     // Check if the completed document exists
     try {
@@ -110,7 +115,11 @@ export async function POST(request: Request) {
       job.initialAssessment = {}
     }
     
-    job.initialAssessment.status = 'completed'
+    job.initialAssessment = {
+      ...job.initialAssessment,
+      status: 'completed',
+      returnedAt: new Date().toISOString()
+    }
 
     // Save the updated job data
     try {
@@ -144,10 +153,12 @@ export async function POST(request: Request) {
       )
     }
 
-    // TODO: Implement notification to user that their document is ready
-    // This could be via email, in-app notification, etc.
-
-    return NextResponse.json(workTickets[ticketIndex])
+    // Return success response
+    return NextResponse.json({
+      success: true,
+      message: 'Document returned successfully',
+      ticket: workTickets[ticketIndex]
+    }, { status: 200 })
   } catch (error) {
     console.error('Error returning document:', error)
     return NextResponse.json(

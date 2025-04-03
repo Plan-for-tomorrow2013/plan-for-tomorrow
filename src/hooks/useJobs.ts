@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 
-interface Job {
+export interface Job {
   id: string
   address: string
   council?: string
   currentStage?: string
   createdAt?: string
+  initialAssessment?: {
+    status?: 'pending' | 'completed' | 'paid'
+    returnedAt?: string
+  }
 }
 
 export function useJobs() {
@@ -43,5 +47,5 @@ export function useJobs() {
     fetchJobs()
   }, [])
 
-  return { jobs, isLoading, error }
+  return { jobs, setJobs, isLoading, error }
 } 

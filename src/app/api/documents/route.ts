@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     const document: Document = {
       id: documentId,
       title: metadata.title,
-      path: metadata.path,
+      path: metadata.path || '',
       type: metadata.type || 'document',
       category: metadata.category || 'general',
       versions: [documentVersion],
@@ -75,8 +75,7 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
-      required: metadata.required,
-      adminOnly: metadata.adminOnly
+      value: metadata.path || ''
     }
 
     // Save metadata

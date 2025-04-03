@@ -6,16 +6,15 @@ import { Button } from '@/components/ui/button'
 import { Plus, Upload, FileText, X, Check } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useJobs } from '@/hooks/useJobs'
+import { useJobs, type Job } from '@/hooks/useJobs'
 import Link from 'next/link'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Document, DOCUMENT_TYPES, DocumentVersion } from '@/types/documents'
+import { Document, DOCUMENT_TYPES } from '@/types/documents'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from '@/components/ui/use-toast'
-import { documentService } from '@/lib/services/documentService'
-import { WorkTicket } from '@/types/workTickets'
+import { PrePreparedSection } from '@/components/InitialAssessment/PrePreparedSection'
 
 // Debug flag - set to true to enable console logging
 const DEBUG = true
@@ -50,15 +49,13 @@ interface JobFormData {
 
 export default function InitialAssessmentPage() {
   const router = useRouter()
-  const { jobs } = useJobs()
+  const { jobs, setJobs } = useJobs()
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined)
   const [documents, setDocuments] = useState<DocumentWithStatus[]>([])
-  const [allDocuments, setAllDocuments] = useState<Document[]>([])
   const [documentError, setDocumentError] = useState<string | null>(null)
   const [formData, setFormData] = useState<JobFormData>({})
   const [showPaymentButton, setShowPaymentButton] = useState(false)
   const [paymentComplete, setPaymentComplete] = useState<Record<string, boolean>>({})
-  const [workTickets, setWorkTickets] = useState<WorkTicket[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -78,33 +75,19 @@ export default function InitialAssessmentPage() {
   // Reset purchase state when job changes
   useEffect(() => {
     if (selectedJobId) {
-      // Fetch both job and work tickets
-      Promise.all([
-        fetch(`/api/jobs/${selectedJobId}`),
-        fetch('/api/work-tickets')
-      ])
-        .then(([jobResponse, workTicketsResponse]) => 
-          Promise.all([jobResponse.json(), workTicketsResponse.json()])
-        )
-        .then(([jobData, workTickets]) => {
+      // Fetch job data
+      fetch(`/api/jobs/${selectedJobId}`)
+        .then(jobResponse => jobResponse.json())
+        .then(jobData => {
           console.log('Initial load:', {
             jobId: selectedJobId,
             initialAssessment: jobData.initialAssessment,
             paymentStatus: jobData.initialAssessment?.status
           })
 
-          // Find the work ticket for this job
-          const workTicket = workTickets.find((ticket: WorkTicket) => 
-            ticket.jobId === selectedJobId && 
-            ticket.ticketType === 'custom-assessment'
-          )
-
-          // Set payment complete if either:
-          // 1. The job has a paid custom assessment
-          // 2. There's a work ticket for this job
-          if ((jobData.initialAssessment?.status === 'paid' && jobData.initialAssessment?.type === 'custom') ||
-              workTicket) {
-            console.log('Setting payment complete - work ticket found or payment status is paid')
+          // Set payment complete if the job has a paid custom assessment
+          if (jobData.initialAssessment?.status === 'paid') {
+            console.log('Setting payment complete - payment status is paid')
             setPaymentComplete(prev => ({
               ...prev,
               [selectedJobId]: true
@@ -158,6 +141,11 @@ export default function InitialAssessmentPage() {
             [selectedJobId]: true
           }))
         }
+
+        // Update the jobs array with the latest job data
+        setJobs((prevJobs: Job[]) => prevJobs.map((job: Job) => 
+          job.id === selectedJobId ? { ...job, ...jobData } : job
+        ))
       } catch (err) {
         console.error('Error fetching documents:', err)
         setDocumentError('Failed to load documents')
@@ -168,20 +156,6 @@ export default function InitialAssessmentPage() {
     fetchDocuments()
   }, [selectedJobId])
 
-  // Add new effect to fetch all documents
-  useEffect(() => {
-    const fetchAllDocuments = async () => {
-      try {
-        const docs = await documentService.getDocuments()
-        setAllDocuments(docs)
-      } catch (error) {
-        console.error('Error fetching all documents:', error)
-      }
-    }
-
-    fetchAllDocuments()
-  }, [])
-
   // Add polling for document updates
   useEffect(() => {
     let pollInterval: NodeJS.Timeout
@@ -190,70 +164,54 @@ export default function InitialAssessmentPage() {
       if (!selectedJobId) return
 
       try {
-        // Fetch both job and work tickets
-        const [jobResponse, workTicketsResponse] = await Promise.all([
-          fetch(`/api/jobs/${selectedJobId}`),
-          fetch('/api/work-tickets')
-        ])
+        // Fetch job data
+        const jobResponse = await fetch(`/api/jobs/${selectedJobId}`)
 
-        if (!jobResponse.ok || !workTicketsResponse.ok) {
+        if (!jobResponse.ok) {
           throw new Error('Failed to fetch updates')
         }
 
-        const [jobData, workTickets] = await Promise.all([
-          jobResponse.json(),
-          workTicketsResponse.json()
-        ])
-
-        // Find the work ticket for this job
-        const workTicket = workTickets.find((ticket: WorkTicket) => 
-          ticket.jobId === selectedJobId && 
-          ticket.ticketType === 'custom-assessment'
-        )
+        const jobData = await jobResponse.json()
         
-        // Update documents state
-        const updatedDocuments = DOCUMENT_TYPES.map(doc => {
-          const uploadedFile = jobData.documents?.[doc.id]
-          const isInitialAssessment = doc.id === 'initial-assessment-report'
-          
-          return {
-            ...doc,
-            status: uploadedFile ? 'uploaded' as const : 'required' as const,
-            uploadedFile: uploadedFile ? {
-              filename: uploadedFile.filename,
-              originalName: uploadedFile.originalName,
-              type: uploadedFile.type,
-              uploadedAt: uploadedFile.uploadedAt,
-              size: uploadedFile.size,
-              // For initial assessment, use the work ticket's returnedAt
-              returnedAt: isInitialAssessment ? workTicket?.completedDocument?.returnedAt : undefined
-            } : undefined
-          }
-        })
-        
-        setDocuments(updatedDocuments)
-
-        // Always ensure payment status is set if we have a work ticket
-        if (workTicket || (jobData.initialAssessment?.status === 'paid' && jobData.initialAssessment?.type === 'custom')) {
+        // Update payment status if needed
+        if (jobData.initialAssessment?.status === 'paid') {
           setPaymentComplete(prev => ({
             ...prev,
             [selectedJobId]: true
           }))
         }
 
-        // Stop polling if the document has been returned
-        if (workTicket?.completedDocument?.returnedAt) {
-          clearInterval(pollInterval)
+        // Update the jobs array with the latest job data
+        setJobs((prevJobs: Job[]) => prevJobs.map((job: Job) => 
+          job.id === selectedJobId ? { ...job, ...jobData } : job
+        ))
+
+        // Update documents if they've changed
+        if (jobData.documents) {
+          const updatedDocuments = documents.map(doc => {
+            const uploadedFile = jobData.documents[doc.id]
+            return {
+              ...doc,
+              status: uploadedFile ? 'uploaded' as const : 'required' as const,
+              uploadedFile: uploadedFile ? {
+                filename: uploadedFile.filename,
+                originalName: uploadedFile.originalName,
+                type: uploadedFile.type,
+                uploadedAt: uploadedFile.uploadedAt,
+                size: uploadedFile.size
+              } : undefined
+            }
+          })
+          setDocuments(updatedDocuments)
         }
-      } catch (err) {
-        console.error('Error polling for updates:', err)
+      } catch (error) {
+        console.error('Error polling for updates:', error)
       }
     }
 
-    // Always poll when a job is selected
+    // Start polling if we have a selected job
     if (selectedJobId) {
-      pollInterval = setInterval(pollForUpdates, 5000)
-      pollForUpdates() // Initial poll
+      pollInterval = setInterval(pollForUpdates, 5000) // Poll every 5 seconds
     }
 
     return () => {
@@ -261,33 +219,12 @@ export default function InitialAssessmentPage() {
         clearInterval(pollInterval)
       }
     }
-  }, [selectedJobId]) // Only depend on selectedJobId
-
-  // Add effect to fetch work tickets
-  useEffect(() => {
-    if (selectedJobId) {
-      fetch('/api/work-tickets')
-        .then(response => response.json())
-        .then(tickets => {
-          console.log('Fetched work tickets:', tickets)
-          setWorkTickets(tickets)
-        })
-        .catch(error => {
-          console.error('Error fetching work tickets:', error)
-        })
-    }
-  }, [selectedJobId])
-
-  const getCurrentWorkTicket = () => {
-    return workTickets.find(ticket => 
-      ticket.jobId === selectedJobId && 
-      ticket.ticketType === 'custom-assessment'
-    )
-  }
+  }, [selectedJobId, documents])
 
   const isAssessmentReturned = () => {
-    const workTicket = getCurrentWorkTicket()
-    return workTicket?.completedDocument?.returnedAt !== undefined
+    if (!selectedJobId) return false
+    const selectedJob = jobs.find(job => job.id === selectedJobId)
+    return selectedJob?.initialAssessment?.returnedAt !== undefined
   }
 
   const renderDocumentStatus = (doc: DocumentWithStatus) => {
@@ -353,7 +290,7 @@ export default function InitialAssessmentPage() {
         throw new Error('Job not found')
       }
 
-      // Create work ticket
+      // Create work ticket for admin
       const workTicketResponse = await fetch('/api/work-tickets', {
         method: 'POST',
         headers: {
@@ -390,7 +327,16 @@ export default function InitialAssessmentPage() {
             status: 'paid',
             type: 'custom',
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            customAssessment: {
+              developmentType: currentFormData.developmentType,
+              additionalInfo: currentFormData.additionalInfo,
+              documents: {
+                certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
+              }
+            }
           }
         })
       })
@@ -568,46 +514,40 @@ export default function InitialAssessmentPage() {
       input.click()
     }
 
-    // Show success message for initial assessment report when custom assessment is purchased
-    const currentJobPaymentComplete = selectedJobId ? paymentComplete[selectedJobId] : false
-    if (doc.id === 'initial-assessment-report' && currentJobPaymentComplete) {
+// Show document tile for initial assessment report when assessment is returned
+    if (doc.id === 'initial-assessment-report') {
       const assessmentReturned = isAssessmentReturned()
-
-      return (
-        <Card key={doc.id} className="relative">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold">{doc.title}</h3>
-                <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
+      if (assessmentReturned) {
+        return (
+          <Card key={doc.id} className="relative">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{doc.title}</h3>
+                  <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
+                </div>
+                <Check className="h-5 w-5 text-green-500" />
               </div>
-              <Check className="h-5 w-5 text-green-500" />
-            </div>
-          </CardHeader>
-          <CardContent className="bg-green-50">
-            <div className="text-center py-4">
-              <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-              <h4 className="font-medium mb-2">Thank you for your payment!</h4>
-              <p className="text-sm text-gray-600">
-                {assessmentReturned
-                  ? "Your initial assessment is now ready."
-                  : "We are processing your initial assessment."
-                }
-              </p>
-              {assessmentReturned && (
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">{doc.uploadedFile?.originalName}</span>
+                </div>
                 <Button
                   variant="outline"
-                  className="mt-4 w-full"
+                  className="w-full"
                   onClick={() => handleDownload('initial-assessment-report')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Assessment
                 </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
     }
 
     return (
@@ -674,45 +614,38 @@ export default function InitialAssessmentPage() {
   // Add renderCustomAssessmentForm function
   const renderCustomAssessmentForm = () => {
     const currentJobPaymentComplete = selectedJobId ? paymentComplete[selectedJobId] : false
-    console.log('Render state:', {
-      selectedJobId,
-      paymentComplete,
-      currentJobPaymentComplete,
-      workTicket: getCurrentWorkTicket(),
-      isReturned: isAssessmentReturned()
-    })
+    const assessmentReturned = isAssessmentReturned()
     
-    const currentFormData = selectedJobId ? (formData[selectedJobId] || { developmentType: '', additionalInfo: '' }) : { developmentType: '', additionalInfo: '' }
-    
+    // Show success message when payment is complete
     if (currentJobPaymentComplete) {
-      const assessmentReturned = isAssessmentReturned()
-
       return (
         <div className="border rounded-lg p-4 bg-green-50">
           <div className="text-center py-4">
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h4 className="font-medium mb-2">Thank you for your payment!</h4>
-            <p className="text-sm text-gray-600">
-              {assessmentReturned
-                ? "Your initial assessment is now ready."
-                : "We are processing your initial assessment."
-              }
-            </p>
-            {assessmentReturned && (
-              <Button 
-                variant="outline"
-                className="mt-4 w-full"
-                onClick={() => handleDownload('initial-assessment-report')}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Download Assessment
-              </Button>
+            {assessmentReturned ? (
+              <>
+                <p className="text-sm text-gray-600">Your initial assessment is now ready.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => handleDownload('initial-assessment-report')}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download Assessment
+                </Button>
+              </>
+            ) : (
+              <p className="text-sm text-gray-600">We are processing your initial assessment.</p>
             )}
           </div>
         </div>
       )
     }
 
+    // Show the form if payment is not complete
+    const currentFormData = selectedJobId ? formData[selectedJobId] || { developmentType: '', additionalInfo: '' } : { developmentType: '', additionalInfo: '' }
+    
     const certificateOfTitle = documents.find(doc => doc.id === 'certificate-of-title')
     const surveyPlan = documents.find(doc => doc.id === 'survey-plan')
     const certificate107 = documents.find(doc => doc.id === '10-7-certificate')
@@ -841,6 +774,7 @@ export default function InitialAssessmentPage() {
               <TabsList className="w-full grid grid-cols-3 h-12">
                 <TabsTrigger value="ai-chatbot" className="data-[state=active]:bg-white">AI Chatbot</TabsTrigger>
                 <TabsTrigger value="custom-assessment" className="data-[state=active]:bg-white">Custom Assessment</TabsTrigger>
+                <TabsTrigger value="pre-prepared" className="data-[state=active]:bg-white">Pre-prepared</TabsTrigger>
               </TabsList>
               
               <div className="p-6">
@@ -855,6 +789,13 @@ export default function InitialAssessmentPage() {
                 
                 <TabsContent value="custom-assessment" className="mt-0">
                   {renderCustomAssessmentForm()}
+                </TabsContent>
+
+                <TabsContent value="pre-prepared" className="mt-0">
+                  <PrePreparedSection 
+                    selectedJobId={selectedJobId} 
+                    jobAddress={jobs.find(j => j.id === selectedJobId)?.address || ''}
+                  />
                 </TabsContent>
               </div>
             </Tabs>

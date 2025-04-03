@@ -791,91 +791,127 @@
     "isActive": true
   },
   {
-    "id": "7006a487-5f14-4711-8e97-9c33eda1016a",
-    "title": "Cumberland",
+    "id": "266c01c5-0f88-4043-b73a-58e6c92ed15b",
+    "title": "Test work ticket",
     "type": "pre-prepared-assessment",
     "category": "ASSESSMENT",
     "versions": [
       {
         "version": 1,
-        "uploadedAt": "2025-04-02T09:00:53.930Z",
-        "filename": "7006a487-5f14-4711-8e97-9c33eda1016a-v1.pdf",
-        "originalName": "DRAFT-Dwelling 01.pdf",
-        "size": 305965,
+        "uploadedAt": "2025-04-02T23:37:09.148Z",
+        "filename": "266c01c5-0f88-4043-b73a-58e6c92ed15b-v1.pdf",
+        "originalName": "ATLReport.pdf",
+        "size": 21383,
         "uploadedBy": "system"
-      },
-      {
-        "version": 2,
-        "uploadedAt": "2025-04-02T09:01:07.375Z",
-        "filename": "7006a487-5f14-4711-8e97-9c33eda1016a-v2.pdf",
-        "originalName": "DRAFT-Dwelling 01.pdf",
-        "size": 305965,
-        "uploadedBy": "admin"
-      },
-      {
-        "version": 3,
-        "uploadedAt": "2025-04-02T09:06:49.364Z",
-        "filename": "7006a487-5f14-4711-8e97-9c33eda1016a-v3.pdf",
-        "originalName": "DRAFT-Dwelling 01.pdf",
-        "size": 305965,
-        "uploadedBy": "admin"
-      },
-      {
-        "version": 4,
-        "uploadedAt": "2025-04-02T10:02:14.039Z",
-        "filename": "7006a487-5f14-4711-8e97-9c33eda1016a-v4.pdf",
-        "originalName": "DRAFT-Dwelling 01.pdf",
-        "size": 305965,
-        "uploadedBy": "admin"
-      },
-      {
-        "version": 5,
-        "uploadedAt": "2025-04-02T10:06:57.463Z",
-        "filename": "7006a487-5f14-4711-8e97-9c33eda1016a-v5.pdf",
-        "originalName": "Penrith (3).pdf",
-        "size": 19,
-        "uploadedBy": "admin"
       }
     ],
-    "currentVersion": 5,
-    "createdAt": "2025-04-02T09:00:53.930Z",
-    "updatedAt": "2025-04-02T10:06:57.463Z",
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:37:09.148Z",
+    "updatedAt": "2025-04-02T23:37:09.148Z",
     "isActive": true
   },
   {
-    "id": "98f93534-d025-4ac5-b2dd-98369d25af39",
-    "title": "Penrith",
+    "id": "744d1d8b-fa4d-4762-984f-cd53db73832c",
+    "title": "Test work ticket",
+    "path": "",
     "type": "pre-prepared-assessment",
     "category": "ASSESSMENT",
     "versions": [
       {
         "version": 1,
-        "uploadedAt": "2025-04-02T09:04:42.913Z",
-        "filename": "98f93534-d025-4ac5-b2dd-98369d25af39-v1.pdf",
+        "uploadedAt": "2025-04-02T23:43:52.846Z",
+        "filename": "744d1d8b-fa4d-4762-984f-cd53db73832c-v1.pdf",
         "originalName": "ATLReport.pdf",
         "size": 21383,
         "uploadedBy": "system"
       },
       {
         "version": 2,
-        "uploadedAt": "2025-04-02T09:09:29.396Z",
-        "filename": "98f93534-d025-4ac5-b2dd-98369d25af39-v2.pdf",
-        "originalName": "ATLReport.pdf",
-        "size": 21383,
-        "uploadedBy": "admin"
-      },
-      {
-        "version": 3,
-        "uploadedAt": "2025-04-02T10:06:44.770Z",
-        "filename": "98f93534-d025-4ac5-b2dd-98369d25af39-v3.pdf",
-        "originalName": "Penrith (2).pdf",
+        "uploadedAt": "2025-04-02T23:44:36.863Z",
+        "filename": "744d1d8b-fa4d-4762-984f-cd53db73832c-v2.pdf",
+        "originalName": "Penrith (3) (4).pdf",
         "size": 19,
         "uploadedBy": "admin"
       }
     ],
-    "currentVersion": 3,
-    "createdAt": "2025-04-02T09:04:42.913Z",
-    "updatedAt": "2025-04-02T10:06:44.770Z",
-    "isActive": true
+    "currentVersion": 2,
+    "createdAt": "2025-04-02T23:43:52.846Z",
+    "updatedAt": "2025-04-02T23:44:36.863Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "3d926917-cc13-48a3-a631-7832349a8dd9",
+    "title": "Cumberland ",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:44:20.468Z",
+        "filename": "3d926917-cc13-48a3-a631-7832349a8dd9-v1.pdf",
+        "originalName": "ATLReport.pdf",
+        "size": 21383,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-04-02T23:44:48.869Z",
+        "filename": "3d926917-cc13-48a3-a631-7832349a8dd9-v2.pdf",
+        "originalName": "Penrith (3) (1).pdf",
+        "size": 19,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-04-02T23:44:20.468Z",
+    "updatedAt": "2025-04-02T23:44:48.869Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "0366594a-e9ec-4d11-8a20-b819b08056dd",
+    "title": "Penrith",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:45:12.856Z",
+        "filename": "0366594a-e9ec-4d11-8a20-b819b08056dd-v1.pdf",
+        "originalName": "Penrith (3) (3).pdf",
+        "size": 19,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:45:12.856Z",
+    "updatedAt": "2025-04-02T23:45:12.856Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "8ecf22e7-f97e-4301-b436-5313cf3fffff",
+    "title": "Penrith",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:48:59.998Z",
+        "filename": "8ecf22e7-f97e-4301-b436-5313cf3fffff-v1.pdf",
+        "originalName": "Penrith (3) (1).pdf",
+        "size": 19,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:48:59.998Z",
+    "updatedAt": "2025-04-02T23:48:59.998Z",
+    "isActive": true,
+    "value": ""
   }
 ]

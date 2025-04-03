@@ -29,13 +29,23 @@ export async function POST(request: Request) {
       )
     }
 
-    // Create documents directory if it doesn't exist
-    const documentsDir = path.join(process.cwd(), 'public', 'documents', 'completed-assessments')
+    const ticket = workTickets[ticketIndex]
+
+    // Create appropriate documents directory based on ticket type
+    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
+    const documentsDir = ticket.ticketType === 'custom-assessment' 
+      ? path.join(baseDocumentsDir, 'custom')
+      : path.join(baseDocumentsDir, 'pre-prepared')
+    
     await fs.mkdir(documentsDir, { recursive: true })
+
+    // Generate appropriate filename based on ticket type
+    const fileName = ticket.ticketType === 'custom-assessment'
+      ? `${ticketId}-${file.name}`
+      : `${ticket.prePreparedAssessment?.documentId}-${file.name}`
 
     // Save the file
     const fileBuffer = Buffer.from(await file.arrayBuffer())
-    const fileName = `${ticketId}-${file.name}`
     const filePath = path.join(documentsDir, fileName)
     await fs.writeFile(filePath, fileBuffer)
 

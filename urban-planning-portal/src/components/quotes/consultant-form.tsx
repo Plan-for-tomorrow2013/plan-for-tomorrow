@@ -93,7 +93,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
               id="name"
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
 
@@ -104,7 +104,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -115,7 +115,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
               type="tel"
               required
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, phone: e.target.value })}
             />
           </div>
 
@@ -125,7 +125,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
               id="company"
               required
               value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, company: e.target.value })}
             />
           </div>
 
@@ -134,7 +134,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
             <Textarea
               id="notes"
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Add any additional notes..."
             />
           </div>
@@ -147,4 +147,3 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
     </Dialog>
   )
 }
-

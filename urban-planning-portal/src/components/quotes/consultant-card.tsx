@@ -61,7 +61,7 @@ export function ConsultantCard({ consultant, onUpdateNotes, jobs }: ConsultantCa
       Job Description: ${job.address}
       Timeframe: ${timeframe}
       Special Details: ${specialDetails}
-      
+
       Selected Documents:
       ${selectedDocs
         .map((docId) => {
@@ -265,4 +265,3 @@ export function ConsultantCard({ consultant, onUpdateNotes, jobs }: ConsultantCa
     </Card>
   )
 }
-

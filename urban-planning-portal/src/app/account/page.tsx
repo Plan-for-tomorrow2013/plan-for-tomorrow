@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "../../../../admin/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../admin/components/ui/card"
+import { Input } from "../../../../admin/components/ui/input"
+import { Label } from "../../../../admin/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../admin/components/ui/tabs"
 import { User, CreditCard, Bell } from "lucide-react"
 
 export default function AccountPage() {

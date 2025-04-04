@@ -1,11 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "../../../../admin/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../admin/components/ui/card"
+import { Label } from "../../../../admin/components/ui/label"
+import { Separator } from "../../../../admin/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../admin/components/ui/tabs"
+import { Textarea } from "../../../../admin/components/ui/textarea"
 import { Building2, FileText, Upload } from "lucide-react"
 import { useState } from "react"
 

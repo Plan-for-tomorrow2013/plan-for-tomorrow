@@ -1,97 +1,224 @@
+"use client"
+
+import { useState, useRef } from "react"
+import { DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { PageHeader } from "@/components/layout/page-header"
+import { CategoryCard } from "@/components/quotes/category-card" // Updated import path
+import { SearchBar } from "@/components/quotes/search-bar" // Updated import path
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, FileText, Clock, CheckCircle } from "lucide-react"
 
 export default function QuotesPage() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
+
+  const categories = [
+    {
+      id: "nathers-basix",
+      title: "NatHERS & BASIX",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/nathers-basix",
+      description: "Energy efficiency and sustainability consultants",
+    },
+    {
+      id: "waste-management",
+      title: "Waste Management",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/waste-management",
+      description: "Waste management consultants and services",
+    },
+    {
+      id: "cost-estimate",
+      title: "Cost Estimate",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/cost-estimate",
+      description: "Cost estimation and quantity surveying",
+    },
+    {
+      id: "stormwater",
+      title: "Stormwater",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/stormwater",
+      description: "Stormwater management consultants",
+    },
+    {
+      id: "traffic",
+      title: "Traffic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/traffic",
+      description: "Traffic impact assessment consultants",
+    },
+    {
+      id: "surveyor",
+      title: "Surveyor",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/surveyor",
+      description: "Land and construction surveyors",
+    },
+    {
+      id: "bushfire",
+      title: "Bushfire",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/bushfire",
+      description: "Bushfire assessment consultants",
+    },
+    {
+      id: "flooding",
+      title: "Flooding",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/flooding",
+      description: "Flood assessment consultants",
+    },
+    {
+      id: "acoustic",
+      title: "Acoustic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/acoustic",
+      description: "Acoustic assessment consultants",
+    },
+    {
+      id: "landscaping",
+      title: "Landscaping",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/landscaping",
+      description: "Landscape architects and consultants",
+    },
+    {
+      id: "heritage",
+      title: "Heritage",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/heritage",
+      description: "Heritage impact consultants",
+    },
+    {
+      id: "biodiversity",
+      title: "Biodiversity",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/biodiversity",
+      description: "Biodiversity assessment consultants",
+    },
+    {
+      id: "lawyer",
+      title: "Lawyer",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/lawyer",
+      description: "Planning and property lawyers",
+    },
+    {
+      id: "certifiers",
+      title: "Certifiers",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/certifiers",
+      description: "Building certifiers and inspectors",
+    },
+    {
+      id: "arborist",
+      title: "Arborist",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/quotes/arborist",
+      description: "Tree assessment and arborist services",
+    },
+  ]
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setShowLeftArrow(scrollLeft > 0)
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 600
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      })
+    }
+  }
+
+  // Split categories into visible and scrollable sections
+  const visibleCategories = categories.slice(0, 6)
+  const scrollableCategories = categories.slice(6)
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Quotes</h1>
-          <p className="text-gray-500 mt-2">Manage your project quotes</p>
-        </div>
-        <Button>New Quote</Button>
+    <div className="p-6">
+      <PageHeader
+        title="Quotes"
+        icon={<DollarSign className="h-6 w-6" />}
+        subtitle="Request quotes from our trusted consultants"
+      />
+
+      <div className="max-w-6xl mx-auto mb-10">
+        <SearchBar placeholder="Search consultants..." />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-500" />
-                <CardTitle>Statement of Environmental Effects</CardTitle>
-              </div>
-              <DollarSign className="h-5 w-5 text-green-500" />
-            </div>
-            <CardDescription>42 Park Road, Merrylands</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">$499</span>
-                <span className="text-sm text-gray-500">inc. GST</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="h-4 w-4" />
-                <span>Created: 23 Mar 2024</span>
-              </div>
-              <Button className="w-full">Accept Quote</Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-6xl mx-auto">
+        {/* Fixed grid for first 6 items */}
+        <div className="grid grid-cols-3 gap-6 mb-6">
+          {visibleCategories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              title={category.title}
+              icon={category.icon}
+              href={category.href}
+              description={category.description}
+            />
+          ))}
+        </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-purple-500" />
-                <CardTitle>Design Check</CardTitle>
-              </div>
-              <DollarSign className="h-5 w-5 text-green-500" />
+        {/* Scrollable section for remaining items */}
+        {scrollableCategories.length > 0 && (
+          <div className="relative">
+            <div
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-16 z-10"
+              style={{ display: showLeftArrow ? "block" : "none" }}
+            >
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 rounded-full bg-background shadow-lg border-primary"
+                onClick={() => scroll("left")}
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
             </div>
-            <CardDescription>42 Park Road, Merrylands</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">$299</span>
-                <span className="text-sm text-gray-500">inc. GST</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="h-4 w-4" />
-                <span>Created: 23 Mar 2024</span>
-              </div>
-              <Button className="w-full">Accept Quote</Button>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-orange-500" />
-                <CardTitle>Complying Development Certificate</CardTitle>
-              </div>
-              <DollarSign className="h-5 w-5 text-green-500" />
+            <div
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-16 z-10"
+              style={{ display: showRightArrow ? "block" : "none" }}
+            >
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12 rounded-full bg-background shadow-lg border-primary"
+                onClick={() => scroll("right")}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </Button>
             </div>
-            <CardDescription>42 Park Road, Merrylands</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold">$699</span>
-                <span className="text-sm text-gray-500">inc. GST</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="h-4 w-4" />
-                <span>Created: 23 Mar 2024</span>
-              </div>
-              <Button className="w-full">Accept Quote</Button>
+
+            <div
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto gap-6 pb-6 scroll-smooth hide-scrollbar"
+              onScroll={handleScroll}
+            >
+              {scrollableCategories.map((category) => (
+                <div key={category.id} className="flex-none w-[300px]">
+                  <CategoryCard
+                    title={category.title}
+                    icon={category.icon}
+                    href={category.href}
+                    description={category.description}
+                  />
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   )
-} 
+}
+

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,15 +7,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  password    String
+  role        UserRole     @default(USER)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assessments Assessment[]
+}
+
 model AssessmentType {
-  id          String   @id
-  value       String   @unique
+  id          String       @id @default(cuid())
+  value       String       @unique
   label       String
   description String?
   file        String?
   documentId  String?
   version     Int?
-  isCustom    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-} 
+  isCustom    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assessments Assessment[]
+}
+
+model Category {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  assessments Assessment[]
+}
+
+model Assessment {
+  id            String           @id @default(cuid())
+  title         String
+  description   String?
+  status        AssessmentStatus @default(DRAFT)
+  typeId        String
+  categoryId    String
+  userId        String
+  dueDate       DateTime?
+  completedDate DateTime?
+  score         Int?
+  feedback      String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  category      Category         @relation(fields: [categoryId], references: [id])
+  type          AssessmentType   @relation(fields: [typeId], references: [id])
+  user          User             @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AssessmentStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  REVIEWED
+}

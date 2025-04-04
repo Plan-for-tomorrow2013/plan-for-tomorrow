@@ -1,9 +1,9 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Badge } from "../../../../admin/components/ui/badge"
+import { Button } from "../../../../admin/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../admin/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../../admin/components/ui/dialog"
 import { FileText, Plus, Upload } from "lucide-react"
 import { useState } from "react"
 

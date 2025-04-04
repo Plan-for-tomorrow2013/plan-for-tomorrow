@@ -1,10 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "../../../../admin/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../admin/components/ui/card"
+import { Input } from "../../../../admin/components/ui/input"
+import { Label } from "../../../../admin/components/ui/label"
+import { Textarea } from "../../../../admin/components/ui/textarea"
 import { useState } from "react"
 
 export default function ProjectManagementPage() {

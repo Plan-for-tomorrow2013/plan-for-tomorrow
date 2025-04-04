@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "../../../../admin/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../admin/components/ui/card"
+import { Input } from "../../../../admin/components/ui/input"
 import { HelpCircle, Search, Book, MessageCircle, Phone } from "lucide-react"
 
 export default function HelpPage() {

@@ -1,0 +1,917 @@
+[
+  {
+    "id": "482627ec-8daa-4cae-af04-44e5da9b88cf",
+    "title": "CDC Dual Occupancy",
+    "description": "Pre-Prepared Assessment",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:14:23.402Z",
+        "filename": "482627ec-8daa-4cae-af04-44e5da9b88cf-v1.pdf",
+        "originalName": "cdc-dual-occupancy.pdf",
+        "size": 574,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:14:23.402Z",
+    "updatedAt": "2025-03-28T13:14:23.402Z",
+    "isActive": true
+  },
+  {
+    "id": "8e041434-dc38-4272-80ff-a08b051d50a3",
+    "title": "Chapter X - Dual Occupancy",
+    "path": "/initial-assessment/pre-prepared",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:19:07.975Z",
+        "filename": "8e041434-dc38-4272-80ff-a08b051d50a3-v1.docx",
+        "originalName": "Chapter X - Dual Occupancy.docx",
+        "size": 31277,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:19:07.975Z",
+    "updatedAt": "2025-03-28T13:19:07.975Z",
+    "isActive": true
+  },
+  {
+    "id": "3462dbcf-9c99-413f-a87d-cafa2ad7c23f",
+    "title": "TEST",
+    "path": "/initial-assessment/pre-prepared",
+    "type": "pre-prepared-assessment",
+    "category": "Assessment",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:23:45.995Z",
+        "filename": "3462dbcf-9c99-413f-a87d-cafa2ad7c23f-v1.pdf",
+        "originalName": "cdc-dual-occupancy.pdf",
+        "size": 574,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-28T13:23:45.995Z",
+    "updatedAt": "2025-03-28T13:23:45.995Z",
+    "isActive": true
+  },
+  {
+    "id": "71e978dc-1000-4a1c-ac35-80edd0a60248",
+    "title": "CDC Dwelling Assessment",
+    "path": "/initial-assessment/pre-prepared/cdc-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:50:11.097Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v1.pdf",
+        "originalName": "CDC Dwelling Assessment.pdf",
+        "size": 574,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-30T04:52:52.062Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v2.pdf",
+        "originalName": "ATLReport (1).pdf",
+        "size": 21383,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T07:10:57.526Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v3.pdf",
+        "originalName": "Contract of Sale 5 Courtland Ave.pdf",
+        "size": 1839700,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-03-31T21:28:54.370Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v4.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 5,
+        "uploadedAt": "2025-03-31T21:40:38.504Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v5.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 6,
+        "uploadedAt": "2025-03-31T21:42:30.402Z",
+        "filename": "71e978dc-1000-4a1c-ac35-80edd0a60248-v6.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 6,
+    "createdAt": "2025-03-28T13:50:11.097Z",
+    "updatedAt": "2025-03-31T21:42:30.402Z",
+    "isActive": true
+  },
+  {
+    "id": "b6af6b2b-ce51-418c-855b-cca4434f151d",
+    "title": "CDC Dual Occupancy",
+    "path": "/initial-assessment/pre-prepared/cdc-dual-occupancy",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:51:20.001Z",
+        "filename": "b6af6b2b-ce51-418c-855b-cca4434f151d-v1.docx",
+        "originalName": "CDC Dwelling.docx",
+        "size": 31277,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-30T09:25:56.377Z",
+        "filename": "b6af6b2b-ce51-418c-855b-cca4434f151d-v2.pdf",
+        "originalName": "Invoice INV-2127.pdf",
+        "size": 57200,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T21:28:59.843Z",
+        "filename": "b6af6b2b-ce51-418c-855b-cca4434f151d-v3.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 3,
+    "createdAt": "2025-03-28T13:51:20.001Z",
+    "updatedAt": "2025-03-31T21:28:59.843Z",
+    "isActive": true
+  },
+  {
+    "id": "459f90ca-34a4-4309-9459-91abaa0b0c41",
+    "title": "CDC Secondary",
+    "path": "/initial-assessment/pre-prepared/cdc-secondary-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-28T13:51:37.467Z",
+        "filename": "459f90ca-34a4-4309-9459-91abaa0b0c41-v1.pdf",
+        "originalName": "Receipt-2084-2253.pdf",
+        "size": 309881,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T20:03:43.096Z",
+        "filename": "459f90ca-34a4-4309-9459-91abaa0b0c41-v2.pdf",
+        "originalName": "Contract of Sale 5 Courtland Ave.pdf",
+        "size": 1839700,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-03-28T13:51:37.467Z",
+    "updatedAt": "2025-03-31T20:03:43.096Z",
+    "isActive": true
+  },
+  {
+    "id": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d",
+    "title": "Cumberland Initial Assessment",
+    "path": "/initial-assessment/pre-prepared/cumberland",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T20:36:44.113Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v1.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T20:36:50.495Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v2.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T20:37:00.120Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v3.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-03-31T21:28:28.133Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v4.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 5,
+        "uploadedAt": "2025-03-31T21:28:44.527Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v5.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 6,
+        "uploadedAt": "2025-03-31T21:40:44.138Z",
+        "filename": "12f48255-7ef8-46e0-a9dc-5d48fa1b8c3d-v6.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 6,
+    "createdAt": "2025-03-31T20:36:44.113Z",
+    "updatedAt": "2025-03-31T21:40:44.138Z",
+    "isActive": true
+  },
+  {
+    "id": "178c9f14-72be-4c88-9080-7738891364d0",
+    "title": "Fairfield Local Assessment",
+    "path": "/initial-assessment/pre-prepared/fairfield",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T20:37:38.380Z",
+        "filename": "178c9f14-72be-4c88-9080-7738891364d0-v1.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T20:37:43.401Z",
+        "filename": "178c9f14-72be-4c88-9080-7738891364d0-v2.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-03-31T20:37:38.380Z",
+    "updatedAt": "2025-03-31T20:37:43.401Z",
+    "isActive": true
+  },
+  {
+    "id": "27e90672-9656-42e6-a61d-6ff4b4d9d75f",
+    "title": "x",
+    "path": "/initial-assessment/pre-prepared/canterbury",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T20:56:32.681Z",
+        "filename": "27e90672-9656-42e6-a61d-6ff4b4d9d75f-v1.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T20:56:37.983Z",
+        "filename": "27e90672-9656-42e6-a61d-6ff4b4d9d75f-v2.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T21:53:04.337Z",
+        "filename": "27e90672-9656-42e6-a61d-6ff4b4d9d75f-v3.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-03-31T21:55:16.891Z",
+        "filename": "27e90672-9656-42e6-a61d-6ff4b4d9d75f-v4.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 4,
+    "createdAt": "2025-03-31T20:56:32.681Z",
+    "updatedAt": "2025-03-31T21:55:16.891Z",
+    "isActive": true
+  },
+  {
+    "id": "14781764-9b83-4f35-a5f4-fecf46fc7879",
+    "title": "Bankstown",
+    "path": "/initial-assessment/pre-prepared/bansktown",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T21:01:31.509Z",
+        "filename": "14781764-9b83-4f35-a5f4-fecf46fc7879-v1.pdf",
+        "originalName": "Certified Documents.pdf",
+        "size": 1602227,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T21:01:39.192Z",
+        "filename": "14781764-9b83-4f35-a5f4-fecf46fc7879-v2.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T22:22:28.266Z",
+        "filename": "14781764-9b83-4f35-a5f4-fecf46fc7879-v3.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-04-01T00:37:31.832Z",
+        "filename": "14781764-9b83-4f35-a5f4-fecf46fc7879-v4.pdf",
+        "originalName": "DRAFT-Dwelling 02.pdf",
+        "size": 311480,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 4,
+    "createdAt": "2025-03-31T21:01:31.509Z",
+    "updatedAt": "2025-04-01T00:37:31.832Z",
+    "isActive": true
+  },
+  {
+    "id": "fd748c36-f9ee-44dd-a7ce-7a56ee617f3d",
+    "title": "ABCD",
+    "path": "/initial-assessment/pre-prepared/cdc-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T21:29:17.981Z",
+        "filename": "fd748c36-f9ee-44dd-a7ce-7a56ee617f3d-v1.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-31T21:29:17.981Z",
+    "updatedAt": "2025-03-31T21:29:17.981Z",
+    "isActive": true
+  },
+  {
+    "id": "eacdeaba-9171-4cca-8dc8-2049ec96e0a8",
+    "title": "adb",
+    "path": "/report-writer/pre-prepared/statement-environmental-effects",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T21:30:29.930Z",
+        "filename": "eacdeaba-9171-4cca-8dc8-2049ec96e0a8-v1.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T21:30:52.439Z",
+        "filename": "eacdeaba-9171-4cca-8dc8-2049ec96e0a8-v2.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-04-01T00:59:45.897Z",
+        "filename": "eacdeaba-9171-4cca-8dc8-2049ec96e0a8-v3.pdf",
+        "originalName": "Invoice INV-2121.pdf",
+        "size": 57114,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-04-01T01:04:43.277Z",
+        "filename": "eacdeaba-9171-4cca-8dc8-2049ec96e0a8-v4.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 4,
+    "createdAt": "2025-03-31T21:30:29.931Z",
+    "updatedAt": "2025-04-01T01:04:43.277Z",
+    "isActive": true
+  },
+  {
+    "id": "673abc60-e962-46b3-8445-4a69fe368871",
+    "title": "abcd",
+    "path": "/report-writer/pre-prepared/statement-environmental-effects",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T21:30:45.885Z",
+        "filename": "673abc60-e962-46b3-8445-4a69fe368871-v1.pdf",
+        "originalName": "Criminal Record Check.pdf",
+        "size": 240930,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-31T21:30:45.885Z",
+    "updatedAt": "2025-03-31T21:30:45.885Z",
+    "isActive": true
+  },
+  {
+    "id": "88dddda2-255d-4936-be4b-1956c1274bdb",
+    "title": "abcd",
+    "path": "/initial-assessment/pre-prepared/cdc-dwelling",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T21:42:20.421Z",
+        "filename": "88dddda2-255d-4936-be4b-1956c1274bdb-v1.pdf",
+        "originalName": "20220502145832937.pdf",
+        "size": 98765,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-03-31T21:42:20.421Z",
+    "updatedAt": "2025-03-31T21:42:20.421Z",
+    "isActive": true
+  },
+  {
+    "id": "4ae6137b-fc27-46c6-9b48-7014a259c4b3",
+    "title": "The Hills Shire",
+    "path": "/initial-assessment/pre-prepared/the-hills-shire",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T22:40:04.307Z",
+        "filename": "4ae6137b-fc27-46c6-9b48-7014a259c4b3-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T22:40:15.960Z",
+        "filename": "4ae6137b-fc27-46c6-9b48-7014a259c4b3-v2.pdf",
+        "originalName": "DRAFT-Dwelling 02.pdf",
+        "size": 311480,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-03-31T23:05:18.883Z",
+        "filename": "4ae6137b-fc27-46c6-9b48-7014a259c4b3-v3.pdf",
+        "originalName": "Part_B_Section_2_-_Sheet_27.pdf",
+        "size": 2957480,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 4,
+        "uploadedAt": "2025-03-31T23:06:36.679Z",
+        "filename": "4ae6137b-fc27-46c6-9b48-7014a259c4b3-v4.pdf",
+        "originalName": "Invoice INV-2121.pdf",
+        "size": 57114,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 5,
+        "uploadedAt": "2025-04-01T00:37:27.006Z",
+        "filename": "4ae6137b-fc27-46c6-9b48-7014a259c4b3-v5.pdf",
+        "originalName": "Invoice INV-2121.pdf",
+        "size": 57114,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 5,
+    "createdAt": "2025-03-31T22:40:04.307Z",
+    "updatedAt": "2025-04-01T00:37:27.006Z",
+    "isActive": true
+  },
+  {
+    "id": "02aefd35-be88-4740-a67a-f1ba1798da68",
+    "title": "Sydney",
+    "path": "/initial-assessment/pre-prepared/sydney",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-03-31T23:59:43.688Z",
+        "filename": "02aefd35-be88-4740-a67a-f1ba1798da68-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-03-31T23:59:57.594Z",
+        "filename": "02aefd35-be88-4740-a67a-f1ba1798da68-v2.pdf",
+        "originalName": "DRAFT-Dwelling 02.pdf",
+        "size": 311480,
+        "uploadedBy": "admin"
+      },
+      {
+        "version": 3,
+        "uploadedAt": "2025-04-01T00:37:07.897Z",
+        "filename": "02aefd35-be88-4740-a67a-f1ba1798da68-v3.pdf",
+        "originalName": "DRAFT-Dwelling 03.pdf",
+        "size": 314460,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 3,
+    "createdAt": "2025-03-31T23:59:43.688Z",
+    "updatedAt": "2025-04-01T00:37:07.897Z",
+    "isActive": true
+  },
+  {
+    "id": "76199e66-9fc7-449e-a03b-d8f3f96bec70",
+    "title": "abc",
+    "path": "/report-writer/pre-prepared/complying-development-certificate",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T01:05:00.418Z",
+        "filename": "76199e66-9fc7-449e-a03b-d8f3f96bec70-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-04-01T01:05:05.730Z",
+        "filename": "76199e66-9fc7-449e-a03b-d8f3f96bec70-v2.pdf",
+        "originalName": "DRAFT-Dwelling 02.pdf",
+        "size": 311480,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-04-01T01:05:00.418Z",
+    "updatedAt": "2025-04-01T01:05:05.730Z",
+    "isActive": true
+  },
+  {
+    "id": "89016fea-99fc-411d-9dfa-5b8548a02371",
+    "title": "Georges River",
+    "path": "/initial-assessment/pre-prepared/georges-river",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T03:35:43.350Z",
+        "filename": "89016fea-99fc-411d-9dfa-5b8548a02371-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-01T03:35:43.350Z",
+    "updatedAt": "2025-04-01T03:35:43.350Z",
+    "isActive": true
+  },
+  {
+    "id": "dfc55d47-fa8c-451b-8dde-8bd4e01a3c06",
+    "title": "Wollongong",
+    "path": "/initial-assessment/pre-prepared/wollongong",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T03:40:17.588Z",
+        "filename": "dfc55d47-fa8c-451b-8dde-8bd4e01a3c06-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-01T03:40:17.588Z",
+    "updatedAt": "2025-04-01T03:40:17.588Z",
+    "isActive": true
+  },
+  {
+    "id": "2477f564-6c69-41c9-9e75-12914bc709c1",
+    "title": "Wollondilly",
+    "path": "/initial-assessment/pre-prepared/wollondilly",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T05:01:18.860Z",
+        "filename": "2477f564-6c69-41c9-9e75-12914bc709c1-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-01T05:01:18.861Z",
+    "updatedAt": "2025-04-01T05:01:18.861Z",
+    "isActive": true
+  },
+  {
+    "id": "b44646e7-77ee-41b8-bd9b-7b28330c0fb2",
+    "title": "Penrith",
+    "path": "/initial-assessment/pre-prepared/penrith",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T05:43:45.424Z",
+        "filename": "b44646e7-77ee-41b8-bd9b-7b28330c0fb2-v1.pdf",
+        "originalName": "DRAFT-Dwelling 02.pdf",
+        "size": 311480,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-01T05:43:45.424Z",
+    "updatedAt": "2025-04-01T05:43:45.424Z",
+    "isActive": true
+  },
+  {
+    "id": "541227b5-3faf-4ef4-88e1-512233b57bac",
+    "title": "Blue Mountain",
+    "path": "/initial-assessment/pre-prepared/blue-mountains",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T06:29:14.482Z",
+        "filename": "541227b5-3faf-4ef4-88e1-512233b57bac-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-01T06:29:14.482Z",
+    "updatedAt": "2025-04-01T06:29:14.482Z",
+    "isActive": true
+  },
+  {
+    "id": "02efab7f-5311-42ae-8a8b-bd4615a53a29",
+    "title": "TEST",
+    "path": "/initial-assessment/pre-prepared/test-assessment",
+    "type": "document",
+    "category": "general",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-01T08:34:13.166Z",
+        "filename": "02efab7f-5311-42ae-8a8b-bd4615a53a29-v1.pdf",
+        "originalName": "DRAFT-Dwelling 01.pdf",
+        "size": 305965,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-04-01T08:45:03.625Z",
+        "filename": "02efab7f-5311-42ae-8a8b-bd4615a53a29-v2.pdf",
+        "originalName": "DRAFT-Dwelling 03.pdf",
+        "size": 314460,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-04-01T08:34:13.166Z",
+    "updatedAt": "2025-04-01T08:45:03.625Z",
+    "isActive": true
+  },
+  {
+    "id": "a1c2ee0c-b082-474e-bac4-4775677ca9b6",
+    "title": "ticket flow",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T06:54:24.057Z",
+        "filename": "a1c2ee0c-b082-474e-bac4-4775677ca9b6-v1.pdf",
+        "originalName": "Assessor QA Reveiw Procedure_2024.pdf",
+        "size": 198093,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T06:54:24.057Z",
+    "updatedAt": "2025-04-02T06:54:24.057Z",
+    "isActive": true
+  },
+  {
+    "id": "734f102f-799a-46b2-984b-cd6fe40b7071",
+    "title": "Ticket flow",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T06:55:02.091Z",
+        "filename": "734f102f-799a-46b2-984b-cd6fe40b7071-v1.pdf",
+        "originalName": "Assessor QA Reveiw Procedure_2024.pdf",
+        "size": 198093,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T06:55:02.091Z",
+    "updatedAt": "2025-04-02T06:55:02.091Z",
+    "isActive": true
+  },
+  {
+    "id": "5234762a-1147-4b0e-8fcb-4f15d9ee33bf",
+    "title": "Testing flow",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T06:57:50.417Z",
+        "filename": "5234762a-1147-4b0e-8fcb-4f15d9ee33bf-v1.pdf",
+        "originalName": "Assessor QA Reveiw Procedure_2024.pdf",
+        "size": 198093,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T06:57:50.417Z",
+    "updatedAt": "2025-04-02T06:57:50.417Z",
+    "isActive": true
+  },
+  {
+    "id": "266c01c5-0f88-4043-b73a-58e6c92ed15b",
+    "title": "Test work ticket",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:37:09.148Z",
+        "filename": "266c01c5-0f88-4043-b73a-58e6c92ed15b-v1.pdf",
+        "originalName": "ATLReport.pdf",
+        "size": 21383,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:37:09.148Z",
+    "updatedAt": "2025-04-02T23:37:09.148Z",
+    "isActive": true
+  },
+  {
+    "id": "744d1d8b-fa4d-4762-984f-cd53db73832c",
+    "title": "Test work ticket",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:43:52.846Z",
+        "filename": "744d1d8b-fa4d-4762-984f-cd53db73832c-v1.pdf",
+        "originalName": "ATLReport.pdf",
+        "size": 21383,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-04-02T23:44:36.863Z",
+        "filename": "744d1d8b-fa4d-4762-984f-cd53db73832c-v2.pdf",
+        "originalName": "Penrith (3) (4).pdf",
+        "size": 19,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-04-02T23:43:52.846Z",
+    "updatedAt": "2025-04-02T23:44:36.863Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "3d926917-cc13-48a3-a631-7832349a8dd9",
+    "title": "Cumberland ",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:44:20.468Z",
+        "filename": "3d926917-cc13-48a3-a631-7832349a8dd9-v1.pdf",
+        "originalName": "ATLReport.pdf",
+        "size": 21383,
+        "uploadedBy": "system"
+      },
+      {
+        "version": 2,
+        "uploadedAt": "2025-04-02T23:44:48.869Z",
+        "filename": "3d926917-cc13-48a3-a631-7832349a8dd9-v2.pdf",
+        "originalName": "Penrith (3) (1).pdf",
+        "size": 19,
+        "uploadedBy": "admin"
+      }
+    ],
+    "currentVersion": 2,
+    "createdAt": "2025-04-02T23:44:20.468Z",
+    "updatedAt": "2025-04-02T23:44:48.869Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "0366594a-e9ec-4d11-8a20-b819b08056dd",
+    "title": "Penrith",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:45:12.856Z",
+        "filename": "0366594a-e9ec-4d11-8a20-b819b08056dd-v1.pdf",
+        "originalName": "Penrith (3) (3).pdf",
+        "size": 19,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:45:12.856Z",
+    "updatedAt": "2025-04-02T23:45:12.856Z",
+    "isActive": true,
+    "value": ""
+  },
+  {
+    "id": "8ecf22e7-f97e-4301-b436-5313cf3fffff",
+    "title": "Penrith",
+    "path": "",
+    "type": "pre-prepared-assessment",
+    "category": "ASSESSMENT",
+    "versions": [
+      {
+        "version": 1,
+        "uploadedAt": "2025-04-02T23:48:59.998Z",
+        "filename": "8ecf22e7-f97e-4301-b436-5313cf3fffff-v1.pdf",
+        "originalName": "Penrith (3) (1).pdf",
+        "size": 19,
+        "uploadedBy": "system"
+      }
+    ],
+    "currentVersion": 1,
+    "createdAt": "2025-04-02T23:48:59.998Z",
+    "updatedAt": "2025-04-02T23:48:59.998Z",
+    "isActive": true,
+    "value": ""
+  }
+]

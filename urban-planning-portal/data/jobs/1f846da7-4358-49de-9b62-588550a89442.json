@@ -1,0 +1,337 @@
+{
+  "id": "1f846da7-4358-49de-9b62-588550a89442",
+  "createdAt": "2025-03-25T04:10:58.221Z",
+  "status": "new",
+  "propertyData": {
+    "address": "17 Hillview Avenue, Bankstown",
+    "coordinates": {
+      "longitude": 151.044362937587,
+      "latitude": -33.913681024645
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "249628",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/23/2023",
+            "Amendment": "Null",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "789091",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "313732",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Maximum Building Height": "9",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "9",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "412825",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/14/2024",
+            "Amendment": "Null",
+            "Layer Class": "450-474",
+            "Lot Size": "450",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio",
+          "attributes": {
+            "OBJECTID": "229901",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Layer Class": "0.5-0.54",
+            "Floor Space Ratio": "0.5",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "193851",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/23/2023",
+            "Amendment": "Null",
+            "Map Type": "CAP",
+            "Type": "Clause Application",
+            "Class": "Area 1",
+            "Description": "Clauses of the LEP Apply",
+            "Label": "Area 1",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "debug": [
+        {
+          "layer": "Local Environmental Plan",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Layer Class",
+            "Legislative Area",
+            "Legislative Clause",
+            "Legislative Value",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "249628",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/23/2023",
+            "Amendment": "Null",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "MAP_NAME",
+            "Land Use",
+            "Zone",
+            "Purpose",
+            "Additional Controls",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "789091",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Maximum Building Height",
+            "Units",
+            "Additional Controls",
+            "Legislative Clause",
+            "EPI Type",
+            "SHAPE",
+            "MAX_B_H_M",
+            "MAX_B_H_RL"
+          ],
+          "sampleData": {
+            "OBJECTID": "313732",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Maximum Building Height": "9",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "9",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Layer Class",
+            "Lot Size",
+            "Units",
+            "Additional Controls",
+            "Legislative Clause",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "412825",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "6/14/2024",
+            "Amendment": "Null",
+            "Layer Class": "450-474",
+            "Lot Size": "450",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio",
+          "fields": [
+            "OBJECTID",
+            "EPI Name",
+            "LGA Name",
+            "Published Date",
+            "Commenced Date",
+            "Currency Date",
+            "Amendment",
+            "Layer Class",
+            "Floor Space Ratio",
+            "Additional Controls",
+            "Legislative Clause",
+            "EPI Type",
+            "SHAPE"
+          ],
+          "sampleData": {
+            "OBJECTID": "229901",
+            "EPI Name": "Canterbury-Bankstown Local Environmental Plan 2023",
+            "LGA Name": "CANTERBURY-BANKSTOWN",
+            "Published Date": "6/23/2023",
+            "Commenced Date": "6/23/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Null",
+            "Layer Class": "0.5-0.54",
+            "Floor Space Ratio": "0.5",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Heritage",
+          "fields": [],
+          "sampleData": null
+        }
+      ]
+    }
+  }
+}

@@ -1,17 +1,16 @@
 "use client"
 
-import { Button } from "../../../../../admin/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../../admin/src/components/ui/card"
-import { Input } from "../../../../../admin/src/components/ui/input"
-import { Label } from "../../../../../admin/src/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../admin/src/components/ui/tabs"
+import { Button } from "../../../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Input } from "../../../components/ui/input"
+import { Label } from "../../../components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { User, CreditCard, Bell } from "lucide-react"
 
 export default function AccountPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
-
       <Tabs defaultValue="profile" className="w-full">
         <TabsList>
           <TabsTrigger value="profile" className="flex items-center gap-2">

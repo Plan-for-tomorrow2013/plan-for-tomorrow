@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 export interface DocumentVersion {
   version: number
   uploadedAt: string
@@ -9,6 +11,7 @@ export interface DocumentVersion {
 }
 
 export interface Document {
+  description: ReactNode
   id: string
   title: string
   path: string // Where the document should appear in the app (e.g., '/initial-assessment/pre-prepared')
@@ -63,7 +66,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    description: undefined
   },
   {
     id: '10-7-certificate',
@@ -76,7 +80,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    description: undefined
   },
   {
     id: 'survey-plan',
@@ -89,7 +94,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    description: undefined
   },
   {
     id: 'initial-assessment-report',
@@ -102,6 +108,7 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    description: undefined
   }
-] 
+]

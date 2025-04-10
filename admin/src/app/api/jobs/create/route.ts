@@ -53,7 +53,7 @@ export async function POST(request: Request) {
           }
         }
         // Special handling for Building Height Additional Controls
-        if (layer.layer === "Building Height Additional Controls") {
+        if (layer.layer === "Height of Building Additional Controls") {
           // Filter out any height-related fields, only keep Legislative info
           const { "Maximum Building Height": _, "Units": __, ...otherAttributes } = layer.attributes
           return {

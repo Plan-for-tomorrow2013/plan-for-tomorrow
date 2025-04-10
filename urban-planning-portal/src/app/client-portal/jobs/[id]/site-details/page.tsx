@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader } from '../../../../../components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
-import { Button } from '../../../../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { Input } from '../../../../../components/ui/input'
-import { Label } from '../../../../../components/ui/label'
-import { Textarea } from '../../../../../components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select'
-import { Alert, AlertDescription, AlertTitle } from '../../../../components/ui/alert'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Check, Loader2 } from 'lucide-react'
 
 export default function SiteDetailsPage({ params }: { params: { id: string } }) {

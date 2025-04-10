@@ -1,12 +1,12 @@
 "use client"
 
-import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
-import { Badge } from "../../../../components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
 import { FileText, Upload, CheckCircle } from "lucide-react"
 import { useState } from "react"
-import { PageHeader } from "../../../components/ui/page-header"
+import { PageHeader } from "@/components/ui/page-header"
 
 export default function DevelopmentApplicationPage() {
   const [showUploadDialog, setShowUploadDialog] = useState(false)

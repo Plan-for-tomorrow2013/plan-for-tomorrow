@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '../ui/button'
-import { Card } from '../ui/card'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Upload } from 'lucide-react'
-import { DOCUMENT_TYPES } from '../../../types/documents'
+import { DOCUMENT_TYPES } from '@/types/documents'
 
 interface DocumentUploadSectionProps {
   jobId: string
@@ -27,9 +27,8 @@ export function DocumentUploadSection({ jobId }: DocumentUploadSectionProps) {
       setIsUploading(false)
     }
   }
-
   return (
-    <Card className="p-6">
+    <Card.Root className="p-6">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Upload Documents</h3>
         <p className="text-sm text-gray-500">

@@ -49,8 +49,7 @@ export async function getZoningInformation(longitude: number | null, latitude: n
     return null
   }
 
-  const arcgisServiceUrl =
-    "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer"
+  const arcgisServiceUrl = "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer";
   const queryUrl = `${arcgisServiceUrl}/2/query`
 
   const params = new URLSearchParams({
@@ -126,4 +125,4 @@ export async function getZoningFromAddress(address: string): Promise<ZoningInfo[
     console.log("Could not retrieve zoning information without valid coordinates.")
     return null
   }
-} 
+}

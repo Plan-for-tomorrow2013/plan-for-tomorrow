@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader } from '../../../../components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, FileText } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
-import { Button } from '../../../../components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { InitialAssessment } from '../../../../types/documents'
+import { InitialAssessment } from '@/types/documents'
 
 interface JobData {
   id: string

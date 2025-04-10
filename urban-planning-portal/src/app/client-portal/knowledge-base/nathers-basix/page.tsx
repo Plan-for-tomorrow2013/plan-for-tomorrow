@@ -1,14 +1,14 @@
 "use client"
 
-import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
-import { Badge } from "../../../../components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
 import { FileText, Upload, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import { paymentService } from "../../../../../lib/services/paymentService"
-import { useToast } from "../../../../components/ui/use-toast"
-import { PageHeader } from "../../../components/ui/page-header"
+import { useToast } from "@/components/ui/use-toast"
+import { PageHeader } from "@/components/ui/page-header"
 
 export default function NathersBASIXPage() {
   const [showUploadDialog, setShowUploadDialog] = useState(false)

@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
-import { Badge } from "../../../../components/ui/badge"
-import { useToast } from "../../../../components/ui/use-toast"
-import { WasteCalculator } from "../../../../components/WasteCalculator"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/use-toast"
+import { WasteCalculator } from "@/components/WasteCalculator"
 import { CheckCircle, FileText, Upload } from "lucide-react"
 import { paymentService } from "../../../../../lib/services/paymentService"
-import { PageHeader } from "../../../components/ui/page-header"
+import { PageHeader } from "@/components/ui/page-header"
 
 export default function WasteManagementPage() {
   const [showUploadDialog, setShowUploadDialog] = useState(false)

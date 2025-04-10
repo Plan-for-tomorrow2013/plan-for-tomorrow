@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '../../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Plus, Upload, FileText, X, Check } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useJobs, type Job } from '../../../../hooks/useJobs'
 import Link from 'next/link'
-import { Alert, AlertDescription } from '../../components/ui/alert'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Document, DOCUMENT_TYPES } from '../../../types/documents'
-import { Input } from '../../../components/ui/input'
-import { Textarea } from '../../../components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card'
-import { toast } from '../../../components/ui/use-toast'
-import { PrePreparedSection } from '../../components/InitialAssessment/PrePreparedSection'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { toast } from '@/components/ui/use-toast'
+import { PrePreparedSection } from '@/components/PrePreparedSection'
 
 // Debug flag - set to true to enable console logging
 const DEBUG = true

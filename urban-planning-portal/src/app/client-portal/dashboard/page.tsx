@@ -1,13 +1,16 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader } from '../../../components/ui/card'
-import { Input } from '../../../components/ui/input'
-import { Button } from '../../../components/ui/button'
-import { useToast } from '../../../components/ui/use-toast'
+import { useState, useEffect, useLayoutEffect } from 'react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
-import { UserStats } from '../../../components/UserStats'
+import { UserStats } from '@/components/UserStats'
 import { Announcements } from '../../../components/Announcements'
+import { useRouter } from 'next/router';
+import { useRef } from 'react';
+import router from 'next/dist/shared/lib/router/router'
 
 interface SearchResult {
   layer: string
@@ -50,72 +53,61 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [isCreatingJob, setIsCreatingJob] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [jobs, setJobs] = useState<Job[]>([
-    {
-      id: '1',
-      address: '9 Viola Place, Greystanes',
-      council: 'Cumberland Council',
-      currentStage: 'initial-assessment'
-    },
-    {
-      id: '2',
-      address: '458 Bells Line of Road, Kurmond',
-      council: 'Hawkesbury Council',
-      currentStage: 'report-writer'
-    }
-  ])
+  const [jobs, setJobs] = useState<Job[]>([])
 
   // Fetch announcements
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const response = await fetch('/api/announcements')
-        if (!response.ok) throw new Error('Failed to fetch announcements')
-        const data = await response.json()
-        setAnnouncements(data)
+        const response = await fetch('/api/announcements');
+        if (!response.ok) throw new Error('Failed to fetch announcements');
+        const data = await response.json();
+        setAnnouncements(data);
       } catch (error) {
-        console.error('Error fetching announcements:', error)
+        console.error('Error fetching announcements:', error);
         toast({
           title: "Error",
           description: "Failed to load announcements",
           variant: "destructive"
-        })
+        });
       }
     }
 
-    fetchAnnouncements()
-  }, [])
+    fetchAnnouncements();
+  }, []);
 
   const handleSearch = async () => {
     if (!address.trim()) {
-      setError('Please enter an address')
-      return
+      setError('Please enter an address');
+      return;
     }
 
-    setLoading(true)
-    setError(null)
-    setResults(null)
+    setLoading(true);
+    setError(null);
+    setResults(null);
 
     try {
-      const response = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`)
-      const data = await response.json()
+      const response = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`);
 
+      // Check if the response is OK
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch results')
+        const errorText = await response.text(); // Get the response as text
+        throw new Error(`Error: ${response.status} - ${errorText}`);
       }
 
-      setResults(data)
+      const data = await response.json(); // Parse as JSON
+      setResults(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCreateJob = async () => {
-    if (!results) return
+    if (!results) return;
 
-    setIsCreatingJob(true)
+    setIsCreatingJob(true);
     try {
       const response = await fetch('/api/jobs/create', {
         method: 'POST',
@@ -125,25 +117,31 @@ export default function DashboardPage() {
         body: JSON.stringify({
           address: results.address,
           coordinates: results.coordinates,
-          planningLayers: results.planningLayers
-        })
-      })
+          planningLayers: results.planningLayers,
+        }),
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.details || 'Failed to create job')
+        const errorText = await response.text(); // Get the response as text
+        console.error('Error response:', errorText); // Log the error response
+        throw new Error(`Error: ${response.status} - ${errorText}`);
       }
 
-      const job = await response.json()
-      // Redirect to the new job page
-      window.location.href = `/jobs/${job.id}`
+      const data = await response.json();
+      console.log('handleCreateJob - data:', data);
+      // Redirect to the new job page using Next.js router
+      try {
+        window.location.href = data.redirectUrl;
+      } catch (error) {
+        console.error('handleCreateJob - redirect error:', error);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create job')
-      console.error('Error creating job:', err)
+      setError(err instanceof Error ? err.message : 'Failed to create job');
+      console.error('handleCreateJob - fetch error:', err);
     } finally {
-      setIsCreatingJob(false)
+      setIsCreatingJob(false);
     }
-  }
+  };
 
   const renderAttributes = (attributes: Record<string, any>, layerName: string) => {
     const renderRow = (label: string, value: any) => (
@@ -164,7 +162,7 @@ export default function DashboardPage() {
     }
 
     // Special handling for Building Height Additional Controls
-    if (layerName === "Building Height Additional Controls") {
+    if (layerName === "Height of Building Additional Controls") {
       return (
         <div className="space-y-3">
           {renderRow("Legislative Area", attributes["Legislative Area"])}
@@ -172,6 +170,16 @@ export default function DashboardPage() {
         </div>
       )
     }
+
+        // Special handling for Minimum Lot Size Additional Controls
+        if (layerName === "Minimum Lot Size Additional Controls") {
+          return (
+            <div className="space-y-3">
+              {renderRow("Legislative Area", attributes["Legislative Area"])}
+              {renderRow("Legislative Clause", attributes["Legislative Clause"])}
+            </div>
+          )
+        }
 
     // Special handling for Local Environmental Plan
     if (layerName === "Local Environmental Plan") {
@@ -213,6 +221,16 @@ export default function DashboardPage() {
         <div className="space-y-3">
           {renderRow("Lot Size", attributes["Lot Size"])}
           {renderRow("Units", attributes["Units"])}
+        </div>
+      )
+    }
+
+    // Special handling for Minimum Dwelling Density Area
+    if (layerName === "Minimum Dwelling Density Area") {
+      return (
+        <div className="space-y-3">
+          {renderRow("Minimum Dwelling Density", attributes["Minimum Dwelling Density"])}
+          {renderRow("Code", attributes["Code"])}
         </div>
       )
     }

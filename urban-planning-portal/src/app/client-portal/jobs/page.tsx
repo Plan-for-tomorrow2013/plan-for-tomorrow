@@ -6,6 +6,7 @@ import { Card, CardContent } from '../../../components/ui/card'
 import Link from 'next/link'
 import { FileText, Search, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '../../../components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 interface Job {
   id: string
   address: string
@@ -180,7 +181,7 @@ export default function JobsPage() {
               )}
             </Button>
 
-            <Link href={`/jobs/${job.id}`}>
+            <Link href={`/client-portal/jobs/${job.id}`}>
               <h3 className="text-lg font-semibold mb-2 text-[#323A40]">
                 {job.address ?? 'Untitled Job'}
               </h3>

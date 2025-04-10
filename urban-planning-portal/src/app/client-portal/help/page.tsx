@@ -1,6 +1,6 @@
-import { Button } from "../../../../../admin/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../../admin/src/components/ui/card"
-import { Input } from "../../../../../admin/src/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { HelpCircle, Search, Book, MessageCircle, Phone } from "lucide-react"
 
 export default function HelpPage() {
@@ -15,27 +15,26 @@ export default function HelpPage() {
 
       <div className="max-w-2xl mb-8">
         <div className="flex gap-4">
-          <Input
+          <input
             type="text"
             placeholder="Search for help..."
-            className="flex-1"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <Button>
+          <button type="button" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
             <Search className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </div>
-
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader>
+        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div className="flex flex-col space-y-1.5 p-6">
             <div className="flex items-center gap-2">
               <Book className="h-6 w-6 text-blue-500" />
-              <CardTitle>Documentation</CardTitle>
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">Documentation</h3>
             </div>
             <CardDescription>Browse our guides and tutorials</CardDescription>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="p-6 pt-0">
             <ul className="space-y-2">
               <li>• Getting Started Guide</li>
               <li>• Initial Assessment Guide</li>
@@ -43,8 +42,8 @@ export default function HelpPage() {
               <li>• Design Check Guide</li>
             </ul>
             <Button variant="outline" className="w-full mt-4">View All</Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <Card>
           <CardHeader>

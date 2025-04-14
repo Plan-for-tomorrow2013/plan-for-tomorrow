@@ -11,6 +11,8 @@ import { Announcements } from '../../../components/Announcements'
 import { useRouter } from 'next/router';
 import { useRef } from 'react';
 import router from 'next/dist/shared/lib/router/router'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useJobs } from '../../../../hooks/useJobs'
 
 interface SearchResult {
   layer: string
@@ -53,7 +55,9 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [isCreatingJob, setIsCreatingJob] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [jobs, setJobs] = useState<Job[]>([])
+  const { jobs, setJobs } = useJobs()
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
+  const [jobDetails, setJobDetails] = useState<Job | null>(null)
 
   // Fetch announcements
   useEffect(() => {
@@ -75,6 +79,20 @@ export default function DashboardPage() {
 
     fetchAnnouncements();
   }, []);
+
+  useEffect(() => {
+    if (selectedJobId) {
+      const fetchJobDetails = async () => {
+        const response = await fetch(`/api/jobs/${selectedJobId}`);
+        const data = await response.json();
+        setJobDetails(data);
+      };
+
+      fetchJobDetails();
+    } else {
+      setJobDetails(null); // Clear job details if no job is selected
+    }
+  }, [selectedJobId]);
 
   const handleSearch = async () => {
     if (!address.trim()) {
@@ -291,13 +309,13 @@ export default function DashboardPage() {
 
       {/* Property Search Section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Property Search</h2>
+        <h2 className="text-2xl font-bold">Search a property to create a new job</h2>
         <Card>
           <CardContent className="p-6">
             <div className="flex gap-2">
               <Input
                 type="text"
-                placeholder="Enter address (e.g., 63 Elgin St Gunnedah)"
+                placeholder="Enter address (e.g., 9 Viola Place, Greystanes)"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -392,9 +410,108 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Announcements
-        announcements={announcements}
-      />
+      {/* Job status section */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Job Status</h2>
+        <div className="flex-1 mr-4">
+          <Select value={selectedJobId || undefined} onValueChange={setSelectedJobId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a job" />
+            </SelectTrigger>
+            <SelectContent>
+              {jobs.map((job) => (
+                <SelectItem key={job.id} value={job.id}>
+                  {job.address}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Job Details Section */}
+      {jobDetails && (
+        <Card>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+              {[
+                {
+                  name: 'Property Info',
+                  id: 'property-info',
+                  description: 'View property details and planning layers',
+                  color: '#EA6B3D',
+                },
+                {
+                  name: 'Site Details',
+                  id: 'site-details',
+                  description: 'Site specifications and requirements',
+                  color: '#CDC532',
+                },
+                {
+                  name: 'Document Store',
+                  id: 'document-store',
+                  description: 'Access and manage documents',
+                  color: '#EEDA54',
+                },
+                {
+                  name: 'Initial Assessment',
+                  id: 'initial-assessment',
+                  description: 'Start your development assessment',
+                  color: '#4A90E2',
+                },
+                {
+                  name: 'Design Check',
+                  id: 'design-check',
+                  description: 'Review design specifications',
+                  color: '#CDC532',
+                },
+                {
+                  name: 'Report Writer',
+                  id: 'report-writer',
+                  description: 'Generate detailed reports',
+                  color: '#532200',
+                },
+                {
+                  name: 'Quotes',
+                  id: 'quotes',
+                  description: 'Manage cost estimates',
+                  color: '#727E86',
+                },
+                {
+                  name: 'Complete',
+                  id: 'complete',
+                  description: 'View completed tasks',
+                  color: '#323A40',
+                },
+              ].map((tile) => (
+                <Card
+                  key={tile.id}
+                  className={`shadow-md hover:shadow-lg transition-shadow cursor-pointer hover:bg-${tile.color}/5 border-l-4`}
+                  style={{ borderLeftColor: tile.color }}
+                  onClick={() => {
+                    // Handle navigation or display logic here
+                    console.log(`Navigating to ${tile.id}`);
+                    // Example: router.push(`/jobs/${jobDetails.id}/${tile.id}`);
+                  }}
+                >
+                  <CardHeader>
+                    <h3 className="font-semibold">{tile.name}</h3>
+                    <p className="text-sm text-gray-500">{tile.description}</p>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Announcements Section */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Announcements</h2>
+        <Announcements
+          announcements={announcements}
+        />
+      </div>
     </div>
   )
 }

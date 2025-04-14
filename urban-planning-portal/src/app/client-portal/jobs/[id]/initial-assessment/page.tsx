@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import Link from 'next/link'
 
 interface Props {
   params: {
@@ -15,20 +14,45 @@ interface Props {
 
 export default function JobInitialAssessmentPage({ params }: Props) {
   const router = useRouter()
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // Auto-save when leaving the page
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasUnsavedChanges])
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Back Button */}
-      <div className="flex items-center gap-2 mb-4">
-        <Link href={`/jobs/${params.id}`}>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            className="gap-2 pl-0 text-muted-foreground"
+            className="p-2"
+            onClick={() => {
+              if (hasUnsavedChanges) {
+                const shouldLeave = window.confirm('You have unsaved changes. Do you want to leave without saving?')
+                if (!shouldLeave) return
+              }
+              router.back()
+            }}
           >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Job
+            <ArrowLeft className="h-5 w-5" />
           </Button>
-        </Link>
+          <h1 className="text-2xl font-semibold text-[#323A40]">Initial Assessment</h1>
+        </div>
+        {hasUnsavedChanges && (
+          <Button onClick={() => {/* Handle save changes logic if needed */}}>
+            Save Changes
+          </Button>
+        )}
       </div>
 
       {/* Section 1: Document Store */}

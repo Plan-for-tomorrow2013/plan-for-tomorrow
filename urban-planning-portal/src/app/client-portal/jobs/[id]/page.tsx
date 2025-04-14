@@ -56,7 +56,8 @@ export default function JobPage({ params }: { params: { id: string } }) {
       try {
         const response = await fetch(`/api/jobs/${params.id}`)
         if (!response.ok) {
-          throw new Error('Failed to fetch job details')
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to fetch job details')
         }
         const data = await response.json()
         setJob(data)
@@ -191,55 +192,67 @@ export default function JobPage({ params }: { params: { id: string } }) {
 
   const tiles = [
     {
-      name: 'Property Information',
-      id: 'property-info',
-      description: 'View property details and planning layers',
-      color: '#EA6B3D'
+      name: 'Planning Info',
+      id: 'planning-info',
+      description: 'View Principal Planning Information',
+      color: '#EA6B3D',
+      href: `/client-portal/jobs/${params.id}/property-info`
     },
     {
       name: 'Site Details',
       id: 'site-details',
-      description: 'Site specifications and requirements',
-      color: '#CDC532'
+      description: 'Add Site specific details to your job',
+      color: '#CDC532',
+      href: `/client-portal/jobs/${params.id}/site-details`
     },
     {
       name: 'Document Store',
       id: 'document-store',
-      description: 'Access and manage documents',
-      color: '#EEDA54'
+      description: 'Add and manage documents',
+      color: '#EEDA54',
+      href: `/client-portal/jobs/${params.id}/document-store`
     },
     {
       name: 'Initial Assessment',
       id: 'initial-assessment',
-      description: 'Start your development assessment',
+      description: 'Complete an initial assessment',
       color: '#4A90E2',
-      status: job.initialAssessment ? 'completed' : 'pending'
+      status: job.initialAssessment ? 'completed' : 'pending',
+      href: `/client-portal/jobs/${params.id}/initial-assessment`
     },
     {
       name: 'Design Check',
       id: 'design-check',
-      description: 'Review design specifications',
-      color: '#CDC532'
+      description: 'Review your design',
+      color: '#CDC532',
+      href: `/client-portal/jobs/${params.id}/design-check`
     },
     {
       name: 'Report Writer',
       id: 'report-writer',
-      description: 'Generate detailed reports',
-      color: '#532200'
+      description: 'Generate or Purchase reports',
+      color: '#532200',
+      href: `/client-portal/jobs/${params.id}/report-writer`
     },
     {
       name: 'Quotes',
       id: 'quotes',
-      description: 'Manage cost estimates',
-      color: '#727E86'
+      description: 'Request and manage Quotes',
+      color: '#727E86',
+      href: `/client-portal/jobs/${params.id}/quotes`
     },
     {
       name: 'Complete',
       id: 'complete',
-      description: 'View completed tasks',
-      color: '#323A40'
+      description: 'Celebrate and view the completed job',
+      color: '#323A40',
+      href: `/client-portal/jobs/${params.id}/complete`
     }
   ]
+
+  const handleNavigateToPropertyInfo = () => {
+    window.location.href = `/client-portal/jobs/${job.id}/property-info`;
+  };
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -259,11 +272,12 @@ export default function JobPage({ params }: { params: { id: string } }) {
               hover:bg-${tile.color}/5 border-l-4`}
             style={{ borderLeftColor: tile.color }}
             onClick={() => {
-              // Special handling for initial assessment
-              if (tile.id === 'initial-assessment') {
+              if (tile.href) {
+                router.push(tile.href)
+              } else if (tile.id === 'initial-assessment') {
                 router.push(`/initial-assessment?job=${params.id}`)
               } else {
-                router.push(`/jobs/${params.id}/${tile.id}`)
+                router.push(`/client-portal/jobs/${params.id}/${tile.id}`)
               }
             }}
           >

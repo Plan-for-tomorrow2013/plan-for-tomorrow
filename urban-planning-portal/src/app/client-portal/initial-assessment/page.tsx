@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Plus, Upload, FileText, X, Check } from 'lucide-react'
+import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useJobs, type Job } from '../../../../hooks/useJobs'
@@ -59,9 +59,21 @@ export default function InitialAssessmentPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   // Separate state for custom section
   const [customAssessmentComplete, setCustomAssessmentComplete] = useState<Record<string, boolean>>({})
+
+  // New state for collapsible section
+  const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
+
+  // Load data from local storage when the component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem(`initialAssessment-${selectedJobId}`);
+    if (savedData) {
+      setFormData(JSON.parse(savedData));
+    }
+  }, [selectedJobId]);
 
   // Set initial job ID from URL if present
   useEffect(() => {
@@ -256,6 +268,7 @@ export default function InitialAssessmentPage() {
         [field]: e.target.value
       }
     }))
+    setHasUnsavedChanges(true)
   }
 
   const handleConfirmDetails = () => {
@@ -514,7 +527,7 @@ export default function InitialAssessmentPage() {
       input.click()
     }
 
-// Show document tile for initial assessment report when assessment is returned
+    // Show document tile for initial assessment report when assessment is returned
     if (doc.id === 'initial-assessment-report') {
       const assessmentReturned = isAssessmentReturned()
       if (assessmentReturned) {
@@ -524,7 +537,6 @@ export default function InitialAssessmentPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">{doc.title}</h3>
-                  <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
                 </div>
                 <Check className="h-5 w-5 text-green-500" />
               </div>
@@ -556,13 +568,10 @@ export default function InitialAssessmentPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">{doc.title}</h3>
-              <p className="text-sm text-gray-500">{doc.value || doc.path}</p>
             </div>
             {doc.status === 'uploaded' ? (
               <Check className="h-5 w-5 text-green-500" />
-            ) : (
-              <div className="text-sm text-orange-500">Required</div>
-            )}
+            ) : null}
           </div>
         </CardHeader>
         <CardContent>
@@ -734,10 +743,48 @@ export default function InitialAssessmentPage() {
     )
   }
 
+  const handleSaveChanges = () => {
+    if (selectedJobId) {
+      localStorage.setItem(`initialAssessment-${selectedJobId}`, JSON.stringify(formData));
+      setHasUnsavedChanges(false);
+      toast({
+        title: "Success",
+        description: "Changes saved successfully.",
+      });
+    }
+  };
+
+  const toggleDocuments = () => {
+    setIsDocumentsOpen(prev => !prev); // Toggle the documents section
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            className="p-2"
+            onClick={() => {
+              if (hasUnsavedChanges) {
+                const shouldLeave = window.confirm('You have unsaved changes. Do you want to leave without saving?');
+                if (!shouldLeave) return;
+              }
+              router.back();
+            }}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-semibold text-[#323A40]">Initial Assessment</h1>
+        </div>
+        {selectedJobId && hasUnsavedChanges && (
+          <Button onClick={handleSaveChanges} disabled={!hasUnsavedChanges}>
+            Save Changes
+          </Button>
+        )}
+      </div>
+
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-4">Initial Assessment</h1>
         <div className="flex items-center justify-between">
           <div className="flex-1 mr-4">
             <Select value={selectedJobId} onValueChange={setSelectedJobId}>
@@ -753,20 +800,36 @@ export default function InitialAssessmentPage() {
               </SelectContent>
             </Select>
           </div>
-          <Link href="/dashboard?action=create-job">
-            <Button variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Create New Job
-            </Button>
-          </Link>
+          {!selectedJobId && (
+            <Link href="/dashboard?action=create-job">
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Create New Job
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
       {selectedJobId && (
         <>
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Required Documents</h2>
-            {renderRequiredDocuments()}
+            <h2
+              className="text-xl font-semibold mb-4 cursor-pointer border-b-2 border-gray-300 pb-2 flex items-center justify-between"
+              onClick={toggleDocuments}
+            >
+              Documents
+              {isDocumentsOpen ? (
+                <ChevronUp className="h-5 w-5 text-gray-600" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-600" />
+              )}
+            </h2>
+            {isDocumentsOpen && ( // Conditional rendering based on state
+              <div>
+                {renderRequiredDocuments()}
+              </div>
+            )}
           </div>
 
           <div className="border rounded-lg bg-white">

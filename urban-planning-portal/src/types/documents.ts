@@ -60,7 +60,7 @@ export const DOCUMENT_TYPES: Document[] = [
     title: 'Certificate of Title',
     category: 'LEGAL',
     path: '/initial-assessment/required-documents',
-    required: true,
+    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,

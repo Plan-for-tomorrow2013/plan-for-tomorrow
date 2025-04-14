@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "c620d2cb-40f3-4b8f-b7f3-99d562d1a926",
+    "jobId": "159df9d4-7205-4648-b5bd-133520aa8a54",
+    "jobAddress": "8 Allen Avenue, Belmore",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-11T05:41:43.133Z",
+    "customAssessment": {
+      "developmentType": "sdvw",
+      "additionalInfo": "berbebr",
+      "documents": {
+        "certificate107": "29 Boundary Road, Tallawong (Lot 10-DP271247) Floor Plans 20250408.pdf"
+      }
+    }
+  }
+]

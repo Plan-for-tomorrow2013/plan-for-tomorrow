@@ -23,7 +23,6 @@ export function Announcements({ announcements, isAdmin = false, onAddAnnouncemen
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Announcements</CardTitle>
           {isAdmin && (
             <Button variant="outline" size="sm" onClick={onAddAnnouncement}>
               <Plus className="h-4 w-4 mr-2" />
@@ -53,4 +52,4 @@ export function Announcements({ announcements, isAdmin = false, onAddAnnouncemen
       </CardContent>
     </Card>
   )
-} 
+}

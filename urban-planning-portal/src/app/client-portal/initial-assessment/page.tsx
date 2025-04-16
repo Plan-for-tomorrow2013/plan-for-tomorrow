@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -12,7 +13,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Document, DOCUMENT_TYPES } from '../../../types/documents'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from '@/components/ui/use-toast'
 import { PrePreparedSection } from '@/components/PrePreparedSection'
 
@@ -547,13 +547,16 @@ export default function InitialAssessmentPage() {
                   <FileText className="h-4 w-4" />
                   <span className="text-sm">{doc.uploadedFile?.originalName}</span>
                 </div>
+                <div className="text-sm text-gray-500">
+                  Uploaded on {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                </div>
                 <Button
                   variant="outline"
                   className="w-full"
                   onClick={() => handleDownload('initial-assessment-report')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Download Assessment
+                  Download
                 </Button>
               </div>
             </CardContent>
@@ -582,7 +585,7 @@ export default function InitialAssessmentPage() {
                 <span className="text-sm">{doc.uploadedFile.originalName}</span>
               </div>
               <div className="text-sm text-gray-500">
-                Uploaded on {new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()}
+                Uploaded on {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
               </div>
               <Button
                 variant="outline"
@@ -641,7 +644,7 @@ export default function InitialAssessmentPage() {
                   onClick={() => handleDownload('initial-assessment-report')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Download Assessment
+                  Download
                 </Button>
               </>
             ) : (
@@ -815,7 +818,7 @@ export default function InitialAssessmentPage() {
         <>
           <div className="mb-8">
             <h2
-              className="text-xl font-semibold mb-4 cursor-pointer border-b-2 border-gray-300 pb-2 flex items-center justify-between"
+              className="h-12 text-xl font-semibold mb-4 cursor-pointer bg-[#323A40] text-white flex items-center justify-between"
               onClick={toggleDocuments}
             >
               Documents
@@ -832,24 +835,24 @@ export default function InitialAssessmentPage() {
             )}
           </div>
 
+          {/* New AI Chatbot Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">AI-Powered Assessment</h2>
+            <div className="p-4 border rounded-lg bg-gray-100">
+              <p className="text-sm text-muted-foreground">
+                Coming soon! Our AI chatbot will guide you through the assessment process.
+              </p>
+            </div>
+          </div>
+
           <div className="border rounded-lg bg-white">
-            <Tabs defaultValue="ai-chatbot" className="w-full">
+            <Tabs defaultValue="custom-assessment" className="w-full">
               <TabsList className="w-full grid grid-cols-3 h-12">
-                <TabsTrigger value="ai-chatbot" className="data-[state=active]:bg-white">AI Chatbot</TabsTrigger>
                 <TabsTrigger value="custom-assessment" className="data-[state=active]:bg-white">Custom Assessment</TabsTrigger>
                 <TabsTrigger value="pre-prepared" className="data-[state=active]:bg-white">Pre-prepared</TabsTrigger>
               </TabsList>
 
               <div className="p-6">
-                <TabsContent value="ai-chatbot" className="mt-0">
-                  <div>
-                    <h3 className="font-semibold mb-2">AI-Powered Assessment</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Coming soon! Our AI chatbot will guide you through the assessment process.
-                    </p>
-                  </div>
-                </TabsContent>
-
                 <TabsContent value="custom-assessment" className="mt-0">
                   {renderCustomAssessmentForm()}
                 </TabsContent>

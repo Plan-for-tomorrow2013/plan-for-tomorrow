@@ -13,5 +13,45 @@
         "certificate107": "29 Boundary Road, Tallawong (Lot 10-DP271247) Floor Plans 20250408.pdf"
       }
     }
+  },
+  {
+    "id": "22cd5320-4fad-44be-aa3f-e161802a55a6",
+    "jobId": "c0b74427-83c5-45ac-bb76-b96ca9b824c6",
+    "jobAddress": "9 Viola Place Greystanes",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-15T09:26:12.170Z",
+    "customAssessment": {
+      "developmentType": "wevwbwwebw",
+      "additionalInfo": "avwevwevbwwaevwewebwbwbebwbewwvwebwewb",
+      "documents": {
+        "certificate107": "Quote QU1019.pdf"
+      }
+    }
+  },
+  {
+    "id": "9cca33cc-6551-4ade-807c-6466453b1e18",
+    "jobId": "c09faece-03b9-4934-b6ab-0e3ceda52e8f",
+    "jobAddress": "34 Wallace Road Fernhill",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-16T09:18:53.211Z",
+    "customAssessment": {
+      "developmentType": "TEST123",
+      "additionalInfo": "TEST123",
+      "documents": {
+        "certificateOfTitle": "Quote QU1024.pdf",
+        "certificate107": "Invoice INV-2148.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "24 Parsonage Rd, Castle Hill - DA 01.pdf",
+      "fileName": "initial-assessment-report.pdf",
+      "uploadedAt": "2025-04-16T09:19:33.880Z",
+      "size": 4575878,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-16T09:19:37.719Z"
+    }
   }
 ]

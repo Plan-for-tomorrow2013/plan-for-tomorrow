@@ -6,16 +6,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link'
 
 export default function AdminPage() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-
+  // The <title> and <meta> tags should be handled by Next.js metadata API
+  // See: https://nextjs.org/docs/app/building-your-application/optimizing/metadata
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-4">Welcome to Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Use the sidebar navigation to manage various aspects of the application.
-        </p>
-      </div>
+    <>
+      {/* Removed redundant html, head, and body tags */}
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold mb-4">Welcome to Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage work tickets, assessments, reports and knowledge base</p>
+            </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
@@ -83,6 +83,7 @@ export default function AdminPage() {
           </a>
         </div>
       </div>
-    </div>
+    </div> {/* Added missing closing div tag */}
+    </>
   )
 }

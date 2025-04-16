@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
 
-const announcementsPath = path.join(process.cwd(), 'data', 'announcements.json')
-
-// Ensure the announcements file exists
-async function ensureAnnouncementsFile() {
-  try {
-    await fs.access(announcementsPath)
-  } catch {
-    await fs.writeFile(announcementsPath, '[]')
-  }
-}
+// Correct path pointing to the admin portal's announcements data
+const announcementsPath = path.join(process.cwd(), '..', 'admin', 'data', 'announcements.json')
 
 // GET /api/announcements
+// Reads announcements from the admin portal's data file.
 export async function GET() {
   try {
-    await ensureAnnouncementsFile()
+    // Check if the admin announcements file exists before reading
+    try {
+      await fs.access(announcementsPath)
+    } catch (accessError) {
+      console.error(`Admin announcements file not found at ${announcementsPath}:`, accessError)
+      // Return empty array if the source file doesn't exist
+      return NextResponse.json([])
+    }
+
     const data = await fs.readFile(announcementsPath, 'utf8')
     const announcements = JSON.parse(data)
     return NextResponse.json(announcements)
@@ -29,41 +29,3 @@ export async function GET() {
     )
   }
 }
-
-// POST /api/announcements
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const { title, content, author } = body
-
-    if (!title || !content || !author) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    await ensureAnnouncementsFile()
-    const data = await fs.readFile(announcementsPath, 'utf8')
-    const announcements = JSON.parse(data)
-
-    const newAnnouncement = {
-      id: uuidv4(),
-      title,
-      content,
-      author,
-      date: new Date().toISOString(),
-    }
-
-    announcements.unshift(newAnnouncement) // Add to the beginning of the array
-    await fs.writeFile(announcementsPath, JSON.stringify(announcements, null, 2))
-
-    return NextResponse.json(newAnnouncement)
-  } catch (error) {
-    console.error('Error creating announcement:', error)
-    return NextResponse.json(
-      { error: 'Failed to create announcement' },
-      { status: 500 }
-    )
-  }
-} 

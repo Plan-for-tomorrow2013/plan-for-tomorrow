@@ -117,5 +117,27 @@
         }
       ]
     }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1744709161339_Quote QU1019.pdf",
+      "originalName": "Quote QU1019.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-15T09:26:01.340Z",
+      "size": 50503
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-15T09:26:12.102Z",
+    "updatedAt": "2025-04-15T09:26:12.102Z",
+    "customAssessment": {
+      "developmentType": "wevwbwwebw",
+      "additionalInfo": "avwevwevbwwaevwewebwbwbebwbewwvwebwewb",
+      "documents": {
+        "certificate107": "Quote QU1019.pdf"
+      }
+    }
   }
 }

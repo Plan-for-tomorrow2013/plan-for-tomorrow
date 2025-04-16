@@ -1,0 +1,26 @@
+[
+  {
+    "id": "3688bb09-63fe-4f15-81db-9d618beff19e",
+    "title": "123456",
+    "content": "123456",
+    "author": "Admin User",
+    "date": "2025-04-16T11:02:10.215Z",
+    "file": {
+      "id": "c401fc6d-c0f7-4275-a0c6-ace02ce80177",
+      "originalName": "Quote QU1024.pdf",
+      "savedPath": "/documents/pre-prepared/c401fc6d-c0f7-4275-a0c6-ace02ce80177.pdf"
+    }
+  },
+  {
+    "id": "759372fa-bd0d-416d-aaca-5d0c492bcd66",
+    "title": "123",
+    "content": "456",
+    "author": "Admin User",
+    "date": "2025-04-16T10:57:11.656Z",
+    "file": {
+      "id": "abb7694f-5a3f-471c-baf3-cc949efaa2c8",
+      "originalName": "Invoice INV-2148.pdf",
+      "savedPath": "/documents/pre-prepared/abb7694f-5a3f-471c-baf3-cc949efaa2c8.pdf"
+    }
+  }
+]

@@ -5,8 +5,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { WorkTicket } from '../../../../types/workTickets'
 
 // Helper function to get the work tickets file path
+// Points to the client portal's work tickets data
 const getWorkTicketsPath = () => {
-  return path.join(process.cwd(), 'data', 'work-tickets.json')
+  return path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'work-tickets.json')
 }
 
 // Helper function to read work tickets

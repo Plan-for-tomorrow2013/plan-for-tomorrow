@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
-import { Badge } from '../../../components/ui/badge'
-import { Button } from '../../../components/ui/button'
-import { FileText, Clock, Upload, Bell } from 'lucide-react'
-import { WorkTicket } from '../../../../types/workTickets'
-import { useToast } from '../../../components/ui/use-toast'
-import { PageHeader } from "../../../components/ui/page-header"
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { FileText, Clock, Upload, Bell, Loader2 } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { WorkTicket } from 'types/workTickets'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default function WorkTicketsPage() {
   const [tickets, setTickets] = useState<WorkTicket[]>([])
@@ -131,7 +132,9 @@ export default function WorkTicketsPage() {
           description="View and manage work tickets"
           backHref="/admin"
         />
-        <div className="p-6">Loading work tickets...</div>
+        <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       </div>
     )
   }
@@ -144,7 +147,9 @@ export default function WorkTicketsPage() {
           description="View and manage work tickets"
           backHref="/admin"
         />
-        <div className="p-6 text-red-500">{error}</div>
+        <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+          <p>{error}</p>
+        </div>
       </div>
     )
   }
@@ -163,14 +168,14 @@ export default function WorkTicketsPage() {
             <CardHeader className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">
+                  <h2 className="text-base font-medium">
                     {ticket.ticketType === 'custom-assessment' ? 'Custom Assessment' : 'Pre-Prepared Assessment'}
-                  </CardTitle>
+                  </h2>
                   <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
                 </div>
-                <Badge className={getStatusColor(ticket.status)}>
+                <div className={cn("rounded-md px-2 py-1 text-xs font-semibold", getStatusColor(ticket.status))}>
                   {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
-                </Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-4">
@@ -264,7 +269,7 @@ export default function WorkTicketsPage() {
                   )}
                 </div>
                 <div className="flex items-center text-xs text-gray-500">
-                  <Clock className="h-3 w-3 mr-1" />
+                  <Clock size={12} className="mr-1" />
                   <span>{new Date(ticket.createdAt).toLocaleString()}</span>
                 </div>
               </div>

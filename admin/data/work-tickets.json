@@ -43,7 +43,7 @@
     "jobId": "6e22c407-65bc-45a6-93b4-8be116328ac2",
     "jobAddress": "9 Viola place, Greystanes",
     "ticketType": "custom-assessment",
-    "status": "pending",
+    "status": "completed",
     "createdAt": "2025-04-03T09:26:01.129Z",
     "customAssessment": {
       "developmentType": "123",
@@ -51,6 +51,10 @@
       "documents": {
         "certificate107": "Penrith (1) (2).pdf"
       }
+    },
+    "completedDocument": {
+      "fileName": "Invoice INV-2148.pdf",
+      "uploadedAt": "2025-04-16T08:38:59.182Z"
     }
   }
 ]

@@ -92,5 +92,68 @@
         "certificate107": "Invoice-572646.pdf"
       }
     }
+  },
+  {
+    "id": "79b7d23f-f003-4281-85bd-7aea224daea2",
+    "jobId": "c3a3cbd2-2b57-4e95-81f4-a860777654ad",
+    "jobAddress": "37 Chudleigh Street, Rydalmere",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "completed",
+    "createdAt": "2025-04-17T08:10:11.266Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "125",
+      "documents": {
+        "certificate107": "8ry0dsabzh-preview.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "Quote QU1024.pdf",
+      "fileName": "initial-assessment-report.pdf",
+      "uploadedAt": "2025-04-17T08:18:52.365Z",
+      "size": 50017,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-17T08:20:08.528Z"
+    }
+  },
+  {
+    "id": "78397503-3cbf-4af9-bf94-32f53cf1e5ea",
+    "jobId": "925ef6cd-f7d5-4df5-895a-12683a645085",
+    "jobAddress": "203 Buffalo Road, Ryde",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-17T08:11:04.569Z",
+    "customAssessment": {
+      "developmentType": "TESY",
+      "additionalInfo": "TEST",
+      "documents": {
+        "certificate107": "Invoice-572646.pdf"
+      }
+    }
+  },
+  {
+    "id": "84ba9677-90ea-4ed3-bdc3-278e679f5325",
+    "jobId": "6a0afc8f-72f7-49b2-9f63-891acf1c0e46",
+    "jobAddress": "54-62 CARRINGTON STREET SYDNEY",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-17T09:30:17.936Z",
+    "customAssessment": {
+      "developmentType": "custom",
+      "additionalInfo": "custom",
+      "documents": {
+        "certificate107": "Invoice-572646.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "Invoice INV-2148.pdf",
+      "fileName": "initial-assessment-report.pdf",
+      "uploadedAt": "2025-04-17T09:30:37.247Z",
+      "size": 60982,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-17T09:30:40.185Z"
+    }
   }
 ]

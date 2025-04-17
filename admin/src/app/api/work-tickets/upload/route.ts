@@ -38,7 +38,8 @@ export async function POST(request: Request) {
       )
     }
 
-    const ticket = workTickets[ticketIndex]
+    const ticket = workTickets[ticketIndex];
+    const ticketType = ticket.ticketType; // Get the actual ticket type
 
     // Ensure the ticket has a jobId, crucial for saving to the correct folder
     if (!ticket.jobId) {
@@ -53,10 +54,10 @@ export async function POST(request: Request) {
     const jobDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'jobs', ticket.jobId, 'documents');
     await fs.mkdir(jobDocumentsDir, { recursive: true });
 
-    // Define a consistent filename for the completed initial assessment report
-    // Using the original file extension
+    // Define the filename based on the ticket type
     const fileExtension = path.extname(file.name);
-    const storedFileName = `initial-assessment-report${fileExtension}`;
+    // Use ticketType for the filename base (e.g., 'statement-of-environmental-effects.pdf')
+    const storedFileName = `${ticketType}${fileExtension}`;
     const filePath = path.join(jobDocumentsDir, storedFileName);
 
     // Save the file
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
       ...ticket, // Use the fetched ticket object
       status: 'completed', // Update status
       completedDocument: {
-        documentId: 'initial-assessment-report', // Standard ID for this document type
+        documentId: ticketType, // Use the actual ticketType as the documentId
         originalName: file.name, // Original filename
         fileName: storedFileName, // Filename used for storage
         uploadedAt: new Date().toISOString(),

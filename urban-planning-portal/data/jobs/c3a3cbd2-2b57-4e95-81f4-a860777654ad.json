@@ -134,17 +134,17 @@
     },
     "initial-assessment-report": {
       "filename": "initial-assessment-report.pdf",
-      "originalName": "Invoice-572646.pdf",
+      "originalName": "Quote QU1024.pdf",
       "type": "application/pdf",
-      "uploadedAt": "2025-04-17T02:59:56.864Z",
-      "size": 17051
+      "uploadedAt": "2025-04-17T08:18:52.365Z",
+      "size": 50017
     }
   },
   "initialAssessment": {
     "status": "completed",
-    "type": "custom",
-    "createdAt": "2025-04-17T02:59:40.812Z",
-    "updatedAt": "2025-04-17T02:59:40.812Z",
+    "type": "statement-of-environmental-effects",
+    "createdAt": "2025-04-17T08:10:11.235Z",
+    "updatedAt": "2025-04-17T08:10:11.235Z",
     "customAssessment": {
       "developmentType": "123",
       "additionalInfo": "125",
@@ -152,6 +152,6 @@
         "certificate107": "8ry0dsabzh-preview.pdf"
       }
     },
-    "returnedAt": "2025-04-17T02:59:58.369Z"
+    "returnedAt": "2025-04-17T08:20:08.528Z"
   }
 }

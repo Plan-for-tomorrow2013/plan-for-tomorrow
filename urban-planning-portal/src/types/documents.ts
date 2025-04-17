@@ -110,5 +110,33 @@ export const DOCUMENT_TYPES: Document[] = [
     updatedAt: new Date().toISOString(),
     isActive: true,
     description: undefined
+  },
+  {
+    id: 'statement-of-environmental-effects',
+    title: 'Statement of Environmental Effects',
+    category: 'REPORTS',
+    path: '/client-portal/report-writer', // Associated with the report writer page
+    adminOnly: true, // Generated/uploaded by admin after purchase
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    description: 'Statement of Environmental Effects report generated via the Report Writer process.'
+  },
+  {
+    id: 'complying-development-certificate',
+    title: 'Complying Development Certificate Report',
+    category: 'REPORTS',
+    path: '/client-portal/report-writer', // Associated with the report writer page
+    adminOnly: true, // Generated/uploaded by admin after purchase
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    description: 'Complying Development Certificate report generated via the Report Writer process.'
   }
 ]

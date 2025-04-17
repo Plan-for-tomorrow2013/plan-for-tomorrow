@@ -78,9 +78,15 @@ export async function POST(request: Request) {
     }
 
     // Add/Update the document reference in the job's documents object
-    // Use the standard documentId 'initial-assessment-report'
-    job.documents['initial-assessment-report'] = {
-      filename: completedDocumentInfo.fileName, // The stored filename (e.g., initial-assessment-report.pdf)
+    // Use the documentId stored in the completedDocument info (e.g., 'statement-of-environmental-effects')
+    const documentId = completedDocumentInfo.documentId;
+    if (!documentId) {
+        console.error(`Ticket ${ticketId} completed document is missing documentId.`);
+        return NextResponse.json({ error: 'Completed document information is incomplete.' }, { status: 400 });
+    }
+
+    job.documents[documentId] = {
+      filename: completedDocumentInfo.fileName, // The stored filename (e.g., statement-of-environmental-effects.pdf)
       originalName: completedDocumentInfo.originalName,
       type: completedDocumentInfo.type,
       uploadedAt: completedDocumentInfo.uploadedAt, // Use the upload timestamp from the ticket

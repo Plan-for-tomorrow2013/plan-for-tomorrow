@@ -84,5 +84,27 @@
       "protectionLayers": [],
       "localProvisionsLayers": []
     }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1744877456100_Invoice-572646.pdf",
+      "originalName": "Invoice-572646.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-17T08:10:56.101Z",
+      "size": 17051
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-17T08:11:04.510Z",
+    "updatedAt": "2025-04-17T08:11:04.510Z",
+    "customAssessment": {
+      "developmentType": "TESY",
+      "additionalInfo": "TEST",
+      "documents": {
+        "certificate107": "Invoice-572646.pdf"
+      }
+    }
   }
 }

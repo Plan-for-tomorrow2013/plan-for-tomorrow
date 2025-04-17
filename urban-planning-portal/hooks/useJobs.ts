@@ -7,8 +7,9 @@ export interface Job {
   currentStage?: string
   createdAt?: string
   initialAssessment?: {
-    status?: 'pending' | 'completed' | 'paid'
-    returnedAt?: string
+    status?: 'pending' | 'completed' | 'paid';
+    returnedAt?: string;
+    type?: 'custom' | 'statement-of-environmental-effects' | 'complying-development-certificate'; // Add the missing type field
   };
   // Add propertyData field, making it optional
   propertyData?: {

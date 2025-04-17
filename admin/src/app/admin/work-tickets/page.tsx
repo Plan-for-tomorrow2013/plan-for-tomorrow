@@ -10,6 +10,21 @@ import Link from 'next/link'
 import { WorkTicket } from 'types/workTickets'
 import { PageHeader } from '@/components/ui/page-header'
 
+// Helper function to get display name for ticket type
+const getTicketTypeDisplayName = (type: string): string => {
+  switch (type) {
+    case 'custom-assessment':
+      return 'Custom Assessment';
+    case 'statement-of-environmental-effects':
+      return 'Statement of Environmental Effects';
+    case 'complying-development-certificate':
+      return 'Complying Development Certificate Report';
+    // Add other types if needed
+    default:
+      return type; // Fallback to the raw type if unknown
+  }
+};
+
 export default function WorkTicketsPage() {
   const [tickets, setTickets] = useState<WorkTicket[]>([])
   const [loading, setLoading] = useState(true)
@@ -169,7 +184,7 @@ export default function WorkTicketsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-base font-medium">
-                    {ticket.ticketType === 'custom-assessment' ? 'Custom Assessment' : 'Pre-Prepared Assessment'}
+                    {getTicketTypeDisplayName(ticket.ticketType)} {/* Use helper function */}
                   </h2>
                   <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
                 </div>

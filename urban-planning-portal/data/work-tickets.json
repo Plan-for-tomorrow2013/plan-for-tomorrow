@@ -53,5 +53,44 @@
       "type": "application/pdf",
       "returnedAt": "2025-04-16T09:19:37.719Z"
     }
+  },
+  {
+    "id": "8ab6bc1a-f96e-482e-b4de-01e58c219414",
+    "jobId": "c3a3cbd2-2b57-4e95-81f4-a860777654ad",
+    "jobAddress": "37 Chudleigh Street, Rydalmere",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-17T02:59:40.363Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "125",
+      "documents": {
+        "certificate107": "8ry0dsabzh-preview.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "Invoice-572646.pdf",
+      "fileName": "initial-assessment-report.pdf",
+      "uploadedAt": "2025-04-17T02:59:56.864Z",
+      "size": 17051,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-17T02:59:58.369Z"
+    }
+  },
+  {
+    "id": "66546e12-7156-4af0-9a7d-69cc14bf771b",
+    "jobId": "c7814fdb-beca-46d3-9a8c-cc6def78dfb0",
+    "jobAddress": "42 Bellevue Street Blacktown",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-17T07:19:54.100Z",
+    "customAssessment": {
+      "developmentType": "123456",
+      "additionalInfo": "78910",
+      "documents": {
+        "certificate107": "Invoice-572646.pdf"
+      }
+    }
   }
 ]

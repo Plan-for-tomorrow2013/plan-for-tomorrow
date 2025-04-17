@@ -101,5 +101,32 @@
         }
       ]
     }
+  },
+  "siteDetails": {
+    "developmentNorth": "brbwbwbw",
+    "developmentSouth": "wbwbrwbwb",
+    "lotType": "Corner"
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1744874382678_Invoice-572646.pdf",
+      "originalName": "Invoice-572646.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-17T07:19:42.679Z",
+      "size": 17051
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-17T07:19:54.103Z",
+    "updatedAt": "2025-04-17T07:19:54.103Z",
+    "customAssessment": {
+      "developmentType": "123456",
+      "additionalInfo": "78910",
+      "documents": {
+        "certificate107": "Invoice-572646.pdf"
+      }
+    }
   }
 }

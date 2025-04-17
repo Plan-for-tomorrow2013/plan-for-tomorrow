@@ -29,13 +29,15 @@ export async function PATCH(
     const currentJob = JSON.parse(jobData)
     const updates = await request.json()
 
-    // Merge updates with current job data
-    const updatedJob = {
-      ...currentJob,
-      initialAssessment: {
+    // Merge updates with current job data - Generic merge
+    const updatedJob = { ...currentJob, ...updates };
+
+    // If initialAssessment is part of the update, merge it deeply
+    if (updates.initialAssessment) {
+      updatedJob.initialAssessment = {
         ...currentJob.initialAssessment,
-        ...updates.initialAssessment
-      }
+        ...updates.initialAssessment,
+      };
     }
 
     // Write updated job data back to file

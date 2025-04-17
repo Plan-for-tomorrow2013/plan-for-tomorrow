@@ -123,5 +123,35 @@
         }
       ]
     }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1744858773277_8ry0dsabzh-preview.pdf",
+      "originalName": "8ry0dsabzh-preview.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-17T02:59:33.279Z",
+      "size": 1346514
+    },
+    "initial-assessment-report": {
+      "filename": "initial-assessment-report.pdf",
+      "originalName": "Invoice-572646.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-17T02:59:56.864Z",
+      "size": 17051
+    }
+  },
+  "initialAssessment": {
+    "status": "completed",
+    "type": "custom",
+    "createdAt": "2025-04-17T02:59:40.812Z",
+    "updatedAt": "2025-04-17T02:59:40.812Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "125",
+      "documents": {
+        "certificate107": "8ry0dsabzh-preview.pdf"
+      }
+    },
+    "returnedAt": "2025-04-17T02:59:58.369Z"
   }
 }

@@ -9,7 +9,27 @@ export interface Job {
   initialAssessment?: {
     status?: 'pending' | 'completed' | 'paid'
     returnedAt?: string
-  }
+  };
+  // Add propertyData field, making it optional
+  propertyData?: {
+    coordinates?: {
+      longitude: number;
+      latitude: number;
+    };
+    planningLayers: {
+      epiLayers: Array<{ layer: string; attributes: Record<string, any> }>;
+      protectionLayers: Array<{ layer: string; attributes: Record<string, any> }>;
+      localProvisionsLayers: Array<{ layer: string; attributes: Record<string, any> }>;
+    };
+  } | null;
+  // Add siteDetails field, making it optional
+  siteDetails?: {
+    siteAddressDetails?: string;
+    siteArea?: string;
+    currentLandUse?: string;
+    zoningInfo?: string;
+    siteConstraints?: string;
+  } | null;
 }
 
 export function useJobs() {
@@ -23,13 +43,13 @@ export function useJobs() {
         setIsLoading(true)
         setError(null)
         const response = await fetch('/api/jobs')
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch jobs')
         }
-        
+
         const data = await response.json()
-        
+
         if (Array.isArray(data)) {
           setJobs(data.filter((job: Job) => job.id && job.address))
         } else {
@@ -48,4 +68,4 @@ export function useJobs() {
   }, [])
 
   return { jobs, setJobs, isLoading, error }
-} 
+}

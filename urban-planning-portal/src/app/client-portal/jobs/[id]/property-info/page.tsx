@@ -120,6 +120,11 @@ export default function PropertyInfoPage({ params }: { params: { id: string } })
       )
     }
 
+    // Special handling for Minimum Dwelling Density Area
+    if (layerName === "Minimum Dwelling Density Area") {
+      return renderRow("Type", attributes["Type"])
+    }
+
     // Special handling for Additional Permitted Uses
     if (layerName === "Additional Permitted Uses") {
       return renderRow("Code", attributes["Code"])

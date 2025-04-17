@@ -15,6 +15,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
 import { PrePreparedSection } from '@/components/PrePreparedSection'
+import PropertyInfo from '@/components/PropertyInfo'; // Adjust the path as necessary
+// Remove incorrect form import
+import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'; // Import the CORRECT form component and its type
 
 // Debug flag - set to true to enable console logging
 const DEBUG = true
@@ -66,6 +69,13 @@ export default function InitialAssessmentPage() {
 
   // New state for collapsible section
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
+
+// New state for property info section
+const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
+// New state for site details section
+const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
+// State to hold the current site details being edited in the form
+const [currentSiteDetails, setCurrentSiteDetails] = useState<DetailedSiteDetailsData | null>(null);
 
   // Load data from local storage when the component mounts
   useEffect(() => {
@@ -527,10 +537,20 @@ export default function InitialAssessmentPage() {
       input.click()
     }
 
-    // Show document tile for initial assessment report when assessment is returned
+    // Logic for Initial Assessment Report tile
     if (doc.id === 'initial-assessment-report') {
-      const assessmentReturned = isAssessmentReturned()
+      const assessmentReturned = isAssessmentReturned();
+      // Check if payment is complete for the current job OR if the assessment has been returned
+      const shouldShowReportTile = (selectedJobId && paymentComplete[selectedJobId]) || assessmentReturned;
+
+      // If neither paid nor returned, render nothing for this tile yet
+      if (!shouldShowReportTile) {
+        return null;
+      }
+
+      // If paid or returned, show the tile (logic for download if returned)
       if (assessmentReturned) {
+        // Render tile with download button if returned
         return (
           <Card key={doc.id} className="relative">
             <CardHeader>
@@ -561,9 +581,52 @@ export default function InitialAssessmentPage() {
               </div>
             </CardContent>
           </Card>
-        )
+        );
+      } else {
+         // Render a placeholder/status tile if paid but not yet returned (optional)
+         // For now, let it fall through to the generic logic which will show "Required"
+         // or potentially adapt the generic logic later if needed.
+         // Alternatively, show a specific "Processing" state card:
+         /*
+         return (
+           <Card key={doc.id} className="relative opacity-70">
+             <CardHeader>
+               <h3 className="text-lg font-semibold">{doc.title}</h3>
+             </CardHeader>
+             <CardContent>
+               <div className="flex items-center text-gray-500">
+                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                 <span className="text-sm">Processing...</span>
+               </div>
+             </CardContent>
+           </Card>
+         );
+         */
+         // Render the "Report In Progress" card matching the Document Store style
+         return (
+            <Card key={doc.id} className="relative">
+              <CardHeader className="bg-[#323A40] text-white"> {/* Match header style */}
+                <h3 className="text-lg font-semibold">{doc.title}</h3>
+                {/* Optionally add subtitle like "REPORTS" if needed */}
+              </CardHeader>
+              <CardContent className="p-4 text-center"> {/* Center content */}
+                <div className="flex flex-col items-center justify-center space-y-2 py-4">
+                   {/* Placeholder for the document icon (replace with actual icon if available) */}
+                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                   </svg>
+                   <p className="font-semibold text-lg">Report In Progress</p>
+                   <p className="text-sm text-gray-600 px-4">
+                     Our team is working on your initial assessment report. You will be notified once it's ready.
+                   </p>
+                </div>
+              </CardContent>
+            </Card>
+         );
       }
     }
+
+    // Generic rendering logic for other documents OR for the report if paid but not returned
 
     return (
       <Card key={doc.id} className="relative">
@@ -761,6 +824,85 @@ export default function InitialAssessmentPage() {
     setIsDocumentsOpen(prev => !prev); // Toggle the documents section
   };
 
+  const togglePropertyInfo = () => {
+    setIsPropertyInfoOpen(prev => !prev); // Toggle the property info section
+  };
+
+  const toggleSiteDetails = () => {
+    setIsSiteDetailsOpen(prev => !prev); // Toggle the site details section
+  };
+
+  // Find the selected job data from the jobs state
+  const selectedJobData = jobs.find(job => job.id === selectedJobId);
+
+  // Effect to initialize currentSiteDetails when selectedJobData changes
+  useEffect(() => {
+    if (selectedJobData) {
+      setCurrentSiteDetails(selectedJobData.siteDetails || {}); // Initialize with job data or empty object
+    } else {
+      setCurrentSiteDetails(null); // Reset if no job is selected
+    }
+  }, [selectedJobData]);
+
+  // Handler for when data changes within DetailedSiteDetails component
+  const handleSiteDetailsChange = (newData: DetailedSiteDetailsData) => {
+    setCurrentSiteDetails(newData);
+    setHasUnsavedChanges(true);
+     // Clear save status if user makes changes after a save
+     // (Assuming a save button might be added later or handled by main save button)
+  };
+
+
+  // Updated save function for Site Details - uses currentSiteDetails state
+  const handleSaveSiteDetails = async () => {
+    // Check if there's data to save and a job selected
+    if (!selectedJobId || !currentSiteDetails) {
+       toast({ title: "Error", description: "No job selected or no site details to save.", variant: "destructive" });
+       return;
+    }
+    console.log('Saving Site Details:', currentSiteDetails);
+
+    // Use PATCH request to update the job with the siteDetails
+    try {
+      const response = await fetch(`/api/jobs/${selectedJobId}`, { // Use correct API endpoint
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteDetails: currentSiteDetails }), // Send the data from state
+      });
+
+       if (!response.ok) {
+         const errorData = await response.json().catch(() => ({})); // Try to parse error response
+         throw new Error(errorData.error || 'Failed to save site details');
+       }
+
+      const updatedJob = await response.json();
+
+      // Update local job state
+      setJobs(prevJobs => prevJobs.map(job =>
+        job.id === selectedJobId ? { ...job, siteDetails: updatedJob.siteDetails } : job // Update with response data
+      ));
+
+      toast({
+        title: "Success",
+        description: "Site details saved successfully.",
+      });
+      setHasUnsavedChanges(false); // Assuming save implies changes are persisted
+    } catch (error) {
+      console.error("Error saving site details:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save site details.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Determine if the form should be read-only - REMOVED FOR THIS PAGE CONTEXT
+  // const isReadOnly = selectedJobId ? (paymentComplete[selectedJobId] || isAssessmentReturned()) : false;
+  // For the Initial Assessment page, we want Site Details to be editable before payment/return.
+  const isReadOnly = false;
+
+
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <div className="flex items-center justify-between gap-4 mb-6">
@@ -814,8 +956,83 @@ export default function InitialAssessmentPage() {
         </div>
       </div>
 
+    {/* New Section for About Initial Assessment */}
+    {!selectedJobId && ( // Only render this section if no job is selected
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">About Initial Assessment</h2>
+        <p className="text-sm text-gray-700">
+          This section provides information about the initial assessment process, including what to expect and how to prepare.
+          Please ensure that all required documents are uploaded before proceeding with your assessment.
+        </p>
+      </div>
+    )}
+
       {selectedJobId && (
         <>
+          {/* New Planning Info Section */}
+          <div className="mb-8">
+            <h2
+              className="h-12 text-xl font-semibold mb-4 cursor-pointer bg-[#323A40] text-white flex items-center justify-between"
+              onClick={togglePropertyInfo}
+            >
+              Property Info
+              {isPropertyInfoOpen ? (
+                <ChevronUp className="h-5 w-5 text-white" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-white" />
+              )}
+            </h2>
+            {isPropertyInfoOpen && selectedJobData && ( // Conditional rendering based on state and if job data exists
+              <div>
+                {/* Pass address and propertyData directly */}
+                <PropertyInfo
+                  address={selectedJobData.address}
+                  propertyData={selectedJobData.propertyData || null}
+                />
+              </div>
+            )}
+             {isPropertyInfoOpen && !selectedJobData && (
+               <p className="p-4 text-sm text-gray-500">Loading job data...</p> // Show loading or placeholder if job data isn't ready
+             )}
+          </div>
+
+          {/* New Site Details Section */}
+          <div className="mb-8">
+            <h2
+              className="h-12 text-xl font-semibold mb-4 cursor-pointer bg-[#323A40] text-white flex items-center justify-between"
+              onClick={toggleSiteDetails}
+            >
+              Site Details
+              {isSiteDetailsOpen ? (
+                <ChevronUp className="h-5 w-5 text-white" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-white" />
+              )}
+            </h2>
+            {isSiteDetailsOpen && selectedJobData && currentSiteDetails !== null && ( // Render only when data is loaded
+              <div>
+                 {/* Use the correct DetailedSiteDetails component */}
+                 <DetailedSiteDetails
+                   // Pass the current state using the 'data' prop
+                   data={currentSiteDetails}
+                   onDataChange={handleSiteDetailsChange} // Pass the change handler
+                   isReadOnly={false} // Ensure form is editable on this page
+                 />
+                  {/* Add a dedicated save button for this form if needed, or rely on the main page save */}
+                  {/* Logic adjusted slightly to check hasUnsavedChanges directly */}
+                  {hasUnsavedChanges && (
+                    <div className="flex justify-end mt-4">
+                        <Button onClick={handleSaveSiteDetails}>Save Site Details</Button>
+                    </div>
+                 )}
+              </div>
+            )}
+             {isSiteDetailsOpen && (!selectedJobData || currentSiteDetails === null) && ( // Show loading if job/details not ready
+               <p className="p-4 text-sm text-gray-500">Loading job data...</p>
+             )}
+          </div>
+
+
           <div className="mb-8">
             <h2
               className="h-12 text-xl font-semibold mb-4 cursor-pointer bg-[#323A40] text-white flex items-center justify-between"

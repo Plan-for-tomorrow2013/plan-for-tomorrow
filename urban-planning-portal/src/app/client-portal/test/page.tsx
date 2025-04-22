@@ -18,6 +18,8 @@ import PropertyInfo from '@/components/PropertyInfo'; // Adjust the path as nece
 import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'
 import DocumentStatus from '@/components/DocumentStatus'
 
+import { PrePreparedAssessments } from '../../../components/PrePreparedAssessments'
+
 interface DocumentWithStatus extends Document {
   status: 'uploaded' | 'pending' | 'required'
   value?: string
@@ -40,6 +42,22 @@ interface JobFormData {
   [key: string]: CustomAssessmentForm
 }
 
+interface PrePreparedAssessments {
+  id: string
+  title: string
+  content: string
+  date: string
+  author: string
+  file?: { // Added optional file object to match component interface
+    id: string
+    originalName: string
+    savedPath: string
+  }
+}
+
+// Define the type for the state based on the updated interface
+type PrePreparedAssessmentData = PrePreparedAssessments[];
+
 export default function InitialAssessmentPage() {
   const router = useRouter()
   const { jobs, setJobs } = useJobs()
@@ -56,6 +74,9 @@ export default function InitialAssessmentPage() {
 
   // Separate state for custom section
   const [customAssessmentComplete, setCustomAssessmentComplete] = useState<Record<string, boolean>>({})
+
+  // State for pre-prepared assessment - Use the specific type alias
+  const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessmentData>([])
 
   // New state for collapsible section
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
@@ -607,26 +628,7 @@ export default function InitialAssessmentPage() {
           </Card>
         );
       } else {
-         // Render a placeholder/status tile if paid but not yet returned (optional)
-         // For now, let it fall through to the generic logic which will show "Required"
-         // or potentially adapt the generic logic later if needed.
-         // Alternatively, show a specific "Processing" state card:
-         /*
-         return (
-           <Card key={doc.id} className="relative opacity-70">
-             <CardHeader>
-               <h3 className="text-lg font-semibold">{doc.title}</h3>
-             </CardHeader>
-             <CardContent>
-               <div className="flex items-center text-gray-500">
-                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                 <span className="text-sm">Processing...</span>
-               </div>
-             </CardContent>
-           </Card>
-         );
-         */
-         // Render the "Report In Progress" card matching the Document Store style
+
          return (
             <Card key={doc.id} className="relative">
               <CardHeader className="bg-[#323A40] text-white"> {/* Match header style */}
@@ -916,11 +918,42 @@ export default function InitialAssessmentPage() {
     }
   };
 
-  // Determine if the form should be read-only - REMOVED FOR THIS PAGE CONTEXT
-  // const isReadOnly = selectedJobId ? (paymentComplete[selectedJobId] || isAssessmentReturned()) : false;
-  // For the Initial Assessment page, we want Site Details to be editable before payment/return.
   const isReadOnly = false;
 
+  // Fetch pre-prepared assessment - Now runs when selectedJobId changes
+  useEffect(() => {
+    const fetchPrePreparedAssessments = async () => {
+      // Only fetch if a job is selected
+      if (!selectedJobId) {
+        console.log('No job selected, skipping pre-prepared assessment fetch.');
+        setPrePreparedAssessments([]); // Clear assessments if job is deselected
+        return;
+      }
+      console.log(`Attempting to fetch pre-prepared assessments for job: ${selectedJobId}...`); // Log start with Job ID
+      try {
+        const response = await fetch('/api/pre-prepared-assessments');
+        console.log('Fetch response status:', response.status); // Log status
+        if (!response.ok) {
+          const errorText = await response.text(); // Try to get error text
+          console.error('Fetch failed:', errorText);
+          throw new Error(`Failed to fetch pre-prepared assessments: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('Successfully fetched pre-prepared assessments:', data); // Log success and data
+        setPrePreparedAssessments(data);
+      } catch (error) {
+        console.error('Error fetching pre-prepared assessments in catch block:', error); // Log error in catch
+        toast({
+          title: "Error",
+          description: "Failed to load pre-prepared assessments",
+          variant: "destructive"
+        });
+      }
+    }
+
+    fetchPrePreparedAssessments();
+    // Add selectedJobId to the dependency array
+  }, [selectedJobId]);
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -1094,13 +1127,28 @@ export default function InitialAssessmentPage() {
                 </TabsContent>
 
                 <TabsContent value="pre-prepared" className="mt-0">
-                <div className="col-span-full text-center py-8 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-medium mb-2">No Pre-prepared Assessments</h3>
-                  <p className="text-sm">
-                  No pre-prepared assessments are available at this time.
-                </p>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {prePreparedAssessments.map((assessment) => (
+                      <div key={assessment.id} className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-lg font-semibold mb-2">{assessment.title}</h3>
+                        <p className="text-sm text-gray-600">{assessment.content}</p>
+                        <p className="text-sm text-gray-500">{new Date(assessment.date).toLocaleDateString()}</p>
+                        <p className="text-sm text-gray-500">Posted by {assessment.author}</p>
+                        {assessment.file && (
+                          <div className="mt-2">
+                            <a href={assessment.file.savedPath} className="text-blue-500 hover:underline">
+                              Download
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {prePreparedAssessments.length === 0 && (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No pre-prepared assessments available.
+                      </p>
+                    )}
+                  </div>
                 </TabsContent>
               </div>
             </Tabs>

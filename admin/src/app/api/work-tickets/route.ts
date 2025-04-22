@@ -36,9 +36,13 @@ async function writeWorkTickets(tickets: WorkTicket[]) {
 }
 
 export async function POST(request: Request) {
+  console.log('[API /api/work-tickets] Received POST request');
   try {
-    const body = await request.json()
-    const { jobId, jobAddress, ticketType, customAssessment, prePreparedAssessment } = body
+    const body = await request.json();
+    console.log('[API /api/work-tickets] Request Body:', JSON.stringify(body, null, 2)); // Log the full body
+
+    const { jobId, jobAddress, ticketType, customAssessment, statementOfEnvironmentalEffects, complyingDevelopmentCertificate } = body;
+    console.log('[API /api/work-tickets] Destructured Data:', { jobId, jobAddress, ticketType, customAssessment, statementOfEnvironmentalEffects, complyingDevelopmentCertificate }); // Log destructured parts
 
     // Create new work ticket
     const newTicket: WorkTicket = {
@@ -48,8 +52,34 @@ export async function POST(request: Request) {
       ticketType,
       status: 'pending',
       createdAt: new Date().toISOString(),
-      customAssessment,
-      prePreparedAssessment
+      ...(ticketType === 'custom-assessment' && customAssessment && {
+        customAssessment: {
+          developmentType: customAssessment.developmentType,
+          additionalInfo: customAssessment.additionalInfo,
+          documents: customAssessment.documents,
+        },
+      }),
+      ...(ticketType === 'statement-of-environmental-effects' && statementOfEnvironmentalEffects
+        ? {
+            statementOfEnvironmentalEffects: {
+              developmentType: statementOfEnvironmentalEffects.developmentType,
+              additionalInfo: statementOfEnvironmentalEffects.additionalInfo,
+              documents: statementOfEnvironmentalEffects.documents,
+            },
+          }
+        : {}), // Use ternary to add empty object if condition fails
+      ...(ticketType === 'complying-development-certificate' && complyingDevelopmentCertificate
+        ? (() => {
+            console.log('[API /api/work-tickets] Processing complyingDevelopmentCertificate:', complyingDevelopmentCertificate); // Log before access
+            return {
+              complyingDevelopmentCertificate: {
+                developmentType: complyingDevelopmentCertificate.developmentType, // Line 57
+                additionalInfo: complyingDevelopmentCertificate.additionalInfo,
+                documents: complyingDevelopmentCertificate.documents,
+              },
+            };
+          })()
+        : {}), // Use ternary to add empty object if condition fails
     }
 
     // Read existing tickets

@@ -14,7 +14,7 @@ export interface Document {
   description: ReactNode
   id: string
   title: string
-  path: string // Where the document should appear in the app (e.g., '/initial-assessment/pre-prepared')
+  path: string // Where the document should appear in the app (e.g., '/initial-assessment/cust')
   value?: string // Added for compatibility with assessment types
   type: string
   category: string
@@ -30,23 +30,41 @@ export interface Document {
   size?: number
 }
 
-export interface PrePreparedAssessment {
-  id: string
-  title: string
-  description: string
-  file: string
-  documentId: string // Reference to the document in the document store
-  version: number // Current version of the document
-  path: string // Path where the assessment should appear
-}
-
 export interface InitialAssessment {
   jobId: string
   uploadedDocuments: Record<string, boolean>
   selectedTab: string
   createdAt: string
   updatedAt: string
-  status?: 'pending' | 'completed' | 'paid'
+  status?: 'paid' | 'completed'
+  purchasedAssessment?: {
+    id: string
+    documentId: string
+    version: number
+  }
+}
+
+export interface StatementOfEnvironmentalEffects {
+  jobId: string
+  uploadedDocuments: Record<string, boolean>
+  selectedTab: string
+  createdAt: string
+  updatedAt: string
+  status?: 'paid' | 'completed'
+  purchasedAssessment?: {
+    id: string
+    documentId: string
+    version: number
+  }
+}
+
+export interface ComplyingDevelopmentCertificate {
+  jobId: string
+  uploadedDocuments: Record<string, boolean>
+  selectedTab: string
+  createdAt: string
+  updatedAt: string
+  status?: 'paid' | 'completed'
   purchasedAssessment?: {
     id: string
     documentId: string
@@ -101,7 +119,7 @@ export const DOCUMENT_TYPES: Document[] = [
     id: 'initial-assessment-report',
     title: 'Initial Assessment Report',
     category: 'REPORTS',
-    path: '/initial-assessment/pre-prepared',
+    path: '/initial-assessment/required-documents',
     adminOnly: true,
     type: 'document',
     versions: [],
@@ -123,7 +141,7 @@ export const DOCUMENT_TYPES: Document[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: 'Statement of Environmental Effects report generated via the Report Writer process.'
+    description: undefined
   },
   {
     id: 'complying-development-certificate',
@@ -137,6 +155,6 @@ export const DOCUMENT_TYPES: Document[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: 'Complying Development Certificate report generated via the Report Writer process.'
+    description: undefined
   }
 ]

@@ -39,17 +39,29 @@ export async function POST(request: Request) {
 
     // Get the completed document file path based on ticket type
     const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
-    const completedDocPath = ticket.ticketType === 'custom-assessment'
-      ? path.join(
-          baseDocumentsDir,
-          'custom',
-          `${ticketId}-${ticket.completedDocument.fileName}`
-        )
-      : path.join(
-          baseDocumentsDir,
-          'pre-prepared',
-          `${ticket.prePreparedAssessment?.documentId}-${ticket.completedDocument.fileName}`
-        )
+    let completedDocPath
+
+    if (ticket.ticketType === 'custom-assessment') {
+      completedDocPath = path.join(
+        baseDocumentsDir,
+        'custom',
+        `${ticketId}-${ticket.completedDocument.fileName}`
+      )
+    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
+      completedDocPath = path.join(
+        baseDocumentsDir,
+        'statement-of-environmental-effects',
+        `${ticket.statementOfEnvironmentalEffects?.documentId}-${ticket.completedDocument.fileName}`
+      )
+    } else if (ticket.ticketType === 'complying-development-certificate') {
+      completedDocPath = path.join(
+        baseDocumentsDir,
+        'complying-development-certificate',
+        `${ticket.complyingDevelopmentCertificate?.documentId}-${ticket.completedDocument.fileName}`
+      )
+    } else {
+      throw new Error('Invalid ticket type')
+    }
 
     // Check if the completed document exists
     try {
@@ -82,7 +94,7 @@ export async function POST(request: Request) {
 
     // Generate a unique filename for the document
     const timestamp = Date.now()
-    const newFileName = `initial-assessment-report_${timestamp}_${ticket.completedDocument.fileName}`
+    const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
     const jobDocPath = path.join(jobDocDir, newFileName)
 
     // Copy the document to the job's document store
@@ -102,7 +114,7 @@ export async function POST(request: Request) {
     }
 
     // Add the document to the job's documents
-    job.documents['initial-assessment-report'] = {
+    job.documents[ticket.ticketType] = {
       filename: newFileName,
       originalName: ticket.completedDocument.fileName,
       type: 'application/pdf',
@@ -110,15 +122,27 @@ export async function POST(request: Request) {
       size: (await fs.stat(completedDocPath)).size
     }
 
-    // Update the job's initial assessment status
-    if (!job.initialAssessment) {
-      job.initialAssessment = {}
-    }
-    
-    job.initialAssessment = {
-      ...job.initialAssessment,
-      status: 'completed',
-      returnedAt: new Date().toISOString()
+    // Update the job's assessment status based on ticket type
+    if (ticket.ticketType === 'custom-assessment') {
+      if (!job.customAssessment) {
+        job.customAssessment = {};
+      }
+      job.customAssessment.status = 'completed';
+      job.customAssessment.returnedAt = new Date().toISOString();
+    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
+      if (!job.statementOfEnvironmentalEffects) {
+        job.statementOfEnvironmentalEffects = {};
+      }
+      job.statementOfEnvironmentalEffects.status = 'completed';
+      job.statementOfEnvironmentalEffects.returnedAt = new Date().toISOString();
+    } else if (ticket.ticketType === 'complying-development-certificate') {
+      if (!job.complyingDevelopmentCertificate) {
+        job.complyingDevelopmentCertificate = {};
+      }
+      job.complyingDevelopmentCertificate.status = 'completed';
+      job.complyingDevelopmentCertificate.returnedAt = new Date().toISOString();
+    } else {
+      throw new Error('Invalid ticket type');
     }
 
     // Save the updated job data
@@ -166,4 +190,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}

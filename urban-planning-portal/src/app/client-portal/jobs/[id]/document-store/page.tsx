@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Document, DOCUMENT_TYPES } from '@/types/documents'
 import { toast } from '@/components/ui/use-toast'
+import { useJobs, type Job } from '../../../../../../hooks/useJobs' // Corrected import path
 
 interface DocumentWithStatus extends Document {
   status: 'uploaded' | 'pending' | 'required'
@@ -20,22 +21,13 @@ interface DocumentWithStatus extends Document {
   }
 }
 
-interface Job {
-  id: string
-  initialAssessment?: {
-    status?: 'pending' | 'completed' | 'paid'
-  }
-  documents?: Record<string, {
-    filename: string
-    originalName: string
-    type: string
-    uploadedAt: string
-    size: number
-  }>
-}
+// Remove the local Job interface definition, use the imported one
 
 export default function DocumentStorePage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  // Use the useJobs hook to potentially access the shared job state if needed,
+  // although this component primarily fetches its own job data based on params.id
+  // const { jobs, setJobs } = useJobs(); // Optional: if needed for other logic
   const [documents, setDocuments] = useState<DocumentWithStatus[]>(
     DOCUMENT_TYPES.map(doc => ({ ...doc, status: 'required' }))
   )
@@ -230,18 +222,22 @@ export default function DocumentStorePage({ params }: { params: { id: string } }
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {documents.map((doc) => {
-          // Special handling for initial assessment report
+          // --- Conditional Rendering Logic ---
+
+          // 1. Initial Assessment Report (Existing Logic)
           if (doc.id === 'initial-assessment-report') {
-            // Show the report tile if assessment exists or is paid
-            const shouldShowReport = job?.initialAssessment?.status === 'paid' ||
-                                   Boolean(job?.documents?.[doc.id]);
+            // Show the report tile if assessment is paid OR the document exists
+            const isPaid = job?.initialAssessment?.status === 'paid';
+            const isUploaded = Boolean(job?.documents?.[doc.id]);
+            const shouldShowReport = isPaid || isUploaded;
 
             if (!shouldShowReport) {
-              return null;
+              return null; // Don't render if not paid and not uploaded
             }
 
-            const isUploaded = Boolean(job?.documents?.[doc.id]);
+            // Render the tile (logic for 'In Progress' or 'Download' below)
 
+            // (Existing rendering code for initial-assessment-report follows)
             return (
               <Card key={doc.id} className="shadow-md">
                 <CardHeader className="bg-[#323A40] text-white">
@@ -256,7 +252,219 @@ export default function DocumentStorePage({ params }: { params: { id: string } }
                   </div>
                 </CardHeader>
                 <CardContent className="p-4 space-y-4">
-                  {isUploaded && doc.uploadedFile ? (
+                  {isUploaded && doc.uploadedFile ? ( // Document exists, show download/remove
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                        <FileText className="h-4 w-4" />
+                        <span>{doc.uploadedFile.originalName}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Uploaded: {new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex justify-between gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-600"
+                          onClick={() => handleRemoveDocument(doc.id)}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(doc.id)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  ) : ( // Paid but not uploaded, show 'In Progress'
+                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <p className="text-sm font-medium">Report In Progress</p>
+                      <p className="text-xs text-muted-foreground">
+                        Our team is working on your initial assessment report. You will be notified once it's ready.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          }
+
+          // 2. Statement of Environmental Effects
+          if (doc.id === 'statement-of-environmental-effects') {
+            // Show the report tile if assessment is paid OR the document exists
+            const isPaid = job?.statementOfEnvironmentalEffects?.status === 'paid';
+            const isUploaded = Boolean(job?.documents?.[doc.id]);
+            const shouldShowReport = isPaid || isUploaded;
+
+            if (!shouldShowReport) {
+              return null; // Don't render if not paid and not uploaded
+            }
+
+            // Render the tile (logic for 'In Progress' or 'Download' below)
+
+            // (Existing rendering code for statement-of-environmental-effects follows)
+            return (
+              <Card key={doc.id} className="shadow-md">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-semibold">{doc.title}</h3>
+                      <p className="text-sm text-gray-300">{doc.category}</p>
+                    </div>
+                    {isUploaded && (
+                      <Check className="h-5 w-5 text-green-400" />
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  {isUploaded && doc.uploadedFile ? ( // Document exists, show download/remove
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                        <FileText className="h-4 w-4" />
+                        <span>{doc.uploadedFile.originalName}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Uploaded: {new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex justify-between gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-600"
+                          onClick={() => handleRemoveDocument(doc.id)}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(doc.id)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  ) : ( // Paid but not uploaded, show 'In Progress'
+                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <p className="text-sm font-medium">Report In Progress</p>
+                      <p className="text-xs text-muted-foreground">
+                        Our team is working on your Statement of Environmental Effects. You will be notified once it's ready.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          }
+
+          // 3. Complying Development Certificate Report
+          if (doc.id === 'complying-development-certificate') {
+            // Show the report tile if assessment is paid OR the document exists
+            const isPaid = job?.complyingDevelopmentCertificate?.status === 'paid';
+            const isUploaded = Boolean(job?.documents?.[doc.id]);
+            const shouldShowReport = isPaid || isUploaded;
+
+            if (!shouldShowReport) {
+              return null; // Don't render if not paid and not uploaded
+            }
+
+            // Render the tile (logic for 'In Progress' or 'Download' below)
+
+            // (Existing rendering code for complying-development-certificate follows)
+            return (
+              <Card key={doc.id} className="shadow-md">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-semibold">{doc.title}</h3>
+                      <p className="text-sm text-gray-300">{doc.category}</p>
+                    </div>
+                    {isUploaded && (
+                      <Check className="h-5 w-5 text-green-400" />
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  {isUploaded && doc.uploadedFile ? ( // Document exists, show download/remove
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                        <FileText className="h-4 w-4" />
+                        <span>{doc.uploadedFile.originalName}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Uploaded: {new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex justify-between gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-600"
+                          onClick={() => handleRemoveDocument(doc.id)}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Remove
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(doc.id)}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                  ) : ( // Paid but not uploaded, show 'In Progress'
+                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <p className="text-sm font-medium">Report In Progress</p>
+                      <p className="text-xs text-muted-foreground">
+                        Our team is working on your Complying Development Certificate report. You will be notified once it's ready.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          }
+
+          // --- Regular Document Handling (for all other docs) ---
+          else {
+            // Use the existing 'uploaded' status from the documents state for regular docs
+            const isRegularUploaded = doc.status === 'uploaded';
+            return (
+              <Card key={doc.id} className="shadow-md">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        {doc.title}
+                        {doc.required && <span className="text-red-400 ml-1">*</span>}
+                      </h3>
+                      <p className="text-sm text-gray-300">{doc.category}</p>
+                    </div>
+                    {doc.status === 'uploaded' && (
+                      <Check className="h-5 w-5 text-green-400" />
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  {doc.status === 'uploaded' && doc.uploadedFile ? (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-[#323A40]">
                         <FileText className="h-4 w-4" />
@@ -286,93 +494,31 @@ export default function DocumentStorePage({ params }: { params: { id: string } }
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center p-4 text-center space-y-2">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <p className="text-sm font-medium">Report In Progress</p>
-                      <p className="text-xs text-muted-foreground">
-                        Our team is working on your initial assessment report. You will be notified once it's ready.
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        id={doc.id}
+                        className="hidden"
+                        accept=".pdf,.doc,.docx"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) handleFileUpload(doc.id, file)
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => document.getElementById(doc.id)?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Document
+                      </Button>
                     </div>
                   )}
                 </CardContent>
               </Card>
             )
           }
-
-          // Regular document handling
-          return (
-            <Card key={doc.id} className="shadow-md">
-              <CardHeader className="bg-[#323A40] text-white">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">
-                      {doc.title}
-                      {doc.required && <span className="text-red-400 ml-1">*</span>}
-                    </h3>
-                    <p className="text-sm text-gray-300">{doc.category}</p>
-                  </div>
-                  {doc.status === 'uploaded' && (
-                    <Check className="h-5 w-5 text-green-400" />
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                {doc.status === 'uploaded' && doc.uploadedFile ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-[#323A40]">
-                      <FileText className="h-4 w-4" />
-                      <span>{doc.uploadedFile.originalName}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Uploaded: {new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()}
-                    </p>
-                    <div className="flex justify-between gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-600"
-                        onClick={() => handleRemoveDocument(doc.id)}
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Remove
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownload(doc.id)}
-                      >
-                        <FileText className="h-4 w-4 mr-2" />
-                        Download
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="file"
-                      id={doc.id}
-                      className="hidden"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) handleFileUpload(doc.id, file)
-                      }}
-                    />
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => document.getElementById(doc.id)?.click()}
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Document
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )
         })}
       </div>
     </div>

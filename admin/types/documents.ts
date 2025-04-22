@@ -11,7 +11,7 @@ export interface DocumentVersion {
 export interface Document {
   id: string
   title: string
-  path: string // Where the document should appear in the app (e.g., '/initial-assessment/pre-prepared')
+  path: string // Where the document should appear in the app (e.g., '/initial-assessment/custom-assessment')
   value?: string // Added for compatibility with assessment types
   type: string
   category: string
@@ -27,17 +27,35 @@ export interface Document {
   size?: number
 }
 
-export interface PrePreparedAssessment {
-  id: string
-  title: string
-  description: string
-  file: string
-  documentId: string // Reference to the document in the document store
-  version: number // Current version of the document
-  path: string // Path where the assessment should appear
+export interface InitialAssessment {
+  jobId: string
+  uploadedDocuments: Record<string, boolean>
+  selectedTab: string
+  createdAt: string
+  updatedAt: string
+  status?: 'pending' | 'completed' | 'paid'
+  purchasedAssessment?: {
+    id: string
+    documentId: string
+    version: number
+  }
 }
 
-export interface InitialAssessment {
+export interface StatementOfEnvironmentalEffects {
+  jobId: string
+  uploadedDocuments: Record<string, boolean>
+  selectedTab: string
+  createdAt: string
+  updatedAt: string
+  status?: 'pending' | 'completed' | 'paid'
+  purchasedAssessment?: {
+    id: string
+    documentId: string
+    version: number
+  }
+}
+
+export interface ComplyingDevelopmentCertificate {
   jobId: string
   uploadedDocuments: Record<string, boolean>
   selectedTab: string
@@ -95,7 +113,7 @@ export const DOCUMENT_TYPES: Document[] = [
     id: 'initial-assessment-report',
     title: 'Initial Assessment Report',
     category: 'REPORTS',
-    path: '/initial-assessment/pre-prepared',
+    path: '/initial-assessment/custom-assessment',
     adminOnly: true,
     type: 'document',
     versions: [],
@@ -103,5 +121,31 @@ export const DOCUMENT_TYPES: Document[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true
+  },
+  {
+    id: 'statement-of-environmental-effects',
+    title: 'Statement of Environmental Effects',
+    category: 'REPORTS',
+    path: '/statement-of-environmental-effects',
+    required: false,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'complying-development-certificate',
+    title: 'Complying Development Certificate',
+    category: 'REPORTS',
+    path: '/complying-development-certificate',
+    required: false,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
   }
-] 
+]

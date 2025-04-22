@@ -1,159 +1,50 @@
 [
   {
-    "id": "c620d2cb-40f3-4b8f-b7f3-99d562d1a926",
-    "jobId": "159df9d4-7205-4648-b5bd-133520aa8a54",
-    "jobAddress": "8 Allen Avenue, Belmore",
-    "ticketType": "custom-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-11T05:41:43.133Z",
-    "customAssessment": {
-      "developmentType": "sdvw",
-      "additionalInfo": "berbebr",
-      "documents": {
-        "certificate107": "29 Boundary Road, Tallawong (Lot 10-DP271247) Floor Plans 20250408.pdf"
-      }
-    }
-  },
-  {
-    "id": "22cd5320-4fad-44be-aa3f-e161802a55a6",
-    "jobId": "c0b74427-83c5-45ac-bb76-b96ca9b824c6",
-    "jobAddress": "9 Viola Place Greystanes",
-    "ticketType": "custom-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-15T09:26:12.170Z",
-    "customAssessment": {
-      "developmentType": "wevwbwwebw",
-      "additionalInfo": "avwevwevbwwaevwewebwbwbebwbewwvwebwewb",
-      "documents": {
-        "certificate107": "Quote QU1019.pdf"
-      }
-    }
-  },
-  {
-    "id": "9cca33cc-6551-4ade-807c-6466453b1e18",
-    "jobId": "c09faece-03b9-4934-b6ab-0e3ceda52e8f",
-    "jobAddress": "34 Wallace Road Fernhill",
+    "id": "406dfbe1-16fb-4775-8631-eae6a7cb742e",
+    "jobId": "60214d26-638b-4e59-b582-c19d2994840f",
+    "jobAddress": "9 Viola Place, Greystanes",
     "ticketType": "custom-assessment",
     "status": "completed",
-    "createdAt": "2025-04-16T09:18:53.211Z",
-    "customAssessment": {
-      "developmentType": "TEST123",
-      "additionalInfo": "TEST123",
-      "documents": {
-        "certificateOfTitle": "Quote QU1024.pdf",
-        "certificate107": "Invoice INV-2148.pdf"
-      }
-    },
-    "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "24 Parsonage Rd, Castle Hill - DA 01.pdf",
-      "fileName": "initial-assessment-report.pdf",
-      "uploadedAt": "2025-04-16T09:19:33.880Z",
-      "size": 4575878,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-16T09:19:37.719Z"
-    }
-  },
-  {
-    "id": "8ab6bc1a-f96e-482e-b4de-01e58c219414",
-    "jobId": "c3a3cbd2-2b57-4e95-81f4-a860777654ad",
-    "jobAddress": "37 Chudleigh Street, Rydalmere",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-17T02:59:40.363Z",
+    "createdAt": "2025-04-21T02:21:05.041Z",
     "customAssessment": {
       "developmentType": "123",
-      "additionalInfo": "125",
+      "additionalInfo": "456",
       "documents": {
-        "certificate107": "8ry0dsabzh-preview.pdf"
+        "certificate107": "10.7 Certificate Check.pdf"
       }
     },
     "completedDocument": {
       "documentId": "initial-assessment-report",
-      "originalName": "Invoice-572646.pdf",
-      "fileName": "initial-assessment-report.pdf",
-      "uploadedAt": "2025-04-17T02:59:56.864Z",
-      "size": 17051,
+      "originalName": "Initial Assessment Check.pdf",
+      "fileName": "custom-assessment.pdf",
+      "uploadedAt": "2025-04-21T02:21:33.000Z",
+      "size": 4136746,
       "type": "application/pdf",
-      "returnedAt": "2025-04-17T02:59:58.369Z"
+      "returnedAt": "2025-04-21T02:21:48.678Z"
     }
   },
   {
-    "id": "66546e12-7156-4af0-9a7d-69cc14bf771b",
-    "jobId": "c7814fdb-beca-46d3-9a8c-cc6def78dfb0",
-    "jobAddress": "42 Bellevue Street Blacktown",
-    "ticketType": "custom-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-17T07:19:54.100Z",
-    "customAssessment": {
-      "developmentType": "123456",
-      "additionalInfo": "78910",
-      "documents": {
-        "certificate107": "Invoice-572646.pdf"
-      }
-    }
-  },
-  {
-    "id": "79b7d23f-f003-4281-85bd-7aea224daea2",
-    "jobId": "c3a3cbd2-2b57-4e95-81f4-a860777654ad",
-    "jobAddress": "37 Chudleigh Street, Rydalmere",
+    "id": "94040349-31e7-47ed-8ee5-f086c449bd27",
+    "jobId": "60214d26-638b-4e59-b582-c19d2994840f",
+    "jobAddress": "9 Viola Place, Greystanes",
     "ticketType": "statement-of-environmental-effects",
     "status": "completed",
-    "createdAt": "2025-04-17T08:10:11.266Z",
-    "customAssessment": {
+    "createdAt": "2025-04-21T02:22:31.205Z",
+    "statementOfEnvironmentalEffects": {
       "developmentType": "123",
-      "additionalInfo": "125",
+      "additionalInfo": "456",
       "documents": {
-        "certificate107": "8ry0dsabzh-preview.pdf"
+        "certificate107": "10.7 Certificate Check.pdf"
       }
     },
     "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "Quote QU1024.pdf",
-      "fileName": "initial-assessment-report.pdf",
-      "uploadedAt": "2025-04-17T08:18:52.365Z",
-      "size": 50017,
+      "documentId": "statement-of-environmental-effects",
+      "originalName": "Statement of Environmental Effects Check.pdf",
+      "fileName": "statement-of-environmental-effects.pdf",
+      "uploadedAt": "2025-04-21T02:22:49.952Z",
+      "size": 4136746,
       "type": "application/pdf",
-      "returnedAt": "2025-04-17T08:20:08.528Z"
-    }
-  },
-  {
-    "id": "78397503-3cbf-4af9-bf94-32f53cf1e5ea",
-    "jobId": "925ef6cd-f7d5-4df5-895a-12683a645085",
-    "jobAddress": "203 Buffalo Road, Ryde",
-    "ticketType": "custom-assessment",
-    "status": "pending",
-    "createdAt": "2025-04-17T08:11:04.569Z",
-    "customAssessment": {
-      "developmentType": "TESY",
-      "additionalInfo": "TEST",
-      "documents": {
-        "certificate107": "Invoice-572646.pdf"
-      }
-    }
-  },
-  {
-    "id": "84ba9677-90ea-4ed3-bdc3-278e679f5325",
-    "jobId": "6a0afc8f-72f7-49b2-9f63-891acf1c0e46",
-    "jobAddress": "54-62 CARRINGTON STREET SYDNEY",
-    "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-17T09:30:17.936Z",
-    "customAssessment": {
-      "developmentType": "custom",
-      "additionalInfo": "custom",
-      "documents": {
-        "certificate107": "Invoice-572646.pdf"
-      }
-    },
-    "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "Invoice INV-2148.pdf",
-      "fileName": "initial-assessment-report.pdf",
-      "uploadedAt": "2025-04-17T09:30:37.247Z",
-      "size": 60982,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-17T09:30:40.185Z"
+      "returnedAt": "2025-04-21T02:22:51.042Z"
     }
   }
 ]

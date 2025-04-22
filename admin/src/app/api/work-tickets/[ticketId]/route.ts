@@ -55,16 +55,6 @@ export async function PATCH(
     tickets[ticketIndex] = {
       ...ticket,
       status,
-      // For pre-prepared assessments that are being completed, ensure completedDocument exists
-      ...(status === 'completed' 
-        ? {
-            completedDocument: ticket.completedDocument || {
-              fileName: `${ticket.prePreparedAssessment?.assessmentType || 'document'}.pdf`,
-              uploadedAt: new Date().toISOString(),
-              returnedAt: new Date().toISOString()
-            }
-          }
-        : {})
     }
 
     // Save updated tickets
@@ -113,4 +103,4 @@ export async function DELETE(
       { status: 500 }
     )
   }
-} 
+}

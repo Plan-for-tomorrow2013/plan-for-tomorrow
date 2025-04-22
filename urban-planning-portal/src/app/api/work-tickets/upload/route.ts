@@ -33,16 +33,26 @@ export async function POST(request: Request) {
 
     // Create appropriate documents directory based on ticket type
     const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
-    const documentsDir = ticket.ticketType === 'custom-assessment' 
-      ? path.join(baseDocumentsDir, 'custom')
-      : path.join(baseDocumentsDir, 'pre-prepared')
-    
+    let documentsDir;
+
+    if (ticket.ticketType === 'custom-assessment') {
+      documentsDir = path.join(baseDocumentsDir, 'custom');
+    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
+      documentsDir = path.join(baseDocumentsDir, 'statement-of-environmental-effects');
+    } else if (ticket.ticketType === 'complying-development-certificate') {
+      documentsDir = path.join(baseDocumentsDir, 'complying-development-certificate');
+    } else {
+      throw new Error('Invalid ticket type');
+    }
+
     await fs.mkdir(documentsDir, { recursive: true })
 
     // Generate appropriate filename based on ticket type
     const fileName = ticket.ticketType === 'custom-assessment'
       ? `${ticketId}-${file.name}`
-      : `${ticket.prePreparedAssessment?.documentId}-${file.name}`
+      : ticket.ticketType === 'statement-of-environmental-effects'
+        ? `${ticket.statementOfEnvironmentalEffects?.documentId}-${file.name}`
+        : `${ticket.complyingDevelopmentCertificate?.documentId}-${file.name}`;
 
     // Save the file
     const fileBuffer = Buffer.from(await file.arrayBuffer())
@@ -62,6 +72,63 @@ export async function POST(request: Request) {
     // Save the updated tickets
     await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
 
+    // Create job documents directory if it doesn't exist
+    const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents')
+    await fs.mkdir(jobDocDir, { recursive: true })
+
+    // Generate a unique filename for the document based on ticket type
+    const timestamp = Date.now()
+    const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
+    const jobDocPath = path.join(jobDocDir, newFileName)
+
+    // Copy the document to the job's document store
+    try {
+      await fs.copyFile(filePath, jobDocPath)
+    } catch (error) {
+      console.error('Error copying document:', error)
+      return NextResponse.json(
+        { error: 'Failed to copy document to job store' },
+        { status: 500 }
+      )
+    }
+
+    // Initialize documents object if it doesn't exist
+    if (!ticket.job.documents) {
+      ticket.job.documents = {}
+    }
+
+    // Add the document to the job's documents based on ticket type
+    ticket.job.documents[ticket.ticketType] = {
+      filename: newFileName,
+      originalName: file.name,
+      type: 'application/pdf',
+      uploadedAt: new Date().toISOString(),
+      size: (await fs.stat(filePath)).size
+    }
+
+    // Update the job's assessment status based on ticket type
+    if (ticket.ticketType === 'custom-assessment') {
+      if (!ticket.job.customAssessment) {
+        ticket.job.customAssessment = {}
+      }
+      ticket.job.customAssessment.status = 'completed'
+      ticket.job.customAssessment.returnedAt = new Date().toISOString()
+    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
+      if (!ticket.job.statementOfEnvironmentalEffects) {
+        ticket.job.statementOfEnvironmentalEffects = {}
+      }
+      ticket.job.statementOfEnvironmentalEffects.status = 'completed'
+      ticket.job.statementOfEnvironmentalEffects.returnedAt = new Date().toISOString()
+    } else if (ticket.ticketType === 'complying-development-certificate') {
+      if (!ticket.job.complyingDevelopmentCertificate) {
+        ticket.job.complyingDevelopmentCertificate = {}
+      }
+      ticket.job.complyingDevelopmentCertificate.status = 'completed'
+      ticket.job.complyingDevelopmentCertificate.returnedAt = new Date().toISOString()
+    } else {
+      throw new Error('Invalid ticket type')
+    }
+
     return NextResponse.json(workTickets[ticketIndex])
   } catch (error) {
     console.error('Error handling file upload:', error)
@@ -70,4 +137,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}

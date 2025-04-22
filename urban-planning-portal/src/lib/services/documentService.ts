@@ -1,4 +1,4 @@
-import { Document, PrePreparedAssessment } from '../../types/documents'
+import { Document } from '../../types/documents'
 
 interface DocumentVersion {
   version: number
@@ -132,4 +132,4 @@ class DocumentService {
   }
 }
 
-export const documentService = DocumentService.getInstance() 
+export const documentService = DocumentService.getInstance()

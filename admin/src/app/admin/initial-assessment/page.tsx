@@ -9,8 +9,9 @@ import { useToast } from "../../../components/ui/use-toast"
 import { Loader2, Plus, FileText } from "lucide-react"
 import { PageHeader } from "../../../components/ui/page-header"
 
-interface PrePreparedAssessment {
+interface PrePreparedAssessments {
   id: string
+  section: string
   title: string
   content: string
   date: string
@@ -23,10 +24,11 @@ interface PrePreparedAssessment {
 
 export default function InitialAssessmentPage() {
   const { toast } = useToast()
-  const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessment[]>([])
+  const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessments[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
+    section: '',
     title: '',
     content: '',
     author: '',
@@ -65,6 +67,7 @@ export default function InitialAssessmentPage() {
     setSubmitting(true)
 
     const formDataToSubmit = new FormData()
+    formDataToSubmit.append('section', formData.section)
     formDataToSubmit.append('title', formData.title)
     formDataToSubmit.append('content', formData.content)
     formDataToSubmit.append('author', formData.author)
@@ -78,21 +81,21 @@ export default function InitialAssessmentPage() {
         body: formDataToSubmit,
       })
 
-      if (!response.ok) throw new Error('Failed to create Pre-Prepared Assessment')
+      if (!response.ok) throw new Error('Failed to create Pre-Prepared Assessments')
 
-      const newPrePreparedAssessment = await response.json()
-      setPrePreparedAssessments(prev => [newPrePreparedAssessment, ...prev])
-      setFormData({ title: '', content: '', author: '', file: null })
+      const newPrePreparedAssessments = await response.json()
+      setPrePreparedAssessments(prev => [newPrePreparedAssessments, ...prev])
+      setFormData({ section: '', title: '', content: '', author: '', file: null })
 
       toast({
         title: "Success",
-        description: "Pre-Prepared Assessment created successfully"
+        description: "Pre-Prepared Assessments created successfully"
       })
     } catch (error) {
       console.error('Error:', error)
       toast({
         title: "Error",
-        description: "Failed to create Pre-Prepared Assessment: " + (error as Error).message,
+        description: "Failed to create Pre-Prepared Assessments: " + (error as Error).message,
         variant: "destructive"
       })
     } finally {
@@ -144,13 +147,57 @@ export default function InitialAssessmentPage() {
         backHref="/admin"
       />
 
-      <div className="grid gap-6">
+<div className="grid gap-6">
         <Card>
+          <CardHeader>
+            <CardTitle>Create New Section</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Section</label>
+                <Input
+                  value={formData.section}
+                  onChange={e => setFormData(prev => ({ ...prev, section: e.target.value }))}
+                  placeholder="Pre-Prepared Section"
+                  required
+                />
+              </div>
+
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Section
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6">
+        <Card className="mt-6">
           <CardHeader>
             <CardTitle>Create New Pre-Prepared Assessment</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <label className="text-sm font-medium mb-1 block">Title</label>
+                <Input
+                  value={formData.section}
+                  onChange={e => setFormData(prev => ({ ...prev, section: e.target.value }))}
+                  placeholder="Pre-Prepared Section"
+                  required
+                />
+              </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Title</label>
                 <Input

@@ -2,7 +2,7 @@ export interface WorkTicket {
   id: string
   jobId: string
   jobAddress: string
-  ticketType: 'custom-assessment' | 'pre-prepared-assessment'
+  ticketType: 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate'
   status: 'pending' | 'in-progress' | 'completed'
   createdAt: string
   completedDocument?: {
@@ -19,8 +19,22 @@ export interface WorkTicket {
       certificate107?: string
     }
   }
-  prePreparedAssessment?: {
-    assessmentType: string
-    documentId: string
+  statementOfEnvironmentalEffects?: {
+    developmentType: string
+    additionalInfo: string
+    documents: {
+      certificateOfTitle?: string
+      surveyPlan?: string
+      certificate107?: string
+    }
   }
-} 
+  complyingDevelopmentCertificate?: {
+    developmentType: string
+    additionalInfo: string
+    documents: {
+      certificateOfTitle?: string
+      surveyPlan?: string
+      certificate107?: string
+    }
+  }
+}

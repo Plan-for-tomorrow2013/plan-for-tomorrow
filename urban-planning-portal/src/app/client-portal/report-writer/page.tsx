@@ -14,19 +14,9 @@ import { Document, DOCUMENT_TYPES } from '../../../types/documents'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
-import { PrePreparedSection } from '@/components/PrePreparedSection'
 import PropertyInfo from '@/components/PropertyInfo'; // Adjust the path as necessary
-// Remove incorrect form import
-import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'; // Import the CORRECT form component and its type
-
-// Debug flag - set to true to enable console logging
-const DEBUG = true
-
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    console.log('[PrePrepared]', ...args)
-  }
-}
+import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'
+import DocumentStatus from '@/components/DocumentStatus'
 
 interface DocumentWithStatus extends Document {
   status: 'uploaded' | 'pending' | 'required'
@@ -41,13 +31,19 @@ interface DocumentWithStatus extends Document {
   }
 }
 
-interface CustomAssessmentForm {
+interface reportWriterForm {
   developmentType: string
   additionalInfo: string
 }
 
 interface JobFormData {
-  [key: string]: CustomAssessmentForm
+  [key: string]: reportWriterForm
+}
+
+interface PaymentStatus {
+  SoEE: boolean;
+  CDC: boolean;
+  customAssessment?: boolean;
 }
 
 export default function ReportWriterPage() {
@@ -58,46 +54,96 @@ export default function ReportWriterPage() {
   const [documentError, setDocumentError] = useState<string | null>(null)
   const [formData, setFormData] = useState<JobFormData>({})
   const [showPaymentButton, setShowPaymentButton] = useState(false)
-  const [paymentComplete, setPaymentComplete] = useState<Record<string, boolean>>({})
+  // Refactored state to track payment status per report type
+  const [paymentStatus, setPaymentStatus] = useState<Record<string, PaymentStatus>>({});
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // State to track the selected report type (tab)
-  const [selectedReportType, setSelectedReportType] = useState<'statement-of-environmental-effects' | 'complying-development-certificate'>('statement-of-environmental-effects');
+  // Separate state for state section
+  const [statementOfEnvironmentalEffectsComplete, setStatementOfEnvironmentalEffectsComplete] = useState<Record<string, boolean>>({})
+  // Separate state for state section
+  const [complyingDevelopmentCertificateComplete, setComplyingDevelopmentCertificateComplete] = useState<Record<string, boolean>>({})
 
-  // Separate state for custom section (may need review if it's still relevant)
-  const [customAssessmentComplete, setCustomAssessmentComplete] = useState<Record<string, boolean>>({})
-
-  // New state for collapsible sections
+  // New state for collapsible section
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
+  const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
+  const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
 
-// New state for property info section
-const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
-// New state for site details section
-const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
-// State to hold the current site details being edited in the form
-const [currentSiteDetails, setCurrentSiteDetails] = useState<DetailedSiteDetailsData | null>(null);
+  // State to hold the current site details being edited in the form
+  const [currentSiteDetails, setCurrentSiteDetails] = useState<DetailedSiteDetailsData | null>(null);
 
-// New state for current form data
-const [currentFormData, setCurrentFormData] = useState<CustomAssessmentForm>({
-  developmentType: '',
-  additionalInfo: ''
-});
+  // State to hold the form data currently displayed/edited in the inputs
+  const [currentReportFormData, setCurrentReportFormData] = useState<reportWriterForm>({ // Corrected state name and type
+    developmentType: '',
+    additionalInfo: ''
+  });
 
-// Assuming you have these documents defined in your state
-const [certificateOfTitle, setCertificateOfTitle] = useState<DocumentWithStatus | null>(null);
-const [surveyPlan, setSurveyPlan] = useState<DocumentWithStatus | null>(null);
-const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(null);
+  // New state for report status
+  const [isSoEEReportInProgress, setIsSoEEReportInProgress] = useState(false);
+  const [isCDCReportInProgress, setIsCDCReportInProgress] = useState(false);
+
+  // New state for progress tracking
+  const [reportProgress, setReportProgress] = useState<{
+    [jobId: string]: {
+      SoEE: boolean;
+      CDC: boolean;
+    };
+  }>({});
+
+  // State to track previous report return status for notifications
+  const [prevSoEEReturnedAt, setPrevSoEEReturnedAt] = useState<string | undefined | null>(null);
+  const [prevCDCReturnedAt, setPrevCDCReturnedAt] = useState<string | undefined | null>(null);
+
 
   // Load data from local storage when the component mounts
   useEffect(() => {
-    const savedData = localStorage.getItem(`initialAssessment-${selectedJobId}`);
+    const savedData = localStorage.getItem(`statementOfEnvironmentalEffects-${selectedJobId}`);
     if (savedData) {
-      setFormData(JSON.parse(savedData));
+      try {
+        const parsedData = JSON.parse(savedData);
+        // Ensure the loaded data structure matches your expected format
+        if (typeof parsedData === 'object' && parsedData !== null) {
+          setFormData(parsedData);
+        } else {
+          console.warn('Invalid data found in local storage for statement of environmental effects, resetting.');
+          localStorage.removeItem(`statementOfEnvironmentalEffects-${selectedJobId}`);
+          setFormData({}); // Reset form data
+        }
+      } catch (error) {
+        console.error('Failed to parse statement of environmental effects data from local storage:', error);
+        localStorage.removeItem(`statementOfEnvironmentalEffects-${selectedJobId}`); // Clear invalid data
+        setFormData({}); // Reset form data
+      }
+    } else {
+      setFormData({}); // Reset if no data found for the job
     }
   }, [selectedJobId]);
+
+    // Load data from local storage when the component mounts
+    useEffect(() => {
+      const savedData = localStorage.getItem(`complyingDevelopmentCertificate-${selectedJobId}`);
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          // Ensure the loaded data structure matches your expected format
+          if (typeof parsedData === 'object' && parsedData !== null) {
+            setFormData(parsedData);
+          } else {
+            console.warn('Invalid data found in local storage for complying development certificate, resetting.');
+            localStorage.removeItem(`complyingDevelopmentCertificate-${selectedJobId}`);
+            setFormData({}); // Reset form data
+          }
+        } catch (error) {
+          console.error('Failed to parse complying development certificate data from local storage:', error);
+          localStorage.removeItem(`complyingDevelopmentCertificate-${selectedJobId}`); // Clear invalid data
+          setFormData({}); // Reset form data
+        }
+      } else {
+        setFormData({}); // Reset if no data found for the job
+      }
+    }, [selectedJobId]);
 
   // Set initial job ID from URL if present
   useEffect(() => {
@@ -106,54 +152,94 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
     if (jobId) {
       setSelectedJobId(jobId)
     }
+    setLoading(false); // Set loading to false after attempting to get job ID
   }, [])
 
   // Reset purchase state when job changes
   useEffect(() => {
     if (selectedJobId) {
       // Fetch job data
-      fetch(`/api/jobs/${selectedJobId}`)
-        .then(jobResponse => jobResponse.json())
-        .then(jobData => {
-          console.log('Initial load:', {
-            jobId: selectedJobId,
-            initialAssessment: jobData.initialAssessment,
-            paymentStatus: jobData.initialAssessment?.status
-          })
-
-          // Set payment complete if the job has a paid custom assessment
-          if (jobData.initialAssessment?.status === 'paid') {
-            console.log('Setting payment complete - payment status is paid')
-            setPaymentComplete(prev => ({
-              ...prev,
-              [selectedJobId]: true
-            }))
+      const fetchJobData = async () => {
+        try {
+          const jobResponse = await fetch(`/api/jobs/${selectedJobId}`);
+          if (!jobResponse.ok) {
+            throw new Error('Failed to fetch job details');
           }
-        })
-        .catch(error => {
-          console.error('Error checking status:', error)
-        })
+          const jobData = await jobResponse.json();
+
+          // Update the global jobs state
+          setJobs((prevJobs: Job[]) => prevJobs.map((job: Job) =>
+            job.id === selectedJobId ? { ...job, ...jobData } : job
+          ));
+
+          // Initialize report progress state based on payment status
+          setReportProgress(prev => ({
+            ...prev,
+            [selectedJobId]: {
+              SoEE: jobData.statementOfEnvironmentalEffects?.status === 'paid',
+              CDC: jobData.complyingDevelopmentCertificate?.status === 'paid',
+            },
+          }));
+
+          // Initialize payment status based on fetched job data
+          setPaymentStatus(prev => ({
+            ...prev,
+            [selectedJobId]: {
+              SoEE: jobData.statementOfEnvironmentalEffects?.status === 'paid',
+              CDC: jobData.complyingDevelopmentCertificate?.status === 'paid',
+            },
+          }));
+
+          // Initialize documents with their status
+          const updatedDocuments = DOCUMENT_TYPES.map(doc => {
+            const uploadedFile = jobData.documents?.[doc.id];
+            return {
+              ...doc,
+              status: uploadedFile ? 'uploaded' as const : 'required' as const,
+              uploadedFile: uploadedFile ? {
+                filename: uploadedFile.filename,
+                originalName: uploadedFile.originalName,
+                type: uploadedFile.type,
+                uploadedAt: uploadedFile.uploadedAt,
+                size: uploadedFile.size
+              } : undefined
+            };
+          });
+
+          setDocuments(updatedDocuments);
+          setDocumentError(null);
+        } catch (error) {
+          console.error('Error fetching job data:', error);
+          setDocumentError('Failed to load job data');
+          setDocuments([]); // Reset documents on error
+        }
+      };
+
+      fetchJobData();
     }
-  }, [selectedJobId])
+    // Reset previous returned status when job changes
+    setPrevSoEEReturnedAt(null);
+    setPrevCDCReturnedAt(null);
+  }, [selectedJobId]);
 
   // Fetch documents when a job is selected
   useEffect(() => {
     const fetchDocuments = async () => {
       if (!selectedJobId) {
-        setDocuments([])
-        return
+        setDocuments([]);
+        return;
       }
 
       try {
-        const response = await fetch(`/api/jobs/${selectedJobId}`)
+        const response = await fetch(`/api/jobs/${selectedJobId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch job details')
+          throw new Error('Failed to fetch job details');
         }
-        const jobData = await response.json()
+        const jobData = await response.json();
 
         // Initialize documents with their status
         const updatedDocuments = DOCUMENT_TYPES.map(doc => {
-          const uploadedFile = jobData.documents?.[doc.id]
+          const uploadedFile = jobData.documents?.[doc.id];
           return {
             ...doc,
             status: uploadedFile ? 'uploaded' as const : 'required' as const,
@@ -164,33 +250,20 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
               uploadedAt: uploadedFile.uploadedAt,
               size: uploadedFile.size
             } : undefined
-          }
-        })
+          };
+        });
 
-        setDocuments(updatedDocuments)
-        setDocumentError(null)
-
-        // Also check for custom assessment payment status
-        if (jobData.initialAssessment?.status === 'paid' && jobData.initialAssessment?.type === 'custom') {
-          setPaymentComplete(prev => ({
-            ...prev,
-            [selectedJobId]: true
-          }))
-        }
-
-        // Update the jobs array with the latest job data
-        setJobs((prevJobs: Job[]) => prevJobs.map((job: Job) =>
-          job.id === selectedJobId ? { ...job, ...jobData } : job
-        ))
-      } catch (err) {
-        console.error('Error fetching documents:', err)
-        setDocumentError('Failed to load documents')
-        setDocuments([])
+        setDocuments(updatedDocuments);
+        setDocumentError(null);
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        setDocumentError('Failed to load documents');
+        setDocuments([]); // Reset documents on error
       }
-    }
+    };
 
-    fetchDocuments()
-  }, [selectedJobId])
+    fetchDocuments();
+  }, [selectedJobId]);
 
   // Add polling for document updates
   useEffect(() => {
@@ -209,13 +282,14 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
 
         const jobData = await jobResponse.json()
 
-        // Update payment status if needed
-        if (jobData.initialAssessment?.status === 'paid') {
-          setPaymentComplete(prev => ({
-            ...prev,
-            [selectedJobId]: true
-          }))
-        }
+        // Update payment status based on polled job data
+        setPaymentStatus(prev => ({
+          ...prev,
+          [selectedJobId]: {
+            SoEE: jobData.statementOfEnvironmentalEffects?.status === 'paid',
+            CDC: jobData.complyingDevelopmentCertificate?.status === 'paid',
+          },
+        }));
 
         // Update the jobs array with the latest job data
         setJobs((prevJobs: Job[]) => prevJobs.map((job: Job) =>
@@ -257,10 +331,46 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
     }
   }, [selectedJobId, documents])
 
-  const isAssessmentReturned = () => {
+  // Effect to show toast notification when a report is returned
+  useEffect(() => {
+    if (!selectedJobId) return;
+
+    const selectedJob = jobs.find(job => job.id === selectedJobId);
+    if (!selectedJob) return;
+
+    const currentSoEEReturnedAt = selectedJob.statementOfEnvironmentalEffects?.returnedAt;
+    const currentCDCReturnedAt = selectedJob.complyingDevelopmentCertificate?.returnedAt;
+
+    // Check for SoEE return
+    if (currentSoEEReturnedAt && currentSoEEReturnedAt !== prevSoEEReturnedAt) {
+      toast({
+        title: "Report Ready",
+        description: "Your Statement of Environmental Effects report is ready for download.",
+      });
+      setPrevSoEEReturnedAt(currentSoEEReturnedAt); // Update previous status
+    }
+
+    // Check for CDC return
+    if (currentCDCReturnedAt && currentCDCReturnedAt !== prevCDCReturnedAt) {
+      toast({
+        title: "Report Ready",
+        description: "Your Complying Development Certificate report is ready for download.",
+      });
+      setPrevCDCReturnedAt(currentCDCReturnedAt); // Update previous status
+    }
+
+  }, [jobs, selectedJobId, prevSoEEReturnedAt, prevCDCReturnedAt]); // Depend on jobs, selectedJobId and previous statuses
+
+  const isStatementOfEnvironmentalEffectsReturned = () => {
     if (!selectedJobId) return false
     const selectedJob = jobs.find(job => job.id === selectedJobId)
-    return selectedJob?.initialAssessment?.returnedAt !== undefined
+    return selectedJob?.statementOfEnvironmentalEffects?.returnedAt !== undefined
+  }
+
+  const isComplyingDevelopmentCertificateReturned = () => {
+    if (!selectedJobId) return false
+    const selectedJob = jobs.find(job => job.id === selectedJobId)
+    return selectedJob?.complyingDevelopmentCertificate?.returnedAt !== undefined
   }
 
   const renderDocumentStatus = (doc: DocumentWithStatus) => {
@@ -280,7 +390,7 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
     )
   }
 
-  const handleFormChange = (field: keyof CustomAssessmentForm) => (
+  const handleFormChange = (field: keyof reportWriterForm) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     if (!selectedJobId) return
@@ -316,25 +426,19 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
     setShowPaymentButton(true)
   }
 
-  const handleDummyPayment = async () => {
-    if (!selectedJobId) return
-
-    // Use the selectedReportType from state
-    const reportType = selectedReportType;
-    const reportTitle = reportType === 'statement-of-environmental-effects'
-      ? 'Statement of Environmental Effects'
-      : 'Complying Development Certificate Report';
+  const handleStatementPayment = async () => {
+    if (!selectedJobId) return;
 
     try {
-      const currentFormData = formData[selectedJobId] || { developmentType: '', additionalInfo: '' }
-      const selectedJob = jobs.find(job => job.id === selectedJobId)
+      const currentFormData = formData[selectedJobId] || { developmentType: '', additionalInfo: '' };
+      const selectedJob = jobs.find(job => job.id === selectedJobId);
 
       if (!selectedJob) {
-        throw new Error('Job not found')
+        throw new Error('Job not found');
       }
 
-      // Create work ticket for admin
-      const workTicketResponse = await fetch('/api/work-tickets', {
+      // Create work ticket for Statement of Environmental Effects
+      const statementTicketResponse = await fetch('/api/work-tickets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -342,8 +446,8 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
         body: JSON.stringify({
           jobId: selectedJobId,
           jobAddress: selectedJob.address,
-          ticketType: reportType, // Use dynamic report type
-          customAssessment: { // Keep this structure for now, might rename later if needed
+          ticketType: 'statement-of-environmental-effects',
+          statementOfEnvironmentalEffects: {
             developmentType: currentFormData.developmentType,
             additionalInfo: currentFormData.additionalInfo,
             documents: {
@@ -353,10 +457,10 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
             }
           }
         })
-      })
+      });
 
-      if (!workTicketResponse.ok) {
-        throw new Error('Failed to create work ticket')
+      if (!statementTicketResponse.ok) {
+        throw new Error('Failed to create statement work ticket');
       }
 
       // Update the job data to store the purchase
@@ -366,12 +470,12 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          initialAssessment: { // Consider renaming 'initialAssessment' if it's confusing
+          statementOfEnvironmentalEffects: {
             status: 'paid',
-            type: reportType, // Use dynamic report type
+            type: 'statement-of-environmental-effects',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            customAssessment: { // Keep this structure for now
+            statementOfEnvironmentalEffects: {
               developmentType: currentFormData.developmentType,
               additionalInfo: currentFormData.additionalInfo,
               documents: {
@@ -382,76 +486,158 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
             }
           }
         })
-      })
+      });
 
       if (!updateResponse.ok) {
-        throw new Error('Failed to update job status')
+        throw new Error('Failed to update job status');
       }
 
-      // Update local state
-      setPaymentComplete(prev => ({
+      // Update local payment status state for SoEE
+      setPaymentStatus(prev => ({
         ...prev,
-        [selectedJobId]: true
-      }))
+        [selectedJobId]: {
+          ...(prev[selectedJobId] || { SoEE: false, CDC: false }), // Ensure object exists
+          SoEE: true,
+        },
+      }));
 
+      // Set report in progress state for the specific job
+      setReportProgress(prev => ({
+        ...prev,
+        [selectedJobId]: {
+          SoEE: true,
+          CDC: false,
+        },
+      }));
+
+      // Show success message
       toast({
         title: "Success",
-        description: `Your ${reportTitle} has been purchased successfully.`, // Dynamic message
-      })
+        description: "Your statement of environmental effects has been purchased successfully.",
+      });
+
     } catch (error) {
-      console.error(`Error processing payment for ${reportType}:`, error)
+      console.error('Error processing statement payment:', error);
       toast({
         title: "Error",
         description: "Failed to process payment. Please try again.",
         variant: "destructive"
-      })
+      });
     }
-  }
+  };
+
+  const handleComplyingDevelopmentPayment = async () => {
+    if (!selectedJobId) return;
+
+    try {
+      const currentFormData = formData[selectedJobId] || { developmentType: '', additionalInfo: '' };
+      const selectedJob = jobs.find(job => job.id === selectedJobId);
+
+      if (!selectedJob) {
+        throw new Error('Job not found');
+      }
+
+      // Create work ticket for Complying Development Certificate
+      const complyingTicketResponse = await fetch('/api/work-tickets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobId: selectedJobId,
+          jobAddress: selectedJob.address,
+          ticketType: 'complying-development-certificate',
+          complyingDevelopmentCertificate: {
+            developmentType: currentFormData.developmentType,
+            additionalInfo: currentFormData.additionalInfo,
+            documents: {
+              certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+              surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+              certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
+            }
+          }
+        })
+      });
+
+      if (!complyingTicketResponse.ok) {
+        throw new Error('Failed to create complying development certificate work ticket');
+      }
+
+      // Update the job data to store the purchase
+      const updateResponse = await fetch(`/api/jobs/${selectedJobId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          complyingDevelopmentCertificate: {
+            status: 'paid',
+            type: 'complying-development-certificate',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            complyingDevelopmentCertificate: {
+              developmentType: currentFormData.developmentType,
+              additionalInfo: currentFormData.additionalInfo,
+              documents: {
+                certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
+              }
+            }
+          }
+        })
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update job status');
+      }
+
+      // Update local payment status state for CDC
+      setPaymentStatus(prev => ({
+        ...prev,
+        [selectedJobId]: {
+          ...(prev[selectedJobId] || { SoEE: false, CDC: false }), // Ensure object exists
+          CDC: true,
+        },
+      }));
+
+      // Set report in progress state for the specific job
+      setReportProgress(prev => ({
+        ...prev,
+        [selectedJobId]: {
+          SoEE: false,
+          CDC: true,
+        },
+      }));
+
+      // Show success message
+      toast({
+        title: "Success",
+        description: "Your complying development certificate has been purchased successfully.",
+      });
+
+    } catch (error) {
+      console.error('Error processing complying development payment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process payment. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Add download function
   const handleDownload = async (documentId: string) => {
+    if (!selectedJobId) {
+      toast({
+        title: "Error",
+        description: "Please select a job first",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      if (!selectedJobId) {
-        toast({
-          title: "Error",
-          description: "Please select a job first",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // For report writer report, always try to download from job documents first
-      if (documentId === 'report-writer-report') {
-        const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
-        if (!response.ok) {
-          throw new Error('Failed to download document');
-        }
-
-        // Get the filename from the Content-Disposition header
-        const contentDisposition = response.headers.get('Content-Disposition');
-        const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'report-writer-report.pdf';
-
-        // Create a blob from the response
-        const blob = await response.blob();
-
-        // Create a download link and trigger it
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        toast({
-          title: "Success",
-          description: "Document downloaded successfully"
-        });
-        return;
-      }
-
-      // Handle other document downloads
       const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
       if (!response.ok) {
         throw new Error('Failed to download document');
@@ -557,17 +743,21 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
       input.click()
     }
 
-    // Logic for the purchased Report tiles (SoEE or CDC)
-    const reportDocIds = ['statement-of-environmental-effects', 'complying-development-certificate'];
-    if (reportDocIds.includes(doc.id)) {
-      const assessmentReturned = isAssessmentReturned();
-      // The decision to show this tile is now handled in renderRequiredDocuments.
-      // We just need to determine if it's "In Progress" or "Ready for Download".
+    // Logic for Statement of Environmental Effects Report tile
+    if (doc.id === 'statement-of-environmental-effects') {
+      const statementOfEnvironmentalEffectsReturned = isStatementOfEnvironmentalEffectsReturned();
+      // Check if SoEE payment is complete for the current job OR if the assessment has been returned
+      const isSoEEPaid = selectedJobId && paymentStatus[selectedJobId]?.SoEE;
+      const shouldShowReportTile = isSoEEPaid || statementOfEnvironmentalEffectsReturned;
 
-      // If the assessment/report has been returned by admin
-      if (assessmentReturned) {
-        // Render tile with download button
-        // Use the specific doc.id for the download handler
+      // If neither paid nor returned, render nothing for this tile yet
+      if (!shouldShowReportTile) {
+        return null;
+      }
+
+      // If paid or returned, show the tile (logic for download if returned)
+      if (statementOfEnvironmentalEffectsReturned) {
+        // Render tile with download button if returned
         return (
           <Card key={doc.id} className="relative">
             <CardHeader>
@@ -590,50 +780,103 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleDownload(doc.id)} // Use the specific document ID
+                  onClick={() => handleDownload('statement-of-environmental-effects')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Download Report
+                  Download
                 </Button>
               </div>
             </CardContent>
           </Card>
         );
       } else {
-         // Render a placeholder/status tile if paid but not yet returned (optional)
-         // For now, let it fall through to the generic logic which will show "Required"
-         // or potentially adapt the generic logic later if needed.
-         // Alternatively, show a specific "Processing" state card:
-         /*
-         return (
-           <Card key={doc.id} className="relative opacity-70">
-             <CardHeader>
-               <h3 className="text-lg font-semibold">{doc.title}</h3>
-             </CardHeader>
-             <CardContent>
-               <div className="flex items-center text-gray-500">
-                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                 <span className="text-sm">Processing...</span>
-               </div>
-             </CardContent>
-           </Card>
-         );
-         */
-         // Render the "Report In Progress" card matching the Document Store style
-         // This should show when payment is complete but assessment is not yet returned.
+
          return (
             <Card key={doc.id} className="relative">
-              {/* Use a consistent title, maybe fetch from doc.title */}
-              <CardHeader className="bg-[#323A40] text-white">
-                <h3 className="text-lg font-semibold">{doc.title || 'Report'}</h3>
+              <CardHeader className="bg-[#323A40] text-white"> {/* Match header style */}
+                <h3 className="text-lg font-semibold">{doc.title}</h3>
+                {/* Optionally add subtitle like "REPORTS" if needed */}
               </CardHeader>
-              <CardContent className="p-4 text-center">
+              <CardContent className="p-4 text-center"> {/* Center content */}
                 <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                   {/* Using a generic document icon */}
-                   <FileText className="h-12 w-12 text-blue-500" />
+                   {/* Placeholder for the document icon (replace with actual icon if available) */}
+                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                   </svg>
                    <p className="font-semibold text-lg">Report In Progress</p>
                    <p className="text-sm text-gray-600 px-4">
-                     Our team is working on your report. You will be notified once it's ready.
+                     Our team is working on your statement of environmental effects. You will be notified once it's ready.
+                   </p>
+                </div>
+              </CardContent>
+            </Card>
+         );
+      }
+    }
+
+    // Logic for Complying Development Certificate Report tile
+    if (doc.id === 'complying-development-certificate') {
+      const complyingDevelopmentCertificateReturned = isComplyingDevelopmentCertificateReturned();
+      // Check if CDC payment is complete for the current job OR if the assessment has been returned
+      const isCDCPaid = selectedJobId && paymentStatus[selectedJobId]?.CDC;
+      const shouldShowReportTile = isCDCPaid || complyingDevelopmentCertificateReturned;
+
+      // If neither paid nor returned, render nothing for this tile yet
+      if (!shouldShowReportTile) {
+        return null;
+      }
+
+      // If paid or returned, show the tile (logic for download if returned)
+      if (complyingDevelopmentCertificateReturned) {
+        // Render tile with download button if returned
+        return (
+          <Card key={doc.id} className="relative">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{doc.title}</h3>
+                </div>
+                <Check className="h-5 w-5 text-green-500" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">{doc.uploadedFile?.originalName}</span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Uploaded on {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleDownload('complying-development-certificate')}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      } else {
+
+         return (
+            <Card key={doc.id} className="relative">
+              <CardHeader className="bg-[#323A40] text-white"> {/* Match header style */}
+                <h3 className="text-lg font-semibold">{doc.title}</h3>
+                {/* Optionally add subtitle like "REPORTS" if needed */}
+              </CardHeader>
+              <CardContent className="p-4 text-center"> {/* Center content */}
+                <div className="flex flex-col items-center justify-center space-y-2 py-4">
+                   {/* Placeholder for the document icon (replace with actual icon if available) */}
+                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                   </svg>
+                   <p className="font-semibold text-lg">Report In Progress</p>
+                   <p className="text-sm text-gray-600 px-4">
+                     Our team is working on your complying development certificate. You will be notified once it's ready.
                    </p>
                 </div>
               </CardContent>
@@ -691,87 +934,118 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
   }
 
   const renderRequiredDocuments = () => {
-    // Find the selected job data to check purchase status
-    const selectedJob = jobs.find(job => job.id === selectedJobId);
-    const purchasedReportType = selectedJob?.initialAssessment?.status === 'paid'
-      ? selectedJob.initialAssessment.type // This should be 'statement-of-environmental-effects' or 'complying-development-certificate'
-      : null;
-
-    // Start with base required documents
-    const baseDocIds = ['certificate-of-title', '10-7-certificate', 'survey-plan'];
-    let documentsToRenderIds = [...baseDocIds];
-
-    // Add the purchased report type ID if applicable and valid
-    if (purchasedReportType && ['statement-of-environmental-effects', 'complying-development-certificate'].includes(purchasedReportType)) {
-      documentsToRenderIds.push(purchasedReportType);
-    }
-
-    // Filter the main documents state based on the IDs we need to render
-    const requiredDocs = documents.filter(doc => documentsToRenderIds.includes(doc.id));
-
-    // Ensure the order is consistent (optional but good practice)
-    requiredDocs.sort((a, b) => documentsToRenderIds.indexOf(a.id) - documentsToRenderIds.indexOf(b.id));
-
+    const requiredDocs = documents.filter(doc =>
+      [
+        'certificate-of-title',
+        '10-7-certificate',
+        'survey-plan',
+        'statement-of-environmental-effects',
+        'complying-development-certificate',
+        'custom-assessment'
+      ].includes(doc.id)
+    );
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {requiredDocs.map(doc => renderDocumentUpload(doc))}
+
+        {/* Conditionally render the returned custom Initial Assessment Report */}
+        {(() => {
+          if (!selectedJobId) return null;
+          const selectedJob = jobs.find(job => job.id === selectedJobId);
+          // Check if it's a custom assessment AND it has been returned
+          const isCustomAssessmentReturned = selectedJob?.initialAssessment?.type === 'custom' && selectedJob?.initialAssessment?.returnedAt;
+
+          if (isCustomAssessmentReturned) {
+            // Find the actual report document using the correct ID
+            const initialAssessmentDoc = documents.find(doc => doc.id === 'initial-assessment-report');
+            if (initialAssessmentDoc) {
+              // Render the document card using the existing function
+              // Make sure renderDocumentUpload handles the 'initial-assessment-report' case correctly
+              // If it doesn't, we might need to adjust renderDocumentUpload or add specific rendering here.
+              // Assuming renderDocumentUpload is generic enough or handles it:
+              return renderDocumentUpload(initialAssessmentDoc);
+            }
+          }
+          // Return null if the conditions aren't met
+          return null;
+        })()}
+
+        {/* The incorrect hardcoded block previously here has been removed. */}
       </div>
-    )
-  }
+    );
+  };
 
-  // Add renderCustomAssessmentForm function
-  const renderCustomAssessmentForm = () => {
-    const currentJobPaymentComplete = selectedJobId ? paymentComplete[selectedJobId] : false
-    const assessmentReturned = isAssessmentReturned();
-    const reportTitle = selectedReportType === 'statement-of-environmental-effects'
-      ? 'Statement of Environmental Effects'
-      : 'Complying Development Certificate Report'; // Get the title based on selected tab
+  // Add renderReportWriterForm function
+  const renderReportWriterForm = (ticketType: 'statement-of-environmental-effects' | 'complying-development-certificate') => {
+    if (!selectedJobId) {
+      return null; // or handle the case when no job is selected
+    }
 
-    // Show success message when payment is complete
-    if (currentJobPaymentComplete) {
+    const currentFormData = formData[selectedJobId] || { developmentType: '', additionalInfo: '' };
+    const certificate107 = documents.find(doc => doc.id === '10-7-certificate');
+
+    // Check if the report has been returned first
+    if (ticketType === 'statement-of-environmental-effects' && isStatementOfEnvironmentalEffectsReturned()) {
       return (
         <div className="border rounded-lg p-4 bg-green-50">
           <div className="text-center py-4">
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h4 className="font-medium mb-2">Thank you for your payment!</h4>
-            {assessmentReturned ? (
-              <>
-                {/* Use the dynamic report title */}
-                <p className="text-sm text-gray-600">Your {reportTitle} is now ready.</p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  // Use the actual purchased report type ID for download
-                  onClick={() => handleDownload(selectedJobData?.initialAssessment?.type || '')}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Download Report
-                </Button>
-              </>
-            ) : (
-              // Show processing message when paid but not returned
-              <p className="text-sm text-gray-600">We are processing your {reportTitle}.</p>
-            )}
+            <h4 className="font-medium mb-2">Report Complete</h4>
+            <p className="text-sm text-gray-600">Your Statement of Environmental Effects report is available for download in the Documents section.</p>
           </div>
         </div>
-      )
+      );
     }
 
-    // Show the form if payment is not complete
-    const currentFormData = selectedJobId ? formData[selectedJobId] || { developmentType: '', additionalInfo: '' } : { developmentType: '', additionalInfo: '' }
+    // If not returned, check if it's in progress (paid but not returned)
+    if (ticketType === 'statement-of-environmental-effects' && reportProgress[selectedJobId]?.SoEE) {
+      return (
+        <div className="border rounded-lg p-4 bg-yellow-50"> {/* Changed background for clarity */}
+          <div className="text-center py-4">
+            {/* Consider an 'in progress' icon instead of Check */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h4 className="font-medium mb-2">Report In Progress</h4>
+            <p className="text-sm text-gray-600">Our team is working on your Statement of Environmental Effects. You will be notified once it's ready.</p>
+          </div>
+        </div>
+      );
+    }
+    if (ticketType === 'complying-development-certificate' && isComplyingDevelopmentCertificateReturned()) {
+       return (
+         <div className="border rounded-lg p-4 bg-blue-50">
+           <div className="text-center py-4">
+             <Check className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+             <h4 className="font-medium mb-2">Report Complete</h4>
+             <p className="text-sm text-gray-600">Your Complying Development Certificate report is available for download in the Documents section.</p>
+           </div>
+         </div>
+       );
+    }
 
-    const certificateOfTitle = documents.find(doc => doc.id === 'certificate-of-title')
-    const surveyPlan = documents.find(doc => doc.id === 'survey-plan')
-    const certificate107 = documents.find(doc => doc.id === '10-7-certificate')
+    // If not returned, check if it's in progress (paid but not returned)
+    if (ticketType === 'complying-development-certificate' && reportProgress[selectedJobId]?.CDC) {
+      return (
+        <div className="border rounded-lg p-4 bg-yellow-50"> {/* Changed background for clarity */}
+          <div className="text-center py-4">
+             {/* Consider an 'in progress' icon instead of Check */}
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+             </svg>
+            <h4 className="font-medium mb-2">Report In Progress</h4>
+            <p className="text-sm text-gray-600">Our team is working on your Complying Development Certificate. You will be notified once it's ready.</p>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Development Type
-            </label>
+            <label className="block text-sm font-medium mb-2">Development Type</label>
             <Input
               placeholder="Enter the type of development"
               value={currentFormData.developmentType}
@@ -780,9 +1054,7 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Additional Information
-            </label>
+            <label className="block text-sm font-medium mb-2">Additional Information</label>
             <Textarea
               placeholder="Enter any additional information about your development"
               value={currentFormData.additionalInfo}
@@ -794,40 +1066,36 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
           {/* Document Attachments Section */}
           <div className="space-y-2">
             <h4 className="font-medium">Attached Documents</h4>
-
-            {certificateOfTitle?.status === 'uploaded' && (
-              <div className="flex items-center text-sm">
-                <Check className="h-4 w-4 mr-2 text-green-600" />
-                <span>Certificate of Title: {certificateOfTitle.uploadedFile?.originalName}</span>
-              </div>
-            )}
-
-            {surveyPlan?.status === 'uploaded' && (
-              <div className="flex items-center text-sm">
-                <Check className="h-4 w-4 mr-2 text-green-600" />
-                <span>Survey Plan: {surveyPlan.uploadedFile?.originalName}</span>
-              </div>
-            )}
-
-            {certificate107?.status === 'uploaded' && (
-              <div className="flex items-center text-sm">
-                <Check className="h-4 w-4 mr-2 text-green-600" />
-                <span>10.7 Certificate: {certificate107.uploadedFile?.originalName}</span>
-              </div>
-            )}
+            <DocumentStatus document={{ id: '10-7-certificate', status: certificate107?.status || 'not-uploaded' }} />
           </div>
 
           {/* Show notification only when 10.7 is missing */}
           {(!certificate107 || certificate107.status !== 'uploaded') && (
             <Alert variant="destructive">
-              <AlertDescription>
-                Please upload all required documents before proceeding
-              </AlertDescription>
+              <AlertDescription>Please upload the 10.7 Certificate before proceeding.</AlertDescription>
             </Alert>
           )}
 
           <div className="pt-4">
-            {!showPaymentButton ? (
+            {showPaymentButton ? (
+              // Show payment button if details are confirmed
+              ticketType === 'statement-of-environmental-effects' ? (
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  onClick={handleStatementPayment}
+                >
+                  Proceed to Payment for Statement
+                </Button>
+              ) : (
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={handleComplyingDevelopmentPayment}
+                >
+                  Proceed to Payment for Complying Development Certificate
+                </Button>
+              )
+            ) : (
+              // Show confirm details button if not confirmed
               <Button
                 className="w-full"
                 onClick={handleConfirmDetails}
@@ -835,28 +1103,34 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
               >
                 Confirm Details
               </Button>
-            ) : (
-              <Button
-                className="w-full bg-green-600 hover:bg-green-700"
-                onClick={handleDummyPayment}
-              >
-                Proceed to Payment
-              </Button>
             )}
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const handleSaveChanges = () => {
     if (selectedJobId) {
-      localStorage.setItem(`reportWriter-${selectedJobId}`, JSON.stringify(formData));
-      setHasUnsavedChanges(false);
-      toast({
-        title: "Success",
-        description: "Changes saved successfully.",
-      });
+      // Determine which form data to save based on the current tab or context
+      const currentFormData = formData[selectedJobId];
+
+      // Save the appropriate form data to local storage
+      if (currentFormData) {
+        const ticketType = currentFormData.developmentType; // Assuming you have a way to determine the ticket type
+
+        if (ticketType === 'statement-of-environmental-effects') {
+          localStorage.setItem(`statementOfEnvironmentalEffects-${selectedJobId}`, JSON.stringify(currentFormData));
+        } else if (ticketType === 'complying-development-certificate') {
+          localStorage.setItem(`complyingDevelopmentCertificate-${selectedJobId}`, JSON.stringify(currentFormData));
+        }
+
+        setHasUnsavedChanges(false);
+        toast({
+          title: "Success",
+          description: "Changes saved successfully.",
+        });
+      }
     }
   };
 
@@ -937,11 +1211,7 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
     }
   };
 
-  // Determine if the form should be read-only - REMOVED FOR THIS PAGE CONTEXT
-  // const isReadOnly = selectedJobId ? (paymentComplete[selectedJobId] || isAssessmentReturned()) : false;
-  // For the repor page, we want Site Details to be editable before payment/return.
   const isReadOnly = false;
-
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -986,7 +1256,7 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
             </Select>
           </div>
           {!selectedJobId && (
-            <Link href="/dashboard?action=create-job">
+            <Link href="/client-portal/dashboard">
               <Button variant="outline" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Create New Job
@@ -1002,7 +1272,7 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
         <h2 className="text-xl font-semibold mb-2">About Report Writer</h2>
         <p className="text-sm text-gray-700">
           This section provides information about the report writer process, including what to expect and how to prepare.
-          Please ensure that all required documents are uploaded before proceeding with your report.
+          Please ensure that all required documents are uploaded before proceeding with your assessment.
         </p>
       </div>
     )}
@@ -1080,9 +1350,9 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
             >
               Documents
               {isDocumentsOpen ? (
-                <ChevronUp className="h-5 w-5 text-gray-600" />
+                <ChevronUp className="h-5 w-5 text-white" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-gray-600" />
+                <ChevronDown className="h-5 w-5 text-white" />
               )}
             </h2>
             {isDocumentsOpen && ( // Conditional rendering based on state
@@ -1103,107 +1373,23 @@ const [certificate107, setCertificate107] = useState<DocumentWithStatus | null>(
           </div>
 
           <div className="border rounded-lg bg-white">
-            {/* Update Tabs component to set the selected report type */}
-            <Tabs
-              defaultValue="statement-of-environmental-effects"
-              className="w-full"
-              onValueChange={(value) => setSelectedReportType(value as 'statement-of-environmental-effects' | 'complying-development-certificate')}
-            >
+            <Tabs defaultValue="statement-of-environmental-effects" className="w-full">
               <TabsList className="w-full grid grid-cols-2 h-12">
                 <TabsTrigger value="statement-of-environmental-effects" className="data-[state=active]:bg-white">
                   Statement of Environmental Effects
                 </TabsTrigger>
                 <TabsTrigger value="complying-development-certificate" className="data-[state=active]:bg-white">
-                  Complying Development Certificate Report
+                  Complying Development Certificate
                 </TabsTrigger>
               </TabsList>
 
               <div className="p-6">
                 <TabsContent value="statement-of-environmental-effects" className="mt-0">
-                  {renderCustomAssessmentForm()}
+                  {renderReportWriterForm('statement-of-environmental-effects')}
                 </TabsContent>
 
                 <TabsContent value="complying-development-certificate" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Development Type
-                        </label>
-                        <Input
-                          placeholder="Enter the type of development"
-                          value={currentFormData.developmentType}
-                          onChange={handleFormChange('developmentType')}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Additional Information
-                        </label>
-                        <Textarea
-                          placeholder="Enter any additional information about your development"
-                          value={currentFormData.additionalInfo}
-                          onChange={handleFormChange('additionalInfo')}
-                          rows={4}
-                        />
-                      </div>
-
-                      {/* Document Attachments Section */}
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Attached Documents</h4>
-
-                        {certificateOfTitle?.status === 'uploaded' && (
-                          <div className="flex items-center text-sm">
-                            <Check className="h-4 w-4 mr-2 text-green-600" />
-                            <span>Certificate of Title: {certificateOfTitle.uploadedFile?.originalName}</span>
-                          </div>
-                        )}
-
-                        {surveyPlan?.status === 'uploaded' && (
-                          <div className="flex items-center text-sm">
-                            <Check className="h-4 w-4 mr-2 text-green-600" />
-                            <span>Survey Plan: {surveyPlan.uploadedFile?.originalName}</span>
-                          </div>
-                        )}
-
-                        {certificate107?.status === 'uploaded' && (
-                          <div className="flex items-center text-sm">
-                            <Check className="h-4 w-4 mr-2 text-green-600" />
-                            <span>10.7 Certificate: {certificate107.uploadedFile?.originalName}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Show notification only when 10.7 is missing */}
-                      {(!certificate107 || certificate107.status !== 'uploaded') && (
-                        <Alert variant="destructive">
-                          <AlertDescription>
-                            Please upload all required documents before proceeding
-                          </AlertDescription>
-                        </Alert>
-                      )}
-
-                      <div className="pt-4">
-                        {!showPaymentButton ? (
-                          <Button
-                            className="w-full"
-                            onClick={handleConfirmDetails}
-                            disabled={!certificate107 || certificate107.status !== 'uploaded'}
-                          >
-                            Confirm Details
-                          </Button>
-                        ) : (
-                          <Button
-                            className="w-full bg-green-600 hover:bg-green-700"
-                            onClick={handleDummyPayment}
-                          >
-                            Proceed to Payment
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {renderReportWriterForm('complying-development-certificate')}
                 </TabsContent>
               </div>
             </Tabs>

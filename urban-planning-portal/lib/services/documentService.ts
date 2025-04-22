@@ -1,4 +1,4 @@
-import { Document, PrePreparedAssessment } from '../../src/types/documents'
+import { Document } from '../../src/types/documents'
 
 interface DocumentVersion {
   version: number

@@ -40,6 +40,22 @@ export async function PATCH(
       };
     }
 
+    // If statementOfEnvironmentalEffects is part of the update, merge it deeply
+    if (updates.statementOfEnvironmentalEffects) {
+      updatedJob.statementOfEnvironmentalEffects = {
+        ...currentJob.statementOfEnvironmentalEffects,
+        ...updates.statementOfEnvironmentalEffects,
+      };
+    }
+
+    // If complyingDevelopmentCertificate is part of the update, merge it deeply
+    if (updates.complyingDevelopmentCertificate) {
+      updatedJob.complyingDevelopmentCertificate = {
+        ...currentJob.complyingDevelopmentCertificate,
+        ...updates.complyingDevelopmentCertificate,
+      };
+    }
+
     // Write updated job data back to file
     await fs.writeFile(jobPath, JSON.stringify(updatedJob, null, 2))
 

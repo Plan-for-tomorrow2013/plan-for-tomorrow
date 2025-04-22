@@ -37,7 +37,7 @@ async function writeWorkTickets(tickets: WorkTicket[]) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { jobId, jobAddress, ticketType, customAssessment, prePreparedAssessment } = body
+    const { jobId, jobAddress, ticketType, customAssessment, statementOfEnvironmentalEffects, complyingDevelopmentCertificate } = body
 
     // Create new work ticket
     const newTicket: WorkTicket = {
@@ -47,8 +47,27 @@ export async function POST(request: Request) {
       ticketType,
       status: 'pending',
       createdAt: new Date().toISOString(),
-      customAssessment,
-      prePreparedAssessment
+      ...(ticketType === 'custom-assessment' && {
+        customAssessment: {
+          developmentType: customAssessment.developmentType,
+          additionalInfo: customAssessment.additionalInfo,
+          documents: customAssessment.documents,
+        },
+      }),
+      ...(ticketType === 'statement-of-environmental-effects' && {
+        statementOfEnvironmentalEffects: {
+          developmentType: statementOfEnvironmentalEffects.developmentType,
+          additionalInfo: statementOfEnvironmentalEffects.additionalInfo,
+          documents: statementOfEnvironmentalEffects.documents,
+        },
+      }),
+      ...(ticketType === 'complying-development-certificate' && {
+        complyingDevelopmentCertificate: {
+          developmentType: complyingDevelopmentCertificate.developmentType,
+          additionalInfo: complyingDevelopmentCertificate.additionalInfo,
+          documents: complyingDevelopmentCertificate.documents,
+        },
+      }),
     }
 
     // Read existing tickets
@@ -64,7 +83,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating work ticket:', error)
     return NextResponse.json(
-      { error: 'Failed to create work ticket' },
+      { error: 'Failed to create work ticket in work ticket route' },
       { status: 500 }
     )
   }

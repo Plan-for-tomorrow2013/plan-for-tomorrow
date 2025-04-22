@@ -15,10 +15,10 @@ const getTicketTypeDisplayName = (type: string): string => {
   switch (type) {
     case 'custom-assessment':
       return 'Custom Assessment';
-    case 'statement-of-environmental-effects':
+    case 'statement-of-environmental-effects': // Ensure this case exists and is correct
       return 'Statement of Environmental Effects';
     case 'complying-development-certificate':
-      return 'Complying Development Certificate Report';
+      return 'Complying Development Certificate';
     // Add other types if needed
     default:
       return type; // Fallback to the raw type if unknown
@@ -39,8 +39,7 @@ export default function WorkTicketsPage() {
           throw new Error('Failed to fetch work tickets')
         }
         const data = await response.json()
-        // Filter out pre-prepared assessments
-        setTickets(data.filter((ticket: WorkTicket) => ticket.ticketType !== 'pre-prepared-assessment'))
+        setTickets(data)
       } catch (error) {
         console.error('Error fetching work tickets:', error)
         setError('Failed to load work tickets')
@@ -195,7 +194,7 @@ export default function WorkTicketsPage() {
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-3">
-                {ticket.customAssessment && (
+                {ticket.ticketType === 'custom-assessment' && ticket.customAssessment && (
                   <>
                     <div>
                       <h3 className="font-medium text-sm mb-1">Development Details</h3>
@@ -231,6 +230,82 @@ export default function WorkTicketsPage() {
                     </div>
                   </>
                 )}
+              </div>
+              <div className="space-y-3">
+                {ticket.ticketType === 'statement-of-environmental-effects' && ticket.statementOfEnvironmentalEffects && (
+                  <>
+                    <div>
+                      <h3 className="font-medium text-sm mb-1">Development Details</h3>
+                      <p className="text-xs mb-1">
+                        <strong>Type:</strong> {ticket.statementOfEnvironmentalEffects.developmentType}
+                      </p>
+                      <p className="text-xs truncate">
+                        <strong>Info:</strong> {ticket.statementOfEnvironmentalEffects.additionalInfo}
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm mb-1">Documents</h3>
+                      <div className="space-y-1">
+                        {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Title: {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle}</span>
+                          </div>
+                        )}
+                        {ticket.statementOfEnvironmentalEffects.documents.surveyPlan && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Plan: {ticket.statementOfEnvironmentalEffects.documents.surveyPlan}</span>
+                          </div>
+                        )}
+                        {ticket.statementOfEnvironmentalEffects.documents.certificate107 && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">10.7: {ticket.statementOfEnvironmentalEffects.documents.certificate107}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {ticket.ticketType === 'complying-development-certificate' && ticket.complyingDevelopmentCertificate && (
+                  <>
+                    <div>
+                      <h3 className="font-medium text-sm mb-1">Development Details</h3>
+                      <p className="text-xs mb-1">
+                        <strong>Type:</strong> {ticket.complyingDevelopmentCertificate.developmentType}
+                      </p>
+                      <p className="text-xs truncate">
+                        <strong>Info:</strong> {ticket.complyingDevelopmentCertificate.additionalInfo}
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-sm mb-1">Documents</h3>
+                      <div className="space-y-1">
+                        {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Title: {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle}</span>
+                          </div>
+                        )}
+                        {ticket.complyingDevelopmentCertificate.documents.surveyPlan && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">Plan: {ticket.complyingDevelopmentCertificate.documents.surveyPlan}</span>
+                          </div>
+                        )}
+                        {ticket.complyingDevelopmentCertificate.documents.certificate107 && (
+                          <div className="flex items-center text-xs">
+                            <FileText className="h-3 w-3 mr-1" />
+                            <span className="truncate">10.7: {ticket.complyingDevelopmentCertificate.documents.certificate107}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 <div className="border-t pt-2">
                   <h3 className="font-medium text-sm mb-1">Completed Assessment</h3>
                   {ticket.completedDocument ? (
@@ -238,7 +313,7 @@ export default function WorkTicketsPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center text-xs">
                           <FileText className="h-3 w-3 mr-1" />
-                          <span className="truncate">{ticket.completedDocument.fileName}</span>
+                          <span className="truncate">{ticket.completedDocument.originalName}</span>
                         </div>
                         {!ticket.completedDocument.returnedAt && (
                           <Button

@@ -93,15 +93,42 @@ export async function POST(request: Request) {
       size: completedDocumentInfo.size
     }
 
-    // Update the job's initial assessment status
-    if (!job.initialAssessment) {
-      job.initialAssessment = {}
-    }
+    // Update the correct status field in the job based on the ticket type
+    const returnTimestamp = new Date().toISOString();
+    const ticketType = ticket.ticketType;
 
-    job.initialAssessment = {
-      ...job.initialAssessment,
-      status: 'completed',
-      returnedAt: new Date().toISOString()
+    if (ticketType === 'custom-assessment') {
+      if (!job.initialAssessment) {
+        job.initialAssessment = {};
+      }
+      job.initialAssessment = {
+        ...job.initialAssessment,
+        status: 'completed', // Or keep existing status if needed, just add returnedAt? Check requirements.
+        returnedAt: returnTimestamp
+      };
+    } else if (ticketType === 'statement-of-environmental-effects') {
+      if (!job.statementOfEnvironmentalEffects) {
+        job.statementOfEnvironmentalEffects = {};
+      }
+      job.statementOfEnvironmentalEffects = {
+        ...job.statementOfEnvironmentalEffects,
+        status: 'completed', // Assuming we mark as completed upon return
+        returnedAt: returnTimestamp
+      };
+    } else if (ticketType === 'complying-development-certificate') {
+      // Note: The documentId for CDC is 'complying-development-certificate'
+      // We need a field in the job JSON to store its status, e.g., 'complyingDevelopmentCertificate'
+      if (!job.complyingDevelopmentCertificate) {
+        job.complyingDevelopmentCertificate = {};
+      }
+      job.complyingDevelopmentCertificate = {
+        ...job.complyingDevelopmentCertificate,
+        status: 'completed', // Assuming we mark as completed upon return
+        returnedAt: returnTimestamp
+      };
+    } else {
+      // Optional: Handle unknown ticket types or log a warning
+      console.warn(`Unhandled ticket type for status update: ${ticketType}`);
     }
 
     // Save the updated job data back to the client's job file

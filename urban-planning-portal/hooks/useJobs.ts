@@ -7,9 +7,29 @@ export interface Job {
   currentStage?: string
   createdAt?: string
   initialAssessment?: {
-    status?: 'pending' | 'completed' | 'paid';
+    status?: 'paid' | 'completed'; // Correct statuses for initial assessment
     returnedAt?: string;
-    type?: 'custom' | 'statement-of-environmental-effects' | 'complying-development-certificate'; // Add the missing type field
+    type?: 'custom';
+  };
+  statementOfEnvironmentalEffects?: {
+    status?: 'paid' | 'completed'; // Correct statuses for SoEE
+    returnedAt?: string;
+    type?: 'statement-of-environmental-effects';
+  };
+  complyingDevelopmentCertificate?: {
+    status?: 'paid' | 'completed'; // Correct statuses for CDC
+    returnedAt?: string;
+    type?: 'complying-development-certificate';
+  };
+  // Add top-level documents field
+  documents?: {
+    [key: string]: { // Index signature: keys are document IDs (strings)
+        filename: string;
+        originalName: string;
+        type: string;
+        uploadedAt: string;
+        size: number;
+    };
   };
   // Add propertyData field, making it optional
   propertyData?: {

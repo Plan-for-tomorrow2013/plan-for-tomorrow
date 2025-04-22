@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const newPrePreparedAssessment = {
+    const newPrePreparedAssessments = {
       id: uuidv4(),
       title,
       content,
@@ -92,10 +92,10 @@ export async function POST(request: Request) {
       file: fileData, // Include file data if uploaded
     }
 
-    prePreparedAssessments.unshift(newPrePreparedAssessment)
+    prePreparedAssessments.unshift(newPrePreparedAssessments)
     await fs.writeFile(prePreparedAssessmentsPath, JSON.stringify(prePreparedAssessments, null, 2))
 
-    return NextResponse.json(newPrePreparedAssessment, { status: 201 }) // Return 201 Created status
+    return NextResponse.json(newPrePreparedAssessments, { status: 201 }) // Return 201 Created status
 
   } catch (error) {
     console.error('Error creating pre-prepared assessment:', error)

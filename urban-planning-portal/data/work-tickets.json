@@ -46,5 +46,53 @@
       "type": "application/pdf",
       "returnedAt": "2025-04-21T02:22:51.042Z"
     }
+  },
+  {
+    "id": "f9008c0f-3f01-4dee-ac6f-b67a201db051",
+    "jobId": "dd924f9f-d445-47a5-8f82-c5077fa41ad1",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-23T00:52:15.014Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "Initial Assessment Check.pdf",
+      "fileName": "custom-assessment.pdf",
+      "uploadedAt": "2025-04-23T00:52:27.405Z",
+      "size": 4136746,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-23T00:52:28.747Z"
+    }
+  },
+  {
+    "id": "b05c9577-cfb7-41d5-bf26-35ecd59b75cf",
+    "jobId": "ad015d14-5f33-439e-8966-18e12071561f",
+    "jobAddress": "11 Lake Avenue Cringila",
+    "ticketType": "custom-assessment",
+    "status": "completed",
+    "createdAt": "2025-04-23T08:34:39.407Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    },
+    "completedDocument": {
+      "documentId": "initial-assessment-report",
+      "originalName": "Architecture Plan - 8 First Ave Macquarie Fields_V1_CDC-280327.pdf",
+      "fileName": "custom-assessment.pdf",
+      "uploadedAt": "2025-04-23T08:35:15.139Z",
+      "size": 7107904,
+      "type": "application/pdf",
+      "returnedAt": "2025-04-23T08:35:17.125Z"
+    }
   }
 ]

@@ -156,5 +156,18 @@ export const DOCUMENT_TYPES: Document[] = [
     updatedAt: new Date().toISOString(),
     isActive: true,
     description: undefined
+  },
+  {
+    id: 'pre-prepared-assessments',
+    title: 'Pre-Prepared Assessments',
+    category: 'REPORTS',
+    path: '/client-portal/test', // Associated with the report writer page
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    description: undefined
   }
 ]

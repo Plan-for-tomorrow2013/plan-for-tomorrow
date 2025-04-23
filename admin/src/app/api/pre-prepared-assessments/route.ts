@@ -3,16 +3,18 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
-const dataDir = path.join(process.cwd(), 'admin', 'data')
-const prePreparedAssessmentsPath = path.join(dataDir, 'pre-prepared-assessments.json')
-const documentsDir = path.join(process.cwd(), 'admin', 'public', 'documents', 'pre-prepared')
+// Admin data directory (for the JSON file)
+const adminDataDir = path.join(process.cwd(), 'admin', 'data');
+const prePreparedAssessmentsPath = path.join(adminDataDir, 'pre-prepared-assessments.json');
+// Client portal public directory (for the actual files)
+const clientPublicDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'public', 'documents', 'pre-prepared');
 
 // Ensure necessary directories and files exist
 async function ensureInfrastructure() {
   try {
-    await fs.mkdir(dataDir, { recursive: true });
-    await fs.mkdir(documentsDir, { recursive: true });
-    // Try to access the file to see if it exists
+    await fs.mkdir(adminDataDir, { recursive: true }); // Ensure admin data dir exists
+    await fs.mkdir(clientPublicDocumentsDir, { recursive: true }); // Ensure client public dir exists
+    // Try to access the JSON file to see if it exists
     await fs.access(prePreparedAssessmentsPath);
   } catch (error: any) {
     // Check if the error is because the file doesn't exist
@@ -46,72 +48,92 @@ export async function GET() {
 // POST /api/pre-prepared-assessments
 export async function POST(request: Request) {
   try {
-    await ensureInfrastructure()
-    const formData = await request.formData()
-    const title = formData.get('title') as string
-    const content = formData.get('content') as string
-    const author = formData.get('author') as string // Assuming author comes from session or elsewhere, hardcoding for now
-    const file = formData.get('file') as File | null
+    await ensureInfrastructure();
+    const formData = await request.formData();
+    const sectionTitle = formData.get('section') as string; // Get the section title
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const author = formData.get('author') as string; // Assuming author comes from session or elsewhere
+    const file = formData.get('file') as File | null;
 
-    if (!title || !content) { // Removed author check for now
+    if (!sectionTitle || !title || !content) {
       return NextResponse.json(
-        { error: 'Missing required fields: title or content' },
+        { error: 'Missing required fields: section, title, or content' },
         { status: 400 }
-      )
+      );
     }
 
     // Read existing assessments
-    const data = await fs.readFile(prePreparedAssessmentsPath, 'utf8')
-    const prePreparedAssessments = JSON.parse(data)
+    const data = await fs.readFile(prePreparedAssessmentsPath, 'utf8');
+    const prePreparedAssessments = JSON.parse(data);
 
-    let fileData = null
-    if (file) {
-      // Generate a unique ID for the file
-      const fileId = uuidv4()
-      const fileExtension = path.extname(file.name)
-      const newFileName = `${fileId}${fileExtension}`
-      const filePath = path.join(documentsDir, newFileName)
-
-      // Convert file buffer to ArrayBuffer, then Buffer
-      const fileBuffer = await file.arrayBuffer()
-      await fs.writeFile(filePath, Buffer.from(fileBuffer))
-
-      fileData = {
-        id: fileId, // Use the generated ID for reference
-        originalName: file.name,
-        savedPath: `/documents/pre-prepared/${newFileName}` // Path relative to public for serving
-      }
+    // Check if the section already exists
+    let sectionIndex = prePreparedAssessments.findIndex((section: { title: string }) => section.title === sectionTitle);
+    if (sectionIndex === -1) {
+      // Create a new section if it doesn't exist
+      const newSection = {
+        id: uuidv4(), // Generate a unique ID for the section
+        title: sectionTitle,
+        assessments: [],
+      };
+      prePreparedAssessments.push(newSection);
+      // Set sectionIndex to the index of the newly added section
+      sectionIndex = prePreparedAssessments.length - 1; // Update sectionIndex to the new section's index
     }
 
-    const newPrePreparedAssessments = {
+    // Create the new assessment
+    const newAssessment = {
       id: uuidv4(),
       title,
       content,
       author: author || "Admin User", // Use provided author or default
       date: new Date().toISOString(),
-      file: fileData, // Include file data if uploaded
+      file: file ? {
+        id: uuidv4(), // Generate a unique ID for the file
+        originalName: file.name,
+        savedPath: `/documents/pre-prepared/${file.name}`, // Adjust as needed
+      } : null,
+    };
+
+    // --- BEGIN FILE SAVING LOGIC ---
+    if (file) {
+      try {
+        // Construct the full path to save the file in the CLIENT PORTAL's public directory
+        const saveFilePath = path.join(clientPublicDocumentsDir, file.name);
+
+        // Read the file content as ArrayBuffer
+        const fileBuffer = await file.arrayBuffer();
+
+        // Write the file to the public directory
+        await fs.writeFile(saveFilePath, Buffer.from(fileBuffer));
+
+        console.log(`File saved successfully to: ${saveFilePath}`);
+
+      } catch (fileError) {
+        console.error('Error saving uploaded file:', fileError);
+        // Decide if you want to stop the whole process or just log the error
+        // For now, we'll return an error response if file saving fails
+        return NextResponse.json(
+          { error: 'Failed to save uploaded file' },
+          { status: 500 }
+        );
+      }
     }
+    // --- END FILE SAVING LOGIC ---
 
-    prePreparedAssessments.unshift(newPrePreparedAssessments)
-    await fs.writeFile(prePreparedAssessmentsPath, JSON.stringify(prePreparedAssessments, null, 2))
+    // Add the new assessment to the corresponding section
+    prePreparedAssessments[sectionIndex].assessments.push(newAssessment);
 
-    return NextResponse.json(newPrePreparedAssessments, { status: 201 }) // Return 201 Created status
+    // Write the updated sections back to the JSON file
+    await fs.writeFile(prePreparedAssessmentsPath, JSON.stringify(prePreparedAssessments, null, 2));
+
+    return NextResponse.json(newAssessment, { status: 201 }); // Return 201 Created status
 
   } catch (error) {
-    console.error('Error creating pre-prepared assessment:', error)
-    // Provide more specific error logging if possible
-    if (error instanceof Error) {
-        console.error(error.message);
-        if ('code' in error && error.code === 'ENOENT') {
-             return NextResponse.json(
-               { error: 'Server configuration error: Directory not found.' },
-               { status: 500 }
-             )
-        }
-    }
+    console.error('Error creating pre-prepared assessment:', error);
     return NextResponse.json(
       { error: 'Failed to create pre-prepared assessment' },
       { status: 500 }
-    )
+    );
   }
 }

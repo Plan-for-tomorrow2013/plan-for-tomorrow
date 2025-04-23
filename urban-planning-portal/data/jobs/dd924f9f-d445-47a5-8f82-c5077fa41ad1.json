@@ -1,0 +1,151 @@
+{
+  "id": "dd924f9f-d445-47a5-8f82-c5077fa41ad1",
+  "address": "9 Viola Place, Greystanes",
+  "council": "Cumberland",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-04-23T00:51:23.337Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.937614203867,
+      "latitude": -33.834153108222
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "268194",
+            "EPI Name": "Cumberland Local Environmental Plan 2021",
+            "LGA Name": "CUMBERLAND",
+            "Published Date": "10/18/2024",
+            "Commenced Date": "10/18/2024",
+            "Currency Date": "10/18/2024",
+            "Amendment": "Map Amendment No 4",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "9",
+            "Units": "m"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "734421",
+            "EPI Name": "Cumberland Local Environmental Plan 2021",
+            "LGA Name": "CUMBERLAND",
+            "Published Date": "2/24/2023",
+            "Commenced Date": "4/26/2023",
+            "Currency Date": "10/18/2024",
+            "Amendment": "State Environmental Planning Policy Amendment (Land Use Zones) 2023",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "456080",
+            "EPI Name": "Cumberland Local Environmental Plan 2021",
+            "LGA Name": "CUMBERLAND",
+            "Published Date": "10/18/2024",
+            "Commenced Date": "10/18/2024",
+            "Currency Date": "10/18/2024",
+            "Amendment": "Map Amendment No 4",
+            "Layer Class": "450-474",
+            "Lot Size": "450",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Salinity",
+          "attributes": {
+            "OBJECTID": "24681",
+            "EPI Name": "Cumberland Local Environmental Plan 2021",
+            "LGA Name": "CUMBERLAND",
+            "Published Date": "10/18/2024",
+            "Commenced Date": "10/18/2024",
+            "Currency Date": "10/18/2024",
+            "Amendment": "Map Amendment No 4",
+            "Class": "Potential Moderate Salinity Land",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1745369504400_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-23T00:51:44.407Z",
+      "size": 4136746
+    },
+    "initial-assessment-report": {
+      "filename": "custom-assessment.pdf",
+      "originalName": "Initial Assessment Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-23T00:52:27.405Z",
+      "size": 4136746
+    }
+  },
+  "initialAssessment": {
+    "status": "completed",
+    "type": "custom",
+    "createdAt": "2025-04-23T00:52:14.823Z",
+    "updatedAt": "2025-04-23T00:52:14.823Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    },
+    "returnedAt": "2025-04-23T00:52:28.747Z"
+  }
+}

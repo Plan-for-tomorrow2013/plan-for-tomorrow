@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
 import { Plus, FileText, Download } from "lucide-react" // Added FileText and Download icons
 import { toast } from "./ui/use-toast" // Added toast for feedback
+import { useState } from "react"
 
 interface PrePreparedAssessments {
   id: string
@@ -27,6 +28,7 @@ interface PrePreparedAssessmentsProps {
 }
 
 export function PrePreparedAssessments({ prePreparedAssessments, isAdmin = false, onAddPrePreparedAssessments }: PrePreparedAssessmentsProps) {
+  const [prePreparedAssessmentsState, setPrePreparedAssessmentsState] = useState<PrePreparedAssessments[]>(prePreparedAssessments || []);
 
   const handleDownload = async (assessment: PrePreparedAssessments) => {
     if (!assessment.file) {
@@ -123,7 +125,7 @@ export function PrePreparedAssessments({ prePreparedAssessments, isAdmin = false
       </CardHeader>
       <CardContent>
         <div className="space-y-6"> {/* Increased spacing */}
-          {prePreparedAssessments.map((assessment) => (
+          {prePreparedAssessmentsState.map((assessment) => (
             <div key={assessment.id} className="border rounded-lg p-4 shadow-sm"> {/* Added border, padding, shadow */}
               <div className="flex items-start justify-between mb-2"> {/* Added margin bottom */}
                 <h3 className="font-semibold text-lg">{assessment.title}</h3> {/* Increased font weight/size */}
@@ -151,7 +153,7 @@ export function PrePreparedAssessments({ prePreparedAssessments, isAdmin = false
               )}
             </div>
           ))}
-          {prePreparedAssessments.length === 0 && !isAdmin && ( // Hide "No assessments" if admin can add
+          {prePreparedAssessmentsState.length === 0 && !isAdmin && ( // Hide "No assessments" if admin can add
             <p className="text-sm text-muted-foreground text-center py-4">
               No pre-prepared assessments at this time
             </p>

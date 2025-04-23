@@ -107,6 +107,27 @@
       "type": "application/pdf",
       "uploadedAt": "2025-04-22T07:03:45.493Z",
       "size": 4136746
+    },
+    "initial-assessment-report": {
+      "filename": "custom-assessment.pdf",
+      "originalName": "Architecture Plan - 8 First Ave Macquarie Fields_V1_CDC-280327.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-23T08:35:15.139Z",
+      "size": 7107904
     }
+  },
+  "initialAssessment": {
+    "status": "completed",
+    "type": "custom",
+    "createdAt": "2025-04-23T08:34:39.379Z",
+    "updatedAt": "2025-04-23T08:34:39.379Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    },
+    "returnedAt": "2025-04-23T08:35:17.124Z"
   }
 }

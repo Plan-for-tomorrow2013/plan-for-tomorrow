@@ -1,10 +1,19 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { DollarSign, ChevronLeft, ChevronRight, Trash, FileText, CheckCircle } from "lucide-react"
 import { CategoryCard } from "@/components/quotes/category-card"
 import { SearchBar } from "@/components/quotes/search-bar"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card" // Added Card imports
+import Link from "next/link"
+
+interface CategoryCardProps {
+  title: string;
+  icon: string;
+  href: string;
+  description: string;
+}
 
 export default function QuotesPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -15,14 +24,14 @@ export default function QuotesPage() {
     {
       id: "nathers-basix",
       title: "NatHERS & BASIX",
-      icon: "/placeholder.svg?height=100&width=100",
+      icon: "/icons/nathers-basix.svg",
       href: "/quotes/nathers-basix",
       description: "Energy efficiency and sustainability consultants",
     },
     {
       id: "waste-management",
       title: "Waste Management",
-      icon: "/placeholder.svg?height=100&width=100",
+      icon: "/icons/waste-management.svg",
       href: "/quotes/waste-management",
       description: "Waste management consultants and services",
     },
@@ -142,22 +151,28 @@ export default function QuotesPage() {
   const scrollableCategories = categories.slice(6)
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-4 mb-6">
-        <DollarSign className="h-6 w-6" />
-        <div>
-          <h1 className="text-2xl font-semibold">Quotes</h1>
-          <p className="text-muted-foreground">Request quotes from our trusted consultants</p>
-        </div>
+    // Added container div with dashboard styling
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Adjusted header section */}
+      <div className="space-y-1"> {/* Added space-y-1 for title/description */}
+        <h1 className="text-2xl font-bold flex items-center gap-2"> {/* Changed font-semibold to font-bold, added flex/gap */}
+          <DollarSign className="h-6 w-6" />
+          Quotes
+        </h1>
+        <p className="text-muted-foreground">Request quotes from our trusted consultants</p>
       </div>
 
-      <div className="max-w-6xl mx-auto mb-10">
-        <SearchBar placeholder="Search consultants..." />
-      </div>
+      {/* Wrapped SearchBar in a Card for consistency */}
+      <Card>
+        <CardContent className="p-6">
+          <SearchBar placeholder="Search consultants..." />
+        </CardContent>
+      </Card>
 
-      <div className="max-w-6xl mx-auto">
+      {/* Main content area for categories */}
+      <div className="space-y-6"> {/* Added space-y-6 */}
         {/* Fixed grid for first 6 items */}
-        <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Added responsive grid classes */}
           {visibleCategories.map((category) => (
             <CategoryCard
               key={category.id}
@@ -171,9 +186,11 @@ export default function QuotesPage() {
 
         {/* Scrollable section for remaining items */}
         {scrollableCategories.length > 0 && (
-          <div className="relative">
-            <div
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-16 z-10"
+          <div className="space-y-4"> {/* Added space-y-4 */}
+            <h2 className="text-xl font-semibold">Other Categories</h2> {/* Added title for scrollable section */}
+            <div className="relative">
+              <div
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10" // Adjusted horizontal translation
               style={{ display: showLeftArrow ? "block" : "none" }}
             >
               <Button
@@ -184,10 +201,10 @@ export default function QuotesPage() {
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
-            </div>
+              </div>
 
-            <div
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-16 z-10"
+              <div
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10" // Adjusted horizontal translation
               style={{ display: showRightArrow ? "block" : "none" }}
             >
               <Button
@@ -207,7 +224,7 @@ export default function QuotesPage() {
             >
               {scrollableCategories.map((category) => (
                 <div key={category.id} className="flex-none w-[300px]">
-                  <CategoryCard
+                  <LocalCategoryCard
                     title={category.title}
                     icon={category.icon}
                     href={category.href}
@@ -216,9 +233,24 @@ export default function QuotesPage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </div> {/* Closes div.relative */}
+        </div> // Closes the added div.space-y-4
+        )} {/* Correctly placed closing parenthesis for the conditional block */}
       </div>
     </div>
   )
 }
+
+const LocalCategoryCard: React.FC<CategoryCardProps> = ({ title, icon, href, description }) => {
+  return (
+    <Link href={href}>
+      <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+        <div className="flex items-center">
+          {icon && <img src={icon} alt={title} className="h-10 w-10 mr-2" />}
+          <h3 className="text-lg font-semibold">{title}</h3>
+        </div>
+        <p className="text-sm text-gray-600">{description}</p>
+      </div>
+    </Link>
+  );
+};

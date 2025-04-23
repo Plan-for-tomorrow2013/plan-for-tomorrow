@@ -24,7 +24,7 @@ interface PrePreparedAssessments {
 
 export default function InitialAssessmentPage() {
   const { toast } = useToast()
-  const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessments[]>([])
+  const [sections, setSections] = useState<{ id: string; title: string; assessments: PrePreparedAssessments[] }[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export default function InitialAssessmentPage() {
       const response = await fetch('/api/pre-prepared-assessments')
       if (!response.ok) throw new Error('Failed to fetch pre-prepared assessments')
       const data = await response.json()
-      setPrePreparedAssessments(data)
+      setSections(data)
     } catch (error) {
       toast({
         title: "Error",
@@ -62,46 +62,64 @@ export default function InitialAssessmentPage() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
+  const handleSectionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Logic to create a new section
+    const newSection = {
+      id: Date.now().toString(), // Generate a unique ID
+      title: formData.section,
+      assessments: [],
+    };
+    setSections(prev => [...prev, newSection]);
+    setFormData(prev => ({ ...prev, section: '' })); // Reset section input
+  };
 
-    const formDataToSubmit = new FormData()
-    formDataToSubmit.append('section', formData.section)
-    formDataToSubmit.append('title', formData.title)
-    formDataToSubmit.append('content', formData.content)
-    formDataToSubmit.append('author', formData.author)
+  const handleAssessmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('section', formData.section);
+    formDataToSubmit.append('title', formData.title);
+    formDataToSubmit.append('content', formData.content);
+    formDataToSubmit.append('author', formData.author);
     if (formData.file) {
-      formDataToSubmit.append('file', formData.file)
+      formDataToSubmit.append('file', formData.file);
     }
 
     try {
       const response = await fetch('/api/pre-prepared-assessments', {
         method: 'POST',
         body: formDataToSubmit,
-      })
+      });
 
-      if (!response.ok) throw new Error('Failed to create Pre-Prepared Assessments')
+      if (!response.ok) throw new Error('Failed to create Pre-Prepared Assessments');
 
-      const newPrePreparedAssessments = await response.json()
-      setPrePreparedAssessments(prev => [newPrePreparedAssessments, ...prev])
-      setFormData({ section: '', title: '', content: '', author: '', file: null })
+      const newAssessment = await response.json();
 
-      toast({
-        title: "Success",
-        description: "Pre-Prepared Assessments created successfully"
-      })
+      // Find the section and add the new assessment to it
+      setSections(prev => {
+        const updatedSections = [...prev];
+        const sectionIndex = updatedSections.findIndex(section => section.title === formData.section);
+        if (sectionIndex !== -1) {
+          // Check if the assessment already exists in the section
+          const assessmentExists = updatedSections[sectionIndex].assessments.some(assessment => assessment.id === newAssessment.id);
+          if (!assessmentExists) {
+            updatedSections[sectionIndex].assessments.push(newAssessment);
+          }
+        }
+        return updatedSections;
+      });
+
+      setFormData({ section: '', title: '', content: '', author: '', file: null });
+      toast({ title: "Success", description: "Pre-Prepared Assessments created successfully" });
     } catch (error) {
-      console.error('Error:', error)
-      toast({
-        title: "Error",
-        description: "Failed to create Pre-Prepared Assessments: " + (error as Error).message,
-        variant: "destructive"
-      })
+      console.error('Error:', error);
+      toast({ title: "Error", description: "Failed to create Pre-Prepared Assessments: " + (error as Error).message, variant: "destructive" });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDownload = async (fileId: string) => {
     try {
@@ -153,7 +171,7 @@ export default function InitialAssessmentPage() {
             <CardTitle>Create New Section</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSectionSubmit} className="space-y-4">
               <div>
                 <label className="text-sm font-medium mb-1 block">Section</label>
                 <Input
@@ -188,15 +206,20 @@ export default function InitialAssessmentPage() {
             <CardTitle>Create New Pre-Prepared Assessment</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label className="text-sm font-medium mb-1 block">Title</label>
-                <Input
+            <form onSubmit={handleAssessmentSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Select Section</label>
+                <select
                   value={formData.section}
                   onChange={e => setFormData(prev => ({ ...prev, section: e.target.value }))}
-                  placeholder="Pre-Prepared Section"
                   required
-                />
+                  className="border rounded-md p-2 w-full"
+                >
+                  <option value="" disabled>Select a section</option>
+                  {sections.map(section => (
+                    <option key={section.id} value={section.title}>{section.title}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Title</label>
@@ -225,7 +248,7 @@ export default function InitialAssessmentPage() {
                   required
                 />
               </div>
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting || !formData.section}>
                 {submitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -247,38 +270,29 @@ export default function InitialAssessmentPage() {
             <CardTitle>Current Pre-Prepared Assessments</CardTitle>
           </CardHeader>
           <CardContent>
-            {/* Changed class here for grid layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {prePreparedAssessments.map((assessment) => (
-                <Card key={assessment.id} className="border p-4 rounded-md shadow-sm flex flex-col"> {/* Added flex flex-col for consistent height if needed */}
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-medium text-lg">{assessment.title}</h3>
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(assessment.date).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-muted-foreground">{assessment.content}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">Posted by {assessment.author}</p>
-                  {assessment.file && (
-                    <div className="mt-2 flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{assessment.file?.originalName}</span>
-                      <Button
-                        onClick={() => assessment.file?.id && handleDownload(assessment.file.id)}
-                        className="ml-2"
-                      >
-                        Download
-                      </Button>
+            {sections.map(section => (
+              <div key={section.id}>
+                <h3 className="font-semibold">{section.title}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Array.isArray(section.assessments) && section.assessments.map(assessment => (
+                    <div key={assessment.id} className="bg-white p-6 rounded-lg shadow-md">
+                      <h4 className="text-lg font-semibold mb-2">{assessment.title}</h4>
+                      <p className="text-sm text-gray-600">{assessment.content}</p>
+                      <p className="text-sm text-gray-500">{new Date(assessment.date).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-500">Posted by {assessment.author}</p>
+                      {assessment.file && (
+                        <div className="mt-2">
+                          <a href={assessment.file.id} className="text-blue-500 hover:underline">Download</a>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </Card>
-              ))}
-              {prePreparedAssessments.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No Pre-Prepared Assessments yet
-                </p>
-              )}
-            </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {sections.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">No pre-prepared assessments available.</p>
+            )}
           </CardContent>
         </Card>
       </div>

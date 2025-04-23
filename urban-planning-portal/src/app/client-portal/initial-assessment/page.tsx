@@ -18,6 +18,8 @@ import PropertyInfo from '@/components/PropertyInfo'; // Adjust the path as nece
 import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'
 import DocumentStatus from '@/components/DocumentStatus'
 
+import { PrePreparedAssessments } from '../../../components/PrePreparedAssessments'
+
 interface DocumentWithStatus extends Document {
   status: 'uploaded' | 'pending' | 'required'
   value?: string
@@ -40,6 +42,34 @@ interface JobFormData {
   [key: string]: CustomAssessmentForm
 }
 
+interface PrePreparedAssessmentSection {
+  id: string;
+  title: string;
+  assessments: PrePreparedAssessments[];
+}
+
+interface UploadedFile {
+  filename: string;
+  originalName: string;
+  type: string;
+  uploadedAt: string;
+  size: number;
+  returnedAt?: string;
+  savedPath?: string;
+}
+
+interface PrePreparedAssessments {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
+  file?: UploadedFile;
+}
+
+// Define the type for the state based on the updated interface
+type PrePreparedAssessmentData = PrePreparedAssessments[];
+
 export default function InitialAssessmentPage() {
   const router = useRouter()
   const { jobs, setJobs } = useJobs()
@@ -56,6 +86,9 @@ export default function InitialAssessmentPage() {
 
   // Separate state for custom section
   const [customAssessmentComplete, setCustomAssessmentComplete] = useState<Record<string, boolean>>({})
+
+  // State for pre-prepared assessment - Use the specific type alias
+  const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessmentSection[]>([])
 
   // New state for collapsible section
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
@@ -413,81 +446,51 @@ export default function InitialAssessmentPage() {
   }
 
   // Add download function
-  const handleDownload = async (documentId: string) => {
+  const handleDownload = async (assessment: PrePreparedAssessments) => {
+    if (!assessment.file) {
+      toast({
+        title: "Error",
+        description: "No file associated with this assessment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log("Downloading from:", assessment.file.savedPath); // Log the path
+    // Fetch directly using the savedPath, as the file is now in the client portal's public dir
+    const downloadUrl = assessment.file.savedPath!;
+    console.log("Attempting fetch from:", downloadUrl);
     try {
-      if (!selectedJobId) {
-        toast({
-          title: "Error",
-          description: "Please select a job first",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // For initial assessment report, always try to download from job documents first
-      if (documentId === 'initial-assessment-report') {
-        const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
-        if (!response.ok) {
-          throw new Error('Failed to download document');
-        }
-
-        // Get the filename from the Content-Disposition header
-        const contentDisposition = response.headers.get('Content-Disposition');
-        const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'assessment-report.pdf';
-
-        // Create a blob from the response
-        const blob = await response.blob();
-
-        // Create a download link and trigger it
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        toast({
-          title: "Success",
-          description: "Document downloaded successfully"
-        });
-        return;
-      }
-
-      // Handle other document downloads
-      const response = await fetch(`/api/jobs/${selectedJobId}/documents/${documentId}/download`);
+      const response = await fetch(downloadUrl); // Fetch the file using the relative path
       if (!response.ok) {
-        throw new Error('Failed to download document');
+        // Log the status for debugging
+        console.error(`Failed to download file: ${response.status} ${response.statusText}`);
+        // Check if the response has text, maybe an error message from the server
+        const errorText = await response.text().catch(() => 'Could not read error response.');
+        console.error("Server response:", errorText);
+        throw new Error(`Failed to download file. Status: ${response.status}`);
       }
 
-      // Get the filename from the Content-Disposition header
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition?.split('filename="')[1]?.split('"')[0] || 'document.pdf';
-
-      // Create a blob from the response
-      const blob = await response.blob();
-
-      // Create a download link and trigger it
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const blob = await response.blob(); // Convert response to blob
+      const url = window.URL.createObjectURL(blob); // Create a URL for the blob
+      const a = document.createElement('a'); // Create a link element
       a.href = url;
-      a.download = filename;
+      a.download = assessment.file.originalName; // Set the file name
       document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
+      a.click(); // Trigger the download
+      window.URL.revokeObjectURL(url); // Clean up
       document.body.removeChild(a);
 
       toast({
         title: "Success",
-        description: "Document downloaded successfully"
+        description: "File downloaded successfully.",
       });
     } catch (error) {
-      console.error('Error downloading document:', error);
+      console.error('Error downloading pre-prepared assessment:', error);
       toast({
-        title: "Error",
-        description: "Failed to download document. Please try again.",
-        variant: "destructive"
+        title: "Download Error",
+        description: (error as Error).message || "An unexpected error occurred during download.",
+        variant: "destructive",
       });
     }
   };
@@ -547,8 +550,11 @@ export default function InitialAssessmentPage() {
   const renderDocumentUpload = (doc: DocumentWithStatus) => {
     const handleClick = () => {
       if (doc.status === 'uploaded') {
-        handleDownload(doc.id)
-        return
+        const assessment = prePreparedAssessments.flatMap(section => section.assessments).find(a => a.file?.originalName === doc.uploadedFile?.originalName);
+        if (assessment) {
+          handleDownload(assessment);
+        }
+        return;
       }
 
       const input = document.createElement('input')
@@ -597,7 +603,7 @@ export default function InitialAssessmentPage() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleDownload('initial-assessment-report')}
+                  onClick={() => handleDownload(doc.uploadedFile as unknown as PrePreparedAssessments)}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download
@@ -607,26 +613,7 @@ export default function InitialAssessmentPage() {
           </Card>
         );
       } else {
-         // Render a placeholder/status tile if paid but not yet returned (optional)
-         // For now, let it fall through to the generic logic which will show "Required"
-         // or potentially adapt the generic logic later if needed.
-         // Alternatively, show a specific "Processing" state card:
-         /*
-         return (
-           <Card key={doc.id} className="relative opacity-70">
-             <CardHeader>
-               <h3 className="text-lg font-semibold">{doc.title}</h3>
-             </CardHeader>
-             <CardContent>
-               <div className="flex items-center text-gray-500">
-                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                 <span className="text-sm">Processing...</span>
-               </div>
-             </CardContent>
-           </Card>
-         );
-         */
-         // Render the "Report In Progress" card matching the Document Store style
+
          return (
             <Card key={doc.id} className="relative">
               <CardHeader className="bg-[#323A40] text-white"> {/* Match header style */}
@@ -677,7 +664,7 @@ export default function InitialAssessmentPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleDownload(doc.id)}
+                onClick={() => handleDownload(doc.uploadedFile as unknown as PrePreparedAssessments)}
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Download
@@ -916,11 +903,30 @@ export default function InitialAssessmentPage() {
     }
   };
 
-  // Determine if the form should be read-only - REMOVED FOR THIS PAGE CONTEXT
-  // const isReadOnly = selectedJobId ? (paymentComplete[selectedJobId] || isAssessmentReturned()) : false;
-  // For the Initial Assessment page, we want Site Details to be editable before payment/return.
   const isReadOnly = false;
 
+  // Fetch pre-prepared assessment - Now runs when selectedJobId changes
+  useEffect(() => {
+    const fetchPrePreparedAssessments = async () => {
+      if (!selectedJobId) {
+        setPrePreparedAssessments([]); // Clear assessments if no job is selected
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/pre-prepared-assessments');
+        if (!response.ok) {
+          throw new Error('Failed to fetch pre-prepared assessments');
+        }
+        const data = await response.json();
+        setPrePreparedAssessments(data); // Assuming data is structured as an array of sections
+      } catch (error) {
+        console.error('Error fetching pre-prepared assessments:', error);
+      }
+    };
+
+    fetchPrePreparedAssessments();
+  }, [selectedJobId]);
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -1094,13 +1100,38 @@ export default function InitialAssessmentPage() {
                 </TabsContent>
 
                 <TabsContent value="pre-prepared" className="mt-0">
-                <div className="col-span-full text-center py-8 text-gray-500">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-medium mb-2">No Pre-prepared Assessments</h3>
-                  <p className="text-sm">
-                  No pre-prepared assessments are available at this time.
-                </p>
-                </div>
+                  <div className="flex flex-wrap gap-4">
+                    {prePreparedAssessments
+                      .sort((a, b) => a.title.localeCompare(b.title))
+                      .map((section) => (
+                        <div key={section.id} className="flex-none w-full mb-4">
+                          <h2 className="text-xl font-semibold mb-2">{section.title}</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {section.assessments.length > 0 ? (
+                              section.assessments.map((assessment) => (
+                                <Card key={assessment.id} className="bg-white p-4 rounded-lg shadow-md mb-2">
+                                  <CardHeader>
+                                    <CardTitle className="text-lg font-semibold">{assessment.title}</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <p className="text-sm text-gray-600">{assessment.content}</p>
+                                    <p className="text-sm text-gray-500">{new Date(assessment.date).toLocaleDateString()}</p>
+                                    <p className="text-sm text-gray-500">Posted by {assessment.author}</p>
+                                    {assessment.file && (
+                                      <Button onClick={() => handleDownload(assessment)} className="text-blue-500 hover:underline">
+                                        Download
+                                      </Button>
+                                    )}
+                                  </CardContent>
+                                </Card>
+                              ))
+                            ) : (
+                              <p>No assessments available for this section.</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </TabsContent>
               </div>
             </Tabs>

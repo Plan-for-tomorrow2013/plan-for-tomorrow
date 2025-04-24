@@ -451,18 +451,9 @@ export default function ReportWriterPage() {
             developmentType: currentFormData.developmentType,
             additionalInfo: currentFormData.additionalInfo,
             documents: {
-              certificateOfTitle: {
-                originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
-              },
-              surveyPlan: {
-                originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
-              },
-              certificate107: {
-                originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
-              }
+              certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+              surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+              certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
             }
           }
         })
@@ -488,18 +479,9 @@ export default function ReportWriterPage() {
               developmentType: currentFormData.developmentType,
               additionalInfo: currentFormData.additionalInfo,
               documents: {
-                certificateOfTitle: {
-                  originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
-                },
-                surveyPlan: {
-                  originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
-                },
-                certificate107: {
-                  originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
-                }
+                certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
               }
             }
           }
@@ -560,18 +542,9 @@ export default function ReportWriterPage() {
             developmentType: currentFormData.developmentType,
             additionalInfo: currentFormData.additionalInfo,
             documents: {
-              certificateOfTitle: {
-                originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
-              },
-              surveyPlan: {
-                originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
-              },
-              certificate107: {
-                originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-                filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
-              }
+              certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+              surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+              certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
             }
           }
         })
@@ -597,18 +570,9 @@ export default function ReportWriterPage() {
               developmentType: currentFormData.developmentType,
               additionalInfo: currentFormData.additionalInfo,
               documents: {
-                certificateOfTitle: {
-                  originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
-                },
-                surveyPlan: {
-                  originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
-                },
-                certificate107: {
-                  originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-                  filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
-                }
+                certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
               }
             }
           }

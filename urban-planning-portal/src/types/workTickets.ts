@@ -14,27 +14,21 @@ export interface WorkTicket {
     developmentType: string
     additionalInfo: string
     documents: {
-      certificateOfTitle?: string
-      surveyPlan?: string
-      certificate107?: string
+      savedPath?: string
     }
   }
   statementOfEnvironmentalEffects?: {
     developmentType: string
     additionalInfo: string
     documents: {
-      certificateOfTitle?: string
-      surveyPlan?: string
-      certificate107?: string
+      savedPath?: string
     }
   }
   complyingDevelopmentCertificate?: {
     developmentType: string
     additionalInfo: string
     documents: {
-      certificateOfTitle?: string
-      surveyPlan?: string
-      certificate107?: string
+      savedPath?: string
     }
   }
 }

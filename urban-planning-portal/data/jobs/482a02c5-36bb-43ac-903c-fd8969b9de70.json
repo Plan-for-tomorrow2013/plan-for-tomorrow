@@ -1,0 +1,167 @@
+{
+  "id": "482a02c5-36bb-43ac-903c-fd8969b9de70",
+  "address": "2A Australia Avenue, Matraville",
+  "council": "Randwick",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-04-24T14:19:28.962Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.231028005123,
+      "latitude": -33.96218810415
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "250604",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "0.5"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "9.5",
+            "Units": "m"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "795835",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "428918",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Layer Class": "250-299",
+            "Lot Size": "275",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "29509",
+            "EPI Name": "Randwick Local Environmental Plan 2012",
+            "LGA Name": "RANDWICK",
+            "Published Date": "8/18/2023",
+            "Commenced Date": "9/1/2023",
+            "Currency Date": "9/1/2023",
+            "Amendment": "Amendment No 9",
+            "Class": "Class 5",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": []
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-24T14:19:41.197Z",
+      "size": 4136746
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-24T14:20:04.694Z",
+    "updatedAt": "2025-04-24T14:20:04.694Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  "statementOfEnvironmentalEffects": {
+    "status": "paid",
+    "type": "statement-of-environmental-effects",
+    "createdAt": "2025-04-24T14:20:30.207Z",
+    "updatedAt": "2025-04-24T14:20:30.207Z",
+    "statementOfEnvironmentalEffects": {
+      "developmentType": "123",
+      "additionalInfo": "455",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  "complyingDevelopmentCertificate": {
+    "status": "paid",
+    "type": "complying-development-certificate",
+    "createdAt": "2025-04-24T14:20:52.458Z",
+    "updatedAt": "2025-04-24T14:20:52.458Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "455",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  }
+}

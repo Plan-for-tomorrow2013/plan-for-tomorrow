@@ -208,22 +208,46 @@ export default function WorkTicketsPage() {
                     <div>
                       <h3 className="font-medium text-sm mb-1">Documents</h3>
                       <div className="space-y-1">
-                        {ticket.customAssessment.documents.certificateOfTitle && (
+                        {ticket.customAssessment.documents.certificateOfTitle?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Title: {ticket.customAssessment.documents.certificateOfTitle}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.customAssessment.documents.certificateOfTitle.filename)}&originalName=${encodeURIComponent(ticket.customAssessment.documents.certificateOfTitle.originalName || ticket.customAssessment.documents.certificateOfTitle.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.customAssessment.documents.certificateOfTitle.originalName}
+                              target="_blank" // Optional: open in new tab
+                              rel="noopener noreferrer"
+                            >
+                              Title: {ticket.customAssessment.documents.certificateOfTitle.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.customAssessment.documents.surveyPlan && (
+                        {ticket.customAssessment.documents.surveyPlan?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Plan: {ticket.customAssessment.documents.surveyPlan}</span>
+                             <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.customAssessment.documents.surveyPlan.filename)}&originalName=${encodeURIComponent(ticket.customAssessment.documents.surveyPlan.originalName || ticket.customAssessment.documents.surveyPlan.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.customAssessment.documents.surveyPlan.originalName}
+                              target="_blank" // Optional: open in new tab
+                              rel="noopener noreferrer"
+                            >
+                              Plan: {ticket.customAssessment.documents.surveyPlan.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.customAssessment.documents.certificate107 && (
+                        {ticket.customAssessment.documents.certificate107?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">10.7: {ticket.customAssessment.documents.certificate107}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.customAssessment.documents.certificate107.filename)}&originalName=${encodeURIComponent(ticket.customAssessment.documents.certificate107.originalName || ticket.customAssessment.documents.certificate107.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.customAssessment.documents.certificate107.originalName}
+                              target="_blank" // Optional: open in new tab
+                              rel="noopener noreferrer"
+                            >
+                              10.7: {ticket.customAssessment.documents.certificate107.originalName}
+                            </a>
                           </div>
                         )}
                       </div>
@@ -246,22 +270,43 @@ export default function WorkTicketsPage() {
                     <div>
                       <h3 className="font-medium text-sm mb-1">Documents</h3>
                       <div className="space-y-1">
-                        {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle && (
+                        {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Title: {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle.filename)}&originalName=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle.originalName || ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              Title: {ticket.statementOfEnvironmentalEffects.documents.certificateOfTitle.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.statementOfEnvironmentalEffects.documents.surveyPlan && (
+                        {ticket.statementOfEnvironmentalEffects.documents.surveyPlan?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Plan: {ticket.statementOfEnvironmentalEffects.documents.surveyPlan}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.surveyPlan.filename)}&originalName=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.surveyPlan.originalName || ticket.statementOfEnvironmentalEffects.documents.surveyPlan.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.statementOfEnvironmentalEffects.documents.surveyPlan.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              Plan: {ticket.statementOfEnvironmentalEffects.documents.surveyPlan.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.statementOfEnvironmentalEffects.documents.certificate107 && (
+                        {ticket.statementOfEnvironmentalEffects.documents.certificate107?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">10.7: {ticket.statementOfEnvironmentalEffects.documents.certificate107}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.certificate107.filename)}&originalName=${encodeURIComponent(ticket.statementOfEnvironmentalEffects.documents.certificate107.originalName || ticket.statementOfEnvironmentalEffects.documents.certificate107.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.statementOfEnvironmentalEffects.documents.certificate107.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              10.7: {ticket.statementOfEnvironmentalEffects.documents.certificate107.originalName}
+                            </a>
                           </div>
                         )}
                       </div>
@@ -283,22 +328,43 @@ export default function WorkTicketsPage() {
                     <div>
                       <h3 className="font-medium text-sm mb-1">Documents</h3>
                       <div className="space-y-1">
-                        {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle && (
+                        {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Title: {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.certificateOfTitle.filename)}&originalName=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.certificateOfTitle.originalName || ticket.complyingDevelopmentCertificate.documents.certificateOfTitle.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.complyingDevelopmentCertificate.documents.certificateOfTitle.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              Title: {ticket.complyingDevelopmentCertificate.documents.certificateOfTitle.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.complyingDevelopmentCertificate.documents.surveyPlan && (
+                        {ticket.complyingDevelopmentCertificate.documents.surveyPlan?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">Plan: {ticket.complyingDevelopmentCertificate.documents.surveyPlan}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.surveyPlan.filename)}&originalName=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.surveyPlan.originalName || ticket.complyingDevelopmentCertificate.documents.surveyPlan.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.complyingDevelopmentCertificate.documents.surveyPlan.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              Plan: {ticket.complyingDevelopmentCertificate.documents.surveyPlan.originalName}
+                            </a>
                           </div>
                         )}
-                        {ticket.complyingDevelopmentCertificate.documents.certificate107 && (
+                        {ticket.complyingDevelopmentCertificate.documents.certificate107?.filename && (
                           <div className="flex items-center text-xs">
                             <FileText className="h-3 w-3 mr-1" />
-                            <span className="truncate">10.7: {ticket.complyingDevelopmentCertificate.documents.certificate107}</span>
+                            <a
+                              href={`/api/download-document?jobId=${ticket.jobId}&filename=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.certificate107.filename)}&originalName=${encodeURIComponent(ticket.complyingDevelopmentCertificate.documents.certificate107.originalName || ticket.complyingDevelopmentCertificate.documents.certificate107.filename)}`}
+                              className="text-blue-600 hover:underline truncate"
+                              download={ticket.complyingDevelopmentCertificate.documents.certificate107.originalName}
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              10.7: {ticket.complyingDevelopmentCertificate.documents.certificate107.originalName}
+                            </a>
                           </div>
                         )}
                       </div>

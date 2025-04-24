@@ -1,98 +1,187 @@
 [
   {
-    "id": "406dfbe1-16fb-4775-8631-eae6a7cb742e",
-    "jobId": "60214d26-638b-4e59-b582-c19d2994840f",
+    "id": "a848111e-fb66-46ab-bd50-cbcc0c51944c",
+    "jobId": "e595b64f-4870-4dde-8088-7824855ccee0",
     "jobAddress": "9 Viola Place, Greystanes",
     "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-21T02:21:05.041Z",
+    "status": "pending",
+    "createdAt": "2025-04-24T11:02:51.833Z",
     "customAssessment": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "Initial Assessment Check.pdf",
-      "fileName": "custom-assessment.pdf",
-      "uploadedAt": "2025-04-21T02:21:33.000Z",
-      "size": 4136746,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-21T02:21:48.678Z"
     }
   },
   {
-    "id": "94040349-31e7-47ed-8ee5-f086c449bd27",
-    "jobId": "60214d26-638b-4e59-b582-c19d2994840f",
+    "id": "93ecbc4f-b22e-40af-9005-780cf8c9791b",
+    "jobId": "e595b64f-4870-4dde-8088-7824855ccee0",
     "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "complying-development-certificate",
+    "status": "pending",
+    "createdAt": "2025-04-24T11:06:27.009Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  {
+    "id": "8d30f6eb-43bf-4e41-b10d-a7aecb3b4500",
+    "jobId": "c7ef4fa5-4609-4211-9b2d-6c0f4b782b96",
+    "jobAddress": "458 Bells Line of Road, Kurmond",
     "ticketType": "statement-of-environmental-effects",
-    "status": "completed",
-    "createdAt": "2025-04-21T02:22:31.205Z",
+    "status": "pending",
+    "createdAt": "2025-04-24T11:07:19.329Z",
     "statementOfEnvironmentalEffects": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "completedDocument": {
-      "documentId": "statement-of-environmental-effects",
-      "originalName": "Statement of Environmental Effects Check.pdf",
-      "fileName": "statement-of-environmental-effects.pdf",
-      "uploadedAt": "2025-04-21T02:22:49.952Z",
-      "size": 4136746,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-21T02:22:51.042Z"
     }
   },
   {
-    "id": "f9008c0f-3f01-4dee-ac6f-b67a201db051",
-    "jobId": "dd924f9f-d445-47a5-8f82-c5077fa41ad1",
-    "jobAddress": "9 Viola Place, Greystanes",
+    "id": "6ec53888-21a2-4c2a-ac2e-976c280cb3f7",
+    "jobId": "c7ef4fa5-4609-4211-9b2d-6c0f4b782b96",
+    "jobAddress": "458 Bells Line of Road, Kurmond",
     "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-23T00:52:15.014Z",
+    "status": "pending",
+    "createdAt": "2025-04-24T11:15:45.810Z",
+    "customAssessment": {
+      "developmentType": "TEST",
+      "additionalInfo": "TEST",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  {
+    "id": "ddc82996-965c-4cc1-8c73-faa56ca658e4",
+    "jobId": "33c8d7a9-dcac-40bf-a5b7-0c8278ae92bf",
+    "jobAddress": "34 Tomerong Street Tullimbar",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-24T12:31:38.457Z",
     "customAssessment": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "Initial Assessment Check.pdf",
-      "fileName": "custom-assessment.pdf",
-      "uploadedAt": "2025-04-23T00:52:27.405Z",
-      "size": 4136746,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-23T00:52:28.747Z"
     }
   },
   {
-    "id": "b05c9577-cfb7-41d5-bf26-35ecd59b75cf",
-    "jobId": "ad015d14-5f33-439e-8966-18e12071561f",
-    "jobAddress": "11 Lake Avenue Cringila",
+    "id": "c6f54ba7-5a02-4d8b-a6fe-9f9e7d587be4",
+    "jobId": "32a8e8e3-9f8d-4333-be76-e65e39ae1726",
+    "jobAddress": "17 Cobargo Street Tullimbar",
     "ticketType": "custom-assessment",
-    "status": "completed",
-    "createdAt": "2025-04-23T08:34:39.407Z",
+    "status": "pending",
+    "createdAt": "2025-04-24T12:56:22.558Z",
     "customAssessment": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "completedDocument": {
-      "documentId": "initial-assessment-report",
-      "originalName": "Architecture Plan - 8 First Ave Macquarie Fields_V1_CDC-280327.pdf",
-      "fileName": "custom-assessment.pdf",
-      "uploadedAt": "2025-04-23T08:35:15.139Z",
-      "size": 7107904,
-      "type": "application/pdf",
-      "returnedAt": "2025-04-23T08:35:17.125Z"
+    }
+  },
+  {
+    "id": "9ca581ed-5be0-47bd-acc9-f75f5c2ae389",
+    "jobId": "cf9af398-3e0d-4a92-8a81-0c2fe3fe26cf",
+    "jobAddress": "37 Park Road, Naremburn",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-24T14:12:26.223Z",
+    "customAssessment": {
+      "developmentType": "testing download",
+      "additionalInfo": "testing download",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  {
+    "id": "86b52791-69db-4ff8-899e-6529d3390064",
+    "jobId": "9b67d8c3-cd9b-4837-8ef1-e8068a4ccdad",
+    "jobAddress": "8 First Avenue, Macquarie Fields",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-24T14:13:53.543Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504006118_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "6880914b-6958-4e71-bbaa-a554c047d378",
+    "jobId": "482a02c5-36bb-43ac-903c-fd8969b9de70",
+    "jobAddress": "2A Australia Avenue, Matraville",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-04-24T14:20:04.690Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "4ee16392-f12c-4f38-83ed-0c4c609676a9",
+    "jobId": "482a02c5-36bb-43ac-903c-fd8969b9de70",
+    "jobAddress": "2A Australia Avenue, Matraville",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-04-24T14:20:30.204Z",
+    "statementOfEnvironmentalEffects": {
+      "developmentType": "123",
+      "additionalInfo": "455",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "944eb7d7-a0bd-4e98-ae99-c70de8d818a2",
+    "jobId": "482a02c5-36bb-43ac-903c-fd8969b9de70",
+    "jobAddress": "2A Australia Avenue, Matraville",
+    "ticketType": "complying-development-certificate",
+    "status": "pending",
+    "createdAt": "2025-04-24T14:20:52.455Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "455",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1745504381192_10.7 Certificate Check.pdf"
+        }
+      }
     }
   }
 ]

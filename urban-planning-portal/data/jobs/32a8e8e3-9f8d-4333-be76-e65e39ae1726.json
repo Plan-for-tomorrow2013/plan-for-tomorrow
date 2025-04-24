@@ -1,0 +1,60 @@
+{
+  "id": "32a8e8e3-9f8d-4333-be76-e65e39ae1726",
+  "address": "17 Cobargo Street Tullimbar",
+  "council": "Unknown Council",
+  "currentStage": "initial-assessment",
+  "createdAt": "2025-04-24T12:45:50.264Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.760335107688,
+      "latitude": -34.579376133429
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "19487",
+            "EPI Name": "Shellharbour Local Environmental Plan 2013",
+            "LGA Name": "SHELLHARBOUR",
+            "Published Date": "5/6/2022",
+            "Commenced Date": "5/6/2022",
+            "Currency Date": "10/13/2023",
+            "Amendment": "Amendment No 25",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Deferred Matter",
+            "Zone": "DM",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": []
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1745498756515_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-04-24T12:45:56.522Z",
+      "size": 4136746
+    }
+  },
+  "initialAssessment": {
+    "status": "paid",
+    "type": "custom",
+    "createdAt": "2025-04-24T12:56:22.562Z",
+    "updatedAt": "2025-04-24T12:56:22.562Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    }
+  }
+}

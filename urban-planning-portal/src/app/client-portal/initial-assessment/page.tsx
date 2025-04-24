@@ -384,9 +384,19 @@ export default function InitialAssessmentPage() {
             developmentType: currentFormData.developmentType,
             additionalInfo: currentFormData.additionalInfo,
             documents: {
-              certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-              surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-              certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
+              certificateOfTitle: {
+                originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
+              },
+              surveyPlan: {
+                originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
+              },
+              certificate107: {
+                originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
+                filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+              }
+              // Add other documents here if they become part of the custom assessment ticket
             }
           }
         })
@@ -412,9 +422,19 @@ export default function InitialAssessmentPage() {
               developmentType: currentFormData.developmentType,
               additionalInfo: currentFormData.additionalInfo,
               documents: {
-                certificateOfTitle: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-                surveyPlan: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-                certificate107: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName
+                 certificateOfTitle: {
+                   originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+                   filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
+                 },
+                 surveyPlan: {
+                   originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+                   filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
+                 },
+                 certificate107: {
+                   originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
+                   filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+                 }
+                 // Add other documents here if they become part of the custom assessment ticket
               }
             }
           }

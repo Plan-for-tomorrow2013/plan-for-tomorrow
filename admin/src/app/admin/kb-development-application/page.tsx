@@ -174,32 +174,6 @@ export default function InitialAssessmentPage() {
     }
   };
 
-  const handleDeleteSection = async (sectionId: string) => {
-    if (!window.confirm("Are you sure you want to delete this entire section and all its assessments? This action cannot be undone.")) {
-      return; // Stop if the user cancels
-    }
-
-    try {
-      const response = await fetch(`/api/pre-prepared-sections/${sectionId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete section');
-      }
-
-      // Update the state to remove the deleted section
-      setSections(prev => prev.filter(section => section.id !== sectionId));
-
-      toast({ title: "Success", description: "Section deleted successfully" });
-    } catch (error) {
-      console.error('Error deleting section:', error);
-      toast({ title: "Error", description: "Failed to delete section: " + (error as Error).message, variant: "destructive" });
-    }
-  };
-
-
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -329,61 +303,36 @@ export default function InitialAssessmentPage() {
           </CardHeader>
           <CardContent>
             {sections.map(section => (
-              <div key={section.id} className="mb-6 border-b pb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-xl">{section.title}</h3>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteSection(section.id)}
-                  >
-                    Delete Section
-                  </Button>
-                </div>
+              <div key={section.id}>
+                <h3 className="font-semibold">{section.title}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {Array.isArray(section.assessments) && section.assessments.map(assessment => (
-                    <div key={assessment.id} className="bg-white p-4 rounded-lg shadow"> {/* Adjusted padding and shadow */}
+                    <div key={assessment.id} className="bg-white p-6 rounded-lg shadow-md">
                       <h4 className="text-lg font-semibold mb-2">{assessment.title}</h4>
                       <p className="text-sm text-gray-600">{assessment.content}</p>
                       <p className="text-sm text-gray-500">{new Date(assessment.date).toLocaleDateString()}</p>
-                      <p className="text-xs text-gray-500">Posted by {assessment.author}</p> {/* Adjusted text size */}
-                      {/* Removed assessment.fileName display as it might be redundant if originalName is available via file object */}
+                      <p className="text-sm text-gray-500">Posted by {assessment.author}</p>
+                      {assessment.fileName && (
+                        <p className="text-sm text-gray-500">Uploaded file: {assessment.fileName}</p>
+                      )}
                       {assessment.file && (
-                         <div className="mt-2 flex justify-between items-center"> {/* Use flex for button layout */}
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => handleDownload(assessment.file?.id || '')}
-                           >
-                             Download ({assessment.file.originalName}) {/* Show original name */}
-                           </Button>
-                           <Button
-                             variant="ghost" // Less prominent delete button for individual items
-                             size="sm"
-                             className="text-red-600 hover:text-red-800"
-                             onClick={() => handleDeleteAssessment(assessment.id)}
-                           >
-                             Delete Item
-                           </Button>
-                         </div>
-                       )}
-                       {!assessment.file && ( // Handle case where there might not be a file
-                         <div className="mt-2 flex justify-end items-center">
-                            <Button
-                             variant="ghost"
-                             size="sm"
-                             className="text-red-600 hover:text-red-800"
-                             onClick={() => handleDeleteAssessment(assessment.id)}
-                           >
-                             Delete Item
-                           </Button>
-                         </div>
-                       )}
+                        <div className="mt-2">
+                          <button
+                            onClick={() => handleDownload(assessment.file?.id || '')}
+                            className="text-blue-500 hover:underline"
+                          >
+                            Download
+                          </button>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleDeleteAssessment(assessment.id)}
+                        className="text-red-500 hover:underline mt-2"
+                      >
+                        Delete
+                      </button>
                     </div>
                   ))}
-                  {Array.isArray(section.assessments) && section.assessments.length === 0 && (
-                     <p className="text-sm text-muted-foreground col-span-full text-center py-4">No assessments in this section.</p>
-                  )}
                 </div>
               </div>
             ))}

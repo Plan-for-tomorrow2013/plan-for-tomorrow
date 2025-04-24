@@ -38,11 +38,17 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { jobId, jobAddress, ticketType, customAssessment, statementOfEnvironmentalEffects, complyingDevelopmentCertificate } = body
+    const formData = await request.formData();
+    const developmentType = formData.get('developmentType') as string; // Get the section title
+    const additionalInfo = formData.get('additionalInfo') as string;
+    const documents = formData.get('documents') as File | null;
 
     // Validate incoming data
     if (!jobId || !jobAddress || !ticketType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+
+    console.log('Received body:', body);
 
     // Create new work ticket
     const newTicket: WorkTicket = {
@@ -56,21 +62,27 @@ export async function POST(request: Request) {
         customAssessment: {
           developmentType: customAssessment?.developmentType,
           additionalInfo: customAssessment?.additionalInfo,
-          documents: customAssessment?.documents,
+          documents: {
+            savedPath: `/initial-assessment/required-documents/${documents?.name}`,
+          },
         },
       }),
       ...(ticketType === 'statement-of-environmental-effects' && {
         statementOfEnvironmentalEffects: {
           developmentType: statementOfEnvironmentalEffects?.developmentType,
           additionalInfo: statementOfEnvironmentalEffects?.additionalInfo,
-          documents: statementOfEnvironmentalEffects?.documents,
+          documents: {
+            savedPath: `/initial-assessment/required-documents/${documents?.name}`,
+          },
         },
       }),
       ...(ticketType === 'complying-development-certificate' && {
         complyingDevelopmentCertificate: {
           developmentType: complyingDevelopmentCertificate?.developmentType,
           additionalInfo: complyingDevelopmentCertificate?.additionalInfo,
-          documents: complyingDevelopmentCertificate?.documents,
+          documents: {
+            savedPath: `/initial-assessment/required-documents/${documents?.name}`,
+          },
         },
       }),
     }

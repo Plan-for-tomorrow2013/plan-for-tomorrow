@@ -1,9 +1,9 @@
 {
-  "id": "60214d26-638b-4e59-b582-c19d2994840f",
+  "id": "e595b64f-4870-4dde-8088-7824855ccee0",
   "address": "9 Viola Place, Greystanes",
   "council": "Cumberland",
   "currentStage": "initial-assessment",
-  "createdAt": "2025-04-21T02:20:15.735Z",
+  "createdAt": "2025-04-24T11:02:33.026Z",
   "propertyData": {
     "coordinates": {
       "longitude": 150.937614203867,
@@ -120,53 +120,50 @@
   },
   "documents": {
     "10-7-certificate": {
-      "filename": "10-7-certificate_1745202038597_10.7 Certificate Check.pdf",
+      "filename": "10-7-certificate_1745492559047_10.7 Certificate Check.pdf",
       "originalName": "10.7 Certificate Check.pdf",
       "type": "application/pdf",
-      "uploadedAt": "2025-04-21T02:20:38.611Z",
-      "size": 4136746
-    },
-    "initial-assessment-report": {
-      "filename": "custom-assessment.pdf",
-      "originalName": "Initial Assessment Check.pdf",
-      "type": "application/pdf",
-      "uploadedAt": "2025-04-21T02:21:33.000Z",
-      "size": 4136746
-    },
-    "statement-of-environmental-effects": {
-      "filename": "statement-of-environmental-effects.pdf",
-      "originalName": "Statement of Environmental Effects Check.pdf",
-      "type": "application/pdf",
-      "uploadedAt": "2025-04-21T02:22:49.952Z",
+      "uploadedAt": "2025-04-24T11:02:39.053Z",
       "size": 4136746
     }
   },
   "initialAssessment": {
-    "status": "completed",
+    "status": "paid",
     "type": "custom",
-    "createdAt": "2025-04-21T02:21:05.043Z",
-    "updatedAt": "2025-04-21T02:21:05.043Z",
+    "createdAt": "2025-04-24T11:02:51.852Z",
+    "updatedAt": "2025-04-24T11:02:51.852Z",
     "customAssessment": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "returnedAt": "2025-04-21T02:21:48.678Z"
+    }
   },
   "statementOfEnvironmentalEffects": {
-    "status": "completed",
+    "status": "paid",
     "type": "statement-of-environmental-effects",
-    "createdAt": "2025-04-21T02:22:31.208Z",
-    "updatedAt": "2025-04-21T02:22:31.208Z",
+    "createdAt": "2025-04-24T11:03:09.880Z",
+    "updatedAt": "2025-04-24T11:03:09.880Z",
     "statementOfEnvironmentalEffects": {
       "developmentType": "123",
       "additionalInfo": "456",
       "documents": {
         "certificate107": "10.7 Certificate Check.pdf"
       }
-    },
-    "returnedAt": "2025-04-21T02:22:51.041Z"
+    }
+  },
+  "complyingDevelopmentCertificate": {
+    "status": "paid",
+    "type": "complying-development-certificate",
+    "createdAt": "2025-04-24T11:06:27.011Z",
+    "updatedAt": "2025-04-24T11:06:27.011Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificate107": "10.7 Certificate Check.pdf"
+      }
+    }
   }
 }

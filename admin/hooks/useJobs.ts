@@ -1,16 +1,5 @@
 import { useEffect, useState } from 'react'
-
-export interface Job {
-  id: string
-  address: string
-  council?: string
-  currentStage?: string
-  createdAt?: string
-  initialAssessment?: {
-    status?: 'pending' | 'completed' | 'paid'
-    returnedAt?: string
-  }
-}
+import { Job } from '../../shared/types/jobs'
 
 export function useJobs() {
   const [jobs, setJobs] = useState<Job[]>([])
@@ -23,13 +12,13 @@ export function useJobs() {
         setIsLoading(true)
         setError(null)
         const response = await fetch('/api/jobs')
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch jobs')
         }
-        
+
         const data = await response.json()
-        
+
         if (Array.isArray(data)) {
           setJobs(data.filter((job: Job) => job.id && job.address))
         } else {
@@ -48,4 +37,4 @@ export function useJobs() {
   }, [])
 
   return { jobs, setJobs, isLoading, error }
-} 
+}

@@ -47,7 +47,7 @@ export default function RootLayout({
                   <Link href="/admin/dashboard">Dashboard</Link>
                 </li>
                 <li>
-                  <Link href="/admin/initial-assessment">Initial Assessment</Link>
+                  <Link href="/admin/pre-prepared-assessments">Pre-prepared Assessments</Link>
                 </li>
                 <li>
                   <Link href="/admin/report-writer">Report Writer</Link>

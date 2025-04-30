@@ -1,6 +1,7 @@
 import { promises as fsPromises } from 'fs'
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, unlinkSync } from 'fs'
 import path from 'path'
+import { Job } from '../../shared/types/jobs'
 
 const JOBS_DIR = path.join(process.cwd(), 'data', 'jobs')
 
@@ -9,7 +10,7 @@ if (!existsSync(JOBS_DIR)) {
   mkdirSync(JOBS_DIR, { recursive: true })
 }
 
-export async function saveJob(jobId: string, jobData: any): Promise<void> {
+export async function saveJob(jobId: string, jobData: Job): Promise<void> {
   try {
     const jobPath = path.join(JOBS_DIR, `${jobId}.json`)
     const jobDir = path.join(JOBS_DIR, jobId)
@@ -26,7 +27,7 @@ export async function saveJob(jobId: string, jobData: any): Promise<void> {
   }
 }
 
-export function getJob(jobId: string): any {
+export function getJob(jobId: string): Job {
   try {
     const jobPath = path.join(JOBS_DIR, `${jobId}.json`)
     if (!existsSync(jobPath)) {
@@ -41,7 +42,7 @@ export function getJob(jobId: string): any {
   }
 }
 
-export function getAllJobs(): any[] {
+export function getAllJobs(): Job[] {
   try {
     if (!existsSync(JOBS_DIR)) {
       return []
@@ -61,7 +62,7 @@ export function getAllJobs(): any[] {
 
 export async function deleteJob(jobId: string): Promise<void> {
   const jobPath = path.join(JOBS_DIR, `${jobId}.json`)
-  
+
   // Check if job exists
   if (!existsSync(jobPath)) {
     throw new Error(`Job ${jobId} not found`)
@@ -86,4 +87,4 @@ export async function deleteJob(jobId: string): Promise<void> {
     console.error(`Error deleting job ${jobId}:`, error)
     throw new Error(`Failed to delete job ${jobId}`)
   }
-} 
+}

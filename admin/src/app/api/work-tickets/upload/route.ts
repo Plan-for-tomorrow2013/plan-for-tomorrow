@@ -65,26 +65,19 @@ export async function POST(request: Request) {
     await fs.writeFile(filePath, fileBuffer);
 
     // Map ticketType to the expected documentId used by the client portal
-    let clientDocumentId = ticketType; // Default to ticketType
-    if (ticketType === 'custom-assessment') {
-      clientDocumentId = 'initial-assessment-report';
-    } else if (ticketType === 'complying-development-certificate') {
-      clientDocumentId = 'complying-development-certificate';
-    }
-    // 'statement-of-environmental-effects' already matches its expected ID
+    let clientDocumentId = ticketType; // All assessment types use their ticketType as the documentId
 
     // Update the ticket with detailed completed document info
     workTickets[ticketIndex] = {
-      ...ticket, // Use the fetched ticket object
-      status: 'completed', // Update status
+      ...ticket,
+      status: 'completed',
       completedDocument: {
-        documentId: clientDocumentId, // Use the mapped client-facing documentId
-        originalName: file.name, // Original filename
-        fileName: storedFileName, // Filename used for storage (based on ticketType)
+        documentId: clientDocumentId,
+        originalName: file.name,
+        fileName: storedFileName,
         uploadedAt: new Date().toISOString(),
         size: file.size,
         type: file.type,
-        // Note: 'returnedAt' will be added in the 'return' step
       }
     };
 

@@ -32,28 +32,25 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Initial Assessment</h2>
+          <h2 className="text-lg font-semibold mb-2">Pre-prepared Assessments</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Review and manage initial assessment submissions from users.
+            Review and manage pre-prepared assessments from users.
           </p>
-          <a
-            href="/admin/initial-assessment"
-            className="text-sm text-blue-500 hover:text-blue-700"
-          >
-            Go to Initial Assessment →
-          </a>
+          <Link href="/admin/pre-prepared-assessments" className="text-sm text-blue-500 hover:text-blue-700">
+            Go to Pre-prepared Assessments →
+          </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-2">Knowledge Base</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Review and manage the knowledge base.
+            Review and manage the knowledge base for Development Applications.
           </p>
           <a
-            href="/admin/knowledge-base"
+            href="/admin/kb-development-application"
             className="text-sm text-blue-500 hover:text-blue-700"
           >
-            Go to Knowledge Base →
+            Go to KB - Development Application →
           </a>
         </div>
 

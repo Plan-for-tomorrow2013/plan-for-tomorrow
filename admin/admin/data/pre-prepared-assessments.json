@@ -1,72 +1,18 @@
 [
   {
-    "id": "71563d55-3987-4027-a216-e40c715a89c1",
-    "title": "NEW SECTION",
+    "id": "5781154d-556d-437e-8623-3ccb2f245bb4",
+    "title": "TEST 1",
     "assessments": [
       {
-        "id": "bb128d6e-ba01-442a-8545-96c5a54316db",
-        "title": "NEW TITLE",
-        "content": "NEW CONTENT",
+        "id": "8804f19a-05b0-4710-aec7-dc4b7dcfb707",
+        "title": "TEST TITLE",
+        "content": "TEST CONTENT",
         "author": "Admin User",
-        "date": "2025-04-24T09:53:35.807Z",
+        "date": "2025-04-27T22:00:56.582Z",
         "file": {
-          "id": "8152b78e-b42a-42a4-9839-b152c53e34cc",
-          "originalName": "Architecture Plan - 8 First Ave Macquarie Fields_V1_CDC-280327.pdf",
-          "savedPath": "/documents/pre-prepared/Architecture Plan - 8 First Ave Macquarie Fields_V1_CDC-280327.pdf"
-        }
-      }
-    ]
-  },
-  {
-    "id": "067dac10-b6a4-4695-b424-55c5fc64eded",
-    "title": "NEW",
-    "assessments": [
-      {
-        "id": "dfbf88dc-cc14-42e5-a2a1-f6044e10237d",
-        "title": "NEW",
-        "content": "NEW",
-        "author": "Admin User",
-        "date": "2025-04-24T13:01:13.013Z",
-        "file": {
-          "id": "dee6f4da-2e2e-49f3-b2a7-a2644c364d6d",
-          "originalName": "10.7 Certificate Check.pdf",
-          "savedPath": "/documents/pre-prepared/10.7 Certificate Check.pdf"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ca774874-80f5-49fe-92fd-1ab1204020dc",
-    "title": "download",
-    "assessments": [
-      {
-        "id": "53826cd7-a26a-4bc6-896e-96620607c594",
-        "title": "download",
-        "content": "download",
-        "author": "Admin User",
-        "date": "2025-04-24T13:16:12.755Z",
-        "file": {
-          "id": "3dc0e9c7-58e4-4614-ad5b-c1c23e79ba9e",
-          "originalName": "Complying Development Certificate Check.pdf",
-          "savedPath": "/documents/pre-prepared/Complying Development Certificate Check.pdf"
-        }
-      }
-    ]
-  },
-  {
-    "id": "0fada0ff-0411-4500-88c6-32e57a5b568f",
-    "title": "file name",
-    "assessments": [
-      {
-        "id": "d41dc16f-e901-4c0e-827f-585206c7e579",
-        "title": "file name",
-        "content": "file name",
-        "author": "Admin User",
-        "date": "2025-04-24T13:25:55.100Z",
-        "file": {
-          "id": "8075e814-1937-4063-b96e-fe369ca700dd",
-          "originalName": "document.pdf",
-          "savedPath": "/documents/pre-prepared/document.pdf"
+          "id": "966825a3-bcc1-4862-81b8-fb2fe2bb066e",
+          "originalName": "10.7 Certificate Check (9).pdf",
+          "savedPath": "/documents/pre-prepared/10.7 Certificate Check (9).pdf"
         }
       }
     ]

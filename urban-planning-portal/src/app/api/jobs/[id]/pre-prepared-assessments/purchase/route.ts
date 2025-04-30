@@ -1,0 +1,63 @@
+import { NextResponse } from 'next/server'
+import { getJob, saveJob } from '@/lib/jobStorage'
+
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const jobId = params.id
+    const { assessment } = await request.json()
+
+    // Get the current job data
+    const job = getJob(jobId)
+    if (!job) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+    }
+
+    // Add the purchased assessment to the job
+    const purchasedAssessment = {
+      id: assessment.id,
+      title: assessment.title,
+      content: assessment.content,
+      purchaseDate: new Date().toISOString(),
+      file: assessment.file
+    }
+
+    // Initialize or update purchasedPrePreparedAssessments and documents in one update
+    const updatedJob = {
+      ...job,
+      purchasedPrePreparedAssessments: {
+        ...(job.purchasedPrePreparedAssessments || {}),
+        [assessment.id]: purchasedAssessment
+      },
+      // Add to documents store
+      documents: {
+        ...(job.documents || {}),
+        [`pre-prepared-${assessment.id}`]: {
+          filename: assessment.file.filename,
+          originalName: assessment.file.originalName,
+          type: assessment.file.type,
+          uploadedAt: new Date().toISOString(),
+          size: assessment.file.size,
+          savedPath: `/api/pre-prepared-assessments/${assessment.id}/download`
+        }
+      }
+    }
+
+    // Save the updated job
+    await saveJob(jobId, updatedJob)
+
+    return NextResponse.json({
+      success: true,
+      purchasedAssessment,
+      documents: updatedJob.documents
+    })
+  } catch (error) {
+    console.error('Error purchasing pre-prepared assessments:', error)
+    return NextResponse.json(
+      { error: 'Failed to purchase assessment' },
+      { status: 500 }
+    )
+  }
+}

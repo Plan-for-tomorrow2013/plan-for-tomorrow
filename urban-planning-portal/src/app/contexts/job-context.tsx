@@ -1,24 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-
-interface Job {
-  id: string
-  address: string
-  council: string
-  currentStage: string
-  coordinates?: {
-    lat: number
-    lng: number
-  }
-  createdAt: string
-  documents?: Array<{
-    id: string
-    name: string
-    type: string
-    url: string
-  }>
-}
+import { Job } from "../../../../shared/types/jobs"
 
 interface JobContextType {
   jobs: Job[]
@@ -52,21 +35,10 @@ export function JobProvider({ children }: { children: ReactNode }) {
           }
         } catch (error) {
           console.error("Error parsing saved jobs:", error)
+          // Clear invalid localStorage data
+          localStorage.removeItem("jobs")
+          localStorage.removeItem("currentJobId")
         }
-      } else {
-        // Add a default job if none exist
-        const defaultJob = {
-          id: "default-job",
-          address: "9 Viola Place, Greystanes",
-          council: "Cumberland Council",
-          currentStage: "initial-assessment",
-          createdAt: new Date().toISOString(),
-          documents: [],
-        }
-        setJobs([defaultJob])
-        setCurrentJob(defaultJob)
-        localStorage.setItem("jobs", JSON.stringify([defaultJob]))
-        localStorage.setItem("currentJobId", defaultJob.id)
       }
     }
   }, [])

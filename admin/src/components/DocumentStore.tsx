@@ -4,108 +4,94 @@ import { useState, useEffect } from "react"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { FileText, Plus, Upload, X } from "lucide-react"
-import { Document, documentService } from "../../lib/services/documentService"
+import { Document } from '@shared/types/documents'
+import { documentService } from "../../lib/services/documentService"
 
 interface DocumentStoreProps {
-  title?: string
-  description?: string
-  onDocumentSelect?: (document: Document) => void
+  documents: Document[]
+  onUpload?: (document: Document) => void
+  onDelete?: (documentId: string) => void
+  jobId: string
 }
 
-export function DocumentStore({
-  title = "Document Store",
-  description = "Your uploaded documents",
-  onDocumentSelect
-}: DocumentStoreProps) {
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [isUploading, setIsUploading] = useState(false)
-
-  useEffect(() => {
-    loadDocuments()
-  }, [])
-
-  const loadDocuments = async () => {
-    const docs = await documentService.getDocuments()
-    setDocuments(docs)
-  }
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
-
-    setIsUploading(true)
+export function DocumentStore({ documents, onUpload, onDelete, jobId }: DocumentStoreProps) {
+  const handleFileUpload = async (file: File) => {
     try {
-      const newDocument = await documentService.uploadFile(files[0])
-      setDocuments((prev: Document[]) => [...prev, newDocument])
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('metadata', JSON.stringify({
+        type: 'document',
+        jobId: jobId,
+        title: file.name,
+        category: 'REPORTS'
+      }))
+
+      const response = await fetch('/api/documents', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error('Failed to upload document')
+      const document = await response.json()
+      onUpload?.(document)
     } catch (error) {
-      console.error("Error uploading file:", error)
-    } finally {
-      setIsUploading(false)
+      console.error('Error uploading document:', error)
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (documentId: string) => {
     try {
-      await documentService.deleteDocument(id)
-      setDocuments((prev: Document[]) => prev.filter((doc: Document) => doc.id !== id))
+      const response = await fetch(`/api/documents/${documentId}?jobId=${jobId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error('Failed to delete document')
+      onDelete?.(documentId)
     } catch (error) {
-      console.error("Error deleting document:", error)
+      console.error('Error deleting document:', error)
     }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle>Documents</CardTitle>
+        <CardDescription>Upload and manage your documents</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-3">
-          {documents.map((doc: Document) => (
-            <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
-              <div className="flex items-center gap-2">
+      <CardContent>
+        <div className="space-y-4">
+          {documents.map((doc) => (
+            <div key={doc.id} className="flex items-center justify-between p-2 border rounded">
+              <div className="flex items-center space-x-2">
                 <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.name}</span>
-                <span className="text-xs text-gray-500">({(doc.size / 1024 / 1024).toFixed(2)} MB)</span>
+                <span>{doc.title}</span>
+                {doc.size && <span className="text-sm text-gray-500">({Math.round(doc.size / 1024)} KB)</span>}
               </div>
-              <div className="flex items-center gap-2">
-                {onDocumentSelect && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDocumentSelect(doc)}
-                  >
-                    Select
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(doc.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+              <button
+                onClick={() => handleDelete(doc.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           ))}
-        </div>
-        <div className="relative">
-          <input
-            type="file"
-            className="hidden"
-            id="file-upload"
-            onChange={handleFileUpload}
-            disabled={isUploading}
-          />
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => document.getElementById("file-upload")?.click()}
-            disabled={isUploading}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {isUploading ? "Uploading..." : "Add More"}
-          </Button>
+          <div className="flex items-center space-x-2">
+            <input
+              type="file"
+              className="hidden"
+              id="file-upload"
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                if (file) handleFileUpload(file)
+              }}
+            />
+            <label
+              htmlFor="file-upload"
+              className="flex items-center space-x-2 text-blue-500 hover:text-blue-700 cursor-pointer"
+            >
+              <Upload className="h-4 w-4" />
+              <span>Upload Document</span>
+            </label>
+          </div>
         </div>
       </CardContent>
     </Card>

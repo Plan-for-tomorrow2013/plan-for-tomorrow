@@ -32,28 +32,18 @@ export async function PATCH(
     // Merge updates with current job data - Generic merge
     const updatedJob = { ...currentJob, ...updates };
 
-    // If initialAssessment is part of the update, merge it deeply
-    if (updates.initialAssessment) {
-      updatedJob.initialAssessment = {
-        ...currentJob.initialAssessment,
-        ...updates.initialAssessment,
-      };
-    }
+    // Handle all assessment types consistently
+    const assessmentTypes = ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate'];
 
-    // If statementOfEnvironmentalEffects is part of the update, merge it deeply
-    if (updates.statementOfEnvironmentalEffects) {
-      updatedJob.statementOfEnvironmentalEffects = {
-        ...currentJob.statementOfEnvironmentalEffects,
-        ...updates.statementOfEnvironmentalEffects,
-      };
-    }
-
-    // If complyingDevelopmentCertificate is part of the update, merge it deeply
-    if (updates.complyingDevelopmentCertificate) {
-      updatedJob.complyingDevelopmentCertificate = {
-        ...currentJob.complyingDevelopmentCertificate,
-        ...updates.complyingDevelopmentCertificate,
-      };
+    for (const type of assessmentTypes) {
+      if (updates[type]) {
+        const update = updates[type];
+        updatedJob[type] = {
+          ...currentJob[type],
+          ...update,
+          status: update.status || currentJob[type]?.status,
+        };
+      }
     }
 
     // Write updated job data back to file

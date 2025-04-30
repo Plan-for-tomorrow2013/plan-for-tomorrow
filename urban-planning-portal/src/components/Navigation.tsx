@@ -22,60 +22,60 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "./ui/navigation-menu"
 
-const mainNav = [
+const navigationItems = [
   {
     title: "Dashboard",
-    href: "/dashboard",
-    icon: Home
+    href: "/professionals/dashboard",
+    icon: <Home className="h-6 w-6" />,
+  },
+  {
+    title: "Jobs",
+    href: "/professionals/jobs",
+    icon: <Briefcase className="h-6 w-6" />,
   },
   {
     title: "Initial Assessment",
-    href: "/initial-assessment",
-    icon: ClipboardCheck
+    href: "/professionals/initial-assessment",
+    icon: <ClipboardCheck className="h-6 w-6" />,
+  },
+  {
+    title: "Design Check",
+    href: "/professionals/design-check",
+    icon: <ClipboardCheck className="h-6 w-6" />,
   },
   {
     title: "Report Writer",
-    href: "/report-writer",
-    icon: FileText
+    href: "/professionals/report-writer",
+    icon: <FileText className="h-6 w-6" />,
   },
   {
     title: "Knowledge Base",
-    href: "/knowledge-base",
-    icon: BookOpen
+    href: "/professionals/knowledge-base",
+    icon: <BookOpen className="h-6 w-6" />,
   },
+  {
+    title: "Quotes",
+    href: "/professionals/quotes",
+    icon: <Calculator className="h-6 w-6" />,
+  },
+    {
+      title: "Help",
+      href: "/professionals/help",
+      icon: <HelpCircle className="h-6 w-6" />,
+    },
+  {
+    title: "Account",
+    href: "/professionals/account",
+    icon: <Settings className="h-6 w-6" />,
+  }
 ]
 
 const routes = [
   {
-    label: "Jobs",
-    icon: Briefcase,
-    href: "/jobs",
-  },
-  {
-    label: "Design Check",
-    icon: FileCheck,
-    href: "/design-check",
-  },
-  {
-    label: "Quotes",
-    icon: Calculator,
-    href: "/quotes",
-  },
-  {
-    label: "Account",
-    icon: Settings,
-    href: "/account",
-  },
-  {
     label: "Log Out",
     icon: LogOut,
-    href: "/logout",
-  },
-  {
-    label: "Help",
-    icon: HelpCircle,
-    href: "/help",
-  },
+    href: "/professionals/logout",
+  }
 ]
 
 export function Navigation() {
@@ -83,20 +83,20 @@ export function Navigation() {
 
   return (
     <ScrollArea className="h-full py-6">
-      <div className="space-y-4">
-        <div className="px-3 py-2">
-          <div className="space-y-1">
-            <div className="flex flex-col space-y-1">
-              {mainNav.map((route) => (
+      <div className="space-y-6">
+        <div className="px-4 py-2">
+          <div className="space-y-2">
+            <div className="flex flex-col space-y-2">
+              {navigationItems.map((route) => (
                 <div key={route.href}>
                   <Button
                     asChild
                     variant={pathname === route.href ? "secondary" : "ghost"}
-                    className="w-full justify-start"
+                    className="w-full justify-start px-4 py-3"
                   >
                     <Link href={route.href}>
-                      <route.icon className="mr-2 h-4 w-4" />
-                      {route.title}
+                      {route.icon}
+                      <span className="ml-3">{route.title}</span>
                     </Link>
                   </Button>
                 </div>
@@ -106,10 +106,10 @@ export function Navigation() {
                   <Button
                     asChild
                     variant={pathname === route.href ? "secondary" : "ghost"}
-                    className="w-full justify-start"
+                    className="w-full justify-start px-4 py-3"
                   >
                     <Link href={route.href}>
-                      <route.icon className="mr-2 h-4 w-4" />
+                      <route.icon className="mr-3 h-4 w-4" />
                       {route.label}
                     </Link>
                   </Button>

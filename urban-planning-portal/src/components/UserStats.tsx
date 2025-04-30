@@ -5,22 +5,18 @@ import { ClipboardCheck, FileCheck, FileSpreadsheet, CheckCircle } from "lucide-
 
 interface UserStatsProps {
   username: string
-  initialAssessments: number
   designChecks: number
   reportsWritten: number
   completedJobs: number
-  initialAssessmentsDiff: number
   designChecksDiff: number
   reportsWrittenDiff: number
 }
 
 export function UserStats({
   username,
-  initialAssessments,
   designChecks,
   reportsWritten,
   completedJobs,
-  initialAssessmentsDiff,
   designChecksDiff,
   reportsWrittenDiff
 }: UserStatsProps) {
@@ -29,22 +25,7 @@ export function UserStats({
       <h1 className="text-2xl font-bold flex items-center gap-2">
         Welcome, {username}
       </h1>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Initial Assessments</p>
-                <h2 className="text-3xl font-bold">{initialAssessments}</h2>
-                <p className="text-xs text-muted-foreground">
-                  {initialAssessmentsDiff > 0 ? "+" : ""}{initialAssessmentsDiff} from last month
-                </p>
-              </div>
-              <ClipboardCheck className="h-8 w-8 text-yellow-500" />
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -82,7 +63,9 @@ export function UserStats({
                 <p className="text-sm font-medium">Completed Jobs</p>
                 <h2 className="text-3xl font-bold">{completedJobs}</h2>
                 <p className="text-xs text-muted-foreground">
-                  {Math.round((completedJobs / (initialAssessments + designChecks + reportsWritten)) * 100)}% completion rate
+                  {(designChecks + reportsWritten) > 0
+                    ? `${Math.round((completedJobs / (designChecks + reportsWritten)) * 100)}% completion rate`
+                    : 'No jobs in progress'}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-yellow-500" />
@@ -92,4 +75,4 @@ export function UserStats({
       </div>
     </div>
   )
-} 
+}

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getJob } from '../../../../../../../../lib/jobStorage'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
-import { Document } from '../../../../../../../../types/documents'
+import { Document } from '@shared/types/documents'
 
 export async function POST(
   request: Request,

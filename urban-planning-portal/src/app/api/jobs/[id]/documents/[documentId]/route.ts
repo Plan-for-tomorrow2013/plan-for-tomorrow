@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getJob, saveJob } from '@/lib/jobStorage'
 import fs from 'fs/promises'
 import path from 'path'
+import { PurchasedPrePreparedAssessments } from '@/types/jobs'
 
 export async function DELETE(
   request: Request,
@@ -25,9 +26,23 @@ export async function DELETE(
 
       delete job.documents[params.documentId]
 
-      // Also remove from initial assessment if it exists
-      if (job.initialAssessment?.uploadedDocuments?.[params.documentId]) {
-        delete job.initialAssessment.uploadedDocuments[params.documentId]
+      // Clean up document references from all assessment types
+      if (job.customAssessment?.uploadedDocuments?.[params.documentId]) {
+        delete job.customAssessment.uploadedDocuments[params.documentId]
+      }
+      if (job.statementOfEnvironmentalEffects?.uploadedDocuments?.[params.documentId]) {
+        delete job.statementOfEnvironmentalEffects.uploadedDocuments[params.documentId]
+      }
+      if (job.complyingDevelopmentCertificate?.uploadedDocuments?.[params.documentId]) {
+        delete job.complyingDevelopmentCertificate.uploadedDocuments[params.documentId]
+      }
+      if (job.purchasedPrePreparedAssessments) {
+        const assessments = job.purchasedPrePreparedAssessments
+        Object.entries(assessments).forEach(([key, assessment]) => {
+          if ((assessment as PurchasedPrePreparedAssessments).file?.id === params.documentId) {
+            delete assessments[key].file
+          }
+        })
       }
 
       await saveJob(params.id, job)

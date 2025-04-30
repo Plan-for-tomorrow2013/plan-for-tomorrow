@@ -29,8 +29,8 @@ const mainNav = [
     icon: Home
   },
   {
-    title: "Initial Assessment",
-    href: "/initial-assessment",
+    title: "Pre-prepared Assessments",
+    href: "/pre-prepared-assessments",
     icon: ClipboardCheck
   },
   {

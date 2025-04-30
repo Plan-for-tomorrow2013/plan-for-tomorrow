@@ -1,11 +1,9 @@
 "use client"
 
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
-import { Plus, FileText, Download } from "lucide-react" // Added FileText and Download icons
-import { toast } from "./ui/use-toast" // Added toast for feedback
+import { Plus, FileText, Download } from "./ui/icons"
+import { toast } from "./ui/use-toast"
 import { useState } from "react"
 
 interface PrePreparedAssessments {
@@ -92,7 +90,7 @@ export function PrePreparedAssessments({ prePreparedAssessments, isAdmin = false
       });
 
     } catch (error: any) {
-      console.error('Error downloading pre-prepared assessment:', error);
+      console.error('Error downloading pre-prepared assessments:', error);
       toast({
         title: "Download Error",
         description: error.message || "An unexpected error occurred during download.",
@@ -155,7 +153,7 @@ export function PrePreparedAssessments({ prePreparedAssessments, isAdmin = false
           ))}
           {prePreparedAssessmentsState.length === 0 && !isAdmin && ( // Hide "No assessments" if admin can add
             <p className="text-sm text-muted-foreground text-center py-4">
-              No pre-prepared assessments at this time
+              No pre-prepared assessments available at this time
             </p>
           )}
         </div>

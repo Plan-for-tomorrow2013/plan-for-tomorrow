@@ -1,23 +1,30 @@
 import { Check } from 'lucide-react';
 
 interface Document {
-  id?: string;
-  status?: string;
+  id: string;
+  title: string;
+  status: 'uploaded' | 'required' | 'optional';
   uploadedFile?: {
-    originalName?: string;
+    originalName: string;
   };
 }
 
 const DocumentStatus = ({ document }: { document: Document }) => {
-  const documentName = document?.uploadedFile?.originalName || '10.7 Certificate Check.pdf';
+  const documentName = document.uploadedFile?.originalName || document.title;
 
   return (
-    <div className={`flex items-center text-sm ${document?.status === 'uploaded' ? 'text-green-600' : 'text-gray-500'}`}>
-      <Check className={`h-4 w-4 mr-2 ${document?.status === 'uploaded' ? '' : 'opacity-0'}`} />
+    <div className={`flex items-center text-sm ${
+      document.status === 'uploaded' ? 'text-green-600' :
+      document.status === 'required' ? 'text-gray-500' :
+      'text-gray-400'
+    }`}>
+      <Check className={`h-4 w-4 mr-2 ${document.status === 'uploaded' ? '' : 'opacity-0'}`} />
       <span>
-        {document?.status === 'uploaded'
-          ? `10.7 Certificate: ${documentName}`
-          : '10.7 Certificate: (Required)'}
+        {document.status === 'uploaded'
+          ? `${document.title}: ${documentName}`
+          : document.status === 'required'
+          ? `${document.title}: (Required)`
+          : `${document.title}: (Optional)`}
       </span>
     </div>
   );

@@ -29,12 +29,20 @@ export async function PATCH(
     const currentJob = JSON.parse(jobData)
     const updates = await request.json()
 
-    // Merge updates with current job data
-    const updatedJob = {
-      ...currentJob,
-      initialAssessment: {
-        ...currentJob.initialAssessment,
-        ...updates.initialAssessment
+    // Merge updates with current job data - Generic merge
+    const updatedJob = { ...currentJob, ...updates };
+
+    // Handle all assessment types consistently
+    const assessmentTypes = ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate'];
+
+    for (const type of assessmentTypes) {
+      if (updates[type]) {
+        const update = updates[type];
+        updatedJob[type] = {
+          ...currentJob[type],
+          ...update,
+          status: update.status || currentJob[type]?.status,
+        };
       }
     }
 

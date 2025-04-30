@@ -98,12 +98,12 @@ export async function POST(request: Request) {
     const ticketType = ticket.ticketType;
 
     if (ticketType === 'custom-assessment') {
-      if (!job.initialAssessment) {
-        job.initialAssessment = {};
+      if (!job.customAssessment) {
+        job.customAssessment = {};
       }
-      job.initialAssessment = {
-        ...job.initialAssessment,
-        status: 'completed', // Or keep existing status if needed, just add returnedAt? Check requirements.
+      job.customAssessment = {
+        ...job.customAssessment,
+        status: 'completed',
         returnedAt: returnTimestamp
       };
     } else if (ticketType === 'statement-of-environmental-effects') {
@@ -112,23 +112,20 @@ export async function POST(request: Request) {
       }
       job.statementOfEnvironmentalEffects = {
         ...job.statementOfEnvironmentalEffects,
-        status: 'completed', // Assuming we mark as completed upon return
+        status: 'completed',
         returnedAt: returnTimestamp
       };
     } else if (ticketType === 'complying-development-certificate') {
-      // Note: The documentId for CDC is 'complying-development-certificate'
-      // We need a field in the job JSON to store its status, e.g., 'complyingDevelopmentCertificate'
       if (!job.complyingDevelopmentCertificate) {
         job.complyingDevelopmentCertificate = {};
       }
       job.complyingDevelopmentCertificate = {
         ...job.complyingDevelopmentCertificate,
-        status: 'completed', // Assuming we mark as completed upon return
+        status: 'completed',
         returnedAt: returnTimestamp
       };
     } else {
-      // Optional: Handle unknown ticket types or log a warning
-      console.warn(`Unhandled ticket type for status update: ${ticketType}`);
+      throw new Error('Invalid ticket type');
     }
 
     // Save the updated job data back to the client's job file

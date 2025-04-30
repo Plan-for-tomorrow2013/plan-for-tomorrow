@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { readFile, writeFile, unlink } from 'fs/promises'
 import path from 'path'
-import { Document } from '../../../../../types/documents'
+import { Document } from '@shared/types/documents'
 
 const DOCUMENTS_DIR = path.join(process.cwd(), 'data', 'documents')
 

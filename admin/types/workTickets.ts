@@ -1,3 +1,5 @@
+import { Assessment } from '@shared/types/jobs'
+
 export interface WorkTicket {
   id: string
   jobId: string
@@ -11,31 +13,7 @@ export interface WorkTicket {
     uploadedAt: string
     returnedAt?: string
   }
-  customAssessment?: {
-    developmentType: string
-    additionalInfo: string
-    documents: {
-      certificateOfTitle?: { originalName?: string; filename?: string };
-      surveyPlan?: { originalName?: string; filename?: string };
-      certificate107?: { originalName?: string; filename?: string };
-    }
-  }
-  statementOfEnvironmentalEffects?: {
-    developmentType: string
-    additionalInfo: string
-    documents: {
-      certificateOfTitle?: { originalName?: string; filename?: string };
-      surveyPlan?: { originalName?: string; filename?: string };
-      certificate107?: { originalName?: string; filename?: string };
-    }
-  }
-  complyingDevelopmentCertificate?: {
-    developmentType: string
-    additionalInfo: string
-    documents: {
-      certificateOfTitle?: { originalName?: string; filename?: string };
-      surveyPlan?: { originalName?: string; filename?: string };
-      certificate107?: { originalName?: string; filename?: string };
-    }
-  }
+  customAssessment?: Assessment
+  statementOfEnvironmentalEffects?: Assessment
+  complyingDevelopmentCertificate?: Assessment
 }

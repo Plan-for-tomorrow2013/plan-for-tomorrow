@@ -36,15 +36,36 @@ async function writeWorkTickets(tickets: WorkTicket[]) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { jobId, jobAddress, ticketType, customAssessment, statementOfEnvironmentalEffects, complyingDevelopmentCertificate } = body
+    const body = await request.json();
+    // Destructure only common fields initially
+    const { jobId, jobAddress, ticketType } = body;
 
     // Validate incoming data
     if (!jobId || !jobAddress || !ticketType) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Create new work ticket
+    // Validate and extract assessment data based on ticketType
+    let assessmentData: any; // Use 'any' for simplicity or create a union type
+    let specificDataKey: string = '';
+
+    if (ticketType === 'custom-assessment' && body.customAssessment) {
+      assessmentData = body.customAssessment;
+      specificDataKey = 'customAssessment';
+    } else if (ticketType === 'statement-of-environmental-effects' && body['statement-of-environmental-effects']) {
+      assessmentData = body['statement-of-environmental-effects'];
+      specificDataKey = 'statementOfEnvironmentalEffects';
+    } else if (ticketType === 'complying-development-certificate' && body['complying-development-certificate']) {
+      assessmentData = body['complying-development-certificate'];
+      specificDataKey = 'complyingDevelopmentCertificate';
+    }
+
+    // Validate that the assessment data was found for the given type
+    if (!assessmentData || !specificDataKey) {
+       return NextResponse.json({ error: `Missing or mismatched data for ticket type: ${ticketType}` }, { status: 400 });
+    }
+
+    // Create new work ticket structure using the identified key and data
     const newTicket: WorkTicket = {
       id: uuidv4(),
       jobId,
@@ -52,28 +73,13 @@ export async function POST(request: Request) {
       ticketType,
       status: 'pending',
       createdAt: new Date().toISOString(),
-      ...(ticketType === 'custom-assessment' && {
-        customAssessment: {
-          developmentType: customAssessment?.developmentType,
-          additionalInfo: customAssessment?.additionalInfo,
-          documents: customAssessment?.documents,
-        },
-      }),
-      ...(ticketType === 'statement-of-environmental-effects' && {
-        statementOfEnvironmentalEffects: {
-          developmentType: statementOfEnvironmentalEffects?.developmentType,
-          additionalInfo: statementOfEnvironmentalEffects?.additionalInfo,
-          documents: statementOfEnvironmentalEffects?.documents,
-        },
-      }),
-      ...(ticketType === 'complying-development-certificate' && {
-        complyingDevelopmentCertificate: {
-          developmentType: complyingDevelopmentCertificate?.developmentType,
-          additionalInfo: complyingDevelopmentCertificate?.additionalInfo,
-          documents: complyingDevelopmentCertificate?.documents,
-        },
-      }),
-    }
+      // Use the identified specificDataKey to nest the data correctly
+      [specificDataKey]: {
+        developmentType: assessmentData?.developmentType,
+        additionalInfo: assessmentData?.additionalInfo,
+        documents: assessmentData?.documents,
+      },
+    };
 
     // Read existing tickets
     const tickets = await readWorkTickets()

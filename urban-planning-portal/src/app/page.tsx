@@ -18,43 +18,34 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>Pending Assessments</CardTitle>
-              <CardDescription>Initial assessments waiting for review</CardDescription>
+              <CardTitle>Design Check</CardTitle>
+              <CardDescription>Start a new design compliance check</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">5</div>
-              <Button variant="outline" className="mt-4" asChild>
-                <Link href="/initial-assessment">View All</Link>
-              </Button>
+              <Link href="/design-check">Start New Check</Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Reports in Progress</CardTitle>
-              <CardDescription>Reports currently being written</CardDescription>
+              <CardTitle>Report Writer</CardTitle>
+              <CardDescription>Generate assessment reports</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3</div>
-              <Button variant="outline" className="mt-4" asChild>
-                <Link href="/report-writer">View All</Link>
-              </Button>
+              <Link href="/report-writer">Write Report</Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Active Projects</CardTitle>
-              <CardDescription>Currently ongoing projects</CardDescription>
+              <CardTitle>Quotes</CardTitle>
+              <CardDescription>View and manage quotes</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <Button variant="outline" className="mt-4" asChild>
-                <Link href="/project-management">View All</Link>
-              </Button>
+              <Link href="/quotes">View Quotes</Link>
             </CardContent>
           </Card>
         </div>

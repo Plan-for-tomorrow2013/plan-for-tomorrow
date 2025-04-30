@@ -1,9 +1,10 @@
 import { ReactNode } from "react"
+import { Assessment, CustomAssessment, StatementOfEnvironmentalEffects, ComplyingDevelopmentCertificate, DocumentWithStatus, PrePreparedAssessment } from '@shared/types/documents'
 
 export interface DocumentVersion {
   version: number
   uploadedAt: string
-  updatedAt?: string // Added for version history
+  updatedAt?: string
   filename: string
   originalName: string
   size: number
@@ -11,11 +12,9 @@ export interface DocumentVersion {
 }
 
 export interface Document {
-  description: ReactNode
   id: string
   title: string
-  path: string // Where the document should appear in the app (e.g., '/initial-assessment/cust')
-  value?: string // Added for compatibility with assessment types
+  path: string
   type: string
   category: string
   versions: DocumentVersion[]
@@ -28,146 +27,108 @@ export interface Document {
   uploadedAt?: string
   fileName?: string
   size?: number
-}
-
-export interface InitialAssessment {
-  jobId: string
-  uploadedDocuments: Record<string, boolean>
-  selectedTab: string
-  createdAt: string
-  updatedAt: string
-  status?: 'paid' | 'completed'
-  purchasedAssessment?: {
-    id: string
-    documentId: string
-    version: number
+  description?: ReactNode
+  requiredStatus?: 'uploaded' | 'pending' | 'required'
+  uploadedFile?: {
+    filename: string
+    originalName: string
+    type: string
+    uploadedAt: string
+    size: number
+    returnedAt?: string
+    savedPath?: string
   }
 }
 
-export interface StatementOfEnvironmentalEffects {
-  jobId: string
-  uploadedDocuments: Record<string, boolean>
-  selectedTab: string
-  createdAt: string
-  updatedAt: string
-  status?: 'paid' | 'completed'
-  purchasedAssessment?: {
-    id: string
-    documentId: string
-    version: number
-  }
-}
+export type { Assessment, CustomAssessment, StatementOfEnvironmentalEffects, ComplyingDevelopmentCertificate, DocumentWithStatus, PrePreparedAssessment }
 
-export interface ComplyingDevelopmentCertificate {
-  jobId: string
-  uploadedDocuments: Record<string, boolean>
-  selectedTab: string
-  createdAt: string
-  updatedAt: string
-  status?: 'paid' | 'completed'
-  purchasedAssessment?: {
-    id: string
-    documentId: string
-    version: number
-  }
+export interface AssessmentDocument {
+  id: string
+  name: string
+  description: string
+  path: string
+  required: boolean
+  type: 'document' | 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate'
+  category: string
 }
 
 export const DOCUMENT_TYPES: Document[] = [
   {
     id: 'certificate-of-title',
     title: 'Certificate of Title',
-    category: 'LEGAL',
-    path: '/initial-assessment/required-documents',
-    required: false,
+    path: '/certificate-of-title',
     type: 'document',
+    category: 'LEGAL',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
+    required: false
   },
   {
     id: '10-7-certificate',
     title: '10.7 Certificate',
-    category: 'PLANNING',
-    path: '/initial-assessment/required-documents',
-    required: true,
+    path: '/10-7-certificate',
     type: 'document',
+    category: 'PLANNING',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
+    required: true
   },
   {
     id: 'survey-plan',
     title: 'Survey Plan',
-    category: 'TECHNICAL',
-    path: '/initial-assessment/required-documents',
-    required: false,
+    path: '/survey-plan',
     type: 'document',
+    category: 'TECHNICAL',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
+    required: false
   },
   {
-    id: 'initial-assessment-report',
-    title: 'Initial Assessment Report',
-    category: 'REPORTS',
-    path: '/initial-assessment/required-documents',
-    adminOnly: true,
+    id: 'custom-assessment',
+    title: 'Custom Assessment Report',
+    path: '/custom-assessment',
     type: 'document',
+    category: 'REPORTS',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
+    required: false
   },
   {
     id: 'statement-of-environmental-effects',
     title: 'Statement of Environmental Effects',
-    category: 'REPORTS',
-    path: '/client-portal/report-writer', // Associated with the report writer page
-    adminOnly: true, // Generated/uploaded by admin after purchase
+    path: '/statement-of-environmental-effects',
     type: 'document',
+    category: 'REPORTS',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
+    required: false
   },
   {
     id: 'complying-development-certificate',
-    title: 'Complying Development Certificate Report',
-    category: 'REPORTS',
-    path: '/client-portal/report-writer', // Associated with the report writer page
-    adminOnly: true, // Generated/uploaded by admin after purchase
+    title: 'Complying Development Certificate',
+    path: '/complying-development-certificate',
     type: 'document',
+    category: 'REPORTS',
     versions: [],
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    description: undefined
-  },
-  {
-    id: 'pre-prepared-assessments',
-    title: 'Pre-Prepared Assessments',
-    category: 'REPORTS',
-    path: '/client-portal/test', // Associated with the report writer page
-    type: 'document',
-    versions: [],
-    currentVersion: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    description: undefined
+    required: false
   }
 ]

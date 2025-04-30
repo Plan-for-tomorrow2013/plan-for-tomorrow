@@ -73,8 +73,9 @@ export async function POST(request: Request) {
       id: jobId,
       address: data.address,
       council: council,
-      currentStage: 'initial-assessment',
+      currentStage: 'design-check',
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       propertyData: {
         coordinates: data.coordinates,
         planningLayers: filteredPlanningLayers
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 
     // Construct absolute URL for redirect
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const redirectUrl = `${appUrl}/client-portal/jobs/${jobId}`;
+    const redirectUrl = `${appUrl}/professionals/jobs/${jobId}`;
 
     // Return the job ID in a JSON response
     return NextResponse.json({ jobId, redirectUrl }, { status: 200 });

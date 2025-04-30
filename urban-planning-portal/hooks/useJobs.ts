@@ -1,92 +1,47 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Job as JobType } from '@/types/jobs'
 
-export interface Job {
-  id: string
-  address: string
-  council?: string
-  currentStage?: string
-  createdAt?: string
-  initialAssessment?: {
-    status?: 'paid' | 'completed'; // Correct statuses for initial assessment
-    returnedAt?: string;
-    type?: 'custom';
-  };
-  statementOfEnvironmentalEffects?: {
-    status?: 'paid' | 'completed'; // Correct statuses for SoEE
-    returnedAt?: string;
-    type?: 'statement-of-environmental-effects';
-  };
-  complyingDevelopmentCertificate?: {
-    status?: 'paid' | 'completed'; // Correct statuses for CDC
-    returnedAt?: string;
-    type?: 'complying-development-certificate';
-  };
-  // Add top-level documents field
-  documents?: {
-    [key: string]: { // Index signature: keys are document IDs (strings)
-        filename: string;
-        originalName: string;
-        type: string;
-        uploadedAt: string;
-        size: number;
-    };
-  };
-  // Add propertyData field, making it optional
-  propertyData?: {
-    coordinates?: {
-      longitude: number;
-      latitude: number;
-    };
-    planningLayers: {
-      epiLayers: Array<{ layer: string; attributes: Record<string, any> }>;
-      protectionLayers: Array<{ layer: string; attributes: Record<string, any> }>;
-      localProvisionsLayers: Array<{ layer: string; attributes: Record<string, any> }>;
-    };
-  } | null;
-  // Add siteDetails field, making it optional
-  siteDetails?: {
-    siteAddressDetails?: string;
-    siteArea?: string;
-    currentLandUse?: string;
-    zoningInfo?: string;
-    siteConstraints?: string;
-  } | null;
+export type Job = JobType
+
+// Define the fetch function outside the hook for clarity
+const fetchJobs = async (): Promise<Job[]> => {
+  const response = await fetch('/api/jobs')
+
+  if (!response.ok) {
+    // Try to get error details from response body
+    const errorBody = await response.text();
+    console.error("Failed to fetch jobs:", response.status, errorBody);
+    throw new Error(`Failed to fetch jobs. Status: ${response.status}`)
+  }
+
+  const data = await response.json()
+
+  // Handle paginated response
+  if (data && data.data && Array.isArray(data.data)) {
+    return data.data.filter((job: Job) => job.id && job.address)
+  } else {
+    console.error("Invalid jobs data received:", data);
+    throw new Error('Invalid jobs data received')
+  }
 }
 
 export function useJobs() {
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    data: jobs = [], // Default to empty array while loading/error
+    isLoading,
+    error,
+    isError, // Use isError for boolean check
+  } = useQuery<Job[], Error>({ // Specify types for data and error
+    queryKey: ['jobs'], // Unique key for this query
+    queryFn: fetchJobs, // The function to fetch data
+    // Optional: Add configuration like staleTime, refetchInterval, etc.
+    // staleTime: 1000 * 60 * 5, // 5 minutes
+  })
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        const response = await fetch('/api/jobs')
+  // Construct the error message based on React Query's error object
+  const errorMessage = isError ? error?.message || 'Failed to fetch jobs. Please try again later.' : null;
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs')
-        }
-
-        const data = await response.json()
-
-        if (Array.isArray(data)) {
-          setJobs(data.filter((job: Job) => job.id && job.address))
-        } else {
-          throw new Error('Invalid jobs data received')
-        }
-      } catch (error) {
-        console.error('Error fetching jobs:', error)
-        setError('Failed to fetch jobs. Please try again later.')
-        setJobs([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchJobs()
-  }, [])
-
-  return { jobs, setJobs, isLoading, error }
+  // Note: setJobs is removed. Updates should be handled via mutations
+  // and query invalidation elsewhere in the application.
+  return { jobs, isLoading, error: errorMessage }
 }

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { FileText, Plus, Upload, X } from "lucide-react"
-import { Document, documentService } from "../../lib/services/documentService"
+import { FileText, Plus, Upload, X } from "./ui/icons"
+import { Document } from "../../lib/services/documentService"
+import { documentService } from "../../lib/services/documentService"
 
 interface DocumentStoreProps {
   title?: string
@@ -35,7 +36,11 @@ export function DocumentStore({
 
     setIsUploading(true)
     try {
-      const newDocument = await documentService.uploadFile(files[0])
+      const newDocument = await documentService.uploadDocument({
+        file: files[0],
+        type: 'document',
+        jobId: 'temp'
+      })
       setDocuments((prev: Document[]) => [...prev, newDocument])
     } catch (error) {
       console.error("Error uploading file:", error)
@@ -46,7 +51,7 @@ export function DocumentStore({
 
   const handleDelete = async (id: string) => {
     try {
-      await documentService.deleteDocument(id)
+      await documentService.removeDocument({ documentId: id, jobId: 'temp' })
       setDocuments((prev: Document[]) => prev.filter((doc: Document) => doc.id !== id))
     } catch (error) {
       console.error("Error deleting document:", error)
@@ -65,8 +70,8 @@ export function DocumentStore({
             <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.name}</span>
-                <span className="text-xs text-gray-500">({(doc.size / 1024 / 1024).toFixed(2)} MB)</span>
+                <span className="text-sm">{doc.title}</span>
+                <span className="text-xs text-gray-500">({(doc.size || 0 / 1024 / 1024).toFixed(2)} MB)</span>
               </div>
               <div className="flex items-center gap-2">
                 {onDocumentSelect && (

@@ -35,24 +35,12 @@ export async function POST(request: Request) {
     const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
     let documentsDir;
 
-    if (ticket.ticketType === 'custom-assessment') {
-      documentsDir = path.join(baseDocumentsDir, 'custom');
-    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
-      documentsDir = path.join(baseDocumentsDir, 'statement-of-environmental-effects');
-    } else if (ticket.ticketType === 'complying-development-certificate') {
-      documentsDir = path.join(baseDocumentsDir, 'complying-development-certificate');
-    } else {
-      throw new Error('Invalid ticket type');
-    }
-
+    // All assessment types use their ticketType as the directory name
+    documentsDir = path.join(baseDocumentsDir, ticket.ticketType);
     await fs.mkdir(documentsDir, { recursive: true })
 
-    // Generate appropriate filename based on ticket type
-    const fileName = ticket.ticketType === 'custom-assessment'
-      ? `${ticketId}-${file.name}`
-      : ticket.ticketType === 'statement-of-environmental-effects'
-        ? `${ticket.statementOfEnvironmentalEffects?.documentId}-${file.name}`
-        : `${ticket.complyingDevelopmentCertificate?.documentId}-${file.name}`;
+    // Generate consistent filename for all assessment types
+    const fileName = `${ticketId}-${file.name}`;
 
     // Save the file
     const fileBuffer = Buffer.from(await file.arrayBuffer())

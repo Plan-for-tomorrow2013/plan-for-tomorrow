@@ -37,31 +37,16 @@ export async function POST(request: Request) {
       )
     }
 
-    // Get the completed document file path based on ticket type
-    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
-    let completedDocPath
+    // Define the path to the completed document based on ticket type
+    let completedDocPath;
+    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents');
 
-    if (ticket.ticketType === 'custom-assessment') {
-      completedDocPath = path.join(
-        baseDocumentsDir,
-        'custom',
-        `${ticketId}-${ticket.completedDocument.fileName}`
-      )
-    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
-      completedDocPath = path.join(
-        baseDocumentsDir,
-        'statement-of-environmental-effects',
-        `${ticket.statementOfEnvironmentalEffects?.documentId}-${ticket.completedDocument.fileName}`
-      )
-    } else if (ticket.ticketType === 'complying-development-certificate') {
-      completedDocPath = path.join(
-        baseDocumentsDir,
-        'complying-development-certificate',
-        `${ticket.complyingDevelopmentCertificate?.documentId}-${ticket.completedDocument.fileName}`
-      )
-    } else {
-      throw new Error('Invalid ticket type')
-    }
+    // All assessment types use their ticketType as the directory name
+    completedDocPath = path.join(
+      baseDocumentsDir,
+      ticket.ticketType,
+      `${ticketId}-${ticket.completedDocument.fileName}`
+    );
 
     // Check if the completed document exists
     try {

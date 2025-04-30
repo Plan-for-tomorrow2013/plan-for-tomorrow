@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { FileText, Upload, X } from "lucide-react"
+import { FileText, Upload, X } from "./ui/icons"
 import { Document, documentService } from "../../lib/services/documentService"
 import { useToast } from "../../hooks/use-toast"
 import { ToastProvider } from "@radix-ui/react-toast"

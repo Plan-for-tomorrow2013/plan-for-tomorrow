@@ -1,32 +1,6 @@
-import { Document } from '../../src/types/documents'
-
-interface DocumentVersion {
-  version: number
-  uploadedAt: string
-  filename: string
-  originalName: string
-  size: number
-  uploadedBy: string
-}
-
-interface DocumentMetadata {
-  id: string
-  title: string
-  path: string
-  type: string
-  category: string
-  versions: DocumentVersion[]
-  currentVersion: number
-  createdAt: string
-  updatedAt: string
-  isActive: boolean
-  uploadedBy?: string
-}
+import { Document, DocumentVersion, DocumentMetadata, DocumentUpload, DocumentDownload, DocumentRemove } from '../../../shared/types/documents'
 
 class DocumentService {
-  uploadFile(file: File): Promise<Document> {
-    throw new Error("Method not implemented.")
-  }
   private static instance: DocumentService
   private documents: Map<string, DocumentMetadata> = new Map()
 
@@ -61,11 +35,15 @@ class DocumentService {
     }
   }
 
-  async uploadDocument(file: File, metadata: Partial<DocumentMetadata>): Promise<Document> {
+  async uploadDocument(upload: DocumentUpload): Promise<Document> {
     try {
       const formData = new FormData()
-      formData.append('file', file)
-      formData.append('metadata', JSON.stringify(metadata))
+      formData.append('file', upload.file)
+      formData.append('metadata', JSON.stringify({
+        type: upload.type,
+        jobId: upload.jobId,
+        ...upload.metadata
+      }))
 
       const response = await fetch('/api/documents', {
         method: 'POST',
@@ -80,34 +58,25 @@ class DocumentService {
     }
   }
 
-  async updateDocument(id: string, file: File, metadata: Partial<DocumentMetadata>): Promise<Document> {
+  async downloadDocument(download: DocumentDownload): Promise<Blob> {
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('metadata', JSON.stringify(metadata))
-
-      const response = await fetch(`/api/documents/${id}`, {
-        method: 'PUT',
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error('Failed to update document')
-      return await response.json()
+      const response = await fetch(`/api/documents/${download.documentId}/download?jobId=${download.jobId}&version=${download.version || 'latest'}`)
+      if (!response.ok) throw new Error('Failed to download document')
+      return await response.blob()
     } catch (error) {
-      console.error('Error updating document:', error)
+      console.error('Error downloading document:', error)
       throw error
     }
   }
 
-  async deleteDocument(id: string): Promise<void> {
+  async removeDocument(remove: DocumentRemove): Promise<void> {
     try {
-      const response = await fetch(`/api/documents/${id}`, {
+      const response = await fetch(`/api/documents/${remove.documentId}?jobId=${remove.jobId}`, {
         method: 'DELETE',
       })
-
-      if (!response.ok) throw new Error('Failed to delete document')
+      if (!response.ok) throw new Error('Failed to remove document')
     } catch (error) {
-      console.error('Error deleting document:', error)
+      console.error('Error removing document:', error)
       throw error
     }
   }

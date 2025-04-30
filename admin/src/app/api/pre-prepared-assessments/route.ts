@@ -130,9 +130,9 @@ export async function POST(request: Request) {
     return NextResponse.json(newAssessment, { status: 201 }); // Return 201 Created status
 
   } catch (error) {
-    console.error('Error creating pre-prepared assessment:', error);
+    console.error('Error creating pre-prepared assessments:', error);
     return NextResponse.json(
-      { error: 'Failed to create pre-prepared assessment' },
+      { error: 'Failed to create pre-prepared assessments' },
       { status: 500 }
     );
   }

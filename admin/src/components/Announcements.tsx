@@ -3,14 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
 import { Plus } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Announcement } from "@shared/types/announcements"
+import { useToast } from "./ui/use-toast"
+import dynamic from 'next/dynamic'
 
-interface Announcement {
-  id: string
-  title: string
-  content: string
-  date: string
-  author: string
-}
+// Dynamically import the rich text editor to avoid SSR issues
+const RichTextEditor = dynamic(() => import('./RichTextEditor'), { ssr: false })
 
 interface AnnouncementsProps {
   announcements: Announcement[]
@@ -18,7 +17,40 @@ interface AnnouncementsProps {
   onAddAnnouncement?: () => void
 }
 
-export function Announcements({ announcements, isAdmin = false, onAddAnnouncement }: AnnouncementsProps) {
+export function Announcements({ announcements: initialAnnouncements, isAdmin = false, onAddAnnouncement }: AnnouncementsProps) {
+  const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    // Set up WebSocket connection
+    const ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001')
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'announcement') {
+        switch (data.action) {
+          case 'created':
+            setAnnouncements(prev => [data.data, ...prev])
+            toast({
+              title: "New Announcement",
+              description: data.data.title
+            })
+            break
+          case 'updated':
+            setAnnouncements(prev => prev.map(a => a.id === data.data.id ? data.data : a))
+            break
+          case 'deleted':
+            setAnnouncements(prev => prev.filter(a => a.id !== data.data.id))
+            break
+        }
+      }
+    }
+
+    return () => {
+      ws.close()
+    }
+  }, [toast])
+
   return (
     <Card>
       <CardHeader>
@@ -40,7 +72,16 @@ export function Announcements({ announcements, isAdmin = false, onAddAnnouncemen
                 <h3 className="font-medium">{announcement.title}</h3>
                 <span className="text-sm text-muted-foreground">{announcement.date}</span>
               </div>
-              <p className="mt-1 text-sm text-muted-foreground">{announcement.content}</p>
+              {announcement.isRichText ? (
+                <div className="mt-1 prose prose-sm max-w-none">
+                  <RichTextEditor
+                    value={announcement.content}
+                    readOnly
+                  />
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-muted-foreground">{announcement.content}</p>
+              )}
               <p className="mt-2 text-xs text-muted-foreground">Posted by {announcement.author}</p>
             </div>
           ))}
@@ -53,4 +94,4 @@ export function Announcements({ announcements, isAdmin = false, onAddAnnouncemen
       </CardContent>
     </Card>
   )
-} 
+}

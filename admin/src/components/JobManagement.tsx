@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Separator } from "./ui/separator"
+import { useRouter } from "next/navigation"
 
 interface LayerInfo {
   layerId: number
@@ -34,6 +35,7 @@ function formatAttributeName(name: string): string {
 }
 
 export function JobManagement() {
+  const router = useRouter()
   const [address, setAddress] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -88,6 +90,32 @@ export function JobManagement() {
         const protectionUrl = "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer"
         const protectionResults = await fetchLayerInfo(coords, protectionUrl, "Protection", true)
         setProtectionLayersInfo(protectionResults)
+
+        // Step 4: Create a new job with the property data
+        const jobData = {
+          address,
+          coordinates: coords,
+          planningLayers: {
+            epiLayers: principalResults,
+            protectionLayers: protectionResults,
+            localProvisionsLayers: [] // We'll add this later if needed
+          }
+        }
+
+        const createJobResponse = await fetch('/api/jobs/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(jobData),
+        })
+
+        if (!createJobResponse.ok) {
+          throw new Error('Failed to create job')
+        }
+
+        const { jobId, redirectUrl } = await createJobResponse.json()
+        router.push(redirectUrl)
       }
     } catch (error) {
       console.error("Error:", error)
@@ -381,4 +409,4 @@ export function JobManagement() {
       </Card>
     </div>
   )
-} 
+}

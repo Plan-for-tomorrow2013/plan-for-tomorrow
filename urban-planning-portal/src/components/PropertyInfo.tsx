@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Define the structure of the propertyData prop
 // This interface defines the *shape* of the propertyData object
-interface PropertyDataShape {
+export interface PropertyDataShape { // Added export keyword
     coordinates?: { // Make coordinates optional
       longitude: number;
       latitude: number;

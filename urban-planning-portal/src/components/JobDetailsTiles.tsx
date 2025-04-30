@@ -3,24 +3,33 @@
 import { ClipboardCheck, FileText, BarChart3, DollarSign } from "lucide-react"
 import { cn } from "../../lib/utils"
 
-export type JobStage = "initial-assessment" | "design-check" | "report-writer" | "quotes"
+export type JobStage = "design-check" | "report-writer" | "quotes"
 
 interface JobDetailsTilesProps {
   currentStage: JobStage
   address: string
   council: string
+  className?: string
 }
 
-export function JobDetailsTiles({ currentStage, address, council }: JobDetailsTilesProps) {
-  const stages: { id: JobStage; label: string; icon: React.ComponentType; href: string }[] = [
-    { id: "initial-assessment", label: "Initial Assessment", icon: ClipboardCheck, href: "/initial-assessment" },
-    { id: "design-check", label: "Design Check", icon: BarChart3, href: "/design-check" },
+interface IconProps {
+  className?: string
+}
+
+export function JobDetailsTiles({
+  currentStage,
+  address,
+  council,
+  className
+}: JobDetailsTilesProps) {
+  const stages: { id: JobStage; label: string; icon: React.ComponentType<IconProps>; href: string }[] = [
+    { id: "design-check", label: "Design Check", icon: ClipboardCheck, href: "/design-check" },
     { id: "report-writer", label: "Report Writer", icon: FileText, href: "/report-writer" },
     { id: "quotes", label: "Quotes", icon: DollarSign, href: "/quotes" }
   ]
 
   return (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", className)}>
       <div className="flex items-center gap-2">
         <div className="flex-1">
           <h3 className="text-lg font-semibold">{address}</h3>
@@ -59,3 +68,9 @@ export function JobDetailsTiles({ currentStage, address, council }: JobDetailsTi
     </div>
   )
 }
+
+export const jobStages: { id: JobStage; label: string; icon: React.ComponentType<IconProps>; href: string }[] = [
+  { id: "design-check", label: "Design Check", icon: ClipboardCheck, href: "/design-check" },
+  { id: "report-writer", label: "Report Writer", icon: FileText, href: "/report-writer" },
+  { id: "quotes", label: "Quotes", icon: DollarSign, href: "/quotes" }
+]

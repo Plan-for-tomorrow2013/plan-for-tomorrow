@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
 import { saveJob } from '../../../../../lib/jobStorage'
+import { Job } from '@shared/types/jobs'
 
 export async function POST(request: Request) {
   try {
@@ -69,15 +70,25 @@ export async function POST(request: Request) {
     }
 
     // Create a new job with the property search data
-    const job = {
+    const job: Job = {
       id: jobId,
       address: data.address,
       council: council,
-      currentStage: 'initial-assessment',
+      currentStage: 'pre-prepared-assessments',
+      status: 'pending',
       createdAt: new Date().toISOString(),
+      documents: {},
+      purchasedPrePreparedAssessments: {},
       propertyData: {
         coordinates: data.coordinates,
         planningLayers: filteredPlanningLayers
+      },
+      siteDetails: {
+        siteAddressDetails: '',
+        siteArea: '',
+        currentLandUse: '',
+        zoningInfo: '',
+        siteConstraints: ''
       }
     }
 

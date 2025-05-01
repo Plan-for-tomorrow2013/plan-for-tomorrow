@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@shared/components/ui/card"
 import { Clock } from "lucide-react"
-import { PageHeader } from "@/components/ui/page-header"
+import { PageHeader } from "@shared/components/ui/page-header"
 
 export default function NatHERSBasixPage() {
   return (

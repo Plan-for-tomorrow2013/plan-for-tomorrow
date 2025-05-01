@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@shared/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
 import { Ruler, Upload, CheckCircle } from "lucide-react"
 
 export default function DesignCheckPage() {

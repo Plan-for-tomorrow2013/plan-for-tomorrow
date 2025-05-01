@@ -1,14 +1,19 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Button } from "../../../components/ui/button"
-import { Input } from "../../../components/ui/input"
-import { useToast } from "../../../components/ui/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Button } from "@shared/components/ui/button"
+import { Input } from "@shared/components/ui/input"
+import { useToast } from "@shared/components/ui/use-toast"
 import { Loader2, Plus, Trash2, Edit2 } from "lucide-react"
-import { PageHeader } from "../../../components/ui/page-header"
+import { PageHeader } from "@shared/components/ui/page-header"
 import { Announcement, AnnouncementResponse } from "@shared/types/announcements"
-import { RichTextEditor } from "../../../components/RichTextEditor"
+import dynamic from 'next/dynamic'
+
+const RichTextEditor = dynamic(() => import('@shared/components/RichTextEditor').then(mod => mod.RichTextEditor), {
+  ssr: false,
+  loading: () => <p className="text-sm text-muted-foreground">Loading editor...</p>
+})
 
 export default function AnnouncementsPage() {
   const { toast } = useToast()

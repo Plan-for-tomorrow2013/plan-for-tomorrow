@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Mail, Phone, Edit2, Save, X, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@shared/components/ui/button"
+import { Textarea } from "@shared/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -13,10 +13,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
+} from "@shared/components/ui/dialog"
+import { Input } from "@shared/components/ui/input"
+import { Label } from "@shared/components/ui/label"
+import { useToast } from "@shared/components/ui/use-toast"
 
 interface Consultant {
   id: string

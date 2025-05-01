@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
 import { FileText, Building2, Lightbulb, Recycle } from "lucide-react"
 
 const navItems = [

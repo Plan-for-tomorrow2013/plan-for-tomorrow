@@ -4,8 +4,8 @@ import { useState, useRef } from "react"
 import { DollarSign, ChevronLeft, ChevronRight, Trash, FileText, CheckCircle } from "lucide-react"
 import { CategoryCard } from "@/components/quotes/category-card"
 import { SearchBar } from "@/components/quotes/search-bar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card" // Added Card imports
+import { Button } from "@shared/components/ui/button"
+import { Card, CardContent, CardHeader } from "@shared/components/ui/card" // Added Card imports
 import Link from "next/link"
 
 interface CategoryCardProps {

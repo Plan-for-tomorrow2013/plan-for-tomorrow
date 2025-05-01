@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { ArrowLeft, Check, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from "@shared/components/ui/button"
 import { useRouter } from 'next/navigation'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
 import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'; // Import the new component and its data type
-import { toast } from '@/components/ui/use-toast'; // Import toast
+import { toast } from "@shared/components/ui/use-toast"; // Import toast
 
 export default function SiteDetailsPage({ params }: { params: { id: string } }) {
   const router = useRouter()

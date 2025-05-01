@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader } from '../../../../../components/ui/card
 import { ArrowLeft, Upload, FileText, X, Check } from 'lucide-react'
 import { Button } from '../../../../../components/ui/button'
 import { useRouter } from 'next/navigation'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
 import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/documents'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from "@shared/components/ui/use-toast"
 import { useJobs } from '../../../../../../hooks/useJobs'
 import type { Job } from '@/types/jobs'
 import { getReportStatus, isReportType, getReportTitle } from '@/utils/report-utils'

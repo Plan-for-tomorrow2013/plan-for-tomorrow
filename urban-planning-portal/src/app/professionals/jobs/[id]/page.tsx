@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
 import { Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, FileText, ClipboardCheck, DollarSign, FileCheck, Building2, FolderOpen } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
+import { Button } from "@shared/components/ui/button"
 import { useRouter } from 'next/navigation'
 import { Job } from '@/types/jobs'
 import { useQuery } from '@tanstack/react-query'

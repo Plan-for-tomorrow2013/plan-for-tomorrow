@@ -1,14 +1,17 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
+import "@shared/styles/globals.css"
+import { Toaster } from "@shared/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Plan For Tomorrow - Admin Portal",
-  description: "Professional portal for urban planning projects",
+  title: "Admin Portal",
+  description: "Urban Planning Professionals Admin Portal",
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

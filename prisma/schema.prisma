@@ -61,6 +61,14 @@ model Assessment {
   user          User             @relation(fields: [userId], references: [id])
 }
 
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  author    String
+  date      DateTime @default(now())
+}
+
 enum UserRole {
   USER
   ADMIN

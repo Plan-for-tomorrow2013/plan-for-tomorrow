@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card";
+import { Badge } from "@shared/components/ui/badge";
+import { Skeleton } from "@shared/components/ui/skeleton";
 import { useQuery } from '@tanstack/react-query';
 import { Job } from '@/types/jobs';
 

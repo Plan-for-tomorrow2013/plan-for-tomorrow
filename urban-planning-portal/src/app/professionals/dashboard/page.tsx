@@ -1,17 +1,17 @@
 "use client"
 
 import { useState, useEffect, useLayoutEffect } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/use-toast'
+import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
+import { Input } from "@shared/components/ui/input"
+import { Button } from "@shared/components/ui/button"
+import { useToast } from "@shared/components/ui/use-toast"
 import { Loader2 } from 'lucide-react'
 import { UserStats } from '@/components/UserStats'
 import { Announcements } from '../../../components/Announcements'
 import { useRouter } from 'next/router';
 import { useRef } from 'react';
 import router from 'next/dist/shared/lib/router/router'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
 import { useJobs } from '../../../../hooks/useJobs'
 import { Job } from "../../../../../shared/types/jobs"
 import { useQueryClient, useMutation } from '@tanstack/react-query'

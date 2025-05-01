@@ -3,28 +3,29 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download } from '@/components/ui/icons'
+import { Button } from "@shared/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@shared/components/ui/card"
+import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download } from "@shared/components/ui/icons"
 import { ShoppingCart } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
 import { useJobs } from '../../../../hooks/useJobs'
 import Link from 'next/link'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription } from "@shared/components/ui/alert"
 import { Document, DOCUMENT_TYPES } from '../../../types/documents'
 import { DocumentWithStatus } from '@shared/types/documents'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { toast } from '@/components/ui/use-toast'
+import { Input } from "@shared/components/ui/input"
+import { Textarea } from "@shared/components/ui/textarea"
+import { toast } from "@shared/components/ui/use-toast"
 import PropertyInfo from '@/components/PropertyInfo'
 import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'
 import DocumentStatus from '@/components/DocumentStatus'
 import { Job, PurchasedPrePreparedAssessments } from '../../../../../shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@/utils/report-utils'
 import type { PropertyDataShape } from '@/components/PropertyInfo'
-import { Progress } from '@/components/ui/progress'
+import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
+import { DocumentUpload } from "../../../../../shared/components/DocumentUpload"
 
 interface CustomAssessmentForm {
   developmentType: string;

@@ -1,7 +1,7 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/ui/page-header"
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { PageHeader } from "@shared/components/ui/page-header"
 import { Clock } from "lucide-react"
 
 export default function ComplyingDevelopmentPage() {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { WorkTicket } from '../../../../types/workTickets'
+import { WorkTicket } from '@shared/types/workTickets'
 
 // Helper function to get the work tickets file path
 // Points to the client portal's work tickets data

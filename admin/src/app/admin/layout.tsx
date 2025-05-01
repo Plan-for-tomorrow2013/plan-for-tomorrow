@@ -1,9 +1,9 @@
 "use client"
 
 import { Inter } from "next/font/google"
-import "@/app/globals.css"
-import { Toaster } from "@/components/ui/toaster"
-import { Navigation } from "@/components/Navigation"
+import "@shared/styles/globals.css"
+import { Toaster } from "@shared/components/ui/toaster"
+import { Navigation } from "@shared/components/Navigation"
 import { FileText, Menu, FileCheck, BellRing, ClipboardCheck, BookOpen, HomeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from "next/navigation"

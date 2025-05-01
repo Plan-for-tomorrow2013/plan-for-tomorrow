@@ -1,14 +1,14 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
+import { Button } from "@shared/components/ui/button"
 import { FileText, Clock, Upload, Bell, Loader2 } from 'lucide-react'
-import { useToast } from '@/components/ui/use-toast'
-import { cn } from '@/lib/utils'
+import { useToast } from "@shared/components/ui/use-toast"
+import { cn } from '@shared/lib/utils'
 import Link from 'next/link'
-import { WorkTicket } from 'types/workTickets'
-import { PageHeader } from '@/components/ui/page-header'
+import { WorkTicket } from '@shared/types/workTickets'
+import { PageHeader } from "@shared/components/ui/page-header"
 import { DocumentWithStatus } from '@shared/types/documents'
 
 // Helper function to get display name for ticket type

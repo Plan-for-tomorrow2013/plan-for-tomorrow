@@ -5,12 +5,34 @@ import { ArrowLeft, Check, Loader2 } from 'lucide-react'
 import { Button } from "@shared/components/ui/button"
 import { useRouter } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
-import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'; // Import the new component and its data type
+import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
 import { toast } from "@shared/components/ui/use-toast"; // Import toast
+
+// Add normalization helper
+function normalizeSiteDetails(data: any): SiteDetails {
+  return {
+    siteArea: data?.siteArea || '',
+    frontage: data?.frontage || '',
+    depth: data?.depth || '',
+    slope: data?.slope || '',
+    orientation: data?.orientation || '',
+    soilType: data?.soilType || '',
+    vegetation: data?.vegetation || '',
+    heritage: data?.heritage || '',
+    floodProne: data?.floodProne || '',
+    bushfireProne: data?.bushfireProne || '',
+    contamination: data?.contamination || '',
+    otherConstraints: data?.otherConstraints || '',
+    adjoiningNorth: data?.adjoiningNorth || '',
+    adjoiningSouth: data?.adjoiningSouth || '',
+    adjoiningEast: data?.adjoiningEast || '',
+    adjoiningWest: data?.adjoiningWest || '',
+  };
+}
 
 export default function SiteDetailsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [siteDetailsData, setSiteDetailsData] = useState<DetailedSiteDetailsData | null>(null); // State to hold the form data
+  const [siteDetailsData, setSiteDetailsData] = useState<SiteDetails | null>(null); // State to hold the form data
   const [isLoading, setIsLoading] = useState(true); // Loading state for initial fetch
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -29,11 +51,11 @@ export default function SiteDetailsPage({ params }: { params: { id: string } }) 
         }
         const jobData = await response.json();
         // Set the site details state from the job data
-        setSiteDetailsData(jobData.siteDetails || {}); // Initialize with job data or default empty object
+        setSiteDetailsData(normalizeSiteDetails(jobData.siteDetails));
       } catch (err) {
         console.error('Error fetching site details:', err);
         setError(err instanceof Error ? err.message : 'Failed to load site details');
-        setSiteDetailsData({}); // Set default empty object on error
+        setSiteDetailsData(normalizeSiteDetails({}));
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +65,7 @@ export default function SiteDetailsPage({ params }: { params: { id: string } }) 
   }, [params.id]);
 
   // Handler for when data changes in the child component
-  const handleDataChange = (newData: DetailedSiteDetailsData) => {
+  const handleDataChange = (newData: SiteDetails) => {
     setSiteDetailsData(newData);
     setHasUnsavedChanges(true);
     // Clear save status if user makes changes after a save
@@ -154,9 +176,8 @@ export default function SiteDetailsPage({ params }: { params: { id: string } }) 
          </div>
       ) : siteDetailsData ? (
         <DetailedSiteDetails
-          data={siteDetailsData}
-          onDataChange={handleDataChange}
-          // isReadOnly={false} // This page should always be editable, so isReadOnly defaults to false in the component
+          siteDetails={siteDetailsData as SiteDetails}
+          onSiteDetailsChange={handleDataChange}
         />
       ) : (
          // Show error if loading finished but data is still null (and no specific load error was set)

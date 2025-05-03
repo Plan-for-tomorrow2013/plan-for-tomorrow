@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert"
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Input } from "@shared/components/ui/input"
+import { Button } from "@shared/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@shared/components/ui/table"
+import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
 import { AlertCircle, Loader2 } from "lucide-react"
-import { Separator } from "./ui/separator"
+import { Separator } from "@shared/components/ui/separator"
 
 interface LayerInfo {
   layerId: number
@@ -381,4 +381,4 @@ export function JobManagement() {
       </Card>
     </div>
   )
-} 
+}

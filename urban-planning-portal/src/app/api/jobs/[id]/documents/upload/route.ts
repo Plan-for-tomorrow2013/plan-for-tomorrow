@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
-import { getJob, saveJob } from '@/lib/jobStorage'
+import { getJob, saveJob } from '@shared/services/jobStorage'
 import { existsSync } from 'fs'
 
 // Configure upload directory and limits
@@ -14,11 +14,11 @@ export async function POST(
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
-    const documentId = formData.get('documentId') as string
+    const documentId = formData.get('docId') as string
 
     if (!file || !documentId) {
       return NextResponse.json(
-        { error: 'File and document ID are required' },
+        { success: false, error: 'File and document ID are required' },
         { status: 400 }
       )
     }
@@ -26,7 +26,7 @@ export async function POST(
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: 'File size exceeds the maximum limit of 20MB' },
+        { success: false, error: 'File size exceeds the maximum limit of 20MB' },
         { status: 400 }
       )
     }
@@ -35,14 +35,13 @@ export async function POST(
     const job = await getJob(params.id)
     if (!job) {
       return NextResponse.json(
-        { error: 'Job not found' },
+        { success: false, error: 'Job not found' },
         { status: 404 }
       )
     }
 
     // Create job documents directory if it doesn't exist
-    const jobDir = join(process.cwd(), 'data', 'jobs', params.id)
-    const documentsDir = join(jobDir, 'documents')
+    const documentsDir = join(process.cwd(), 'data', 'jobs', params.id, 'documents')
     if (!existsSync(documentsDir)) {
       await mkdir(documentsDir, { recursive: true })
     }
@@ -58,7 +57,7 @@ export async function POST(
     } catch (writeError) {
       console.error('Error writing file:', writeError)
       return NextResponse.json(
-        { error: 'Failed to save file to disk' },
+        { success: false, error: 'Failed to save file to disk' },
         { status: 500 }
       )
     }
@@ -73,12 +72,16 @@ export async function POST(
       size: file.size
     }
 
-    const updatedJob = {
-      ...job,
-      documents
+    // Save the updated job
+    try {
+      await saveJob(params.id, job)
+    } catch (saveError) {
+      console.error('Error saving job:', saveError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to update job data' },
+        { status: 500 }
+      )
     }
-
-    await saveJob(params.id, updatedJob)
 
     return NextResponse.json({
       success: true,
@@ -87,7 +90,10 @@ export async function POST(
   } catch (error) {
     console.error('Error handling document upload:', error)
     return NextResponse.json(
-      { error: 'Failed to upload document: ' + (error instanceof Error ? error.message : 'Unknown error') },
+      {
+        success: false,
+        error: 'Failed to upload document: ' + (error instanceof Error ? error.message : 'Unknown error')
+      },
       { status: 500 }
     )
   }

@@ -1,4 +1,4 @@
-import { Job } from '@/types/jobs'
+import { Job } from '@shared/types/jobs'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Assessment } from '@shared/types/jobs'
 

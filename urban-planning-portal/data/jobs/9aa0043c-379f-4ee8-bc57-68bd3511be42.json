@@ -1,0 +1,142 @@
+{
+  "id": "9aa0043c-379f-4ee8-bc57-68bd3511be42",
+  "address": "99 Nelson Street, Fairfield Heights",
+  "council": "Fairfield",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-03T00:39:23.117Z",
+  "updatedAt": "2025-05-03T00:39:23.117Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.945116677762,
+      "latitude": -33.86901587428
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "861",
+            "EPI Name": "Fairfield Local Environmental Plan 2013",
+            "LGA Name": "FAIRFIELD",
+            "Published Date": "9/4/2020",
+            "Commenced Date": "9/4/2020",
+            "Currency Date": "9/4/2020",
+            "Amendment": "Amendment No 33",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Clause 1.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio Additional Controls",
+          "attributes": {
+            "Legislative Area": "Area B",
+            "Legislative Clause": "Clause 4.4"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "0.65"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "Floor Space Ratio": "Null"
+          }
+        },
+        {
+          "layer": "Height of Building Additional Controls",
+          "attributes": {
+            "OBJECTID": "331453",
+            "EPI Name": "Fairfield Local Environmental Plan 2013",
+            "LGA Name": "FAIRFIELD",
+            "Published Date": "5/24/2024",
+            "Commenced Date": "5/24/2024",
+            "Currency Date": "1/10/2025",
+            "Amendment": "Amendment No 45",
+            "Legislative Area": "Area A",
+            "Legislative Clause": "Clause 4.3",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "Shape": "Polygon",
+            "MAX_B_H_M": "Null",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "9",
+            "Units": "m"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "Maximum Building Height": "Null",
+            "Units": "NA"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "777667",
+            "EPI Name": "Fairfield Local Environmental Plan 2013",
+            "LGA Name": "FAIRFIELD",
+            "Published Date": "4/28/2023",
+            "Commenced Date": "4/28/2023",
+            "Currency Date": "1/10/2025",
+            "Amendment": "Map Amendment No 5",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Medium Density Residential",
+            "Zone": "R3",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746232771991_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-03T00:39:31.994Z",
+      "size": 4136746
+    }
+  }
+}

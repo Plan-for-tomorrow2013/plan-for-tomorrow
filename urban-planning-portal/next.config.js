@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
@@ -21,6 +23,12 @@ const nextConfig = {
         },
       ],
     });
+
+    // Add path alias for shared directory
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@shared': path.resolve(__dirname, '../shared'),
+    };
 
     // Enable bundle analyzer in development
     if (process.env.ANALYZE === 'true') {

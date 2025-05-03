@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { geocodeAddress } from '../../../../lib/geocoding-service'
+import { geocodeAddress } from '@shared/services/geocodingService'
 
 interface LayerResult {
   layerId: number

@@ -1,21 +1,55 @@
 import { NextResponse } from 'next/server'
-import { getJob, deleteJob, saveJob } from '@/lib/jobStorage'
+import { getJob, deleteJob, saveJob } from '@shared/services/jobStorage'
 import { promises as fs } from 'fs'
+import { getJobPath } from '@shared/utils/paths'
+import { readFile, writeFile, mkdir } from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
+import { Job } from '@shared/types/jobs'
+
+const JOBS_DIR = path.join(process.cwd(), 'data', 'jobs')
+
+// Ensure jobs directory exists
+async function ensureDirectoryExists() {
+  if (!existsSync(JOBS_DIR)) {
+    await mkdir(JOBS_DIR, { recursive: true })
+  }
+}
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const jobPath = path.join(process.cwd(), 'data', 'jobs', `${params.id}.json`)
-    const jobData = await fs.readFile(jobPath, 'utf8')
+    await ensureDirectoryExists()
+    const jobPath = path.join(JOBS_DIR, `${params.id}.json`)
+
+    if (!existsSync(jobPath)) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+    }
+
+    const jobData = await readFile(jobPath, 'utf-8')
     return NextResponse.json(JSON.parse(jobData))
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch job data' },
-      { status: 500 }
-    )
+    console.error('Error getting job:', error)
+    return NextResponse.json({ error: 'Failed to get job' }, { status: 500 })
+  }
+}
+
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await ensureDirectoryExists()
+    const jobPath = path.join(JOBS_DIR, `${params.id}.json`)
+    const jobData = await request.json()
+
+    await writeFile(jobPath, JSON.stringify(jobData, null, 2))
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error saving job:', error)
+    return NextResponse.json({ error: 'Failed to save job' }, { status: 500 })
   }
 }
 
@@ -24,7 +58,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const jobPath = path.join(process.cwd(), 'data', 'jobs', `${params.id}.json`)
+    const jobPath = getJobPath(params.id)
     const jobData = await fs.readFile(jobPath, 'utf8')
     const currentJob = JSON.parse(jobData)
     const updates = await request.json()

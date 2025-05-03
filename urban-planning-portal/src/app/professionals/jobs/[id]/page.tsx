@@ -6,9 +6,9 @@ import { Loader2, ChevronDown, ChevronUp, CheckCircle2, Check, FileText, Clipboa
 import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
 import { Button } from "@shared/components/ui/button"
 import { useRouter } from 'next/navigation'
-import { Job } from '@/types/jobs'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import type { Job } from '@shared/types/jobs'
 
 interface Props {
   params: {
@@ -100,12 +100,12 @@ export default function JobPage({ params }: Props) {
     }
 
     // Special handling for Protection Layers
-    if (job?.propertyData?.planningLayers?.protectionLayers?.some(layer => layer.layer === layerName)) {
+    if (job?.propertyData?.planningLayers?.protectionLayers?.some((layer: { layer: string }) => layer.layer === layerName)) {
       return renderRow("Class", attributes["Class"])
     }
 
     // Special handling for Local Provisions
-    if (job?.propertyData?.planningLayers?.localProvisionsLayers?.some(layer => layer.layer === layerName) &&
+    if (job?.propertyData?.planningLayers?.localProvisionsLayers?.some((layer: { layer: string }) => layer.layer === layerName) &&
         layerName !== "Additional Permitted Uses") {
       return (
         <div className="space-y-3">

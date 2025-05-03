@@ -1,9 +1,11 @@
 {
-  "id": "bc5a9432-8b6b-4774-b0de-726c38af9c00",
+  "id": "142eb9ad-84f7-40ba-8021-34c1d7f5db3f",
   "address": "9 Viola Place, Greystanes",
   "council": "Cumberland",
-  "currentStage": "initial-assessment",
-  "createdAt": "2025-04-27T20:39:08.605Z",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-02T22:38:37.197Z",
+  "updatedAt": "2025-05-02T22:38:37.197Z",
   "propertyData": {
     "coordinates": {
       "longitude": 150.937614203867,
@@ -116,6 +118,29 @@
           }
         }
       ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746229063588_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-02T23:37:43.593Z",
+      "size": 4136746
+    },
+    "certificate-of-title": {
+      "filename": "certificate-of-title_1746229077341_Complying Development Certificate Check.pdf",
+      "originalName": "Complying Development Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-02T23:37:57.345Z",
+      "size": 4136746
+    },
+    "survey-plan": {
+      "filename": "survey-plan_1746229082553_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-02T23:38:02.560Z",
+      "size": 4136746
     }
   }
 }

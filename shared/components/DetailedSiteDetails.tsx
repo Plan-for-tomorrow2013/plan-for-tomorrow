@@ -20,6 +20,10 @@ export interface SiteDetails {
   bushfireProne: string
   contamination: string
   otherConstraints: string
+  adjoiningNorth: string
+  adjoiningSouth: string
+  adjoiningEast: string
+  adjoiningWest: string
 }
 
 interface DetailedSiteDetailsProps {
@@ -233,6 +237,51 @@ export function DetailedSiteDetails({
           />
         </div>
       </CardContent>
+      <Card className="shadow-sm border border-gray-200 mt-6">
+        <CardHeader className="bg-gray-100 border-b border-gray-200">
+          <h3 className="text-md font-semibold text-gray-700">Adjoining Sites</h3>
+        </CardHeader>
+        <CardContent className="p-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="adjoiningNorth">Adjoining North</Label>
+              <Input
+                id="adjoiningNorth"
+                value={siteDetails.adjoiningNorth}
+                onChange={(e) => handleChange('adjoiningNorth', e.target.value)}
+                readOnly={readOnly}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="adjoiningSouth">Adjoining South</Label>
+              <Input
+                id="adjoiningSouth"
+                value={siteDetails.adjoiningSouth}
+                onChange={(e) => handleChange('adjoiningSouth', e.target.value)}
+                readOnly={readOnly}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="adjoiningEast">Adjoining East</Label>
+              <Input
+                id="adjoiningEast"
+                value={siteDetails.adjoiningEast}
+                onChange={(e) => handleChange('adjoiningEast', e.target.value)}
+                readOnly={readOnly}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="adjoiningWest">Adjoining West</Label>
+              <Input
+                id="adjoiningWest"
+                value={siteDetails.adjoiningWest}
+                onChange={(e) => handleChange('adjoiningWest', e.target.value)}
+                readOnly={readOnly}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </Card>
   )
 }

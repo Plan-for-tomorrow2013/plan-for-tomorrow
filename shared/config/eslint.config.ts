@@ -1,6 +1,6 @@
 import type { Linter } from 'eslint'
 
-const baseConfig: Linter.Config = {
+const baseConfig = {
   extends: [
     'next/core-web-vitals',
     'plugin:@typescript-eslint/recommended',
@@ -20,6 +20,6 @@ const baseConfig: Linter.Config = {
     '*.config.js',
     '*.config.ts',
   ],
-}
+} as unknown as Linter.Config
 
 export default baseConfig

@@ -1,27 +1,28 @@
 {
-  "id": "1f511bef-f9a3-498c-9f2d-c3ebc4ccd5a4",
-  "address": "9 Viola Place, Greystanes",
-  "council": "Cumberland",
+  "id": "f8331c88-7d28-4652-a1cb-28fa8f6b70ac",
+  "address": "24 Parsonage Road, Castle Hill",
+  "council": "The Hills",
   "currentStage": "design-check",
-  "createdAt": "2025-04-30T10:32:34.563Z",
-  "updatedAt": "2025-04-30T10:32:34.563Z",
+  "status": "pending",
+  "createdAt": "2025-05-03T00:42:13.515Z",
+  "updatedAt": "2025-05-03T00:42:13.515Z",
   "propertyData": {
     "coordinates": {
-      "longitude": 150.937614203867,
-      "latitude": -33.834153108222
+      "longitude": 150.99860889418,
+      "latitude": -33.73644316743
     },
     "planningLayers": {
       "epiLayers": [
         {
           "layer": "Local Environmental Plan",
           "attributes": {
-            "OBJECTID": "268194",
-            "EPI Name": "Cumberland Local Environmental Plan 2021",
-            "LGA Name": "CUMBERLAND",
-            "Published Date": "10/18/2024",
-            "Commenced Date": "10/18/2024",
-            "Currency Date": "10/18/2024",
-            "Amendment": "Map Amendment No 4",
+            "OBJECTID": "121491",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "12/6/2019",
+            "Commenced Date": "12/6/2019",
+            "Currency Date": "12/6/2019",
+            "Amendment": "Null",
             "Layer Class": "Included",
             "Legislative Area": "Null",
             "Legislative Clause": "Null",
@@ -40,16 +41,16 @@
         {
           "layer": "Land Zoning",
           "attributes": {
-            "OBJECTID": "734421",
-            "EPI Name": "Cumberland Local Environmental Plan 2021",
-            "LGA Name": "CUMBERLAND",
-            "Published Date": "2/24/2023",
-            "Commenced Date": "4/26/2023",
-            "Currency Date": "10/18/2024",
-            "Amendment": "State Environmental Planning Policy Amendment (Land Use Zones) 2023",
+            "OBJECTID": "535715",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "7/16/2021",
+            "Commenced Date": "7/16/2021",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Amendment No 20",
             "MAP_NAME": "Land Zoning Map",
-            "Land Use": "Low Density Residential",
-            "Zone": "R2",
+            "Land Use": "Medium Density Residential",
+            "Zone": "R3",
             "Purpose": "Null",
             "Additional Controls": "Null",
             "EPI Type": "Local Environment Plan",
@@ -59,40 +60,24 @@
         {
           "layer": "Minimum Lot Size",
           "attributes": {
-            "OBJECTID": "456080",
-            "EPI Name": "Cumberland Local Environmental Plan 2021",
-            "LGA Name": "CUMBERLAND",
-            "Published Date": "10/18/2024",
-            "Commenced Date": "10/18/2024",
-            "Currency Date": "10/18/2024",
-            "Amendment": "Map Amendment No 4",
-            "Layer Class": "450-474",
-            "Lot Size": "450",
+            "OBJECTID": "291925",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "8/11/2023",
+            "Commenced Date": "8/11/2023",
+            "Currency Date": "8/11/2023",
+            "Amendment": "Map Amendment No 2",
+            "Layer Class": "700-749",
+            "Lot Size": "700",
             "Units": "m²",
             "Additional Controls": "Null",
-            "Legislative Clause": "Clause 4.1",
+            "Legislative Clause": "Null",
             "EPI Type": "Local Environment Plan",
             "SHAPE": "Polygon"
           }
         }
       ],
-      "protectionLayers": [
-        {
-          "layer": "Salinity",
-          "attributes": {
-            "OBJECTID": "24681",
-            "EPI Name": "Cumberland Local Environmental Plan 2021",
-            "LGA Name": "CUMBERLAND",
-            "Published Date": "10/18/2024",
-            "Commenced Date": "10/18/2024",
-            "Currency Date": "10/18/2024",
-            "Amendment": "Map Amendment No 4",
-            "Class": "Potential Moderate Salinity Land",
-            "EPI Type": "Local Environment Plan",
-            "SHAPE": "Polygon"
-          }
-        }
-      ],
+      "protectionLayers": [],
       "localProvisionsLayers": [
         {
           "layer": "Local Provisions",
@@ -118,5 +103,23 @@
         }
       ]
     }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746232992388_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-03T00:43:12.392Z",
+      "size": 4136746
+    }
+  },
+  "customAssessment": {
+    "uploadedDocuments": {}
+  },
+  "statementOfEnvironmentalEffects": {
+    "uploadedDocuments": {}
+  },
+  "complyingDevelopmentCertificate": {
+    "uploadedDocuments": {}
   }
 }

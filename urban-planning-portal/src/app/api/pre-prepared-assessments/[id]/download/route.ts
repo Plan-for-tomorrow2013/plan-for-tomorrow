@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllJobs } from '@/lib/jobStorage'
+import { getAllJobs } from '@shared/services/jobStorage'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'

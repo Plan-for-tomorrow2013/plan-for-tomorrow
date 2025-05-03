@@ -1,35 +1,34 @@
 import { NextResponse } from 'next/server'
-import { writeFile, readFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir, readFile, unlink } from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { Document, DocumentVersion } from '@/types/documents'
+import { Document, DocumentVersion } from '@shared/types/documents'
+import { getDocumentsPath, getDocumentsMetadataPath, getDocumentPath, MAX_FILE_SIZE } from '@shared/utils/paths'
 
-const DOCUMENTS_DIR = path.join(process.cwd(), 'data', 'documents')
-
+// Ensure documents directory exists
 async function ensureDirectoryExists() {
-  try {
-    await mkdir(DOCUMENTS_DIR, { recursive: true })
-  } catch (error) {
-    console.error('Error creating directory:', error)
-    throw error
+  const documentsDir = getDocumentsPath()
+  if (!existsSync(documentsDir)) {
+    await mkdir(documentsDir, { recursive: true })
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await ensureDirectoryExists()
-    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json')
+    const metadataPath = getDocumentsMetadataPath()
 
     try {
-      const documents = await readFile(metadataPath, 'utf-8')
-      return NextResponse.json(JSON.parse(documents))
+      const metadata = await readFile(metadataPath, 'utf-8')
+      const documents = JSON.parse(metadata)
+      return NextResponse.json(documents)
     } catch (error) {
-      // If metadata.json doesn't exist, return empty array
       return NextResponse.json([])
     }
   } catch (error) {
-    console.error('Error fetching documents:', error)
-    return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 })
+    console.error('Error getting documents:', error)
+    return NextResponse.json({ error: 'Failed to get documents' }, { status: 500 })
   }
 }
 
@@ -44,10 +43,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'File size exceeds 20MB limit' }, { status: 400 })
+    }
+
     const documentId = uuidv4()
     const version = 1
-    const filename = `${documentId}-v${version}${path.extname(file.name)}`
-    const filePath = path.join(DOCUMENTS_DIR, filename)
+    const extension = path.extname(file.name)
+    const filePath = getDocumentPath(documentId, version, extension)
 
     // Save the file
     const buffer = Buffer.from(await file.arrayBuffer())
@@ -57,16 +60,17 @@ export async function POST(request: Request) {
     const documentVersion: DocumentVersion = {
       version,
       uploadedAt: new Date().toISOString(),
-      filename,
+      filename: path.basename(filePath),
       originalName: file.name,
       size: file.size,
+      type: file.type,
       uploadedBy: metadata.uploadedBy || 'system'
     }
 
-    // Create document metadata
+    // Create document
     const document: Document = {
       id: documentId,
-      title: metadata.title,
+      title: metadata.title || file.name,
       path: metadata.path || '',
       type: metadata.type || 'document',
       category: metadata.category || 'general',
@@ -75,19 +79,20 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
-      value: metadata.path || '',
-      description: undefined
+      metadata: {
+        jobId: metadata.jobId,
+        ...metadata
+      }
     }
 
     // Save metadata
-    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json')
+    const metadataPath = getDocumentsMetadataPath()
     try {
       const existingMetadata = await readFile(metadataPath, 'utf-8')
       const documents = JSON.parse(existingMetadata)
       documents.push(document)
       await writeFile(metadataPath, JSON.stringify(documents, null, 2))
     } catch (error) {
-      // If metadata.json doesn't exist, create it with the first document
       await writeFile(metadataPath, JSON.stringify([document], null, 2))
     }
 
@@ -95,5 +100,40 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error uploading document:', error)
     return NextResponse.json({ error: 'Failed to upload document' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const documentId = searchParams.get('documentId')
+    const jobId = searchParams.get('jobId')
+
+    if (!documentId) {
+      return NextResponse.json({ error: 'Document ID is required' }, { status: 400 })
+    }
+
+    const metadataPath = getDocumentsMetadataPath()
+    const metadata = await readFile(metadataPath, 'utf-8')
+    const documents = JSON.parse(metadata)
+
+    const document = documents.find((doc: Document) => doc.id === documentId)
+    if (!document) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+    }
+
+    // Remove file
+    const currentVersion = document.versions[document.currentVersion - 1]
+    const filePath = getDocumentPath(documentId, currentVersion.version, path.extname(currentVersion.filename))
+    await unlink(filePath)
+
+    // Update metadata
+    const updatedDocuments = documents.filter((doc: Document) => doc.id !== documentId)
+    await writeFile(metadataPath, JSON.stringify(updatedDocuments, null, 2))
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting document:', error)
+    return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 })
   }
 }

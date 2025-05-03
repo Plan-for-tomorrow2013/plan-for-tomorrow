@@ -1,0 +1,163 @@
+{
+  "id": "9dd45988-2d77-48aa-a0dd-8eb477542515",
+  "address": "53 Leamington Road, Telopea",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-03T00:54:56.611Z",
+  "updatedAt": "2025-05-03T00:54:56.611Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.038317322283,
+      "latitude": -33.796985821704
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "247867",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "3/3/2023",
+            "Amendment": "Null",
+            "Layer Class": "INCLUDED",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "OBJECTID": "265103",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "4/17/2025",
+            "Commenced Date": "4/17/2025",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Map Amendment No 8",
+            "Layer Class": "0.5-0.54",
+            "Floor Space Ratio": "0.5",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "305140",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Null",
+            "Maximum Building Height": "9",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "9",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "714288",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Null",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "380810",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Null",
+            "Layer Class": "550-574",
+            "Lot Size": "550",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "28648",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "3/3/2023",
+            "Amendment": "Null",
+            "Class": "Class 5",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {},
+  "customAssessment": {
+    "uploadedDocuments": {}
+  },
+  "statementOfEnvironmentalEffects": {
+    "uploadedDocuments": {}
+  },
+  "complyingDevelopmentCertificate": {
+    "uploadedDocuments": {}
+  }
+}

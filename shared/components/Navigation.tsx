@@ -40,11 +40,11 @@ export function Navigation({ role, className }: NavigationProps) {
       href: `${prefix}/dashboard`,
       icon: Home
     },
-    ...(role === 'admin' ? [{
-      title: "Pre-prepared Assessments",
-      href: `${prefix}/pre-prepared-assessments`,
+    {
+      title: "Initial Assessment",
+      href: `${prefix}/initial-assessment`,
       icon: ClipboardCheck
-    }] : []),
+    },
     {
       title: "Report Writer",
       href: `${prefix}/report-writer`,

@@ -15,15 +15,15 @@ import { DocumentWithStatus } from '@shared/types/documents'
 const getTicketTypeDisplayName = (type: string): string => {
   switch (type) {
     case 'custom-assessment':
-      return 'Custom Assessment';
+      return 'Custom Assessment'
     case 'statement-of-environmental-effects':
-      return 'Statement of Environmental Effects';
+      return 'Statement of Environmental Effects'
     case 'complying-development-certificate':
-      return 'Complying Development Certificate';
+      return 'Complying Development Certificate'
     default:
-      return type;
+      return type
   }
-};
+}
 
 // Create a new DocumentRenderer component
 function DocumentRenderer({ doc, jobId }: { doc: DocumentWithStatus, jobId: string }) {
@@ -126,8 +126,6 @@ export default function WorkTicketsPage() {
 
   const handleReturnDocument = async (ticketId: string) => {
     try {
-      console.log('Starting document return for ticket:', ticketId)
-
       const response = await fetch('/api/work-tickets/return', {
         method: 'POST',
         headers: {
@@ -136,23 +134,19 @@ export default function WorkTicketsPage() {
         body: JSON.stringify({ ticketId }),
       })
 
-      const result = await response.json()
-      console.log('Received response:', result)
-
       if (!response.ok) {
-        console.log('Response not ok:', response.status)
+        const result = await response.json()
         throw new Error(result.error || 'Failed to return document')
       }
 
-      console.log('Updating tickets with result:', result)
+      const result = await response.json()
       setTickets(tickets.map(ticket =>
-        ticket.id === ticketId ? result.ticket : ticket
+        ticket.id === ticketId ? result : ticket
       ))
 
-      console.log('Showing success toast with message:', result.message)
       toast({
         title: 'Success',
-        description: result.message || 'The assessment document has been added to the document store.'
+        description: 'The document has been returned successfully.'
       })
     } catch (error) {
       console.error('Error returning document:', error)

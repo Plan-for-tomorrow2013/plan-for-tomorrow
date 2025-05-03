@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
-import path from 'path'
+import { getWorkTicketsPath, getJobPath, getDocumentsMetadataPath } from '@shared/utils/paths'
 
 export async function POST(request: Request) {
   try {
@@ -13,17 +13,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Read the work tickets file from the client portal's data
-    const workTicketsPath = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'work-tickets.json')
+    // Read work tickets
+    const workTicketsPath = getWorkTicketsPath()
     let workTickets = []
     try {
-        const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
-        workTickets = JSON.parse(workTicketsData)
+      const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
+      workTickets = JSON.parse(workTicketsData)
     } catch (readError) {
-        if ((readError as NodeJS.ErrnoException).code === 'ENOENT') {
-            return NextResponse.json({ error: 'Work tickets file not found.' }, { status: 404 });
-        }
-        throw readError;
+      if ((readError as NodeJS.ErrnoException).code === 'ENOENT') {
+        return NextResponse.json({ error: 'Work tickets file not found.' }, { status: 404 })
+      }
+      throw readError
     }
 
     // Find the ticket to update
@@ -47,99 +47,43 @@ export async function POST(request: Request) {
 
     // Ensure the ticket has a jobId
     if (!ticket.jobId) {
-        console.error(`Ticket ${ticketId} is missing jobId.`);
-        return NextResponse.json({ error: 'Ticket is missing associated Job ID.' }, { status: 400 });
+      console.error(`Ticket ${ticketId} is missing jobId.`)
+      return NextResponse.json({ error: 'Ticket is missing associated Job ID.' }, { status: 400 })
     }
 
-    // Construct the path to the client's job data file
-    const jobPath = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'jobs', `${ticket.jobId}.json`)
+    // Read job data
+    const jobPath = getJobPath(ticket.jobId)
     let job
     try {
       const jobData = await fs.readFile(jobPath, 'utf-8')
       job = JSON.parse(jobData)
-    } catch (error) {
-      console.error('Error reading job file:', error)
-      return NextResponse.json(
-        { error: 'Associated job not found' },
-        { status: 404 }
-      )
-    }
-
-    // --- File copy logic removed, as the file is already in the correct location ---
-    // The 'upload' step now places the file directly in:
-    // urban-planning-portal/data/jobs/[jobId]/documents/initial-assessment-report.[ext]
-
-    // Use the details stored in the work ticket's completedDocument field
-    const completedDocumentInfo = ticket.completedDocument;
-
-    // Initialize documents object if it doesn't exist
-    if (!job.documents) {
-      job.documents = {}
-    }
-
-    // Add/Update the document reference in the job's documents object
-    // Use the documentId stored in the completedDocument info (e.g., 'statement-of-environmental-effects')
-    const documentId = completedDocumentInfo.documentId;
-    if (!documentId) {
-        console.error(`Ticket ${ticketId} completed document is missing documentId.`);
-        return NextResponse.json({ error: 'Completed document information is incomplete.' }, { status: 400 });
-    }
-
-    job.documents[documentId] = {
-      filename: completedDocumentInfo.fileName, // The stored filename (e.g., statement-of-environmental-effects.pdf)
-      originalName: completedDocumentInfo.originalName,
-      type: completedDocumentInfo.type,
-      uploadedAt: completedDocumentInfo.uploadedAt, // Use the upload timestamp from the ticket
-      size: completedDocumentInfo.size
-    }
-
-    // Update the correct status field in the job based on the ticket type
-    const returnTimestamp = new Date().toISOString();
-    const ticketType = ticket.ticketType;
-
-    if (ticketType === 'custom-assessment') {
-      if (!job.customAssessment) {
-        job.customAssessment = {};
+    } catch (readError) {
+      if ((readError as NodeJS.ErrnoException).code === 'ENOENT') {
+        return NextResponse.json({ error: 'Job file not found.' }, { status: 404 })
       }
-      job.customAssessment = {
-        ...job.customAssessment,
-        status: 'completed',
-        returnedAt: returnTimestamp
-      };
-    } else if (ticketType === 'statement-of-environmental-effects') {
-      if (!job.statementOfEnvironmentalEffects) {
-        job.statementOfEnvironmentalEffects = {};
-      }
-      job.statementOfEnvironmentalEffects = {
-        ...job.statementOfEnvironmentalEffects,
-        status: 'completed',
-        returnedAt: returnTimestamp
-      };
-    } else if (ticketType === 'complying-development-certificate') {
-      if (!job.complyingDevelopmentCertificate) {
-        job.complyingDevelopmentCertificate = {};
-      }
-      job.complyingDevelopmentCertificate = {
-        ...job.complyingDevelopmentCertificate,
-        status: 'completed',
-        returnedAt: returnTimestamp
-      };
-    } else {
-      throw new Error('Invalid ticket type');
+      throw readError
     }
 
-    // Save the updated job data back to the client's job file
+    // Update document metadata
+    const metadataPath = getDocumentsMetadataPath()
     try {
-      await fs.writeFile(jobPath, JSON.stringify(job, null, 2))
-    } catch (error) {
-      console.error('Error saving updated client job data:', error)
-      return NextResponse.json(
-        { error: 'Failed to update job data' },
-        { status: 500 }
+      const metadataData = await fs.readFile(metadataPath, 'utf-8')
+      const documents = JSON.parse(metadataData)
+
+      // Find and update the document
+      const documentIndex = documents.findIndex(
+        (doc: any) => doc.metadata?.ticketId === ticketId
       )
+
+      if (documentIndex !== -1) {
+        documents[documentIndex].metadata.returnedAt = new Date().toISOString()
+        await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+      }
+    } catch (error) {
+      console.error('Error updating document metadata:', error)
     }
 
-    // Update the ticket with the return timestamp
+    // Update ticket status
     workTickets[ticketIndex] = {
       ...ticket,
       status: 'completed',
@@ -149,27 +93,14 @@ export async function POST(request: Request) {
       }
     }
 
-    // Save the updated tickets back to the client's work ticket file
-    try {
-      await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
-    } catch (error) {
-      console.error('Error saving updated client work tickets:', error)
-      return NextResponse.json(
-        { error: 'Failed to update work ticket' },
-        { status: 500 }
-      )
-    }
+    // Save updated tickets
+    await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
 
-    // Return success response
-    return NextResponse.json({
-      success: true,
-      message: 'Document returned successfully',
-      ticket: workTickets[ticketIndex]
-    }, { status: 200 })
+    return NextResponse.json(workTickets[ticketIndex])
   } catch (error) {
-    console.error('Error returning document:', error)
+    console.error('Error returning work ticket:', error)
     return NextResponse.json(
-      { error: 'Failed to process document return' },
+      { error: 'Failed to return work ticket' },
       { status: 500 }
     )
   }

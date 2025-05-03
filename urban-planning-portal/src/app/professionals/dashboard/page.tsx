@@ -6,15 +6,14 @@ import { Input } from "@shared/components/ui/input"
 import { Button } from "@shared/components/ui/button"
 import { useToast } from "@shared/components/ui/use-toast"
 import { Loader2 } from 'lucide-react'
-import { UserStats } from '@/components/UserStats'
-import { Announcements } from '../../../components/Announcements'
-import { useRouter } from 'next/router';
-import { useRef } from 'react';
-import router from 'next/dist/shared/lib/router/router'
+import { useRouter } from 'next/navigation'
+import { useRef } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { useJobs } from '../../../../hooks/useJobs'
-import { Job } from "../../../../../shared/types/jobs"
 import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useJobs } from '@shared/hooks/useJobs'
+import { Job } from '@shared/types/jobs'
+import { UserStats } from '@shared/components/UserStats'
+import { Announcements } from '@shared/components/Announcements'
 
 interface SearchResult {
   layer: string
@@ -83,15 +82,22 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
+        console.log('Fetching announcements...')
         const response = await fetch('/api/announcements');
+        console.log('API Response status:', response.status)
         if (!response.ok) throw new Error('Failed to fetch announcements');
         const data = await response.json();
-        setAnnouncements(data);
+        console.log('API Response data:', data)
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+        console.log('Setting announcements:', data.data)
+        setAnnouncements(data.data || []);
       } catch (error) {
         console.error('Error fetching announcements:', error);
         toast({
           title: "Error",
-          description: "Failed to load announcements",
+          description: error instanceof Error ? error.message : "Failed to load announcements",
           variant: "destructive"
         });
       }
@@ -300,6 +306,7 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6 space-y-6">
       <UserStats
         username="Matt"
+        role="professional"
         designChecks={8}
         reportsWritten={6}
         completedJobs={4}

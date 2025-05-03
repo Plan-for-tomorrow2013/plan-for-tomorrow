@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { Label } from "./ui/label"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { useToast } from "./ui/use-toast"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Label } from "@shared/components/ui/label"
+import { Input } from "@shared/components/ui/input"
+import { Button } from "@shared/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
+import { useToast } from "@shared/components/ui/use-toast"
 
 interface WasteCalculationResult {
   totalWaste: number
@@ -107,7 +107,7 @@ export function WasteCalculator() {
               id="floorArea"
               type="number"
               value={floorArea}
-              onChange={(e) => setFloorArea(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFloorArea(e.target.value)}
               placeholder="Enter floor area"
             />
           </div>
@@ -118,7 +118,7 @@ export function WasteCalculator() {
               id="demolitionArea"
               type="number"
               value={demolitionArea}
-              onChange={(e) => setDemolitionArea(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDemolitionArea(e.target.value)}
               placeholder="Enter demolition area"
             />
           </div>
@@ -148,4 +148,4 @@ export function WasteCalculator() {
       </CardContent>
     </Card>
   )
-} 
+}

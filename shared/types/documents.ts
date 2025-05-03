@@ -7,7 +7,8 @@ export interface DocumentVersion {
   filename: string
   originalName: string
   size: number
-  uploadedBy: string
+  type: string
+  uploadedBy?: string
 }
 
 export interface Document {
@@ -22,14 +23,20 @@ export interface Document {
   createdAt: string
   updatedAt: string
   isActive: boolean
-  required?: boolean
   adminOnly?: boolean
   uploadedAt?: string
   fileName?: string
   size?: number
   description?: ReactNode
-  requiredStatus?: 'uploaded' | 'pending' | 'required'
   url?: string
+  metadata?: {
+    jobId?: string
+    uploadedBy?: string
+    title?: string
+    description?: string
+    category?: string
+    path?: string
+  }
   uploadedFile?: {
     filename: string
     originalName: string
@@ -103,6 +110,8 @@ export interface DocumentUpload {
     title?: string
     description?: string
     category?: string
+    path?: string
+    uploadedBy?: string
   }
 }
 
@@ -118,7 +127,7 @@ export interface DocumentRemove {
 }
 
 export interface DocumentWithStatus extends Document {
-  status: 'uploaded' | 'pending' | 'required'
+  status: 'uploaded' | 'pending'
   uploadedFile?: {
     filename: string
     originalName: string
@@ -150,7 +159,6 @@ export const DOCUMENT_TYPES: Document[] = [
     title: 'Certificate of Title',
     category: 'LEGAL',
     path: '/certificate-of-title',
-    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -163,7 +171,6 @@ export const DOCUMENT_TYPES: Document[] = [
     title: '10.7 Certificate',
     category: 'PLANNING',
     path: '/10-7-certificate',
-    required: true,
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -176,7 +183,6 @@ export const DOCUMENT_TYPES: Document[] = [
     title: 'Survey Plan',
     category: 'TECHNICAL',
     path: '/survey-plan',
-    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -190,7 +196,6 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/custom-assessment',
     adminOnly: true,
-    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -204,7 +209,6 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/statement-of-environmental-effects',
     adminOnly: true,
-    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -218,7 +222,6 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/complying-development-certificate',
     adminOnly: true,
-    required: false,
     type: 'document',
     versions: [],
     currentVersion: 0,

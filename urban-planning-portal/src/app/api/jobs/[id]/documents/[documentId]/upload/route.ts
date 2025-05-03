@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getJob } from '@/lib/jobStorage'
-import { writeFile } from 'fs/promises'
+import { getJob, saveJob } from '@shared/services/jobStorage'
+import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
-import { Document } from '@/types/documents'
+import { Document } from '@shared/types/documents'
+import { existsSync } from 'fs'
 
 export async function POST(
   request: Request,
@@ -14,7 +15,7 @@ export async function POST(
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
-    const document = job.documents?.find((doc: Document) => doc.id === params.documentId)
+    const document = job.documents?.[params.documentId]
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
@@ -27,15 +28,21 @@ export async function POST(
     // Convert base64 to buffer
     const buffer = Buffer.from(file.split(',')[1], 'base64')
 
-    // Write file to disk
-    const filePath = join(process.cwd(), 'uploads', job.id, document.filename)
+    // Ensure documents directory exists
+    const documentsDir = join(process.cwd(), 'data', 'jobs', params.id, 'documents')
+    if (!existsSync(documentsDir)) {
+      await mkdir(documentsDir, { recursive: true })
+    }
+
+    // Write file to disk using the correct path
+    const filePath = join(documentsDir, document.filename)
     await writeFile(filePath, buffer)
 
     // Update document size
     document.size = buffer.length
 
     // Save updated job data
-    await job.save()
+    await saveJob(params.id, job)
 
     return NextResponse.json({ success: true })
   } catch (error) {

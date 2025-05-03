@@ -1,9 +1,10 @@
 import { Document, DocumentVersion, DocumentMetadata, DocumentUpload, DocumentDownload, DocumentRemove } from '../types/documents'
+import path from 'path'
+import { mkdir, readFile, writeFile, unlink } from 'fs/promises'
+import { v4 as uuidv4 } from 'uuid'
 
 class DocumentService {
   private static instance: DocumentService
-  private documents: Map<string, DocumentMetadata> = new Map()
-
   private constructor() {}
 
   static getInstance(): DocumentService {
@@ -13,14 +14,20 @@ class DocumentService {
     return DocumentService.instance
   }
 
-  async getDocuments(): Promise<Document[]> {
+  async getDocuments(jobId?: string): Promise<Document[]> {
     try {
       const response = await fetch('/api/documents')
       if (!response.ok) throw new Error('Failed to fetch documents')
-      return await response.json()
+      const documents = await response.json()
+
+      if (jobId) {
+        return documents.filter((doc: Document) => doc.metadata?.jobId === jobId)
+      }
+
+      return documents
     } catch (error) {
-      console.error('Error fetching documents:', error)
-      return []
+      console.error('Error getting documents:', error)
+      throw error
     }
   }
 
@@ -42,41 +49,55 @@ class DocumentService {
       formData.append('metadata', JSON.stringify({
         type: upload.type,
         jobId: upload.jobId,
-        ...upload.metadata
+        title: upload.metadata?.title || upload.file.name,
+        category: upload.metadata?.category || 'general',
+        path: upload.metadata?.path || '',
+        uploadedBy: upload.metadata?.uploadedBy || 'system'
       }))
 
       const response = await fetch('/api/documents', {
         method: 'POST',
-        body: formData,
+        body: formData
       })
 
-      if (!response.ok) throw new Error('Failed to upload document')
-      return await response.json()
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to upload document')
+      }
+
+      return response.json()
     } catch (error) {
       console.error('Error uploading document:', error)
       throw error
     }
   }
 
-  async downloadDocument(download: DocumentDownload): Promise<Blob> {
+  async removeDocument(documentId: string, jobId: string): Promise<void> {
     try {
-      const response = await fetch(`/api/documents/${download.documentId}/download?jobId=${download.jobId}&version=${download.version || 'latest'}`)
-      if (!response.ok) throw new Error('Failed to download document')
-      return await response.blob()
+      const response = await fetch(`/api/documents?documentId=${documentId}&jobId=${jobId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to remove document')
+      }
     } catch (error) {
-      console.error('Error downloading document:', error)
+      console.error('Error removing document:', error)
       throw error
     }
   }
 
-  async removeDocument(remove: DocumentRemove): Promise<void> {
+  async downloadDocument(documentId: string, jobId: string): Promise<Blob> {
     try {
-      const response = await fetch(`/api/documents/${remove.documentId}?jobId=${remove.jobId}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) throw new Error('Failed to remove document')
+      const response = await fetch(`/api/documents/${documentId}/download?jobId=${jobId}`)
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to download document')
+      }
+      return response.blob()
     } catch (error) {
-      console.error('Error removing document:', error)
+      console.error('Error downloading document:', error)
       throw error
     }
   }

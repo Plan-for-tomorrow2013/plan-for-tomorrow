@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Button } from "../../../admin/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../admin/src/components/ui/card"
+import { Button } from "@shared/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
 import { FileText, Plus, Upload, X } from "lucide-react"
 import { Document } from '../../types/documents'
-import { documentService } from "../../../admin/lib/services/documentService"
+import { documentService } from "@shared/services/documentService"
 import { ManagedDocumentStoreProps, ControlledDocumentStoreProps } from './types'
 
 // Base component with shared UI logic

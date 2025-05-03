@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Button } from "../../../components/ui/button"
-import { Input } from "../../../components/ui/input"
-import { Textarea } from "../../../components/ui/textarea"
-import { useToast } from "../../../components/ui/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Button } from "@shared/components/ui/button"
+import { Input } from "@shared/components/ui/input"
+import { Textarea } from "@shared/components/ui/textarea"
+import { useToast } from "@shared/components/ui/use-toast"
 import { Loader2, Plus, FileText } from "lucide-react"
-import { PageHeader } from "../../../components/ui/page-header"
+import { PageHeader } from "@shared/components/ui/page-header"
 
 interface PrePreparedAssessments {
   id: string

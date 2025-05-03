@@ -5,27 +5,29 @@ import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from "@shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@shared/components/ui/card"
-import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download } from "@shared/components/ui/icons"
+import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download, AlertCircle } from "@shared/components/ui/icons"
 import { ShoppingCart } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { useJobs } from '../../../../hooks/useJobs'
+import { useJobs } from '@shared/hooks/useJobs'
 import Link from 'next/link'
 import { Alert, AlertDescription } from "@shared/components/ui/alert"
-import { Document, DOCUMENT_TYPES } from '../../../types/documents'
+import { Document, DOCUMENT_TYPES } from '@shared/types/documents'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Input } from "@shared/components/ui/input"
 import { Textarea } from "@shared/components/ui/textarea"
 import { toast } from "@shared/components/ui/use-toast"
-import PropertyInfo from '@/components/PropertyInfo'
-import DetailedSiteDetails, { DetailedSiteDetailsData } from '@/components/DetailedSiteDetails'
-import DocumentStatus from '@/components/DocumentStatus'
-import { Job, PurchasedPrePreparedAssessments } from '../../../../../shared/types/jobs'
+import { PropertyInfo } from '@shared/components/PropertyInfo'
+import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
+import { DocumentStatus } from '@shared/components/DocumentStatus'
+import { Job, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@/utils/report-utils'
-import type { PropertyDataShape } from '@/components/PropertyInfo'
+import type { PropertyDataShape } from '@shared/components/PropertyInfo'
 import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
-import { DocumentUpload } from "../../../../../shared/components/DocumentUpload"
+import { DocumentUpload } from "@shared/components/DocumentUpload"
+import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
+import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -196,14 +198,37 @@ const formatDate = (dateString: string) => {
   }
 };
 
-export default function ReportWriterPage() {
+// Helper to normalize any site details object to SiteDetails shape
+function normalizeSiteDetails(data: any): SiteDetails {
+  return {
+    siteArea: data?.siteArea || '',
+    frontage: data?.frontage || '',
+    depth: data?.depth || '',
+    slope: data?.slope || '',
+    orientation: data?.orientation || '',
+    soilType: data?.soilType || '',
+    vegetation: data?.vegetation || '',
+    heritage: data?.heritage || '',
+    floodProne: data?.floodProne || '',
+    bushfireProne: data?.bushfireProne || '',
+    contamination: data?.contamination || '',
+    otherConstraints: data?.otherConstraints || '',
+    adjoiningNorth: data?.adjoiningNorth || '',
+    adjoiningSouth: data?.adjoiningSouth || '',
+    adjoiningEast: data?.adjoiningEast || '',
+    adjoiningWest: data?.adjoiningWest || '',
+  };
+}
+
+function ReportWriterContent({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const queryClient = useQueryClient() // Get query client instance
-  const { jobs } = useJobs();
-  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined);
-  const [documents, setDocuments] = useState<DocumentWithStatus[]>([]);
-  const [documentError, setDocumentError] = useState<string | null>(null);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const queryClient = useQueryClient()
+  const { jobs } = useJobs()
+  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined)
+  const { documents, isLoading, error, uploadDocument, removeDocument, downloadDocument } = useDocuments()
+  const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
+  const [documentError, setDocumentError] = useState<string | null>(null)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Combined state for both report forms (Keep this)
   const [formState, setFormState] = useState<ReportWriterFormState>({
@@ -227,22 +252,13 @@ export default function ReportWriterPage() {
     },
   });
 
-  // Remove local state for pre-prepared assessments, use query data directly
-  // const [prePreparedAssessments, setPrePreparedAssessments] = useState<PrePreparedAssessmentSection[]>([]);
-
   // New state for collapsible section
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
   const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
   const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
 
-  // State to hold the current site details being edited in the form
-  const [currentSiteDetails, setCurrentSiteDetails] = useState<DetailedSiteDetailsData | null>(null);
-
   // Add this after other state declarations
   const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
-
-  // Flag to track unsaved changes specifically for site details
-  const [hasUnsavedSiteDetails, setHasUnsavedSiteDetails] = useState(false);
 
   // Load form data from local storage when the job ID changes
   useEffect(() => {
@@ -338,12 +354,12 @@ export default function ReportWriterPage() {
     if (currentJob) {
       // Helper function to transform uploaded documents into boolean record
       const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
-        if (!documents) return {};
+        if (!documents) return {}
         return Object.keys(documents).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as Record<string, boolean>);
-      };
+          acc[key] = true
+          return acc
+        }, {} as Record<string, boolean>)
+      }
 
       // Update form state based on job data
       setFormState(prev => ({
@@ -386,24 +402,7 @@ export default function ReportWriterPage() {
                 selectedTab: 'details'
               },
         },
-      }));
-
-      // Update documents state
-      const updatedDocuments = DOCUMENT_TYPES.map(doc => {
-        const uploadedFile = currentJob.documents?.[doc.id];
-        return {
-          ...doc,
-          status: uploadedFile ? 'uploaded' as const : 'required' as const,
-          uploadedFile: uploadedFile ? {
-            filename: uploadedFile.filename,
-            originalName: uploadedFile.originalName,
-            type: uploadedFile.type,
-            uploadedAt: uploadedFile.uploadedAt,
-            size: uploadedFile.size
-          } : undefined
-        };
-      });
-      setDocuments(updatedDocuments);
+      }))
 
       // Update purchased assessments state from fetched job data
       if (currentJob.purchasedPrePreparedAssessments) {
@@ -412,38 +411,34 @@ export default function ReportWriterPage() {
             (acc, assessmentId) => ({ ...acc, [assessmentId]: true }),
             {}
           )
-        );
+        )
       } else {
-        setPurchasedAssessments({});
+        setPurchasedAssessments({})
       }
 
       // Update site details state if not already modified locally
       if (!hasUnsavedSiteDetails) {
-        setCurrentSiteDetails(currentJob.siteDetails || {});
+        updateSiteDetails(normalizeSiteDetails(currentJob.siteDetails || {}))
       }
 
-      setDocumentError(null);
-
+      setDocumentError(null)
     } else if (!selectedJobId) {
       // Reset states if no job is selected
-      setDocuments([]);
       setFormState({
         'custom-assessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
         'statement-of-environmental-effects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
         'complying-development-certificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
-      });
-      setPurchasedAssessments({});
-      setCurrentSiteDetails(null);
-      setDocumentError(null);
+      })
+      setPurchasedAssessments({})
+      updateSiteDetails({})
+      setDocumentError(null)
     }
 
     if (isJobError) {
-      console.error('Error fetching job data:', jobError);
-      setDocumentError(jobError?.message || 'Failed to load job data');
-      setDocuments([]);
+      console.error('Error fetching job data:', jobError)
+      setDocumentError(jobError?.message || 'Failed to load job data')
     }
-
-  }, [currentJob, selectedJobId, isJobError, jobError, hasUnsavedSiteDetails]);
+  }, [currentJob, selectedJobId, isJobError, jobError, hasUnsavedSiteDetails])
 
 
   const isAssessmentReturned = (type: 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate') => {
@@ -460,7 +455,7 @@ export default function ReportWriterPage() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
-      status: 'required'
+      status: 'pending'
     };
     const { isCompleted } = getReportStatus(doc, currentJob)
     return isCompleted
@@ -547,26 +542,35 @@ export default function ReportWriterPage() {
   // --- Mutation for Creating Work Ticket ---
   const createWorkTicketMutation = useMutation<any, Error, any>({
     mutationFn: async (payload) => {
+      const formData = new FormData()
+      formData.append('file', payload.file)
+      formData.append('metadata', JSON.stringify({
+        jobId: params.id,
+        jobAddress: payload.jobAddress,
+        ticketType: payload.ticketType,
+        uploadedBy: 'professional'
+      }))
+
       const response = await fetch('/api/work-tickets', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        body: formData,
+      })
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to create work ticket');
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to create work ticket')
       }
-      return response.json();
+      return response.json()
     },
     onError: (error) => {
-        console.error("Error creating work ticket:", error);
-        toast({
-            title: "Error Creating Work Ticket",
-            description: `${error.message}`,
-            variant: "destructive",
-        });
+      console.error("Error creating work ticket:", error)
+      toast({
+        title: "Error Creating Work Ticket",
+        description: `${error.message}`,
+        variant: "destructive",
+      })
     },
-  });
+  })
 
 
   // Generalized payment handler - Refactored with useMutation
@@ -643,7 +647,7 @@ export default function ReportWriterPage() {
 
 
   // --- Mutation for Saving Site Details ---
-  const saveSiteDetailsMutation = useMutation<Job, Error, { jobId: string; details: DetailedSiteDetailsData }>({
+  const saveSiteDetailsMutation = useMutation<Job, Error, { jobId: string; details: SiteDetails }>({
       mutationFn: async ({ jobId, details }) => {
           const response = await fetch(`/api/jobs/${jobId}`, {
               method: 'PATCH',
@@ -658,7 +662,7 @@ export default function ReportWriterPage() {
       },
       onSuccess: (data, variables) => {
           queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
-          setHasUnsavedSiteDetails(false); // Reset unsaved flag on successful save
+          updateSiteDetails({});
           toast({
               title: "Success",
               description: "Site details saved successfully.",
@@ -676,13 +680,13 @@ export default function ReportWriterPage() {
 
   // Updated save function for Site Details - uses useMutation
   const handleSaveSiteDetails = () => {
-      if (!selectedJobId || !currentSiteDetails) {
-          toast({ title: "Error", description: "No job selected or no site details to save.", variant: "destructive" });
-          return;
-      }
-      console.log('Saving Site Details via mutation:', currentSiteDetails);
-      saveSiteDetailsMutation.mutate({ jobId: selectedJobId, details: currentSiteDetails });
-  };
+    if (!selectedJobId) {
+      toast({ title: "Error", description: "No job selected.", variant: "destructive" })
+      return
+    }
+    console.log('Saving Site Details via mutation:', siteDetails)
+    saveSiteDetailsMutation.mutate({ jobId: selectedJobId, details: siteDetails })
+  }
 
 
   // --- Mutation for Purchasing Pre-prepared Assessments ---
@@ -864,282 +868,207 @@ export default function ReportWriterPage() {
      window.location.href = `/api/jobs/${selectedJobId}/documents/${documentId}/download`;
   };
 
-  const handleUpload = (documentId: string) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.pdf,.doc,.docx';
+  const handleUpload = (docId: string) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.pdf,.doc,.docx'
     input.onchange = async (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) await handleFileUpload(documentId, file); // Use refactored handler
-    };
-    input.click();
-  };
-
-  const renderDocumentUpload = (doc: DocumentWithStatus) => {
-    if (isReportType(doc.id)) {
-      const reportTitle = getReportTitle(doc.id)
-
-      // Handle SoEE
-      if (doc.id === 'statement-of-environmental-effects') {
-        const assessmentReturned = isAssessmentReturned('statement-of-environmental-effects');
-        const shouldShowReportTile = currentJob?.statementOfEnvironmentalEffects?.status === 'paid' || assessmentReturned;
-
-        if (!shouldShowReportTile) return null;
-
-        if (assessmentReturned) {
-          return (
-            <Card key={doc.id} className="relative">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div><h3 className="text-lg font-semibold">{reportTitle}</h3></div>
-                  <Check className="h-5 w-5 text-green-500" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span className="text-sm">
-                      {currentJob?.statementOfEnvironmentalEffects?.originalName || 'Report File'}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500">Completed</div>
-                  <Button variant="outline" className="w-full" onClick={() => handleDownload(doc.id)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        }
-
-        // In Progress Card JSX
-        return (
-          <Card key={doc.id} className="shadow-md">
-            <CardHeader className="bg-[#323A40] text-white">
-              <div className="flex justify-between items-start">
-                <div><h3 className="text-lg font-semibold">{doc.title}</h3><p className="text-sm text-gray-300">{doc.category}</p></div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 text-center">
-              <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                <p className="font-semibold text-lg">Report In Progress</p>
-                <p className="text-sm text-gray-600 px-4">Our team is working on your Statement of Environmental Effects. You will be notified once it's ready.</p>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      }
-
-      // Handle CDC
-      if (doc.id === 'complying-development-certificate') {
-        const assessmentReturned = isAssessmentReturned('complying-development-certificate');
-        const shouldShowReportTile = currentJob?.complyingDevelopmentCertificate?.status === 'paid' || assessmentReturned;
-
-        if (!shouldShowReportTile) return null;
-
-        if (assessmentReturned) {
-          return (
-            <Card key={doc.id} className="relative">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div><h3 className="text-lg font-semibold">{reportTitle}</h3></div>
-                  <Check className="h-5 w-5 text-green-500" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span className="text-sm">
-                      {currentJob?.complyingDevelopmentCertificate?.originalName || 'Report File'}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500">Completed</div>
-                  <Button variant="outline" className="w-full" onClick={() => handleDownload(doc.id)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        }
-
-        // In Progress Card JSX
-        return (
-          <Card key={doc.id} className="shadow-md">
-            <CardHeader className="bg-[#323A40] text-white">
-              <div className="flex justify-between items-start">
-                <div><h3 className="text-lg font-semibold">{doc.title}</h3><p className="text-sm text-gray-300">{doc.category}</p></div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 text-center">
-              <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                <p className="font-semibold text-lg">Report In Progress</p>
-                <p className="text-sm text-gray-600 px-4">Our team is working on your Complying Development Certificate. You will be notified once it's ready.</p>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      }
-
-      // Handle Custom Assessment Report
-      if (doc.id === 'custom-assessment') {
-        const customAssessmentStatus = currentJob?.customAssessment?.status;
-        const customAssessmentReturned = currentJob?.customAssessment?.returnedAt;
-        const shouldShowReportTile = customAssessmentStatus === 'paid' || !!customAssessmentReturned;
-
-        if (!shouldShowReportTile) return null;
-
-        if (customAssessmentReturned) {
-          return (
-            <Card key={doc.id} className="relative">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div><h3 className="text-lg font-semibold">{doc.title}</h3></div>
-                  <Check className="h-5 w-5 text-green-500" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <span className="text-sm">{doc.uploadedFile?.originalName || 'Custom Assessment Report'}</span>
-                  </div>
-                  <div className="text-sm text-gray-500">Completed on {customAssessmentReturned ? new Date(customAssessmentReturned).toLocaleDateString() : 'N/A'}</div>
-                  <Button variant="outline" className="w-full" onClick={() => handleDownload(doc.id)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        }
-
-        // In Progress Card JSX
-        return (
-          <Card key={doc.id} className="shadow-md">
-            <CardHeader className="bg-[#323A40] text-white">
-              <div className="flex justify-between items-start">
-                <div><h3 className="text-lg font-semibold">{doc.title}</h3><p className="text-sm text-gray-300">{doc.category}</p></div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 text-center">
-              <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                <p className="font-semibold text-lg">Report In Progress</p>
-                <p className="text-sm text-gray-600 px-4">Our team is working on your Custom Assessment Report. You will be notified once it's ready.</p>
-              </div>
-            </CardContent>
-          </Card>
-        );
+      const file = (event.target as HTMLInputElement).files?.[0]
+      if (file) {
+        await uploadDocument(params.id, docId, file)
       }
     }
+    input.click()
+  }
 
-    // Standard Document Card
-    const isUploaded = doc.status === 'uploaded';
+  const handleDelete = async (docId: string) => {
+    if (confirm('Are you sure you want to delete this document?')) {
+      await removeDocument(params.id, docId)
+    }
+  }
+
+  // Add the renderDocumentCard function from document store
+  const renderDocumentCard = (doc: DocumentWithStatus) => {
+    const isUploaded = doc.status === 'uploaded'
+    const isRequired = ['certificate-of-title', 'survey-plan'].includes(doc.id) ||
+      (doc.id === '10-7-certificate' && currentJob?.customAssessment?.status === 'paid')
+
     return (
       <Card key={doc.id} className="relative">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div><h3 className="text-lg font-semibold">{doc.title}</h3></div>
+            <div>
+              <h3 className="text-lg font-semibold">{doc.title}</h3>
+              {isRequired && (
+                <p className="text-sm text-red-500">Required</p>
+              )}
+            </div>
             {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
           </div>
         </CardHeader>
         <CardContent>
           {isUploaded && doc.uploadedFile ? (
             <div className="space-y-2">
-              <div className="flex items-center gap-2"><FileText className="h-4 w-4" /><span className="text-sm">{doc.uploadedFile.originalName}</span></div>
-              <div className="text-sm text-gray-500">Uploaded on {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}</div>
-              <Button variant="outline" className="w-full" onClick={() => handleDownload(doc.id)}><FileText className="h-4 w-4 mr-2" />Download</Button>
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="text-sm">{doc.uploadedFile.originalName}</span>
+              </div>
+              <div className="text-sm text-gray-500">
+                Uploaded on {doc.uploadedFile.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                {doc.uploadedFile.size && (
+                  <span className="ml-2">
+                    ({(doc.uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    try {
+                      handleDownload(doc.id)
+                    } catch (error) {
+                      console.error('Error downloading document:', error)
+                      toast({
+                        title: "Download Failed",
+                        description: error instanceof Error ? error.message : "Failed to download document",
+                        variant: "destructive"
+                      })
+                    }
+                  }}
+                >
+                  <FileText className="h-4 w-4 mr-2" />Download
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => {
+                    if (confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+                      try {
+                        handleDelete(doc.id)
+                      } catch (error) {
+                        console.error('Error deleting document:', error)
+                        toast({
+                          title: "Delete Failed",
+                          description: error instanceof Error ? error.message : "Failed to delete document",
+                          variant: "destructive"
+                        })
+                      }
+                    }
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleUpload(doc.id)}
-              disabled={uploadDocumentMutation.isPending} // Disable while uploading
-            >
-              {uploadDocumentMutation.isPending && uploadDocumentMutation.variables?.documentId === doc.id
-                ? 'Uploading...'
-                : <><Upload className="h-4 w-4 mr-2" />Upload Document</>
-              }
-            </Button>
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  try {
+                    handleUpload(doc.id)
+                  } catch (error) {
+                    console.error('Error initiating upload:', error)
+                    toast({
+                      title: "Upload Failed",
+                      description: error instanceof Error ? error.message : "Failed to initiate upload",
+                      variant: "destructive"
+                    })
+                  }
+                }}
+              >
+                <Upload className="h-4 w-4 mr-2" />Upload Document
+              </Button>
+              {isRequired && (
+                <p className="text-sm text-red-500">
+                  This document is required to proceed
+                </p>
+              )}
+            </div>
           )}
-           {/* Show progress/error for this specific upload */}
-           {uploadDocumentMutation.isPending && uploadDocumentMutation.variables?.documentId === doc.id && (
-              <p className="text-sm text-gray-500 text-center mt-2">Uploading...</p>
-           )}
-           {uploadDocumentMutation.isError && uploadDocumentMutation.variables?.documentId === doc.id && (
-              <p className="text-sm text-red-500 text-center mt-2">Upload failed.</p>
-           )}
         </CardContent>
       </Card>
-    );
-  };
-
+    )
+  }
 
   const renderRequiredDocuments = () => {
-    // Keep existing filter logic which now uses currentJob from useQuery
-    const requiredDocs = documents.filter(doc => {
-      const isPrePrepared = doc.id.startsWith('pre-prepared-');
-      const isStandardRequired = ['certificate-of-title', '10-7-certificate', 'survey-plan'].includes(doc.id);
-      const isReportOutput = ['statement-of-environmental-effects', 'complying-development-certificate', 'custom-assessment'].includes(doc.id);
-
-      if (isPrePrepared) {
-        const assessmentId = doc.id.replace('pre-prepared-', '');
-        return purchasedAssessments[assessmentId];
-      }
-
-      if (isReportOutput) {
-        const type = doc.id as ReportType;
-        const reportData = getReportData(doc, currentJob!);
-        return reportData?.status === 'paid' || isAssessmentReturned(type);
-      }
-
-      return isStandardRequired;
+    // Debug logging
+    console.log('[ReportWriter] Rendering required documents:', {
+      documentCount: documents.length,
+      documentTypes: documents.map(doc => doc.type)
     });
 
-    // Keep existing logic to add purchased assessments
-    if (selectedJobId && currentJob?.purchasedPrePreparedAssessments) {
-      Object.entries(currentJob.purchasedPrePreparedAssessments).forEach(([assessmentId, assessment]) => {
-        const docId = `pre-prepared-${assessmentId}`;
-        if (!requiredDocs.find(doc => doc.id === docId)) {
-          requiredDocs.push({
-            id: docId,
-            title: assessment.title,
-            category: 'Pre-prepared Assessments',
-            description: assessment.content,
-            path: '/document-store',
-            type: 'document',
-            versions: [],
-            currentVersion: 1,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isActive: true,
-            status: 'uploaded' as const,
-            uploadedFile: assessment.file ? {
-              filename: assessment.file.id,
-              originalName: assessment.file.originalName,
-              type: 'application/pdf',
-              uploadedAt: new Date().toISOString(),
-              size: 0
-            } : undefined
-          });
-        }
-      });
+    // Show loading state if documents are being fetched
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="mt-4 text-gray-600">Loading documents...</p>
+        </div>
+      );
     }
 
+    // Show error state if there's an error
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
+          <AlertCircle className="h-8 w-8 text-red-500" />
+          <p className="mt-4 text-red-600">Error loading documents</p>
+          <p className="text-sm text-gray-600 mt-2">{error}</p>
+        </div>
+      );
+    }
+
+    // Filter documents based on visibility rules
+    const visibleDocuments = documents.filter(doc => {
+      // Base documents are always visible
+      if (['certificate-of-title', 'survey-plan', '10-7-certificate'].includes(doc.id)) {
+        return true;
+      }
+
+      // Assessment documents visibility depends on job status
+      if (doc.type === 'assessment') {
+        // Check if the assessment is associated with a paid job
+        const isPaid =
+          (doc.id === 'custom-assessment' && currentJob?.customAssessment?.status === 'paid') ||
+          (doc.id === 'statement-of-environmental-effects' && currentJob?.statementOfEnvironmentalEffects?.status === 'paid') ||
+          (doc.id === 'complying-development-certificate' && currentJob?.complyingDevelopmentCertificate?.status === 'paid');
+        return isPaid;
+      }
+
+      // All other documents are visible
+      return true;
+    });
+
+    // Show empty state if no documents are visible
+    if (!visibleDocuments || visibleDocuments.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg">
+          <FileText className="h-8 w-8 text-gray-400" />
+          <p className="mt-4 text-gray-600">No documents available</p>
+          <p className="text-sm text-gray-500 mt-2">Upload your first document to get started</p>
+        </div>
+      );
+    }
+
+    // Show filtered documents
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {requiredDocs.map(doc => renderDocumentUpload(doc))}
+        {visibleDocuments.map(doc => {
+          // Debug logging for each document
+          console.log('[ReportWriter] Rendering document:', {
+            id: doc.id,
+            type: doc.type,
+            status: doc.status,
+            visibility: 'visible'
+          });
+          return renderDocumentCard(doc);
+        })}
       </div>
-    )
+    );
   }
 
   // Updated renderCustomAssessmentForm function
@@ -1198,6 +1127,9 @@ export default function ReportWriterPage() {
     const certificateOfTitle = documents.find(doc => doc.id === 'certificate-of-title');
     const surveyPlan = documents.find(doc => doc.id === 'survey-plan');
 
+    // Only require 10.7 certificate for custom assessment and complying development certificate
+    const requires107Certificate = formType === 'custom-assessment' || formType === 'complying-development-certificate';
+
     return (
       <div className="space-y-6">
         <div className="space-y-4">
@@ -1208,20 +1140,68 @@ export default function ReportWriterPage() {
           <div className="space-y-3 border-t pt-4 mt-4">
              <h4 className="font-medium text-gray-700">Document Requirements</h4>
              <p className="text-xs text-gray-500">Please ensure the following documents are uploaded in the 'Documents' section above before proceeding.</p>
-             <DocumentStatus document={{ id: '10-7-certificate', title: '10.7 Certificate', status: certificate107Doc?.status === 'uploaded' ? 'uploaded' : 'required' }} />
+             {requires107Certificate && (
+               <DocumentStatus document={{
+                 id: '10-7-certificate',
+                 title: '10.7 Certificate',
+                 path: '',
+                 type: 'document',
+                 category: '',
+                 versions: [],
+                 currentVersion: 1,
+                 createdAt: '',
+                 updatedAt: '',
+                 isActive: true,
+                 status: certificate107Doc?.status === 'uploaded' ? 'uploaded' : 'pending',
+               }} />
+             )}
              {certificateOfTitle && (
-               <DocumentStatus document={{ id: 'certificate-of-title', title: 'Certificate of Title', status: certificateOfTitle.status === 'uploaded' ? 'uploaded' : 'optional' }} />
+               <DocumentStatus document={{
+                 id: 'certificate-of-title',
+                 title: 'Certificate of Title',
+                 path: '',
+                 type: 'document',
+                 category: '',
+                 versions: [],
+                 currentVersion: 1,
+                 createdAt: '',
+                 updatedAt: '',
+                 isActive: true,
+                 status: certificateOfTitle.status === 'uploaded' ? 'uploaded' : 'pending',
+               }} />
              )}
              {surveyPlan && (
-               <DocumentStatus document={{ id: 'survey-plan', title: 'Survey Plan', status: surveyPlan.status === 'uploaded' ? 'uploaded' : 'optional' }} />
+               <DocumentStatus document={{
+                 id: 'survey-plan',
+                 title: 'Survey Plan',
+                 path: '',
+                 type: 'document',
+                 category: '',
+                 versions: [],
+                 currentVersion: 1,
+                 createdAt: '',
+                 updatedAt: '',
+                 isActive: true,
+                 status: surveyPlan.status === 'uploaded' ? 'uploaded' : 'pending',
+               }} />
              )}
           </div>
-          {/* 10.7 Cert Alert */}
-          {(!certificate107Doc || certificate107Doc.status !== 'uploaded') && (<Alert variant="destructive"><AlertDescription>Please upload the 10.7 Certificate before proceeding.</AlertDescription></Alert>)}
+          {/* 10.7 Cert Alert - only show for required report types */}
+          {requires107Certificate && (!certificate107Doc || certificate107Doc.status !== 'uploaded') && (
+            <Alert variant="destructive">
+              <AlertDescription>Please upload the 10.7 Certificate before proceeding.</AlertDescription>
+            </Alert>
+          )}
           {/* Buttons */}
           <div className="pt-4">
             {!showPaymentBtn ? (
-              <Button className="w-full" onClick={() => handleConfirmDetails(formType)} disabled={!certificate107Doc || certificate107Doc.status !== 'uploaded'}>Confirm Details & Proceed</Button>
+              <Button
+                className="w-full"
+                onClick={() => handleConfirmDetails(formType)}
+                disabled={requires107Certificate && (!certificate107Doc || certificate107Doc.status !== 'uploaded')}
+              >
+                Confirm Details & Proceed
+              </Button>
             ) : (
               <Button
                 className="w-full bg-green-600 hover:bg-green-700"
@@ -1277,12 +1257,6 @@ export default function ReportWriterPage() {
     } else {
       toast({ title: "No Changes", description: "No unsaved changes to save." });
     }
-  };
-
-  // Handler for when data changes within DetailedSiteDetails component
-  const handleSiteDetailsChange = (newData: DetailedSiteDetailsData) => {
-     setCurrentSiteDetails(newData);
-     setHasUnsavedSiteDetails(true);
   };
 
   const toggleDocuments = () => { setIsDocumentsOpen(prev => !prev); };
@@ -1459,9 +1433,9 @@ export default function ReportWriterPage() {
             {isSiteDetailsOpen && (
               <div className="mt-4">
                 <DetailedSiteDetails
-                  data={currentSiteDetails || {}}
-                  onDataChange={handleSiteDetailsChange}
-                  isReadOnly={isReadOnly}
+                  siteDetails={siteDetails}
+                  onSiteDetailsChange={updateSiteDetails}
+                  readOnly={isReadOnly}
                 />
               </div>
             )}
@@ -1478,7 +1452,7 @@ export default function ReportWriterPage() {
             </button>
             {isDocumentsOpen && (
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {documents.map(doc => renderDocumentUpload(doc))}
+                {renderRequiredDocuments()}
               </div>
             )}
           </div>
@@ -1530,4 +1504,14 @@ export default function ReportWriterPage() {
       )}
     </div>
   );
+}
+
+export default function ReportWriterPage({ params }: { params: { id: string } }) {
+  return (
+    <DocumentProvider jobId={params.id}>
+      <SiteDetailsProvider jobId={params.id}>
+        <ReportWriterContent params={params} />
+      </SiteDetailsProvider>
+    </DocumentProvider>
+  )
 }

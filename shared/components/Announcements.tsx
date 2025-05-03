@@ -34,6 +34,12 @@ export function Announcements({
   const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements)
   const { toast } = useToast()
 
+  // Log initial announcements for debugging
+  useEffect(() => {
+    console.log('Initial announcements:', initialAnnouncements)
+    setAnnouncements(initialAnnouncements)
+  }, [initialAnnouncements])
+
   useEffect(() => {
     if (!enableWebSocket) return
 
@@ -67,6 +73,11 @@ export function Announcements({
       ws.close()
     }
   }, [enableWebSocket, isAdmin, toast])
+
+  // Log current announcements for debugging
+  useEffect(() => {
+    console.log('Current announcements:', announcements)
+  }, [announcements])
 
   return (
     <Card className={className}>

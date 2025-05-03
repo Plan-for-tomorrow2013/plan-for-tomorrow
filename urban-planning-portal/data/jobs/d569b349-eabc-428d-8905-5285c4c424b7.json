@@ -1,9 +1,11 @@
 {
-  "id": "436c58bc-2f95-486e-9b47-48245adb5790",
+  "id": "d569b349-eabc-428d-8905-5285c4c424b7",
   "address": "458 Bells Line of Road, Kurmond",
   "council": "Hawkesbury",
-  "currentStage": "initial-assessment",
-  "createdAt": "2025-04-27T21:52:27.345Z",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-02T23:17:56.227Z",
+  "updatedAt": "2025-05-02T23:17:56.227Z",
   "propertyData": {
     "coordinates": {
       "longitude": 150.696134842325,
@@ -131,6 +133,15 @@
           }
         }
       ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746229972353_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-02T23:52:52.357Z",
+      "size": 4136746
     }
   }
 }

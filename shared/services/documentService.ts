@@ -14,48 +14,23 @@ class DocumentService {
     return DocumentService.instance
   }
 
-  async getDocuments(jobId?: string): Promise<Document[]> {
-    try {
-      const response = await fetch('/api/documents')
-      if (!response.ok) throw new Error('Failed to fetch documents')
-      const documents = await response.json()
+  // Removed getDocuments - will be derived from job data in context
+  // Removed getDocumentById - will be derived from job data in context
 
-      if (jobId) {
-        return documents.filter((doc: Document) => doc.metadata?.jobId === jobId)
-      }
-
-      return documents
-    } catch (error) {
-      console.error('Error getting documents:', error)
-      throw error
+  async uploadDocument(upload: DocumentUpload): Promise<any> { // Return type might need adjustment based on actual API response
+    if (!upload.jobId || !upload.docId) {
+      throw new Error('Job ID and Document ID are required for upload.');
     }
-  }
-
-  async getDocumentById(id: string): Promise<Document | null> {
-    try {
-      const response = await fetch(`/api/documents/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch document')
-      return await response.json()
-    } catch (error) {
-      console.error('Error fetching document:', error)
-      return null
-    }
-  }
-
-  async uploadDocument(upload: DocumentUpload): Promise<Document> {
     try {
       const formData = new FormData()
       formData.append('file', upload.file)
-      formData.append('metadata', JSON.stringify({
-        type: upload.type,
-        jobId: upload.jobId,
-        title: upload.metadata?.title || upload.file.name,
-        category: upload.metadata?.category || 'general',
-        path: upload.metadata?.path || '',
-        uploadedBy: upload.metadata?.uploadedBy || 'system'
-      }))
+      formData.append('docId', upload.docId) // Send docId directly
 
-      const response = await fetch('/api/documents', {
+      // Metadata is no longer sent in the body for this endpoint
+      // const metadata: any = { ... }
+      // formData.append('metadata', JSON.stringify(metadata))
+
+      const response = await fetch(`/api/jobs/${upload.jobId}/documents/upload`, { // Use job-specific endpoint
         method: 'POST',
         body: formData
       })
@@ -72,9 +47,11 @@ class DocumentService {
     }
   }
 
+  // TODO: Implement corresponding API endpoint: DELETE /api/jobs/[jobId]/documents/[documentId]
   async removeDocument(documentId: string, jobId: string): Promise<void> {
     try {
-      const response = await fetch(`/api/documents?documentId=${documentId}&jobId=${jobId}`, {
+      // Use job-specific endpoint structure
+      const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}`, {
         method: 'DELETE'
       })
 
@@ -88,12 +65,21 @@ class DocumentService {
     }
   }
 
-  async downloadDocument(documentId: string, jobId: string): Promise<Blob> {
+  // TODO: Implement corresponding API endpoint: GET /api/jobs/[jobId]/documents/[documentId]/download
+  async downloadDocument(documentId: string, jobId: string, filename: string): Promise<Blob> { // Added filename for potential use
     try {
-      const response = await fetch(`/api/documents/${documentId}/download?jobId=${jobId}`)
+      // Use job-specific endpoint structure (filename might be needed for Content-Disposition)
+      const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}/download`)
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to download document')
+        // Attempt to read error message, but handle cases where it might not be JSON
+        let errorMessage = `Failed to download document (status: ${response.status})`;
+        try {
+            const errorBody = await response.json();
+            errorMessage = errorBody.error || errorMessage;
+        } catch (e) {
+            // Ignore JSON parsing error if response body isn't valid JSON
+        }
+        throw new Error(errorMessage);
       }
       return response.blob()
     } catch (error) {
@@ -102,27 +88,8 @@ class DocumentService {
     }
   }
 
-  async getDocumentVersion(id: string, version: number): Promise<DocumentVersion | null> {
-    try {
-      const response = await fetch(`/api/documents/${id}/versions/${version}`)
-      if (!response.ok) throw new Error('Failed to fetch document version')
-      return await response.json()
-    } catch (error) {
-      console.error('Error fetching document version:', error)
-      return null
-    }
-  }
-
-  async getDocumentVersions(id: string): Promise<DocumentVersion[]> {
-    try {
-      const response = await fetch(`/api/documents/${id}/versions`)
-      if (!response.ok) throw new Error('Failed to fetch document versions')
-      return await response.json()
-    } catch (error) {
-      console.error('Error fetching document versions:', error)
-      return []
-    }
-  }
+  // Removed getDocumentVersion - Versioning is handled differently now (or removed)
+  // Removed getDocumentVersions - Versioning is handled differently now (or removed)
 }
 
 export const documentService = DocumentService.getInstance()

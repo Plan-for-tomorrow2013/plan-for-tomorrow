@@ -18,7 +18,7 @@ export const getReportStatus = (doc: DocumentWithStatus, job: Job): ReportStatus
   const hasFile = Boolean(reportData?.filename || reportData?.originalName);
 
   return {
-    isPaid: status === 'paid',
+    isPaid: status === 'paid' || status === 'completed',
     isCompleted: status === 'completed',
     isUploaded: hasFile,
     hasFile,

@@ -1,0 +1,174 @@
+[
+  {
+    "id": "871d80d3-8072-435d-97a9-f3ff660ea239",
+    "jobId": "78022b9c-b351-4ba7-8c98-5a0c39038765",
+    "jobAddress": "145 Beaconsfield Street Silverwater",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-05-08T08:43:03.468Z"
+  },
+  {
+    "id": "7431a3fe-2245-4b9c-8f2e-da07a5ed8fc2",
+    "jobId": "78022b9c-b351-4ba7-8c98-5a0c39038765",
+    "jobAddress": "145 Beaconsfield Street Silverwater",
+    "ticketType": "complying-development-certificate",
+    "status": "pending",
+    "createdAt": "2025-05-08T08:51:31.266Z"
+  },
+  {
+    "id": "eaf0ddca-1991-4447-9eba-4d5bb8b78100",
+    "jobId": "78022b9c-b351-4ba7-8c98-5a0c39038765",
+    "jobAddress": "145 Beaconsfield Street Silverwater",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-05-08T08:52:14.080Z"
+  },
+  {
+    "id": "34ab656b-d7ff-4cc9-99a8-aa25182c8bf2",
+    "jobId": "85104e74-fd99-46ed-af30-d662971bfa96",
+    "jobAddress": "24 Parsonage Road Castle Hill",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-05-09T01:47:59.620Z"
+  },
+  {
+    "id": "7f432b86-4ff7-46d5-9179-ddd51e2ec25e",
+    "jobId": "85104e74-fd99-46ed-af30-d662971bfa96",
+    "jobAddress": "24 Parsonage Road Castle Hill",
+    "ticketType": "complying-development-certificate",
+    "status": "pending",
+    "createdAt": "2025-05-09T02:30:43.295Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "d16b9a26-0ab1-4275-91c6-0d25813ced01",
+    "jobId": "85104e74-fd99-46ed-af30-d662971bfa96",
+    "jobAddress": "24 Parsonage Road Castle Hill",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-05-09T03:07:32.270Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "f8fa3394-4c42-4c69-a2fc-9cce8128dc21",
+    "jobId": "e2353da7-0890-44a4-9851-994b8abfcdf8",
+    "jobAddress": "207A Edgar Street, Condell Park",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-05-09T06:47:41.650Z",
+    "statementOfEnvironmentalEffects": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "filename": "10-7-certificate_1746773235344_10.7 Certificate Check.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "111d9e16-e63a-48bd-a3dc-44f756d2e6f7",
+    "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
+    "jobAddress": "137B Victoria Street Smithfield",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-05-09T07:07:39.766Z",
+    "statementOfEnvironmentalEffects": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "d76579fe-2fee-4e23-9186-5be1f07dc84d",
+    "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
+    "jobAddress": "137B Victoria Street Smithfield",
+    "ticketType": "complying-development-certificate",
+    "status": "pending",
+    "createdAt": "2025-05-09T21:27:46.974Z",
+    "complyingDevelopmentCertificate": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "29cab7b5-41de-4fb5-a7fc-3c37980d3432",
+    "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
+    "jobAddress": "137B Victoria Street Smithfield",
+    "ticketType": "custom-assessment",
+    "status": "pending",
+    "createdAt": "2025-05-09T21:53:24.393Z",
+    "customAssessment": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
+        }
+      }
+    }
+  },
+  {
+    "id": "f0ab9617-b037-436b-9ec6-0193eacd2c13",
+    "jobId": "1637928f-663c-46bd-92c4-1561a7d30a7d",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "statement-of-environmental-effects",
+    "status": "pending",
+    "createdAt": "2025-05-09T22:09:34.723Z",
+    "statementOfEnvironmentalEffects": {
+      "developmentType": "123",
+      "additionalInfo": "456",
+      "documents": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "filename": "10-7-certificate_1746828567336_10_7_5.pdf"
+        }
+      }
+    }
+  }
+]

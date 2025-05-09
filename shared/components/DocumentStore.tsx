@@ -4,44 +4,43 @@ import React, { useState, useEffect } from "react"
 import { Button } from "@shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
 import { FileText, Plus, Upload, X } from "lucide-react"
-import { Document } from '../types/documents'
-import { documentService } from "../../admin/lib/services/documentService"
+import { Document, DocumentWithStatus } from '../types/documents'
+import { documentService } from "@shared/services/documentService"
 
 interface DocumentStoreBaseProps {
   title?: string
   description?: string
   className?: string
+  documents: DocumentWithStatus[]
+  onUpload: (file: File) => void
+  onDelete: (id: string) => void
+  onDocumentSelect?: (document: DocumentWithStatus) => void
+  isUploading?: boolean
 }
 
 interface ManagedDocumentStoreProps extends DocumentStoreBaseProps {
-  onDocumentSelect?: (document: Document) => void
+  onDocumentSelect?: (document: DocumentWithStatus) => void
 }
 
-interface ControlledDocumentStoreProps extends DocumentStoreBaseProps {
-  documents: Document[]
-  onUpload?: (document: Document) => void
-  onDelete?: (documentId: string) => void
+interface ControlledDocumentStoreProps {
+  documents: DocumentWithStatus[]
+  onUpload?: (document: DocumentWithStatus) => void
+  onDelete: (id: string) => void
   jobId: string
+  title?: string
+  description?: string
 }
 
 // Base component with shared UI logic
-function BaseDocumentStore({
-  title = "Document Store",
-  description = "Your uploaded documents",
+export function BaseDocumentStore({
   documents,
+  onUpload,
   onDelete,
   onDocumentSelect,
-  isUploading,
-  onUpload,
-}: {
-  title: string
-  description: string
-  documents: Document[]
-  onDelete: (id: string) => void
-  onDocumentSelect?: (document: Document) => void
-  isUploading: boolean
-  onUpload: (file: File) => void
-}) {
+  title = "Document Store",
+  description = "Your uploaded documents",
+  isUploading = false
+}: DocumentStoreBaseProps) {
   return (
     <Card>
       <CardHeader>
@@ -50,35 +49,49 @@ function BaseDocumentStore({
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          {documents.map((doc) => (
-            <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.title}</span>
-                <span className="text-xs text-gray-500">
-                  ({doc.size ? (doc.size / 1024 / 1024).toFixed(2) : '0.00'} MB)
-                </span>
+          {documents.map((doc: DocumentWithStatus) => {
+            const isReportType = doc.category === 'REPORTS';
+            const isInProgress = isReportType && doc.displayStatus === 'pending_admin_delivery';
+            const isCompleted = isReportType && doc.displayStatus === 'uploaded';
+
+            return (
+              <div key={doc.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">{doc.title}</span>
+                  {isInProgress && (
+                    <span className="text-xs text-blue-600">(In Progress)</span>
+                  )}
+                  {isCompleted && (
+                    <span className="text-xs text-green-600">(Completed)</span>
+                  )}
+                  <span className="text-xs text-gray-500">
+                    ({doc.size ? (doc.size / 1024 / 1024).toFixed(2) : '0.00'} MB)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {onDocumentSelect && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDocumentSelect(doc)}
+                    >
+                      Select
+                    </Button>
+                  )}
+                  {!isInProgress && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(doc.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {onDocumentSelect && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDocumentSelect(doc)}
-                  >
-                    Select
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDelete(doc.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="relative">
           <input
@@ -106,35 +119,52 @@ function BaseDocumentStore({
   )
 }
 
-// Managed version (for urban-planning-portal)
-export function ManagedDocumentStore({
-  title = "Document Store",
-  description = "Your uploaded documents",
-  onDocumentSelect
-}: ManagedDocumentStoreProps) {
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [isUploading, setIsUploading] = useState(false)
-
-  useEffect(() => {
-    loadDocuments()
-  }, [])
-
-  const loadDocuments = async () => {
-    const docs = await documentService.getDocuments()
-    setDocuments(docs)
-  }
+// Managed component that handles its own state
+export function ManagedDocumentStore(props: ManagedDocumentStoreProps) {
+  const [isUploading, setIsUploading] = React.useState(false)
 
   const handleUpload = async (file: File) => {
     setIsUploading(true)
     try {
+      await props.onUpload(file)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  return (
+    <BaseDocumentStore
+      {...props}
+      isUploading={isUploading}
+      onUpload={handleUpload}
+    />
+  )
+}
+
+// Controlled component that receives documents as props
+export function ControlledDocumentStore({
+  documents,
+  onUpload,
+  onDelete,
+  jobId,
+  title,
+  description
+}: ControlledDocumentStoreProps) {
+  const [isUploading, setIsUploading] = React.useState(false)
+
+  const handleUpload = async (file: File) => {
+    if (!onUpload) return
+    setIsUploading(true)
+    try {
       const newDocument = await documentService.uploadDocument({
         file,
-        type: 'document',
-        jobId: 'temp'
+        type: file.type,
+        jobId,
+        docId: 'temp' // This should be replaced with the actual document ID
       })
-      setDocuments(prev => [...prev, newDocument])
+      onUpload(newDocument)
     } catch (error) {
-      console.error("Error uploading file:", error)
+      console.error('Error uploading document:', error)
     } finally {
       setIsUploading(false)
     }
@@ -142,79 +172,21 @@ export function ManagedDocumentStore({
 
   const handleDelete = async (id: string) => {
     try {
-      await documentService.removeDocument({ documentId: id, jobId: 'temp' })
-      setDocuments(prev => prev.filter(doc => doc.id !== id))
+      await documentService.removeDocument(id, jobId)
+      onDelete(id)
     } catch (error) {
-      console.error("Error deleting document:", error)
+      console.error('Error removing document:', error)
     }
   }
 
   return (
     <BaseDocumentStore
-      title={title}
-      description={description}
       documents={documents}
-      isUploading={isUploading}
-      onDelete={handleDelete}
-      onDocumentSelect={onDocumentSelect}
       onUpload={handleUpload}
-    />
-  )
-}
-
-// Controlled version (for admin)
-export function ControlledDocumentStore({
-  documents,
-  onUpload,
-  onDelete,
-  jobId,
-  title = "Document Store",
-  description = "Your uploaded documents"
-}: ControlledDocumentStoreProps) {
-  const handleControlledUpload = async (file: File) => {
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('metadata', JSON.stringify({
-        type: 'document',
-        jobId: jobId,
-        title: file.name,
-        category: 'REPORTS'
-      }))
-
-      const response = await fetch('/api/documents', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error('Failed to upload document')
-      const document = await response.json()
-      onUpload?.(document)
-    } catch (error) {
-      console.error('Error uploading document:', error)
-    }
-  }
-
-  const handleControlledDelete = async (documentId: string) => {
-    try {
-      const response = await fetch(`/api/documents/${documentId}?jobId=${jobId}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) throw new Error('Failed to delete document')
-      onDelete?.(documentId)
-    } catch (error) {
-      console.error('Error deleting document:', error)
-    }
-  }
-
-  return (
-    <BaseDocumentStore
+      onDelete={handleDelete}
       title={title}
       description={description}
-      documents={documents}
-      isUploading={false}
-      onDelete={handleControlledDelete}
-      onUpload={handleControlledUpload}
+      isUploading={isUploading}
     />
   )
 }

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
-import path from 'path'
+import path from 'path' // Keep path for joining filename later
 import { PaginationParams, PaginatedResponse, Job } from '../../../../../shared/types/jobs'
+import { getJobsPath } from '@shared/utils/paths' // Import the path utility
 
 // Helper function to extract number from address
 function extractNumber(address: string): number {
@@ -19,8 +20,8 @@ export async function GET(request: Request) {
     const sortBy = searchParams.get('sortBy') || 'address'
     const sortOrder = searchParams.get('sortOrder') || 'asc'
 
-    // Get the jobs directory path
-    const jobsDirectory = path.join(process.cwd(), 'data/jobs')
+    // Get the jobs directory path using the utility
+    const jobsDirectory = getJobsPath() // Use the utility function
 
     // Read all files in the jobs directory
     const files = await fs.readdir(jobsDirectory)

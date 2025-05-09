@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
 import { Input } from "@shared/components/ui/input"
 import { Button } from "@shared/components/ui/button"
 import { useToast } from "@shared/components/ui/use-toast"
-import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useRef } from 'react'
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { useJobs } from '@shared/hooks/useJobs'
@@ -51,8 +51,9 @@ export default function DashboardPage() {
   const [isCreatingJob, setIsCreatingJob] = useState(false)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const { jobs, isLoading, error: jobsError } = useJobs()
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
-  const [jobDetails, setJobDetails] = useState<Job | null>(null)
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [jobDetails, setJobDetails] = useState<Job | null>(null);
+  const router = useRouter(); // Initialize the router
 
   const createJobMutation = useMutation({
     mutationFn: async (jobData: any) => {
@@ -65,8 +66,8 @@ export default function DashboardPage() {
       return response.json()
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] })
-      window.location.href = data.redirectUrl
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      router.push(data.redirectUrl); // Use router.push for client-side navigation
     },
     onError: (error) => {
       setError(error instanceof Error ? error.message : 'Failed to create job')
@@ -235,8 +236,19 @@ export default function DashboardPage() {
     // Special handling for Floor Space Ratio (n:1)
     if (layerName === "Floor Space Ratio (n:1)") {
       return (
+         <div className="space-y-3">
+            {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
+            {renderRow("Units", attributes["Units"])}
+          </div>
+        )
+      }
+
+    // Special handling for Floor Space Ratio
+    if (layerName === "Floor Space Ratio") {
+      return (
         <div className="space-y-3">
           {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
+          {renderRow("Units", attributes["Units"])}
         </div>
       )
     }
@@ -451,9 +463,9 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
                     {[
                       {
-                        name: 'Property Info',
-                        id: 'property-info',
-                        description: 'View property details and planning layers',
+                        name: 'Planning Layers',
+                        id: 'planning-layers',
+                        description: 'View planning layer details and attributes',
                         color: '#EA6B3D',
                       },
                       {
@@ -466,6 +478,12 @@ export default function DashboardPage() {
                         name: 'Document Store',
                         id: 'document-store',
                         description: 'Access and manage documents',
+                        color: '#EEDA54',
+                      },
+                      {
+                        name: 'Initial Assessment',
+                        id: 'initial-assessment',
+                        description: 'Initial assessment of the development',
                         color: '#EEDA54',
                       },
                       {

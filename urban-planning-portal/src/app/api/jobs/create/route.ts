@@ -4,17 +4,17 @@ import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 import { Job } from '@shared/types/jobs'
+import { getJobPath, getJobsPath, getDocumentsPath } from '@shared/utils/paths' // Import path utilities
 
-const JOBS_DIR = path.join(process.cwd(), 'data', 'jobs')
-const DOCUMENTS_DIR = path.join(process.cwd(), 'data', 'documents')
-
-// Ensure directories exist
+// Ensure directories exist using path utilities
 async function ensureDirectoriesExist() {
-  if (!existsSync(JOBS_DIR)) {
-    await mkdir(JOBS_DIR, { recursive: true })
+  const jobsDir = getJobsPath()
+  const documentsDir = getDocumentsPath()
+  if (!existsSync(jobsDir)) {
+    await mkdir(jobsDir, { recursive: true })
   }
-  if (!existsSync(DOCUMENTS_DIR)) {
-    await mkdir(DOCUMENTS_DIR, { recursive: true })
+  if (!existsSync(documentsDir)) {
+    await mkdir(documentsDir, { recursive: true })
   }
 }
 
@@ -51,11 +51,15 @@ export async function POST(request: Request) {
       }
     }
 
-    // Store the job
-    const jobPath = path.join(JOBS_DIR, `${jobId}.json`)
+    // Store the job using the correct path utility
+    const jobPath = getJobPath(jobId) // Use the utility function
     await writeFile(jobPath, JSON.stringify(job, null, 2))
 
-    return NextResponse.json(job)
+    // Construct the redirect URL
+    const redirectUrl = `/professionals/jobs/${jobId}`
+
+    // Return the redirect URL instead of the full job object
+    return NextResponse.json({ redirectUrl })
   } catch (error) {
     console.error('Error creating job:', error)
     return NextResponse.json({ error: 'Failed to create job' }, { status: 500 })

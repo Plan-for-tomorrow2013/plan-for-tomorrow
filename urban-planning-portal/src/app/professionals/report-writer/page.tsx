@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from "@shared/components/ui/button"
@@ -17,17 +17,19 @@ import { DocumentWithStatus } from '@shared/types/documents'
 import { Input } from "@shared/components/ui/input"
 import { Textarea } from "@shared/components/ui/textarea"
 import { toast } from "@shared/components/ui/use-toast"
-import { PropertyInfo } from '@shared/components/PropertyInfo'
+import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo'
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
-import { DocumentStatus } from '@shared/components/DocumentStatus'
+import { DocumentStatus } from '@shared/components/DocumentStatus' // Keep this one
 import { Job, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@/utils/report-utils'
-import type { PropertyDataShape } from '@shared/components/PropertyInfo'
+// Removed duplicate PropertyDataShape import
 import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
 import { DocumentUpload } from "@shared/components/DocumentUpload"
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
-import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'
+import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'; // Import SiteDetailsProvider and useSiteDetails
+import { AlertTitle } from "@shared/components/ui/alert"
+import camelcaseKeys from 'camelcase-keys'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -41,6 +43,7 @@ interface ReportFormState {
   paymentComplete: boolean
   showPaymentButton: boolean
   hasUnsavedChanges: boolean
+  purchaseInitiated: boolean // Added flag for purchase initiation
 }
 
 interface ReportWriterFormState {
@@ -88,80 +91,6 @@ interface ReportSectionProps {
   isLoading: boolean
 }
 
-const ReportSection = ({ doc, job, onUpload, onDownload, onDelete, isLoading }: ReportSectionProps) => {
-  const status = getReportStatus(doc, job)
-  const title = getReportTitle(doc.id)
-
-  return (
-    <Card className="mb-4">
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <div className="flex items-center space-x-2">
-            {status.isPaid && <span className="text-green-500">Paid</span>}
-            {status.isCompleted && <span className="text-blue-500">Completed</span>}
-            {status.isUploaded && <span className="text-purple-500">Uploaded</span>}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {status.hasFile && (
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                onClick={onDownload}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Download'
-                )}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={onDelete}
-                disabled={isLoading}
-              >
-                Delete
-              </Button>
-            </div>
-          )}
-
-          {!status.hasFile && (
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) onUpload(file)
-                  }}
-                  disabled={isLoading}
-                />
-                {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              </div>
-              <p className="text-sm text-gray-500">
-                Upload a PDF or Word document
-              </p>
-            </div>
-          )}
-
-          {status.reportData && (
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Report Data</h4>
-              <pre className="bg-gray-100 p-2 rounded text-sm overflow-auto">
-                {JSON.stringify(status.reportData, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
-      </div>
-    </Card>
-  )
-}
-
 // Define fetch function for individual job details
 const fetchJobDetails = async (jobId: string): Promise<Job> => {
   const response = await fetch(`/api/jobs/${jobId}`);
@@ -170,7 +99,8 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
     console.error("Failed to fetch job details:", response.status, errorBody);
     throw new Error(`Failed to fetch job details for ID ${jobId}. Status: ${response.status}`);
   }
-  return response.json();
+  const data = await response.json();
+  return camelcaseKeys(data, { deep: true });
 };
 
 // Define fetch function for pre-prepared assessments
@@ -187,7 +117,7 @@ const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSecti
         console.error("Invalid pre-prepared assessments data received:", data);
         throw new Error('Invalid pre-prepared assessments data received');
     }
-    return data;
+    return camelcaseKeys(data, { deep: true });
 };
 
 const formatDate = (dateString: string) => {
@@ -220,16 +150,14 @@ function normalizeSiteDetails(data: any): SiteDetails {
   };
 }
 
-function ReportWriterContent({ params }: { params: { id: string } }) {
+// *** NEW COMPONENT for Job-Specific Content ***
+function JobReportWriter({ jobId }: { jobId: string }) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { jobs } = useJobs()
-  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined)
-  const { documents, isLoading, error, uploadDocument, removeDocument, downloadDocument } = useDocuments()
+  const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
+  console.log('[ReportWriter] documents from context:', documents);
   const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
   const [documentError, setDocumentError] = useState<string | null>(null)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-
   // Combined state for both report forms (Keep this)
   const [formState, setFormState] = useState<ReportWriterFormState>({
     'custom-assessment': {
@@ -237,18 +165,21 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
+      purchaseInitiated: false, // Initialize flag
     },
     'statement-of-environmental-effects': {
       formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' },
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
+      purchaseInitiated: false, // Initialize flag
     },
     'complying-development-certificate': {
       formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' },
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
+      purchaseInitiated: false, // Initialize flag
     },
   });
 
@@ -262,17 +193,18 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
 
   // Load form data from local storage when the job ID changes
   useEffect(() => {
-    if (!selectedJobId) {
+    if (!jobId) { // Use jobId prop
+      // Reset state including purchaseInitiated
       setFormState({
-        'custom-assessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
-        'statement-of-environmental-effects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
-        'complying-development-certificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
+        'custom-assessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'statement-of-environmental-effects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'complying-development-certificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       });
       return;
     }
 
     const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => { // Ensure return type matches
-      const savedData = localStorage.getItem(`${formType}-${selectedJobId}`);
+      const savedData = localStorage.getItem(`${formType}-${jobId}`); // Use jobId prop
       if (savedData) {
         try {
           const parsedData = JSON.parse(savedData);
@@ -280,11 +212,11 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
             return parsedData;
           } else {
             console.warn(`Invalid data found in local storage for ${formType}, resetting.`);
-            localStorage.removeItem(`${formType}-${selectedJobId}`);
+            localStorage.removeItem(`${formType}-${jobId}`); // Use jobId prop
           }
         } catch (error) {
           console.error(`Failed to parse ${formType} data from local storage:`, error);
-          localStorage.removeItem(`${formType}-${selectedJobId}`);
+          localStorage.removeItem(`${formType}-${jobId}`); // Use jobId prop
         }
       }
       return { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }; // Default empty form
@@ -297,30 +229,24 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         ...prev['custom-assessment'], // Spread specific form type state
         formData: loadFormData('custom-assessment'),
         hasUnsavedChanges: false,
+        purchaseInitiated: false, // Reset on load
       },
       'statement-of-environmental-effects': {
         ...prev['statement-of-environmental-effects'], // Spread specific form type state
         formData: loadFormData('statement-of-environmental-effects'),
         hasUnsavedChanges: false,
+        purchaseInitiated: false, // Reset on load
       },
       'complying-development-certificate': {
         ...prev['complying-development-certificate'], // Spread specific form type state
         formData: loadFormData('complying-development-certificate'),
         hasUnsavedChanges: false,
+        purchaseInitiated: false, // Reset on load
       },
     }));
 
-  }, [selectedJobId]);
+  }, [jobId]); // Depend on jobId prop
 
-
-    // Set initial job ID from URL if present
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const jobId = params.get('job')
-    if (jobId) {
-      setSelectedJobId(jobId)
-    }
-  }, [])
 
   // --- React Query for fetching selected job details ---
   const {
@@ -328,10 +254,11 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     isLoading: isJobLoading,
     error: jobError,
     isError: isJobError,
-  } = useQuery<Job, Error>({
-    queryKey: ['job', selectedJobId],
-    queryFn: () => fetchJobDetails(selectedJobId!),
-    enabled: !!selectedJobId,
+    refetch: refetchJob, // Add refetch if needed elsewhere
+  } = useQuery<Job, Error>({ // *** Use jobId prop ***
+    queryKey: ['job', jobId],
+    queryFn: () => fetchJobDetails(jobId),
+    enabled: !!jobId, // Enable only when jobId is present
   });
   // --- End React Query ---
 
@@ -366,7 +293,9 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         'custom-assessment': {
           ...prev['custom-assessment'],
           paymentComplete: currentJob.customAssessment?.status === 'paid',
-          showPaymentButton: currentJob.customAssessment?.status !== 'paid',
+          showPaymentButton: currentJob.customAssessment?.status === 'paid'
+            ? false
+            : prev['custom-assessment'].purchaseInitiated && !prev['custom-assessment'].paymentComplete,
           formData: prev['custom-assessment'].hasUnsavedChanges
             ? prev['custom-assessment'].formData
             : {
@@ -379,7 +308,9 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         'statement-of-environmental-effects': {
           ...prev['statement-of-environmental-effects'],
           paymentComplete: currentJob.statementOfEnvironmentalEffects?.status === 'paid',
-          showPaymentButton: currentJob.statementOfEnvironmentalEffects?.status !== 'paid',
+          showPaymentButton: currentJob.statementOfEnvironmentalEffects?.status === 'paid'
+            ? false
+            : prev['statement-of-environmental-effects'].purchaseInitiated && !prev['statement-of-environmental-effects'].paymentComplete,
           formData: prev['statement-of-environmental-effects'].hasUnsavedChanges
             ? prev['statement-of-environmental-effects'].formData
             : {
@@ -392,7 +323,9 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         'complying-development-certificate': {
           ...prev['complying-development-certificate'],
           paymentComplete: currentJob.complyingDevelopmentCertificate?.status === 'paid',
-          showPaymentButton: currentJob.complyingDevelopmentCertificate?.status !== 'paid',
+          showPaymentButton: currentJob.complyingDevelopmentCertificate?.status === 'paid'
+            ? false
+            : prev['complying-development-certificate'].purchaseInitiated && !prev['complying-development-certificate'].paymentComplete,
           formData: prev['complying-development-certificate'].hasUnsavedChanges
             ? prev['complying-development-certificate'].formData
             : {
@@ -416,30 +349,31 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         setPurchasedAssessments({})
       }
 
-      // Update site details state if not already modified locally
+      // Update site details state from fetched job if not already modified locally
       if (!hasUnsavedSiteDetails) {
         updateSiteDetails(normalizeSiteDetails(currentJob.siteDetails || {}))
       }
 
       setDocumentError(null)
-    } else if (!selectedJobId) {
+    } else if (!jobId) { // Corrected: Use jobId prop here instead of selectedJobId
       // Reset states if no job is selected
+      // Reset states including purchaseInitiated if no job is selected
       setFormState({
-        'custom-assessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
-        'statement-of-environmental-effects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
-        'complying-development-certificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false },
+        'custom-assessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'statement-of-environmental-effects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'complying-development-certificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       })
       setPurchasedAssessments({})
-      updateSiteDetails({})
+      updateSiteDetails({}) // Assuming updateSiteDetails({}) resets the site details state
       setDocumentError(null)
     }
-
-    if (isJobError) {
+    // Dependencies: currentJob, jobId, isJobError, jobError, hasUnsavedSiteDetails, updateSiteDetails
+    else if (isJobError) { // Use else if to avoid setting error when resetting
       console.error('Error fetching job data:', jobError)
       setDocumentError(jobError?.message || 'Failed to load job data')
     }
-  }, [currentJob, selectedJobId, isJobError, jobError, hasUnsavedSiteDetails])
-
+  // *** Depend on jobId prop ***
+  }, [currentJob, jobId, isJobError, jobError, hasUnsavedSiteDetails, updateSiteDetails])
 
   const isAssessmentReturned = (type: 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate') => {
     if (!currentJob) return false;
@@ -455,9 +389,11 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isActive: true,
-      status: 'pending'
+      // Corrected: Use displayStatus and a valid initial state
+      displayStatus: 'pending_user_upload'
     };
-    const { isCompleted } = getReportStatus(doc, currentJob)
+    // Note: getReportStatus might need adjustment if it relies on the old status field internally
+    const { isCompleted } = getReportStatus(doc, currentJob || {} as Job)
     return isCompleted
   }
 
@@ -465,7 +401,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   const handleFormChange = (formType: keyof ReportWriterFormState, field: keyof CustomAssessmentForm) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-     if (!selectedJobId) return;
+     if (!jobId) return; // Use jobId prop
      setFormState(prev => ({
        ...prev,
        [formType]: {
@@ -479,25 +415,65 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
      }));
   };
 
+  // Handler to initiate the purchase flow for a specific report type
+  const handleInitiatePurchase = (formType: keyof ReportWriterFormState) => {
+    setFormState(prev => ({
+      ...prev,
+      [formType]: {
+        ...prev[formType],
+        purchaseInitiated: true,
+      },
+    }));
+  };
 
-  // Generalized confirm details handler
+
+  // Generalized confirm details handler - Restructured for sequential validation
   const handleConfirmDetails = (formType: keyof ReportWriterFormState) => {
-     if (!selectedJobId) return;
+     console.log(`[handleConfirmDetails] Called for formType: ${formType}`);
+     if (!jobId) {
+        console.log('[handleConfirmDetails] No jobId, returning.');
+        return;
+     }
      const currentFormData = formState[formType].formData;
-     if (!currentFormData.developmentType.trim()) {
-       alert('Please enter the development type');
-       return;
+     console.log(`[handleConfirmDetails] Checking developmentType: "${currentFormData.developmentType}"`);
+
+     // 1. Check Development Type
+     if (currentFormData.developmentType.trim().length === 0) {
+       console.log('[handleConfirmDetails] Development type is empty. Showing toast and returning.');
+       toast({
+         title: "Missing Information",
+         description: "Please enter the development type.",
+         variant: "destructive",
+       });
+       return; // Exit if validation fails
      }
-     const certificate107Doc = documents.find(doc => doc.id === '10-7-certificate');
-     if (!certificate107Doc || certificate107Doc.status !== 'uploaded') {
-       alert('Please upload the 10.7 Certificate before proceeding');
-       return;
+     console.log('[handleConfirmDetails] Development type check passed.');
+
+     // 2. Check 10.7 Certificate (if required)
+     const requires107Certificate = formType === 'custom-assessment' || formType === 'complying-development-certificate';
+     console.log(`[handleConfirmDetails] Requires 10.7 Cert: ${requires107Certificate}`);
+     if (requires107Certificate) {
+        const certificate107Doc = documents.find(doc => doc.id === '10-7-certificate');
+        console.log(`[handleConfirmDetails] Checking 10.7 Cert status: ${certificate107Doc?.displayStatus}`);
+        if (!certificate107Doc || certificate107Doc.displayStatus !== 'uploaded') {
+          console.log('[handleConfirmDetails] 10.7 Cert missing/not uploaded. Showing toast and returning.');
+          toast({
+            title: "Missing Document",
+            description: "Please upload the 10.7 Certificate before proceeding.",
+            variant: "destructive",
+          });
+          return; // Exit if validation fails
+        }
+        console.log('[handleConfirmDetails] 10.7 Cert check passed.');
      }
+
+     // 3. All checks passed - Proceed to update state
+     console.log('[handleConfirmDetails] All checks passed. Setting showPaymentButton = true.');
      setFormState(prev => ({
        ...prev,
        [formType]: {
          ...prev[formType],
-         showPaymentButton: true,
+         showPaymentButton: true, // Only set if all checks pass
        },
      }));
   };
@@ -505,7 +481,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   // --- Mutation for Updating Job Status (Payment) ---
   const updateJobMutation = useMutation<Job, Error, { jobId: string; payload: Partial<Job> }>({
     mutationFn: async ({ jobId, payload }) => {
-      const response = await fetch(`/api/jobs/${jobId}`, {
+      const response = await fetch(`/api/jobs/${jobId}`, { // Use jobId from arguments
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -517,17 +493,11 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
       return response.json();
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
-      const formType = Object.keys(variables.payload)[0] as keyof ReportWriterFormState | undefined;
-      if (formType && (formType === 'custom-assessment' || formType === 'statement-of-environmental-effects' || formType === 'complying-development-certificate')) {
-          setFormState(prev => ({
-            ...prev,
-            [formType]: {
-              ...prev[formType],
-              showPaymentButton: false,
-            },
-          }));
-      }
+      console.log('[updateJobMutation onSuccess] Received data from PATCH. Setting queryClient cache:', data);
+      // Directly update the React Query cache with the fresh data from the PATCH response.
+      // The useEffect hook observing currentJob will then derive the formState from this.
+      queryClient.setQueryData(['job', variables.jobId], data);
+      // Intentionally not calling refetchJob() immediately to rely on setQueryData.
     },
     onError: (error) => {
       console.error("Error updating job status:", error);
@@ -542,18 +512,23 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   // --- Mutation for Creating Work Ticket ---
   const createWorkTicketMutation = useMutation<any, Error, any>({
     mutationFn: async (payload) => {
-      const formData = new FormData()
-      formData.append('file', payload.file)
+      // Revert to FormData as expected by the API
+      const formData = new FormData();
+      // Append metadata as a JSON string. The payload itself contains all necessary info.
       formData.append('metadata', JSON.stringify({
-        jobId: params.id,
+        jobId: payload.jobId, // Ensure jobId is correctly passed in payload
         jobAddress: payload.jobAddress,
         ticketType: payload.ticketType,
-        uploadedBy: 'professional'
-      }))
+        uploadedBy: 'professional', // Assuming this is constant
+        // Include the report-specific data from the payload
+        reportData: payload[payload.ticketType]
+      }));
+      // DO NOT append a 'file' field as it's not provided in the payload
 
       const response = await fetch('/api/work-tickets', {
         method: 'POST',
-        body: formData,
+        body: formData, // Send the FormData object
+        // Let the browser set the Content-Type header for FormData
       })
 
       if (!response.ok) {
@@ -575,7 +550,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
 
   // Generalized payment handler - Refactored with useMutation
   const handlePayment = async (formType: keyof ReportWriterFormState) => {
-    if (!selectedJobId || !currentJob) {
+    if (!jobId || !currentJob) { // Use jobId prop
       toast({ title: "Error", description: "Job data not loaded.", variant: "destructive" });
       return;
     }
@@ -589,27 +564,27 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     }
 
     const workTicketPayload = {
-      jobId: selectedJobId,
-      jobAddress: currentJob.address,
-      ticketType: formType,
-      [formType]: {
-        developmentType: currentFormData.developmentType,
-        additionalInfo: currentFormData.additionalInfo,
-        documents: {
-          certificateOfTitle: {
-            originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-            filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
-          },
-          surveyPlan: {
-            originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-            filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
-          },
-          certificate107: {
-            originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-            filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+        jobId: jobId, // Use jobId prop
+        jobAddress: currentJob.address,
+        ticketType: formType,
+        [formType]: {
+          developmentType: currentFormData.developmentType,
+          additionalInfo: currentFormData.additionalInfo,
+          documents: {
+            certificateOfTitle: {
+              originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
+              filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
+            },
+            surveyPlan: {
+              originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
+              filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
+            },
+            certificate107: {
+              originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
+              filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+            }
           }
         }
-      }
     };
 
     const jobUpdatePayload = {
@@ -626,7 +601,22 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
 
     try {
       await createWorkTicketMutation.mutateAsync(workTicketPayload);
-      await updateJobMutation.mutateAsync({ jobId: selectedJobId, payload: jobUpdatePayload });
+      await updateJobMutation.mutateAsync({ jobId: jobId, payload: jobUpdatePayload }); // Use jobId prop
+
+      // Invalidate the job query so UI refetches latest data
+      await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+      await queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
+
+      // Update the form state immediately after successful payment
+      setFormState(prev => ({
+        ...prev,
+        [formType]: {
+          ...prev[formType],
+          paymentComplete: true,
+          showPaymentButton: false,
+          purchaseInitiated: false
+        }
+      }));
 
       toast({
         title: "Success",
@@ -649,7 +639,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   // --- Mutation for Saving Site Details ---
   const saveSiteDetailsMutation = useMutation<Job, Error, { jobId: string; details: SiteDetails }>({
       mutationFn: async ({ jobId, details }) => {
-          const response = await fetch(`/api/jobs/${jobId}`, {
+          const response = await fetch(`/api/jobs/${jobId}`, { // Use jobId from arguments
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ siteDetails: details }),
@@ -661,8 +651,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
           return response.json();
       },
       onSuccess: (data, variables) => {
-          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
-          updateSiteDetails({});
+          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] }); // Use jobId from variables
+          updateSiteDetails({}); // Reset local unsaved changes state in useSiteDetails hook
           toast({
               title: "Success",
               description: "Site details saved successfully.",
@@ -680,20 +670,20 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
 
   // Updated save function for Site Details - uses useMutation
   const handleSaveSiteDetails = () => {
-    if (!selectedJobId) {
+    if (!jobId) { // Use jobId prop
       toast({ title: "Error", description: "No job selected.", variant: "destructive" })
       return
     }
     console.log('Saving Site Details via mutation:', siteDetails)
-    saveSiteDetailsMutation.mutate({ jobId: selectedJobId, details: siteDetails })
+    saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails }) // Use jobId prop
   }
 
 
   // --- Mutation for Purchasing Pre-prepared Assessments ---
   const purchasePrePreparedMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
-    mutationFn: async ({ assessment }) => {
-      if (!selectedJobId) throw new Error("No job selected");
-      const response = await fetch(`/api/jobs/${selectedJobId}/pre-prepared-assessments/purchase`, {
+    mutationFn: async ({ assessment }) => { // Use jobId prop inside
+      if (!jobId) throw new Error("No job selected"); // *** Use jobId prop ***
+      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, { // *** Use jobId prop ***
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -714,7 +704,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
       return response.json();
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['job', selectedJobId] });
+      queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Use jobId prop
       setPurchasedAssessments(prev => ({
         ...prev,
         [variables.assessment.id]: true
@@ -737,8 +727,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   // Handle pre-prepared assessments purchase and download
   const handlePrePreparedAssessments = async (assessment: PrePreparedAssessment) => {
     try {
-      // Fetch job details
-      const jobResponse = await fetch(`/api/jobs/${selectedJobId}`);
+      // Fetch job details using jobId prop
+      const jobResponse = await fetch(`/api/jobs/${jobId}`); // *** Use jobId prop ***
       if (!jobResponse.ok) {
         throw new Error('Failed to fetch job details');
       }
@@ -757,7 +747,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            jobId: selectedJobId,
+            jobId: jobId, // Use jobId prop
             assessmentId: assessment.id,
             type: 'pre-prepared-assessment',
           }),
@@ -822,13 +812,14 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
   // --- Mutation for Uploading Document ---
   const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
       mutationFn: async ({ documentId, file }) => {
-          if (!selectedJobId) throw new Error("No job selected");
+          if (!jobId) throw new Error("No job selected"); // Use jobId prop
           const formData = new FormData();
           formData.append('file', file);
-          formData.append('documentId', documentId);
+          // Corrected key from 'documentId' to 'docId' to match backend API expectation
+          formData.append('docId', documentId);
 
-          const response = await fetch(`/api/jobs/${selectedJobId}/documents/upload`, {
-              method: 'POST',
+          const response = await fetch(`/api/jobs/${jobId}/documents/upload`, { // Use jobId prop
+              method: 'POST', // Corrected method
               body: formData,
           });
           if (!response.ok) {
@@ -837,35 +828,29 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
           }
           return response.json();
       },
-      onSuccess: (data, variables) => {
-          queryClient.invalidateQueries({ queryKey: ['job', selectedJobId] });
-          toast({
-              title: "Success",
-              description: "Document uploaded successfully",
-          });
-      },
-      onError: (error) => {
-          console.error('Error uploading document:', error);
-          toast({
-              title: "Upload Error",
-              description: `Failed to upload document: ${error.message}`,
-              variant: "destructive",
-          });
-      },
+    onSuccess: (data, variables) => {
+        // Corrected: Invalidate relevant queries using jobId from component scope
+        queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] }); // Document context uses this key
+        queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Invalidate job data as well
+        toast({
+            title: "Success",
+            description: "Document uploaded successfully",
+        });
+    },
   });
 
   // Refactored handleFileUpload to use mutation
   const handleFileUpload = (documentId: string, file: File) => {
-    if (!selectedJobId) {
+    if (!jobId) { // Use jobId prop
       toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
       return;
     }
     uploadDocumentMutation.mutate({ documentId, file });
   }
 
-  const handleDownload = async (documentId: string) => {
-     if (!selectedJobId) return;
-     window.location.href = `/api/jobs/${selectedJobId}/documents/${documentId}/download`;
+  const handleDownload = async (documentId: string) => { // Use jobId prop
+     if (!jobId) return;
+     window.location.href = `/api/jobs/${jobId}/documents/${documentId}/download`; // *** Use jobId prop ***
   };
 
   const handleUpload = (docId: string) => {
@@ -875,134 +860,60 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     input.onchange = async (event: Event) => {
       const file = (event.target as HTMLInputElement).files?.[0]
       if (file) {
-        await uploadDocument(params.id, docId, file)
+        // Use the mutation wrapper
+        handleFileUpload(docId, file);
+        // await uploadDocument(jobId, docId, file) // Avoid direct call if mutation handles it
       }
     }
     input.click()
   }
 
-  const handleDelete = async (docId: string) => {
+  // --- Mutation for Removing Document ---
+  const removeDocumentMutation = useMutation<any, Error, { documentId: string }>({
+      mutationFn: async ({ documentId }) => {
+          if (!jobId) throw new Error("No job selected");
+          const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}`, { // Use jobId prop
+              method: 'DELETE',
+          });
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Failed to delete document');
+          }
+          return response.json(); // Or handle empty response if API returns 204
+      },
+      onSuccess: (data, variables) => {
+          queryClient.invalidateQueries({ queryKey: ['documents', jobId] }); // Use jobId prop
+          queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Also invalidate job data
+          toast({
+              title: "Success",
+              description: "Document deleted successfully",
+          });
+      },
+      onError: (error) => {
+          console.error('Error deleting document:', error);
+          toast({
+              title: "Delete Error",
+              description: `Failed to delete document: ${error.message}`,
+              variant: "destructive",
+          });
+      },
+  });
+
+  const handleDelete = async (docId: string) => { // Use jobId prop
     if (confirm('Are you sure you want to delete this document?')) {
-      await removeDocument(params.id, docId)
+      removeDocumentMutation.mutate({ documentId: docId }); // *** Use mutation ***
     }
   }
 
-  // Add the renderDocumentCard function from document store
-  const renderDocumentCard = (doc: DocumentWithStatus) => {
-    const isUploaded = doc.status === 'uploaded'
-    const isRequired = ['certificate-of-title', 'survey-plan'].includes(doc.id) ||
-      (doc.id === '10-7-certificate' && currentJob?.customAssessment?.status === 'paid')
-
-    return (
-      <Card key={doc.id} className="relative">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold">{doc.title}</h3>
-              {isRequired && (
-                <p className="text-sm text-red-500">Required</p>
-              )}
-            </div>
-            {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isUploaded && doc.uploadedFile ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.uploadedFile.originalName}</span>
-              </div>
-              <div className="text-sm text-gray-500">
-                Uploaded on {doc.uploadedFile.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
-                {doc.uploadedFile.size && (
-                  <span className="ml-2">
-                    ({(doc.uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)
-                  </span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    try {
-                      handleDownload(doc.id)
-                    } catch (error) {
-                      console.error('Error downloading document:', error)
-                      toast({
-                        title: "Download Failed",
-                        description: error instanceof Error ? error.message : "Failed to download document",
-                        variant: "destructive"
-                      })
-                    }
-                  }}
-                >
-                  <FileText className="h-4 w-4 mr-2" />Download
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => {
-                    if (confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
-                      try {
-                        handleDelete(doc.id)
-                      } catch (error) {
-                        console.error('Error deleting document:', error)
-                        toast({
-                          title: "Delete Failed",
-                          description: error instanceof Error ? error.message : "Failed to delete document",
-                          variant: "destructive"
-                        })
-                      }
-                    }
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => {
-                  try {
-                    handleUpload(doc.id)
-                  } catch (error) {
-                    console.error('Error initiating upload:', error)
-                    toast({
-                      title: "Upload Failed",
-                      description: error instanceof Error ? error.message : "Failed to initiate upload",
-                      variant: "destructive"
-                    })
-                  }
-                }}
-              >
-                <Upload className="h-4 w-4 mr-2" />Upload Document
-              </Button>
-              {isRequired && (
-                <p className="text-sm text-red-500">
-                  This document is required to proceed
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    )
-  }
-
-  const renderRequiredDocuments = () => {
-    // Debug logging
-    console.log('[ReportWriter] Rendering required documents:', {
+const renderRequiredDocuments = () => {
+  // Debug logging
+  console.log('[ReportWriter] Rendering required documents:', {
       documentCount: documents.length,
       documentTypes: documents.map(doc => doc.type)
     });
 
     // Show loading state if documents are being fetched
-    if (isLoading) {
+    if (isDocsLoading) { // Use specific loading state
       return (
         <div className="flex flex-col items-center justify-center p-8">
           <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -1012,39 +923,19 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     }
 
     // Show error state if there's an error
-    if (error) {
+    if (docsError) { // Use specific error state
       return (
         <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
           <AlertCircle className="h-8 w-8 text-red-500" />
-          <p className="mt-4 text-red-600">Error loading documents</p>
-          <p className="text-sm text-gray-600 mt-2">{error}</p>
+          <p className="mt-4 text-red-600">Error loading documents: {docsError}</p>
+          {/* Corrected: Removed out-of-scope {error} variable */}
+          <p className="text-sm text-gray-600 mt-2">Please check the console for details or try again.</p>
         </div>
       );
     }
 
-    // Filter documents based on visibility rules
-    const visibleDocuments = documents.filter(doc => {
-      // Base documents are always visible
-      if (['certificate-of-title', 'survey-plan', '10-7-certificate'].includes(doc.id)) {
-        return true;
-      }
-
-      // Assessment documents visibility depends on job status
-      if (doc.type === 'assessment') {
-        // Check if the assessment is associated with a paid job
-        const isPaid =
-          (doc.id === 'custom-assessment' && currentJob?.customAssessment?.status === 'paid') ||
-          (doc.id === 'statement-of-environmental-effects' && currentJob?.statementOfEnvironmentalEffects?.status === 'paid') ||
-          (doc.id === 'complying-development-certificate' && currentJob?.complyingDevelopmentCertificate?.status === 'paid');
-        return isPaid;
-      }
-
-      // All other documents are visible
-      return true;
-    });
-
     // Show empty state if no documents are visible
-    if (!visibleDocuments || visibleDocuments.length === 0) {
+    if (!documents || documents.length === 0) { // Check raw documents from hook
       return (
         <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg">
           <FileText className="h-8 w-8 text-gray-400" />
@@ -1055,34 +946,99 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     }
 
     // Show filtered documents
+    const renderDocumentCard = (doc: DocumentWithStatus) => {
+      const isReportPlaceholder = doc.type === 'report' && doc.filename === 'pending';
+      // Uses handleDownload, handleDelete, handleUpload which now use jobId prop correctly
+      // Corrected: Use displayStatus
+      const isUploaded = doc.displayStatus === 'uploaded'
+      return (
+        <Card key={doc.id} className="relative">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="text-sm">{doc.title}</span>
+                {isReportPlaceholder && (
+                  <span className="text-xs text-yellow-600 ml-2">(Report In Progress)</span>
+                )}
+              </div>
+              {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isUploaded && doc.uploadedFile ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-sm">{doc.uploadedFile.originalName}</span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Uploaded on {doc.uploadedFile.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={() => handleDownload(doc.id)}>
+                    <FileText className="h-4 w-4 mr-2" />Download
+                  </Button>
+                  {!isReportPlaceholder && (
+                    <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : isReportPlaceholder ? (
+              <div className="text-sm text-gray-500 text-center py-4">
+                Purchase successful. Document pending delivery from admin.
+              </div>
+            ) : (
+              <Button variant="outline" className="w-full" onClick={() => handleUpload(doc.id)}>
+                <Upload className="h-4 w-4 mr-2" />Upload Document
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )
+    }
+
+    // Corrected: Wrap multiple elements in a React Fragment
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {visibleDocuments.map(doc => {
-          // Debug logging for each document
-          console.log('[ReportWriter] Rendering document:', {
-            id: doc.id,
-            type: doc.type,
-            status: doc.status,
-            visibility: 'visible'
-          });
-          return renderDocumentCard(doc);
-        })}
-      </div>
-    );
+      <>
+        {/* Removed wrapping div <div className="space-y-6"> */}
+        {/* Removed empty div </div> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {documents.map(doc => renderDocumentCard(doc))}
+        </div>
+      </>
+    )
   }
 
   // Updated renderCustomAssessmentForm function
   const renderCustomAssessmentForm = (formType: keyof ReportWriterFormState) => {
+    // Uses formState, currentJob, documents, handlers from JobReportWriter scope
     const specificFormState = formState[formType];
-    const paymentComplete = formType === 'statement-of-environmental-effects'
-      ? currentJob?.statementOfEnvironmentalEffects?.status === 'paid'
-      : formType === 'complying-development-certificate'
-      ? currentJob?.complyingDevelopmentCertificate?.status === 'paid'
-      : currentJob?.customAssessment?.status === 'paid';
-    const assessmentReturned = isAssessmentReturned(formType);
+    const reportTitle = getReportTitle(formType); // Get the display title
+
+    // Use getReportStatus to determine paid/in-progress/completed
+    const doc: DocumentWithStatus = {
+      id: formType,
+      title: reportTitle,
+      category: 'Report',
+      description: '',
+      path: '/document-store',
+      type: 'document',
+      versions: [],
+      currentVersion: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isActive: true,
+      displayStatus: 'pending_user_upload',
+    };
+    const { isPaid, isCompleted } = getReportStatus(doc, currentJob || {} as Job);
+    const purchaseInitiated = specificFormState.purchaseInitiated; // Get the flag
     const isStatementOfEnvironmentalEffects = formType === 'statement-of-environmental-effects';
 
-    if (assessmentReturned) {
+    // 1. Check if assessment is returned (completed)
+    if (isCompleted) {
       // Completed Card JSX
       return (
         <div className="border rounded-lg p-4 bg-green-50">
@@ -1100,7 +1056,9 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
         </div>
       );
     }
-    if (paymentComplete) {
+
+    // 2. Check if payment is complete (in progress)
+    if (isPaid) {
       // In Progress Card JSX
       return (
         <div className="border rounded-lg p-4 bg-yellow-50">
@@ -1121,6 +1079,22 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
       );
     }
 
+    // 3. Check if purchase has been initiated
+    if (!purchaseInitiated) {
+      // Initial State: Show only the "Purchase" button
+      return (
+        <div className="flex justify-center items-center p-6">
+          <Button
+            className="w-full max-w-xs" // Added max-width for better appearance
+            onClick={() => handleInitiatePurchase(formType)}
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase {reportTitle}
+          </Button>
+        </div>
+      );
+    }
+
+    // 4. Purchase initiated, but not paid/completed: Show the form
     const currentFormData = specificFormState.formData;
     const showPaymentBtn = specificFormState.showPaymentButton;
     const certificate107Doc = documents.find(doc => doc.id === '10-7-certificate');
@@ -1130,17 +1104,52 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     // Only require 10.7 certificate for custom assessment and complying development certificate
     const requires107Certificate = formType === 'custom-assessment' || formType === 'complying-development-certificate';
 
+    // Explicitly calculate disable conditions here for clarity
+    const isDevTypeEmpty = currentFormData.developmentType.trim().length === 0;
+    const isCertMissing = requires107Certificate && (!certificate107Doc || certificate107Doc.displayStatus !== 'uploaded');
+    const isConfirmButtonDisabled = isDevTypeEmpty || isCertMissing;
+
+
     return (
       <div className="space-y-6">
         <div className="space-y-4">
           {/* Input Fields */}
           <div><label className="block text-sm font-medium mb-2">Development Type</label><Input placeholder="Enter the type of development" value={currentFormData.developmentType} onChange={handleFormChange(formType, 'developmentType')} /></div>
           <div><label className="block text-sm font-medium mb-2">Additional Information</label><Textarea placeholder="Enter any additional information about your development" value={currentFormData.additionalInfo} onChange={handleFormChange(formType, 'additionalInfo')} rows={4} /></div>
-          {/* Document Requirements */}
-          <div className="space-y-3 border-t pt-4 mt-4">
-             <h4 className="font-medium text-gray-700">Document Requirements</h4>
-             <p className="text-xs text-gray-500">Please ensure the following documents are uploaded in the 'Documents' section above before proceeding.</p>
-             {requires107Certificate && (
+
+          {/* Attached Documents Section */}
+          {(() => {
+            const uploadedDocs = [
+              certificate107Doc,
+              certificateOfTitle,
+              surveyPlan
+            ].filter(doc => doc?.displayStatus === 'uploaded');
+
+            if (uploadedDocs.length === 0) return null;
+
+            return (
+              <div className="space-y-2 border-t pt-4 mt-4">
+                <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
+                <p className="text-xs text-gray-500">The following uploaded documents will be included with your submission:</p>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  {uploadedDocs.map(doc => (
+                    // Use optional chaining for safety
+                    <li key={doc?.id}>
+                      {doc?.title}
+                      {doc?.uploadedFile?.originalName && ` (${doc.uploadedFile.originalName})`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
+
+          {/* Document Requirements - Only shown if 10.7 Cert is required */}
+          {requires107Certificate && (
+            <div className="space-y-3 border-t pt-4 mt-4">
+               <h4 className="font-medium text-gray-700">Document Requirements</h4>
+               <p className="text-xs text-gray-500">Please ensure the following document is uploaded in the 'Documents' section above before proceeding.</p>
+               {/* Display 10.7 Certificate Status */}
                <DocumentStatus document={{
                  id: '10-7-certificate',
                  title: '10.7 Certificate',
@@ -1152,42 +1161,15 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
                  createdAt: '',
                  updatedAt: '',
                  isActive: true,
-                 status: certificate107Doc?.status === 'uploaded' ? 'uploaded' : 'pending',
+                 // Corrected: Use displayStatus and map appropriately
+                 displayStatus: certificate107Doc?.displayStatus === 'uploaded' ? 'uploaded' : 'pending_user_upload',
                }} />
-             )}
-             {certificateOfTitle && (
-               <DocumentStatus document={{
-                 id: 'certificate-of-title',
-                 title: 'Certificate of Title',
-                 path: '',
-                 type: 'document',
-                 category: '',
-                 versions: [],
-                 currentVersion: 1,
-                 createdAt: '',
-                 updatedAt: '',
-                 isActive: true,
-                 status: certificateOfTitle.status === 'uploaded' ? 'uploaded' : 'pending',
-               }} />
-             )}
-             {surveyPlan && (
-               <DocumentStatus document={{
-                 id: 'survey-plan',
-                 title: 'Survey Plan',
-                 path: '',
-                 type: 'document',
-                 category: '',
-                 versions: [],
-                 currentVersion: 1,
-                 createdAt: '',
-                 updatedAt: '',
-                 isActive: true,
-                 status: surveyPlan.status === 'uploaded' ? 'uploaded' : 'pending',
-               }} />
-             )}
-          </div>
+             </div>
+          )} {/* End of conditional rendering for Document Requirements */}
+
           {/* 10.7 Cert Alert - only show for required report types */}
-          {requires107Certificate && (!certificate107Doc || certificate107Doc.status !== 'uploaded') && (
+          {/* Corrected: Check displayStatus */}
+          {requires107Certificate && (!certificate107Doc || certificate107Doc.displayStatus !== 'uploaded') && (
             <Alert variant="destructive">
               <AlertDescription>Please upload the 10.7 Certificate before proceeding.</AlertDescription>
             </Alert>
@@ -1197,8 +1179,12 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
             {!showPaymentBtn ? (
               <Button
                 className="w-full"
-                onClick={() => handleConfirmDetails(formType)}
-                disabled={requires107Certificate && (!certificate107Doc || certificate107Doc.status !== 'uploaded')}
+                onClick={() => {
+                    // Add log directly in onClick to see if it fires when disabled
+                    console.log(`Confirm Details button clicked. Disabled state: ${isConfirmButtonDisabled}`);
+                    handleConfirmDetails(formType);
+                }}
+                disabled={isConfirmButtonDisabled} // Use the calculated boolean
               >
                 Confirm Details & Proceed
               </Button>
@@ -1220,30 +1206,29 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     );
   };
 
-
   // Generalized save changes handler (Site details save is now separate)
   const handleSaveChanges = () => {
-    if (!selectedJobId) return;
+    if (!jobId) return; // Use jobId prop
     let changesSaved = false;
     const updatedFormState = { ...formState };
 
     if (formState['custom-assessment'].hasUnsavedChanges) {
-      localStorage.setItem(`custom-assessment-${selectedJobId}`, JSON.stringify(formState['custom-assessment'].formData));
+      localStorage.setItem(`custom-assessment-${jobId}`, JSON.stringify(formState['custom-assessment'].formData)); // *** Use jobId prop ***
       updatedFormState['custom-assessment'] = { ...updatedFormState['custom-assessment'], hasUnsavedChanges: false };
       changesSaved = true;
     }
     if (formState['statement-of-environmental-effects'].hasUnsavedChanges) {
-      localStorage.setItem(`statement-of-environmental-effects-${selectedJobId}`, JSON.stringify(formState['statement-of-environmental-effects'].formData));
+      localStorage.setItem(`statement-of-environmental-effects-${jobId}`, JSON.stringify(formState['statement-of-environmental-effects'].formData)); // *** Use jobId prop ***
       updatedFormState['statement-of-environmental-effects'] = { ...updatedFormState['statement-of-environmental-effects'], hasUnsavedChanges: false };
       changesSaved = true;
     }
     if (formState['complying-development-certificate'].hasUnsavedChanges) {
-      localStorage.setItem(`complying-development-certificate-${selectedJobId}`, JSON.stringify(formState['complying-development-certificate'].formData));
+      localStorage.setItem(`complying-development-certificate-${jobId}`, JSON.stringify(formState['complying-development-certificate'].formData)); // *** Use jobId prop ***
       updatedFormState['complying-development-certificate'] = { ...updatedFormState['complying-development-certificate'], hasUnsavedChanges: false };
       changesSaved = true;
     }
     if (hasUnsavedSiteDetails) {
-      handleSaveSiteDetails(); // Triggers mutation
+      handleSaveSiteDetails(); // Triggers mutation (uses jobId prop internally)
       changesSaved = true;
     }
 
@@ -1290,10 +1275,10 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
 
   const handleAssessmentPurchase = async (assessmentId: string) => {
     try {
-      if (!selectedJobId) {
+      if (!jobId) { // Use jobId prop
         throw new Error('No job selected');
       }
-      const response = await fetch(`/api/jobs/${selectedJobId}/pre-prepared-assessments/purchase`, {
+      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, { // *** Use jobId prop ***
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1324,7 +1309,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     }
   };
 
-  const handleAssessmentDownload = async (assessment: PurchasedPrePreparedAssessments) => {
+  // Corrected: Change parameter type to PrePreparedAssessment
+  const handleAssessmentDownload = async (assessment: PrePreparedAssessment) => {
     try {
       if (!assessment.file) {
         throw new Error('No file available for download');
@@ -1362,7 +1348,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    status: 'uploaded',
+    // Corrected: Use displayStatus
+    displayStatus: 'uploaded',
     uploadedFile: assessment.file ? {
       filename: assessment.file.id,
       originalName: assessment.file.originalName,
@@ -1372,38 +1359,37 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
     } : undefined
   });
 
+  // --- Main Render Logic for JobReportWriter ---
+  const isLoading = isDocsLoading || isJobLoading; // Combined loading state
+
+  // Corrected: Refined loading/error handling
+  if (isLoading) return <div>Loading job details and documents...</div>; // Handle combined loading
+
+  // Handle specific errors in JSX below
+  if (isJobError) return <Alert variant="destructive"><AlertTitle>Error Loading Job</AlertTitle><AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription></Alert>;
+  if (!currentJob && !isJobLoading) return <div>Job data not available. Select a job or check for errors.</div>; // Refined check
+  // We need currentJob for the rest of the render, so ensure it exists if not loading/error
+  if (!currentJob) return <div>Loading...</div>; // Fallback if somehow still null
+
   return (
     <div className="space-y-6">
-      {/* Job Selection */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Report Writer</h1>
-        <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-          <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder="Select a job" />
-          </SelectTrigger>
-          <SelectContent>
-            {jobs?.map((job) => (
-              <SelectItem key={job.id} value={job.id}>
-                {job.address}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Loading States */}
-      {isJobLoading && <div>Loading job details...</div>}
+      {/* Loading States - Removed as handled above */}
+      {/* {isJobLoading && <div>Loading job details...</div>} */}
       {isPrePreparedLoading && <div>Loading assessments...</div>}
 
-      {/* Error States */}
-      {isJobError && <Alert variant="destructive"><AlertDescription>{jobError?.message}</AlertDescription></Alert>}
+      {/* Error States - Removed Job Error as handled above */}
+      {/* {isJobError && <Alert variant="destructive"><AlertDescription>{jobError?.message}</AlertDescription></Alert>} */}
       {isPrePreparedError && <Alert variant="destructive"><AlertDescription>{prePreparedError?.message}</AlertDescription></Alert>}
+      {/* Display document context error if it exists */}
+      {docsError && <Alert variant="destructive"><AlertTitle>Document Error</AlertTitle><AlertDescription>{docsError}</AlertDescription></Alert>}
+      {/* Display specific document error state if it exists */}
+      {documentError && <Alert variant="destructive"><AlertTitle>Operation Error</AlertTitle><AlertDescription>{documentError}</AlertDescription></Alert>}
+
 
       {/* Main Content */}
-      {selectedJobId && currentJob && (
-        <div className="space-y-6">
-          {/* Property Info Section */}
-          <div className="border rounded-lg p-4">
+      <div className="space-y-6">
+              {/* Property Info Section */}
+              <div className="border rounded-lg p-4">
             <button
               onClick={togglePropertyInfo}
               className="flex items-center justify-between w-full"
@@ -1414,7 +1400,7 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
             {isPropertyInfoOpen && (
               <div className="mt-4">
                 <PropertyInfo
-                  address={currentJob.address}
+                  address={currentJob?.address || 'N/A'}
                   propertyData={currentJob.propertyData || null}
                 />
               </div>
@@ -1433,8 +1419,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
             {isSiteDetailsOpen && (
               <div className="mt-4">
                 <DetailedSiteDetails
-                  siteDetails={siteDetails}
-                  onSiteDetailsChange={updateSiteDetails}
+                  siteDetails={siteDetails} // from useSiteDetails()
+                  onSiteDetailsChange={updateSiteDetails} // from useSiteDetails()
                   readOnly={isReadOnly}
                 />
               </div>
@@ -1451,8 +1437,8 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
               {isDocumentsOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
             </button>
             {isDocumentsOpen && (
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {renderRequiredDocuments()}
+              <div className="mt-4"> {/* Removed extra grid classes here */}
+                {renderRequiredDocuments()} {/* Uses documents from useDocuments() */}
               </div>
             )}
           </div>
@@ -1493,25 +1479,84 @@ function ReportWriterContent({ params }: { params: { id: string } }) {
           </div>
 
           {/* Save Changes Button */}
-          {(formState['statement-of-environmental-effects'].hasUnsavedChanges ||
-            formState['complying-development-certificate'].hasUnsavedChanges ||
+          {(Object.values(formState).some(s => s.hasUnsavedChanges) ||
             hasUnsavedSiteDetails) && (
             <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
               Save Changes
             </Button>
           )}
+        </div> {/* Closing inner div */}
+      {/* Corrected: Added missing closing div tag */}
+    </div>
+  )
+}
+
+// *** MAIN PAGE COMPONENT (Handles Job Selection) ***
+export default function ReportWriterPage() {
+  const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs();
+  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined);
+  const router = useRouter();
+
+  // Effect to set initial job ID from URL query param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get('job');
+    if (jobId && jobs?.find(j => j.id === jobId)) { // Ensure the job exists in the list
+      setSelectedJobId(jobId);
+    } else if (jobs && jobs.length > 0 && !jobId) {
+        // Optionally select the first job if none is in the URL
+        // setSelectedJobId(jobs[0].id);
+    }
+  }, [jobs]); // Depend on jobs loading
+
+  // Update URL when job selection changes
+  useEffect(() => {
+    if (selectedJobId) {
+      router.push(`/professionals/report-writer?job=${selectedJobId}`, { scroll: false });
+    }
+    // Optional: handle case where selection is cleared
+    // else { router.push('/professionals/report-writer', { scroll: false }); }
+  }, [selectedJobId, router]);
+
+
+  return (
+    <div className="space-y-6">
+      {/* Job Selection */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Report Writer</h1>
+        {isLoadingJobs ? (
+            <div>Loading jobs...</div>
+        ) : jobsError ? (
+            <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
+        ) : (
+            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Select a job" />
+                </SelectTrigger>
+                <SelectContent>
+                    {jobs?.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                            {job.address}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        )}
+      </div>
+
+      {/* Conditional Rendering of Job-Specific Content with Providers */}
+      {selectedJobId ? (
+        // *** Wrap the JobReportWriter with Providers ***
+        <DocumentProvider jobId={selectedJobId}>
+          <SiteDetailsProvider jobId={selectedJobId}>
+            <JobReportWriter jobId={selectedJobId} />
+          </SiteDetailsProvider>
+        </DocumentProvider>
+      ) : (
+        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
+          <p>Please select a job from the dropdown above to view the report writer details and manage documents.</p>
         </div>
       )}
     </div>
   );
-}
-
-export default function ReportWriterPage({ params }: { params: { id: string } }) {
-  return (
-    <DocumentProvider jobId={params.id}>
-      <SiteDetailsProvider jobId={params.id}>
-        <ReportWriterContent params={params} />
-      </SiteDetailsProvider>
-    </DocumentProvider>
-  )
 }

@@ -1,0 +1,199 @@
+{
+  "id": "78022b9c-b351-4ba7-8c98-5a0c39038765",
+  "address": "145 Beaconsfield Street Silverwater",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-08T08:42:37.130Z",
+  "updatedAt": "2025-05-08T08:42:37.130Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.034784433914,
+      "latitude": -33.835965275688
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "247867",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "3/3/2023",
+            "Amendment": "Null",
+            "Layer Class": "INCLUDED",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "OBJECTID": "267085",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "4/17/2025",
+            "Commenced Date": "4/17/2025",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Map Amendment No 8",
+            "Layer Class": "1-1.09",
+            "Floor Space Ratio": "1",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "714407",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Null",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "General Industrial",
+            "Zone": "E4",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "380389",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "4/17/2025",
+            "Amendment": "Null",
+            "Layer Class": "1000-1999",
+            "Lot Size": "1500",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "28647",
+            "EPI Name": "Parramatta Local Environmental Plan 2023",
+            "LGA Name": "CITY OF PARRAMATTA",
+            "Published Date": "3/3/2023",
+            "Commenced Date": "3/3/2023",
+            "Currency Date": "3/3/2023",
+            "Amendment": "Null",
+            "Class": "Class 5",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746693768574_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-08T08:42:48.578Z",
+      "size": 4136746
+    }
+  },
+  "customAssessment": {
+    "uploadedDocuments": {}
+  },
+  "statementOfEnvironmentalEffects": {
+    "uploadedDocuments": {}
+  },
+  "complyingDevelopmentCertificate": {
+    "uploadedDocuments": {}
+  },
+  "statement-of-environmental-effects": {
+    "status": "paid",
+    "type": "statement-of-environmental-effects",
+    "createdAt": "2025-05-08T08:43:03.263Z",
+    "updatedAt": "2025-05-08T08:43:03.263Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746693768574_10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  "complying-development-certificate": {
+    "status": "paid",
+    "type": "complying-development-certificate",
+    "createdAt": "2025-05-08T08:51:30.955Z",
+    "updatedAt": "2025-05-08T08:51:30.955Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746693768574_10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  "custom-assessment": {
+    "status": "paid",
+    "type": "custom-assessment",
+    "createdAt": "2025-05-08T08:52:14.107Z",
+    "updatedAt": "2025-05-08T08:52:14.107Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746693768574_10.7 Certificate Check.pdf"
+      }
+    }
+  }
+}

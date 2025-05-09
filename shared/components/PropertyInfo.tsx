@@ -66,11 +66,33 @@ export function PropertyInfo({ address, propertyData, className = "" }: Property
       )
     }
 
+    // Special handling for Floor Space Ratio (n:1)
+    if (layerName === "Floor Space Ratio (n:1)") {
+      return (
+        <div className="space-y-1">
+          {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
+          {renderRow("Units", attributes["Units"])}
+        </div>
+      )
+    }
     // Special handling for Floor Space Ratio
     if (layerName === "Floor Space Ratio") {
-      return renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])
+      return (
+        <div className="space-y-1">
+          {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
+          {renderRow("Units", attributes["Units"])}
+        </div>
+      )
     }
-
+    // Special handling for Floor Space Ratio Additional Controls
+    if (layerName === "Floor Space Ratio Additional Controls") {
+      return (
+        <div className="space-y-3">
+          {renderRow("Legislative Area", attributes["Legislative Area"])}
+          {renderRow("Legislative Clause", attributes["Legislative Clause"])}
+        </div>
+      )
+    }
     // Special handling for Minimum Dwelling Density Area
     if (layerName === "Minimum Dwelling Density Area") {
       return renderRow("Type", attributes["Type"])

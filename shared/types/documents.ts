@@ -24,6 +24,7 @@ export interface Document {
   updatedAt: string
   isActive: boolean
   adminOnly?: boolean
+  purchasable?: boolean // Added purchasable flag
   uploadedAt?: string
   fileName?: string
   size?: number
@@ -106,6 +107,7 @@ export interface DocumentUpload {
   file: File
   type: string
   jobId: string
+  docId?: string // Add optional docId for updating existing placeholders
   metadata?: {
     title?: string
     description?: string
@@ -127,7 +129,8 @@ export interface DocumentRemove {
 }
 
 export interface DocumentWithStatus extends Document {
-  status: 'uploaded' | 'pending'
+  // Renamed 'status' to 'displayStatus' and added new states
+  displayStatus: 'uploaded' | 'pending_user_upload' | 'pending_admin_delivery'
   uploadedFile?: {
     filename: string
     originalName: string
@@ -164,7 +167,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    purchasable: false // Explicitly set for standard docs
   },
   {
     id: '10-7-certificate',
@@ -176,7 +180,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    purchasable: false // Explicitly set for standard docs
   },
   {
     id: 'survey-plan',
@@ -188,7 +193,8 @@ export const DOCUMENT_TYPES: Document[] = [
     currentVersion: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    isActive: true
+    isActive: true,
+    purchasable: false // Explicitly set for standard docs
   },
   {
     id: 'custom-assessment',
@@ -196,6 +202,7 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/custom-assessment',
     adminOnly: true,
+    purchasable: true, // Mark as purchasable
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -209,6 +216,7 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/statement-of-environmental-effects',
     adminOnly: true,
+    purchasable: true, // Mark as purchasable
     type: 'document',
     versions: [],
     currentVersion: 0,
@@ -222,6 +230,7 @@ export const DOCUMENT_TYPES: Document[] = [
     category: 'REPORTS',
     path: '/complying-development-certificate',
     adminOnly: true,
+    purchasable: true, // Mark as purchasable
     type: 'document',
     versions: [],
     currentVersion: 0,

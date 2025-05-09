@@ -3,9 +3,8 @@
 import React, { useState } from "react"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
-import { FileText, Upload, X } from "lucide-react"
+import { Upload } from "lucide-react"
 import { Document } from "../types/documents"
-import { documentService } from "../../admin/lib/services/documentService"
 import { useToast } from "../lib/toast-context"
 
 interface DocumentUploadProps {

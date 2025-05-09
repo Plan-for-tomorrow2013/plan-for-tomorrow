@@ -1,0 +1,185 @@
+{
+  "id": "85104e74-fd99-46ed-af30-d662971bfa96",
+  "address": "24 Parsonage Road Castle Hill",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-09T01:45:45.887Z",
+  "updatedAt": "2025-05-09T01:45:45.887Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 150.99860889418,
+      "latitude": -33.73644316743
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "121491",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "12/6/2019",
+            "Commenced Date": "12/6/2019",
+            "Currency Date": "12/6/2019",
+            "Amendment": "Null",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "218676",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "10/20/2023",
+            "Commenced Date": "10/20/2023",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Amendment No 25",
+            "Maximum Building Height": "9",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "9",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "535715",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "7/16/2021",
+            "Commenced Date": "7/16/2021",
+            "Currency Date": "11/27/2024",
+            "Amendment": "Amendment No 20",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Medium Density Residential",
+            "Zone": "R3",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "291925",
+            "EPI Name": "The Hills Local Environmental Plan 2019",
+            "LGA Name": "THE HILLS SHIRE",
+            "Published Date": "8/11/2023",
+            "Commenced Date": "8/11/2023",
+            "Currency Date": "8/11/2023",
+            "Amendment": "Map Amendment No 2",
+            "Layer Class": "700-749",
+            "Lot Size": "700",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [],
+      "localProvisionsLayers": [
+        {
+          "layer": "Local Provisions",
+          "attributes": {
+            "OBJECTID": "121314",
+            "EPI Name": "State Environmental Planning Policy (Precincts—Western Parkland City) 2021",
+            "LGA Name": "",
+            "Published Date": "12/2/2021",
+            "Commenced Date": "3/1/2022",
+            "Currency Date": "3/1/2022",
+            "Amendment": "Null",
+            "Map Type": "TBZ",
+            "Type": "Wind Turbine Buffer Zone",
+            "Class": "30 km",
+            "Description": "30km",
+            "Label": "30km",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "State Environmental Planning Policy",
+            "SHAPE": "Polygon"
+          }
+        }
+      ]
+    }
+  },
+  "documents": {
+    "10-7-certificate": {
+      "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-09T01:46:31.193Z",
+      "size": 4136746
+    }
+  },
+  "customAssessment": {
+    "uploadedDocuments": {}
+  },
+  "statementOfEnvironmentalEffects": {
+    "uploadedDocuments": {}
+  },
+  "complyingDevelopmentCertificate": {
+    "uploadedDocuments": {}
+  },
+  "statement-of-environmental-effects": {
+    "status": "paid",
+    "type": "statement-of-environmental-effects",
+    "createdAt": "2025-05-09T01:47:58.674Z",
+    "updatedAt": "2025-05-09T01:47:58.674Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  "complying-development-certificate": {
+    "status": "paid",
+    "type": "complying-development-certificate",
+    "createdAt": "2025-05-09T02:30:43.539Z",
+    "updatedAt": "2025-05-09T02:30:43.539Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  "custom-assessment": {
+    "status": "paid",
+    "type": "custom-assessment",
+    "createdAt": "2025-05-09T03:07:32.557Z",
+    "updatedAt": "2025-05-09T03:07:32.557Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
+      }
+    }
+  }
+}

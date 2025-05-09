@@ -65,6 +65,7 @@ export interface Job {
     zoningInfo?: string;
     siteConstraints?: string;
   } | null;
+  manualSubmission?: (Record<string, any> & { updatedAt: string }) | null;
 }
 
 export interface PurchasedPrePreparedAssessments {

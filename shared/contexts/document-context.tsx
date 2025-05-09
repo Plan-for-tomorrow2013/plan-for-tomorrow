@@ -29,119 +29,106 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
 
   // Use React Query for document data
   const { data: documents = [], isLoading, error } = useQuery<DocumentWithStatus[], Error>({
-    queryKey: ['documents', jobId],
+    queryKey: ['jobDocuments', jobId], // Changed queryKey to reflect source
     queryFn: async () => {
       try {
-        console.log('Fetching documents for job:', jobId)
-        const [jobDocuments, job] = await Promise.all([
-          documentService.getDocuments(jobId),
-          jobService.getJob(jobId)
-        ])
+        console.log('Fetching job data for document status, job:', jobId)
+        // Fetch ONLY the job data
+        const job = await jobService.getJob(jobId)
+        if (!job) {
+          console.error('Job not found for document context:', jobId)
+          return [] // Return empty array if job doesn't exist
+        }
 
-        // Initialize documents map
-        const docsMap = new Map<string, DocumentWithStatus>()
+        // --- New Logic: Filter and Process Documents ---
+        const displayableDocuments: DocumentWithStatus[] = []
 
-        // 1. Initialize base documents first
-        const baseDocuments = DOCUMENT_TYPES.filter(doc =>
-          ['certificate-of-title', '10-7-certificate', 'survey-plan'].includes(doc.id)
-        )
+        DOCUMENT_TYPES.forEach(docType => {
+          let shouldDisplay = false
+          let assessmentData: Assessment | undefined | null = null
 
-        baseDocuments.forEach(docType => {
-          docsMap.set(docType.id, {
-            ...docType,
-            status: 'pending',
-            uploadedFile: undefined
-          })
-        })
-
-        // 2. Add all uploaded documents, regardless of type
-        jobDocuments.forEach((doc: Document) => {
-          const docType = DOCUMENT_TYPES.find(dt => dt.id === doc.id) || {
-            id: doc.id,
-            title: doc.title,
-            category: 'GENERAL',
-            path: `/${doc.id}`,
-            type: 'document',
-            versions: [],
-            currentVersion: 1,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isActive: true
+          if (docType.purchasable) {
+            // For purchasable documents, check job assessment status
+            const assessmentKey = docType.id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) as keyof Job
+            assessmentData = job[assessmentKey] as Assessment | undefined
+            if (assessmentData && (assessmentData.status === 'paid' || assessmentData.status === 'completed')) {
+              shouldDisplay = true
+            }
+          } else {
+            // Standard documents always display
+            shouldDisplay = true
           }
 
-          docsMap.set(doc.id, {
-            ...docType,
-            status: 'uploaded',
-            uploadedFile: {
-              filename: doc.versions[doc.currentVersion - 1].filename,
-              originalName: doc.versions[doc.currentVersion - 1].originalName,
-              type: doc.versions[doc.currentVersion - 1].type,
-              uploadedAt: doc.versions[doc.currentVersion - 1].uploadedAt,
-              size: doc.versions[doc.currentVersion - 1].size
-            }
-          })
-        })
+          if (shouldDisplay) {
+            let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload' // Default for standard
+            let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
 
-        // 3. Add assessment documents if they've been purchased and aren't already in the map
-        const assessmentDocuments = DOCUMENT_TYPES.filter(doc =>
-          ['custom-assessment', 'statement-of-environmental-effects', 'complying-development-certificate'].includes(doc.id)
-        )
+            // Check job.documents first (primary source for uploaded files)
+            const jobDocData = job.documents?.[docType.id]
+            const assessmentFilename = assessmentData?.filename
 
-        assessmentDocuments.forEach(docType => {
-          if (!docsMap.has(docType.id)) {
-            const assessmentKey = docType.id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
-            const assessment = job[assessmentKey as keyof Job]
-
-            if (assessment && typeof assessment === 'object' && 'status' in assessment) {
-              const typedAssessment = assessment as Assessment
-              if (typedAssessment.status === 'paid' || typedAssessment.status === 'completed') {
-                docsMap.set(docType.id, {
-                  ...docType,
-                  status: typedAssessment.filename ? 'uploaded' : 'pending',
-                  uploadedFile: typedAssessment.filename ? {
-                    filename: typedAssessment.filename,
-                    originalName: typedAssessment.originalName || typedAssessment.filename,
-                    type: typedAssessment.type || 'application/pdf',
-                    uploadedAt: typedAssessment.uploadedAt || new Date().toISOString(),
-                    size: typedAssessment.size || 0
-                  } : undefined
-                })
+            if (jobDocData && jobDocData.filename) {
+              displayStatus = 'uploaded'
+              uploadedFile = {
+                filename: jobDocData.filename,
+                originalName: jobDocData.originalName,
+                type: jobDocData.type,
+                uploadedAt: jobDocData.uploadedAt,
+                size: jobDocData.size
               }
+            } else if (assessmentFilename && docType.purchasable) {
+              // Check assessment data for filename if purchasable and not in job.documents
+              displayStatus = 'uploaded'
+              uploadedFile = {
+                filename: assessmentFilename,
+                originalName: assessmentData?.originalName || assessmentFilename,
+                type: assessmentData?.type || 'application/pdf',
+                uploadedAt: assessmentData?.uploadedAt || new Date().toISOString(),
+                size: assessmentData?.size || 0
+              }
+            } else if (docType.purchasable) {
+              // Purchasable, paid/completed, but no file yet
+              displayStatus = 'pending_admin_delivery'
             }
+            // Otherwise, it remains 'pending_user_upload' for standard docs
+
+            displayableDocuments.push({
+              ...docType,
+              displayStatus: displayStatus,
+              uploadedFile: uploadedFile
+            })
           }
         })
+        // --- End New Logic ---
 
-        const finalDocuments = Array.from(docsMap.values())
-        console.log('Processed documents:', {
-          total: finalDocuments.length,
-          uploaded: finalDocuments.filter((d: DocumentWithStatus) => d.status === 'uploaded').length,
-          pending: finalDocuments.filter((d: DocumentWithStatus) => d.status === 'pending').length,
-          types: finalDocuments.map(d => d.id).join(', ')
-        })
+        console.log('Processed documents for display:', displayableDocuments)
 
-        return finalDocuments
+        return displayableDocuments
       } catch (error) {
-        console.error('Error fetching documents:', error)
-        throw error
+        console.error('Error processing job data for documents:', error)
+        // If jobService.getJob throws, it will be caught here
+        throw new Error(`Failed to process job documents: ${error instanceof Error ? error.message : String(error)}`)
       }
-    }
+    },
+    // Add options like staleTime or refetchOnWindowFocus if needed
   })
 
   // Upload document mutation
   const uploadDocumentMutation = useMutation({
     mutationFn: async ({ jobId, docId, file }: { jobId: string; docId: string; file: File }) => {
+      // Call the refactored service method
+      // No need to pass extensive metadata anymore, just what the service needs
       return documentService.uploadDocument({
         file,
-        type: 'document',
         jobId,
-        metadata: {
-          title: file.name,
-          category: 'REPORTS'
-        }
+        docId,
+        type: 'document', // Add default type to satisfy DocumentUpload type
+        // metadata is no longer needed by the refactored service method
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents', jobId] })
+      // Invalidate the query using the new key
+      queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] })
       toast({
         title: "Success",
         description: "Document uploaded successfully",
@@ -159,10 +146,12 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
   // Remove document mutation
   const removeDocumentMutation = useMutation({
     mutationFn: async ({ jobId, docId }: { jobId: string; docId: string }) => {
+      // Call the refactored service method
       return documentService.removeDocument(docId, jobId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents', jobId] })
+      // Invalidate the query using the new key
+      queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] })
       toast({
         title: "Success",
         description: "Document removed successfully",
@@ -186,12 +175,27 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
   }
 
   const downloadDocument = async (jobId: string, docId: string) => {
+    // Find the document in the current state to get the filename
+    // Updated to check displayStatus
+    const docToDownload = documents.find(doc => doc.id === docId && doc.displayStatus === 'uploaded');
+    const filename = docToDownload?.uploadedFile?.originalName || docToDownload?.uploadedFile?.filename || docId; // Use original name, fallback to stored filename or docId
+
+    if (!docToDownload) {
+       toast({
+         title: "Error",
+         description: "Document not found or not available for download.",
+         variant: "destructive",
+       })
+       return;
+    }
+
     try {
-      const blob = await documentService.downloadDocument(docId, jobId)
+      // Call the refactored service method, passing the filename
+      const blob = await documentService.downloadDocument(docId, jobId, filename)
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = docId
+      a.download = filename // Use the determined filename
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

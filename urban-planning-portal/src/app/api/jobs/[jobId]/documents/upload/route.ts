@@ -1,0 +1,101 @@
+import { NextResponse } from 'next/server'
+import { writeFile, mkdir } from 'fs/promises'
+import { join } from 'path' // Keep join for filename
+import { getJob, saveJob } from '@shared/services/jobStorage'
+import { existsSync } from 'fs'
+import { getJobDocumentsPath } from '@shared/utils/paths' // Import the path utility
+
+// Configure upload directory and limits
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB in bytes
+
+export async function POST(
+  request: Request,
+  { params }: { params: { jobId: string } }
+) {
+  try {
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    const documentId = formData.get('docId') as string
+
+    if (!file || !documentId) {
+      return NextResponse.json(
+        { success: false, error: 'File and document ID are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { success: false, error: 'File size exceeds the maximum limit of 20MB' },
+        { status: 400 }
+      )
+    }
+
+    // Get job and ensure it exists
+    const job = await getJob(params.jobId)
+    if (!job) {
+      return NextResponse.json(
+        { success: false, error: 'Job not found' },
+        { status: 404 }
+      )
+    }
+
+    // Create job documents directory if it doesn't exist using the path utility
+    const documentsDir = getJobDocumentsPath(params.jobId) // Use the utility function
+    if (!existsSync(documentsDir)) {
+      await mkdir(documentsDir, { recursive: true })
+    }
+
+    // Create unique filename and save file
+    const timestamp = Date.now()
+    const filename = `${documentId}_${timestamp}_${file.name}`
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+
+    try {
+      await writeFile(join(documentsDir, filename), buffer)
+    } catch (writeError) {
+      console.error('Error writing file:', writeError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to save file to disk' },
+        { status: 500 }
+      )
+    }
+
+    // Update job with document information
+    const documents = job.documents || {}
+    documents[documentId] = {
+      filename,
+      originalName: file.name,
+      type: file.type,
+      uploadedAt: new Date().toISOString(),
+      size: file.size
+    }
+
+    // Save the updated job
+    try {
+      await saveJob(params.jobId, job)
+    } catch (saveError) {
+      console.error('Error saving job:', saveError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to update job data' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      document: documents[documentId]
+    })
+  } catch (error) {
+    console.error('Error handling document upload:', error)
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to upload document: ' + (error instanceof Error ? error.message : 'Unknown error')
+      },
+      { status: 500 }
+    )
+  }
+}

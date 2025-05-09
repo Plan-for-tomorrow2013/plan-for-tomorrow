@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
-import { saveJob } from '../../../../../lib/jobStorage'
 import { Job } from '@shared/types/jobs'
+import { saveJob } from '@shared/lib/jobStorage'
 
 export async function POST(request: Request) {
   try {
@@ -22,12 +22,23 @@ export async function POST(request: Request) {
     const filteredPlanningLayers = {
       ...data.planningLayers,
       epiLayers: data.planningLayers.epiLayers.map((layer: any) => {
+        // Special handling for Floor Space Ratio
+        if (layer.layer === "Floor Space Ratio") {
+          return {
+            layer: layer.layer,
+            attributes: {
+              "Floor Space Ratio": layer.attributes["Floor Space Ratio"],
+              "Units": layer.attributes["Units"]
+            }
+          }
+        }
         // Special handling for Floor Space Ratio (n:1)
         if (layer.layer === "Floor Space Ratio (n:1)") {
           return {
             layer: layer.layer,
             attributes: {
-              "Floor Space Ratio": layer.attributes["Floor Space Ratio"]
+              "Floor Space Ratio": layer.attributes["Floor Space Ratio"],
+              "Units": layer.attributes["Units"]
             }
           }
         }

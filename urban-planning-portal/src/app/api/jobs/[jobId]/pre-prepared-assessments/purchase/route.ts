@@ -35,7 +35,7 @@ export async function POST(
       documents: {
         ...(job.documents || {}),
         [`pre-prepared-${assessment.id}`]: {
-          filename: assessment.file.filename,
+          fileName: assessment.file.fileName,
           originalName: assessment.file.originalName,
           type: assessment.file.type,
           uploadedAt: new Date().toISOString(),

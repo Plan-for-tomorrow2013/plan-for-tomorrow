@@ -7,6 +7,7 @@ import { toast } from "../components/ui/use-toast"
 import { Job, Assessment } from "../types/jobs"
 import { documentService } from "../services/documentService"
 import { jobService } from "../services/jobService"
+import { getDocumentDisplayStatus } from "@shared/utils/report-utils"
 
 interface DocumentContextType {
   documents: DocumentWithStatus[]
@@ -65,23 +66,23 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
 
             // Check job.documents first (primary source for uploaded files)
             const jobDocData = job.documents?.[docType.id]
-            const assessmentFilename = assessmentData?.filename
+            const assessmentFileName = assessmentData?.fileName
 
-            if (jobDocData && jobDocData.filename) {
+            if (jobDocData && jobDocData.fileName) {
               displayStatus = 'uploaded'
               uploadedFile = {
-                filename: jobDocData.filename,
+                fileName: jobDocData.fileName,
                 originalName: jobDocData.originalName,
                 type: jobDocData.type,
                 uploadedAt: jobDocData.uploadedAt,
                 size: jobDocData.size
               }
-            } else if (assessmentFilename && docType.purchasable) {
-              // Check assessment data for filename if purchasable and not in job.documents
+            } else if (assessmentFileName && docType.purchasable) {
+              // Check assessment data for fileName if purchasable and not in job.documents
               displayStatus = 'uploaded'
               uploadedFile = {
-                filename: assessmentFilename,
-                originalName: assessmentData?.originalName || assessmentFilename,
+                fileName: assessmentFileName,
+                originalName: assessmentData?.originalName || assessmentFileName,
                 type: assessmentData?.type || 'application/pdf',
                 uploadedAt: assessmentData?.uploadedAt || new Date().toISOString(),
                 size: assessmentData?.size || 0
@@ -94,7 +95,11 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
 
             displayableDocuments.push({
               ...docType,
-              displayStatus: displayStatus,
+              displayStatus: getDocumentDisplayStatus({
+                ...docType,
+                uploadedFile: uploadedFile,
+                displayStatus: displayStatus
+              }, job),
               uploadedFile: uploadedFile
             })
           }
@@ -175,10 +180,10 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
   }
 
   const downloadDocument = async (jobId: string, docId: string) => {
-    // Find the document in the current state to get the filename
+    // Find the document in the current state to get the fileName
     // Updated to check displayStatus
     const docToDownload = documents.find(doc => doc.id === docId && doc.displayStatus === 'uploaded');
-    const filename = docToDownload?.uploadedFile?.originalName || docToDownload?.uploadedFile?.filename || docId; // Use original name, fallback to stored filename or docId
+    const fileName = docToDownload?.uploadedFile?.originalName || docToDownload?.uploadedFile?.fileName || docId; // Use original name, fallback to stored fileName or docId
 
     if (!docToDownload) {
        toast({
@@ -190,12 +195,12 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
     }
 
     try {
-      // Call the refactored service method, passing the filename
-      const blob = await documentService.downloadDocument(docId, jobId, filename)
+      // Call the refactored service method, passing the fileName
+      const blob = await documentService.downloadDocument(docId, jobId, fileName)
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = filename // Use the determined filename
+      a.download = fileName // Use the determined fileName
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

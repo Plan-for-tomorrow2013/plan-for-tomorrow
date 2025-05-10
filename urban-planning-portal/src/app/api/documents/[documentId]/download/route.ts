@@ -30,7 +30,7 @@ export async function GET(
     }
 
     const currentVersion = document.versions[document.currentVersion - 1]
-    const filePath = getDocumentPath(params.documentId, currentVersion.version, path.extname(currentVersion.filename))
+    const filePath = getDocumentPath(params.documentId, currentVersion.version, path.extname(currentVersion.fileName))
     if (!existsSync(filePath)) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 })
     }
@@ -38,7 +38,7 @@ export async function GET(
     const buffer = await readFile(filePath)
     const headers = new Headers()
     headers.set('Content-Type', currentVersion.type)
-    headers.set('Content-Disposition', `attachment; filename="${currentVersion.originalName}"`)
+    headers.set('Content-Disposition', `attachment; fileName="${currentVersion.originalName}"`)
 
     return new NextResponse(buffer, { headers })
   } catch (error) {

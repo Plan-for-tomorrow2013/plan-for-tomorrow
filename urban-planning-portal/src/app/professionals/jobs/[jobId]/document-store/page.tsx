@@ -10,7 +10,7 @@ import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/docu
 import { toast } from "@shared/components/ui/use-toast"
 import { useJobs } from '@shared/hooks/useJobs'
 import type { Job } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle } from '@/utils/report-utils'
+import { getReportStatus, isReportType, getReportTitle, getDocumentDisplayStatus } from '@shared/utils/report-utils'
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'
 
@@ -18,6 +18,8 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
   const router = useRouter()
   const { documents, isLoading, error, uploadDocument, removeDocument, downloadDocument } = useDocuments()
   const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
+  const { jobs, isLoading: isJobsLoading, error: jobsError } = useJobs()
+  const job = jobs.find(j => j.id === params.jobId)
 
   if (error) {
     return (
@@ -54,6 +56,13 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
       await removeDocument(params.jobId, docId)
     }
   }
+
+  const mappedDocuments = job
+    ? documents.map(doc => ({
+        ...doc,
+        displayStatus: getDocumentDisplayStatus(doc, job)
+      }))
+    : [];
 
   const renderDocumentCard = (doc: DocumentWithStatus) => {
     // Use displayStatus instead of status
@@ -114,7 +123,7 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {documents.map(doc => renderDocumentCard(doc))}
+        {mappedDocuments.map(doc => renderDocumentCard(doc))}
       </div>
     </div>
   )

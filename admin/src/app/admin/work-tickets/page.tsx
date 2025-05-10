@@ -28,7 +28,7 @@ const getTicketTypeDisplayName = (type: string): string => {
 // Create a new DocumentRenderer component
 function DocumentRenderer({ doc, jobId }: { doc: DocumentWithStatus, jobId: string }) {
   const uploadedFile = doc.uploadedFile;
-  if (!uploadedFile?.filename || !uploadedFile?.originalName) return null;
+  if (!uploadedFile?.fileName || !uploadedFile?.originalName) return null;
 
   return (
     <div className="space-y-2">
@@ -42,7 +42,7 @@ function DocumentRenderer({ doc, jobId }: { doc: DocumentWithStatus, jobId: stri
       <Button
         variant="outline"
         className="w-full"
-        onClick={() => window.open(`/api/download-document?jobId=${jobId}&filename=${encodeURIComponent(uploadedFile.filename)}&originalName=${encodeURIComponent(uploadedFile.originalName)}`, '_blank')}
+        onClick={() => window.open(`/api/download-document?jobId=${jobId}&fileName=${encodeURIComponent(uploadedFile.fileName)}&originalName=${encodeURIComponent(uploadedFile.originalName)}`, '_blank')}
       >
         <FileText className="h-4 w-4 mr-2" />
         Download Document
@@ -239,7 +239,7 @@ export default function WorkTicketsPage() {
                         isActive: true,
                         status: 'uploaded',
                         uploadedFile: {
-                          filename: ticket.customAssessment.filename || '',
+                          fileName: ticket.customAssessment.fileName || '',
                           originalName: ticket.customAssessment.originalName || '',
                           type: 'application/pdf',
                           uploadedAt: ticket.customAssessment.uploadedAt || new Date().toISOString(),
@@ -276,7 +276,7 @@ export default function WorkTicketsPage() {
                         isActive: true,
                         status: 'uploaded',
                         uploadedFile: {
-                          filename: ticket.statementOfEnvironmentalEffects.filename || '',
+                          fileName: ticket.statementOfEnvironmentalEffects.fileName || '',
                           originalName: ticket.statementOfEnvironmentalEffects.originalName || '',
                           type: 'application/pdf',
                           uploadedAt: ticket.statementOfEnvironmentalEffects.uploadedAt || new Date().toISOString(),
@@ -313,7 +313,7 @@ export default function WorkTicketsPage() {
                         isActive: true,
                         status: 'uploaded',
                         uploadedFile: {
-                          filename: ticket.complyingDevelopmentCertificate.filename || '',
+                          fileName: ticket.complyingDevelopmentCertificate.fileName || '',
                           originalName: ticket.complyingDevelopmentCertificate.originalName || '',
                           type: 'application/pdf',
                           uploadedAt: ticket.complyingDevelopmentCertificate.uploadedAt || new Date().toISOString(),

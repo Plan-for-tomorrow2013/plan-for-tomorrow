@@ -47,14 +47,14 @@ export async function POST(
       await mkdir(documentsDir, { recursive: true })
     }
 
-    // Create unique filename and save file
+    // Create unique fileName and save file
     const timestamp = Date.now()
-    const filename = `${documentId}_${timestamp}_${file.name}`
+    const fileName = `${documentId}_${timestamp}_${file.name}`
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
     try {
-      await writeFile(join(documentsDir, filename), buffer)
+      await writeFile(join(documentsDir, fileName), buffer)
     } catch (writeError) {
       console.error('Error writing file:', writeError)
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function POST(
     // Update job with document information
     const documents = job.documents || {}
     documents[documentId] = {
-      filename,
+      fileName,
       originalName: file.name,
       type: file.type,
       uploadedAt: new Date().toISOString(),

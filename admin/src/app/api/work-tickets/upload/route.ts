@@ -54,9 +54,9 @@ export async function POST(request: Request) {
     const jobDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'jobs', ticket.jobId, 'documents');
     await fs.mkdir(jobDocumentsDir, { recursive: true });
 
-    // Define the filename based on the ticket type
+    // Define the fileName based on the ticket type
     const fileExtension = path.extname(file.name);
-    // Use ticketType for the filename base (e.g., 'statement-of-environmental-effects.pdf')
+    // Use ticketType for the fileName base (e.g., 'statement-of-environmental-effects.pdf')
     const storedFileName = `${ticketType}${fileExtension}`;
     const filePath = path.join(jobDocumentsDir, storedFileName);
 

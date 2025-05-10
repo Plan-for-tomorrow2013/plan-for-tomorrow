@@ -25,7 +25,7 @@ export async function GET(
     }
 
     // Get the file path
-    const filePath = join(process.cwd(), 'data', 'jobs', params.jobId, 'documents', document.filename)
+    const filePath = join(process.cwd(), 'data', 'jobs', params.jobId, 'documents', document.fileName)
 
     // Read the file
     const fileBuffer = await readFile(filePath)
@@ -34,7 +34,7 @@ export async function GET(
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': document.type,
-        'Content-Disposition': `attachment; filename="${document.originalName}"`,
+        'Content-Disposition': `attachment; fileName="${document.originalName}"`,
       },
     })
   } catch (error) {

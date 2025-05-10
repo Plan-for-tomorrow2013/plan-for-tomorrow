@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents')
     await fs.mkdir(jobDocDir, { recursive: true })
 
-    // Generate a unique filename for the document
+    // Generate a unique fileName for the document
     const timestamp = Date.now()
     const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
     const jobDocPath = path.join(jobDocDir, newFileName)
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
 
     // Add the document to the job's documents
     job.documents[ticket.ticketType] = {
-      filename: newFileName,
+      fileName: newFileName,
       originalName: ticket.completedDocument.fileName,
       type: 'application/pdf',
       uploadedAt: new Date().toISOString(),

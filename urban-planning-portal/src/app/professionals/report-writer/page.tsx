@@ -21,7 +21,8 @@ import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
 import { DocumentStatus } from '@shared/components/DocumentStatus' // Keep this one
 import { Job, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@/utils/report-utils'
+import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@shared/utils/report-utils'
+import { getDocumentDisplayStatus } from '@shared/utils/report-utils'
 // Removed duplicate PropertyDataShape import
 import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
@@ -573,15 +574,15 @@ function JobReportWriter({ jobId }: { jobId: string }) {
           documents: {
             certificateOfTitle: {
               originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.fileName
             },
             surveyPlan: {
               originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.fileName
             },
             certificate107: {
               originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.fileName
             }
           }
         }
@@ -946,8 +947,13 @@ const renderRequiredDocuments = () => {
     }
 
     // Show filtered documents
+    const mappedDocuments = documents.map(doc => ({
+      ...doc,
+      displayStatus: getDocumentDisplayStatus(doc, currentJob || {} as Job)
+    }));
+
     const renderDocumentCard = (doc: DocumentWithStatus) => {
-      const isReportPlaceholder = doc.type === 'report' && doc.filename === 'pending';
+      const isReportPlaceholder = doc.type === 'report' && doc.fileName === 'pending';
       // Uses handleDownload, handleDelete, handleUpload which now use jobId prop correctly
       // Corrected: Use displayStatus
       const isUploaded = doc.displayStatus === 'uploaded'
@@ -986,9 +992,11 @@ const renderRequiredDocuments = () => {
                   )}
                 </div>
               </div>
-            ) : isReportPlaceholder ? (
-              <div className="text-sm text-gray-500 text-center py-4">
-                Purchase successful. Document pending delivery from admin.
+            ) : doc.displayStatus === 'pending_admin_delivery' ? (
+              <div className="text-sm text-yellow-600 text-center py-4">
+                <span className="font-semibold">Report In Progress</span>
+                <br />
+                We are processing your report. You will be notified when it's ready.
               </div>
             ) : (
               <Button variant="outline" className="w-full" onClick={() => handleUpload(doc.id)}>
@@ -1006,7 +1014,7 @@ const renderRequiredDocuments = () => {
         {/* Removed wrapping div <div className="space-y-6"> */}
         {/* Removed empty div </div> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {documents.map(doc => renderDocumentCard(doc))}
+          {mappedDocuments.map(doc => renderDocumentCard(doc))}
         </div>
       </>
     )
@@ -1351,7 +1359,7 @@ const renderRequiredDocuments = () => {
     // Corrected: Use displayStatus
     displayStatus: 'uploaded',
     uploadedFile: assessment.file ? {
-      filename: assessment.file.id,
+      fileName: assessment.file.id,
       originalName: assessment.file.originalName,
       type: 'application/pdf',
       uploadedAt: new Date().toISOString(),

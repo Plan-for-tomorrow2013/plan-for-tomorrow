@@ -44,9 +44,9 @@ export async function GET(
 
     // 2. Construct the full path to the actual file using the savedPath from metadata
     // The savedPath is relative to the admin public dir, e.g., /documents/pre-prepared/some-id.pdf
-    // We need the filename part: some-id.pdf
-    const filenameFromPath = path.basename(assessmentMetadata.file.savedPath);
-    const filePath = path.join(ADMIN_DOCUMENTS_BASE_PATH, filenameFromPath);
+    // We need the fileName part: some-id.pdf
+    const fileNameFromPath = path.basename(assessmentMetadata.file.savedPath);
+    const filePath = path.join(ADMIN_DOCUMENTS_BASE_PATH, fileNameFromPath);
 
     console.log(`Constructed file path: ${filePath}`);
 
@@ -72,8 +72,8 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': contentType,
-        // Use the originalName from metadata for the download filename
-        'Content-Disposition': `attachment; filename="${assessmentMetadata.file.originalName}"`,
+        // Use the originalName from metadata for the download fileName
+        'Content-Disposition': `attachment; fileName="${assessmentMetadata.file.originalName}"`,
       },
     });
 

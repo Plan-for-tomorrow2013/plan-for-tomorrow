@@ -28,7 +28,7 @@ export async function POST(
     const buffer = Buffer.from(file.split(',')[1], 'base64')
 
     // Write file to disk
-    const filePath = join(process.cwd(), 'uploads', params.jobId, document.filename)
+    const filePath = join(process.cwd(), 'uploads', params.jobId, document.fileName)
     await writeFile(filePath, buffer)
 
     // Update document size

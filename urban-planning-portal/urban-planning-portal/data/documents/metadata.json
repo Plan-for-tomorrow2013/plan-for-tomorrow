@@ -1,226 +1,23 @@
 [
   {
-    "id": "dd670671-41e4-430d-aa6d-4722d87a9536",
-    "title": "Custom Assessment - 24 Parsonage Road Castle Hill",
-    "path": "work-tickets/d16b9a26-0ab1-4275-91c6-0d25813ced01",
-    "type": "document",
-    "category": "WORK_TICKET",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-09T03:07:32.270Z",
-    "updatedAt": "2025-05-09T03:07:32.270Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "85104e74-fd99-46ed-af30-d662971bfa96",
-      "ticketId": "d16b9a26-0ab1-4275-91c6-0d25813ced01",
-      "ticketType": "custom-assessment",
-      "attachedDocuments": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10.7 Certificate Check.pdf",
-          "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
-        }
-      },
-      "jobAddress": "24 Parsonage Road Castle Hill",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {},
-          "surveyPlan": {},
-          "certificate107": {
-            "originalName": "10.7 Certificate Check.pdf",
-            "filename": "10-7-certificate_1746755191187_10.7 Certificate Check.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "bfddb846-eadc-4bde-85ab-c320d27c3331",
-    "title": "Statement of Environmental Effects - 207A Edgar Street, Condell Park",
-    "path": "work-tickets/f8fa3394-4c42-4c69-a2fc-9cce8128dc21",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-09T06:47:41.650Z",
-    "updatedAt": "2025-05-09T06:47:41.650Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "e2353da7-0890-44a4-9851-994b8abfcdf8",
-      "ticketId": "f8fa3394-4c42-4c69-a2fc-9cce8128dc21",
-      "ticketType": "statement-of-environmental-effects",
-      "attachedDocuments": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10.7 Certificate Check.pdf",
-          "filename": "10-7-certificate_1746773235344_10.7 Certificate Check.pdf"
-        }
-      },
-      "jobAddress": "207A Edgar Street, Condell Park",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {},
-          "surveyPlan": {},
-          "certificate107": {
-            "originalName": "10.7 Certificate Check.pdf",
-            "filename": "10-7-certificate_1746773235344_10.7 Certificate Check.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "f63a2143-b49d-4c99-95f9-f68201dbab6a",
-    "title": "Statement of Environmental Effects - 137B Victoria Street Smithfield",
-    "path": "work-tickets/111d9e16-e63a-48bd-a3dc-44f756d2e6f7",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-09T07:07:39.766Z",
-    "updatedAt": "2025-05-09T07:07:39.766Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
-      "ticketId": "111d9e16-e63a-48bd-a3dc-44f756d2e6f7",
-      "ticketType": "statement-of-environmental-effects",
-      "attachedDocuments": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-        }
-      },
-      "jobAddress": "137B Victoria Street Smithfield",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {},
-          "surveyPlan": {},
-          "certificate107": {
-            "originalName": "10_7_5.pdf",
-            "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "81e1cc06-66c7-429a-8672-598c956e2a64",
-    "title": "Complying Development Certificate - 137B Victoria Street Smithfield",
-    "path": "work-tickets/d76579fe-2fee-4e23-9186-5be1f07dc84d",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-09T21:27:46.974Z",
-    "updatedAt": "2025-05-09T21:27:46.974Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
-      "ticketId": "d76579fe-2fee-4e23-9186-5be1f07dc84d",
-      "ticketType": "complying-development-certificate",
-      "attachedDocuments": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-        }
-      },
-      "jobAddress": "137B Victoria Street Smithfield",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {},
-          "surveyPlan": {},
-          "certificate107": {
-            "originalName": "10_7_5.pdf",
-            "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "53973b3a-cb42-49aa-959e-af7cc2b346ab",
-    "title": "Custom Assessment - 137B Victoria Street Smithfield",
-    "path": "work-tickets/29cab7b5-41de-4fb5-a7fc-3c37980d3432",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-09T21:53:24.393Z",
-    "updatedAt": "2025-05-09T21:53:24.393Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "9e8677a9-30ab-497c-94dc-97095ed420f7",
-      "ticketId": "29cab7b5-41de-4fb5-a7fc-3c37980d3432",
-      "ticketType": "custom-assessment",
-      "attachedDocuments": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-        }
-      },
-      "jobAddress": "137B Victoria Street Smithfield",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {},
-          "surveyPlan": {},
-          "certificate107": {
-            "originalName": "10_7_5.pdf",
-            "filename": "10-7-certificate_1746774429311_10_7_5.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "0d4d71b0-c740-4f8c-ac7e-8f927ac08e9f",
+    "id": "bcb4ea31-6b6e-4a70-95e9-e9c56a427709",
     "title": "Statement of Environmental Effects - 9 Viola Place, Greystanes",
-    "path": "work-tickets/f0ab9617-b037-436b-9ec6-0193eacd2c13",
+    "path": "work-tickets/6d0b8169-9ccb-4be5-9fc5-652c272463ee",
     "type": "document",
     "category": "REPORTS",
     "versions": [],
     "currentVersion": 1,
-    "createdAt": "2025-05-09T22:09:34.723Z",
-    "updatedAt": "2025-05-09T22:09:34.723Z",
+    "createdAt": "2025-05-10T05:16:50.394Z",
+    "updatedAt": "2025-05-10T05:16:50.394Z",
     "isActive": true,
     "metadata": {
-      "jobId": "1637928f-663c-46bd-92c4-1561a7d30a7d",
-      "ticketId": "f0ab9617-b037-436b-9ec6-0193eacd2c13",
+      "jobId": "063dd408-3d3d-479f-ab6f-26a0bd5a25ed",
+      "ticketId": "6d0b8169-9ccb-4be5-9fc5-652c272463ee",
       "ticketType": "statement-of-environmental-effects",
       "attachedDocuments": {
         "certificateOfTitle": {},
         "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "filename": "10-7-certificate_1746828567336_10_7_5.pdf"
-        }
+        "certificate107": {}
       },
       "jobAddress": "9 Viola Place, Greystanes",
       "uploadedBy": "professional",
@@ -230,9 +27,52 @@
         "documents": {
           "certificateOfTitle": {},
           "surveyPlan": {},
+          "certificate107": {}
+        }
+      }
+    },
+    "displayStatus": "pending_admin_delivery"
+  },
+  {
+    "id": "e353150f-37cd-4960-b539-54cd74f2595c",
+    "title": "Complying Development Certificate - 36 Prince Street Randwick",
+    "path": "work-tickets/5bec013d-4b67-4493-bf3e-8c09e7aa4995",
+    "type": "document",
+    "category": "REPORTS",
+    "versions": [],
+    "currentVersion": 1,
+    "createdAt": "2025-05-10T05:46:31.895Z",
+    "updatedAt": "2025-05-10T05:46:31.895Z",
+    "isActive": true,
+    "metadata": {
+      "jobId": "094f9c4a-988f-4256-9a3f-1af38299f6fc",
+      "ticketId": "5bec013d-4b67-4493-bf3e-8c09e7aa4995",
+      "ticketType": "complying-development-certificate",
+      "attachedDocuments": {
+        "certificateOfTitle": {
+          "originalName": "Certificate of Title.pdf",
+          "fileName": "certificate-of-title_1746855968397_Certificate of Title.pdf"
+        },
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "fileName": "10-7-certificate_1746855934873_10_7_5.pdf"
+        }
+      },
+      "jobAddress": "36 Prince Street Randwick",
+      "uploadedBy": "professional",
+      "reportData": {
+        "developmentType": "123",
+        "additionalInfo": "456",
+        "documents": {
+          "certificateOfTitle": {
+            "originalName": "Certificate of Title.pdf",
+            "fileName": "certificate-of-title_1746855968397_Certificate of Title.pdf"
+          },
+          "surveyPlan": {},
           "certificate107": {
             "originalName": "10_7_5.pdf",
-            "filename": "10-7-certificate_1746828567336_10_7_5.pdf"
+            "fileName": "10-7-certificate_1746855934873_10_7_5.pdf"
           }
         }
       }

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Generate a unique filename
+    // Generate a unique fileName
     const fileExtension = file.name.split('.').pop()
     const uniqueFilename = `${uuidv4()}.${fileExtension}`
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       id: uuidv4(),
       title,
       description,
-      filename: uniqueFilename,
+      fileName: uniqueFilename,
       originalName: file.name,
       type: file.type,
       uploadedAt: new Date().toISOString(),

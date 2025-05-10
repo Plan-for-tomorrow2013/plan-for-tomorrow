@@ -18,7 +18,7 @@ export async function GET(
       // Create response with appropriate headers
       const response = new NextResponse(fileContent)
       response.headers.set('Content-Type', 'application/pdf')
-      response.headers.set('Content-Disposition', `attachment; filename="${params.documentId}"`)
+      response.headers.set('Content-Disposition', `attachment; fileName="${params.documentId}"`)
 
       return response
     } catch (error) {

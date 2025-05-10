@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getJob } from '@shared/services/jobStorage'
 
 interface StoredDocument {
-  filename: string
+  fileName: string
   originalName: string
   type: string
   uploadedAt: string
@@ -31,7 +31,7 @@ export async function GET(
     const documents: DocumentResponse[] = Object.entries(job.documents || {}).map(([id, doc]) => ({
       id,
       status: 'uploaded',
-      filename: (doc as StoredDocument).filename,
+      fileName: (doc as StoredDocument).fileName,
       originalName: (doc as StoredDocument).originalName,
       type: (doc as StoredDocument).type,
       uploadedAt: (doc as StoredDocument).uploadedAt

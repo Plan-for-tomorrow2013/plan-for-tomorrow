@@ -91,7 +91,7 @@ export async function GET(
     response.headers.set('Content-Type', contentType);
     response.headers.set(
       'Content-Disposition',
-      `attachment; filename="${encodeURIComponent(fileDetails.originalName)}"` // Encode filename
+      `attachment; fileName="${encodeURIComponent(fileDetails.originalName)}"` // Encode fileName
     );
 
     return response;

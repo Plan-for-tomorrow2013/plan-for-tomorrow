@@ -66,9 +66,9 @@ class DocumentService {
   }
 
   // TODO: Implement corresponding API endpoint: GET /api/jobs/[jobId]/documents/[documentId]/download
-  async downloadDocument(documentId: string, jobId: string, filename: string): Promise<Blob> { // Added filename for potential use
+  async downloadDocument(documentId: string, jobId: string, fileName: string): Promise<Blob> { // Added fileName for potential use
     try {
-      // Use job-specific endpoint structure (filename might be needed for Content-Disposition)
+      // Use job-specific endpoint structure (fileName might be needed for Content-Disposition)
       const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}/download`)
       if (!response.ok) {
         // Attempt to read error message, but handle cases where it might not be JSON

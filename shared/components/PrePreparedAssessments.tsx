@@ -75,11 +75,11 @@ export function PrePreparedAssessments({
       }
 
       const contentDisposition = response.headers.get('Content-Disposition')
-      let filename = assessment.file.originalName
+      let fileName = assessment.file.originalName
       if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i)
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1]
+        const fileNameMatch = contentDisposition.match(/fileName="?(.+)"?/i)
+        if (fileNameMatch && fileNameMatch[1]) {
+          fileName = fileNameMatch[1]
         }
       }
 
@@ -87,7 +87,7 @@ export function PrePreparedAssessments({
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = filename
+      a.download = fileName
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     documentsDir = path.join(baseDocumentsDir, ticket.ticketType);
     await fs.mkdir(documentsDir, { recursive: true })
 
-    // Generate consistent filename for all assessment types
+    // Generate consistent fileName for all assessment types
     const fileName = `${ticketId}-${file.name}`;
 
     // Save the file
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents')
     await fs.mkdir(jobDocDir, { recursive: true })
 
-    // Generate a unique filename for the document based on ticket type
+    // Generate a unique fileName for the document based on ticket type
     const timestamp = Date.now()
     const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
     const jobDocPath = path.join(jobDocDir, newFileName)
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
     // Add the document to the job's documents based on ticket type
     ticket.job.documents[ticket.ticketType] = {
-      filename: newFileName,
+      fileName: newFileName,
       originalName: file.name,
       type: 'application/pdf',
       uploadedAt: new Date().toISOString(),

@@ -10,7 +10,7 @@ import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/docu
 import { toast } from "@shared/components/ui/use-toast"
 import { useJobs } from '@shared/hooks/useJobs'
 import type { Job } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle } from '@/utils/report-utils'
+import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/report-utils'
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
 import { useQuery } from '@tanstack/react-query'
 
@@ -127,7 +127,7 @@ function ReportWriterContent({ params }: { params: { jobId: string } }) {
     }
 
     // Standard Document Card
-    const isUploaded = doc.status === 'uploaded'
+    const isUploaded = doc.displayStatus === 'uploaded'
     return (
       <Card key={doc.id} className="relative">
         <CardHeader>

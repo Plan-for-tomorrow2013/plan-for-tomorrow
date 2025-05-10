@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
-import path from 'path' // Keep path for joining filename later
+import path from 'path' // Keep path for joining fileName later
 import { PaginationParams, PaginatedResponse, Job } from '../../../../../shared/types/jobs'
 import { getJobsPath } from '@shared/utils/paths' // Import the path utility
 

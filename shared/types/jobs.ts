@@ -1,7 +1,7 @@
 export interface Assessment {
   status?: 'paid' | 'completed';
   returnedAt?: string;
-  filename?: string;
+  fileName?: string;
   originalName?: string;
   type?: string;
   uploadedAt?: string;
@@ -11,13 +11,13 @@ export interface Assessment {
   createdAt?: string;
   updatedAt?: string;
   documents?: {
-    certificateOfTitle?: { originalName?: string; filename?: string };
-    surveyPlan?: { originalName?: string; filename?: string };
-    certificate107?: { originalName?: string; filename?: string };
+    certificateOfTitle?: { originalName?: string; fileName?: string };
+    surveyPlan?: { originalName?: string; fileName?: string };
+    certificate107?: { originalName?: string; fileName?: string };
   };
   uploadedDocuments?: {
     [key: string]: {
-      filename: string;
+      fileName: string;
       originalName: string;
       type: string;
       uploadedAt: string;
@@ -40,7 +40,7 @@ export interface Job {
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   documents?: {
     [key: string]: {
-      filename: string;
+      fileName: string;
       originalName: string;
       type: string;
       uploadedAt: string;

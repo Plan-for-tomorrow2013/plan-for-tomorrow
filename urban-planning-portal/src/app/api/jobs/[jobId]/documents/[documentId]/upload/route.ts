@@ -35,7 +35,7 @@ export async function POST(
     }
 
     // Write file to disk using the correct path
-    const filePath = join(documentsDir, document.filename)
+    const filePath = join(documentsDir, document.fileName)
     await writeFile(filePath, buffer)
 
     // Update document size

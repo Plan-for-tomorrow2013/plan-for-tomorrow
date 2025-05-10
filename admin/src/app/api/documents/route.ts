@@ -46,8 +46,8 @@ export async function POST(request: Request) {
 
     const documentId = uuidv4()
     const version = 1
-    const filename = `${documentId}-v${version}${path.extname(file.name)}`
-    const filePath = path.join(DOCUMENTS_DIR, filename)
+    const fileName = `${documentId}-v${version}${path.extname(file.name)}`
+    const filePath = path.join(DOCUMENTS_DIR, fileName)
 
     // Save the file
     const buffer = Buffer.from(await file.arrayBuffer())
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     const documentVersion: DocumentVersion = {
       version,
       uploadedAt: new Date().toISOString(),
-      filename,
+      fileName,
       originalName: file.name,
       size: file.size,
       uploadedBy: metadata.uploadedBy || 'system'

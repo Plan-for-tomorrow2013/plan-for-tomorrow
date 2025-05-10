@@ -1,10 +1,10 @@
 {
-  "id": "1637928f-663c-46bd-92c4-1561a7d30a7d",
+  "id": "063dd408-3d3d-479f-ab6f-26a0bd5a25ed",
   "address": "9 Viola Place, Greystanes",
   "currentStage": "design-check",
   "status": "pending",
-  "createdAt": "2025-05-09T22:09:17.453Z",
-  "updatedAt": "2025-05-09T22:09:17.453Z",
+  "createdAt": "2025-05-10T05:16:11.387Z",
+  "updatedAt": "2025-05-10T05:16:11.387Z",
   "propertyData": {
     "coordinates": {
       "longitude": 150.937614203867,
@@ -134,17 +134,24 @@
   },
   "documents": {
     "10-7-certificate": {
-      "filename": "10-7-certificate_1746828567336_10_7_5.pdf",
+      "fileName": "10-7-certificate_1746854182074_10_7_5.pdf",
       "originalName": "10_7_5.pdf",
       "type": "application/pdf",
-      "uploadedAt": "2025-05-09T22:09:27.337Z",
+      "uploadedAt": "2025-05-10T05:16:22.076Z",
       "size": 148265
     },
+    "certificate-of-title": {
+      "fileName": "certificate-of-title_1746854199657_Certificate of Title.pdf",
+      "originalName": "Certificate of Title.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-10T05:16:39.664Z",
+      "size": 4136746
+    },
     "statement-of-environmental-effects-report": {
-      "filename": "pending",
+      "fileName": "pending",
       "originalName": "Statement of Environmental Effects (Pending)",
       "type": "report",
-      "uploadedAt": "2025-05-09T22:09:34.727Z",
+      "uploadedAt": "2025-05-10T05:16:50.397Z",
       "size": 0
     }
   },
@@ -155,17 +162,14 @@
     "uploadedDocuments": {},
     "status": "paid",
     "type": "statement-of-environmental-effects",
-    "createdAt": "2025-05-09T22:09:34.727Z",
-    "updatedAt": "2025-05-09T22:09:34.727Z",
+    "createdAt": "2025-05-10T05:16:50.397Z",
+    "updatedAt": "2025-05-10T05:16:50.397Z",
     "developmentType": "123",
     "additionalInfo": "456",
     "documents": {
       "certificateOfTitle": {},
       "surveyPlan": {},
-      "certificate107": {
-        "originalName": "10_7_5.pdf",
-        "filename": "10-7-certificate_1746828567336_10_7_5.pdf"
-      }
+      "certificate107": {}
     }
   },
   "complyingDevelopmentCertificate": {
@@ -174,17 +178,14 @@
   "statement-of-environmental-effects": {
     "status": "paid",
     "type": "statement-of-environmental-effects",
-    "createdAt": "2025-05-09T22:09:35.037Z",
-    "updatedAt": "2025-05-09T22:09:35.037Z",
+    "createdAt": "2025-05-10T05:16:50.216Z",
+    "updatedAt": "2025-05-10T05:16:50.216Z",
     "developmentType": "123",
     "additionalInfo": "456",
     "documents": {
       "certificateOfTitle": {},
       "surveyPlan": {},
-      "certificate107": {
-        "originalName": "10_7_5.pdf",
-        "filename": "10-7-certificate_1746828567336_10_7_5.pdf"
-      }
+      "certificate107": {}
     }
   }
 }

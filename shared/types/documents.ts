@@ -4,7 +4,7 @@ export interface DocumentVersion {
   version: number
   uploadedAt: string
   updatedAt?: string
-  filename: string
+  fileName: string
   originalName: string
   size: number
   type: string
@@ -39,7 +39,7 @@ export interface Document {
     path?: string
   }
   uploadedFile?: {
-    filename: string
+    fileName: string
     originalName: string
     type: string
     uploadedAt: string
@@ -52,7 +52,7 @@ export interface Document {
 export interface Assessment {
   status?: 'paid' | 'completed';
   returnedAt?: string;
-  filename?: string;
+  fileName?: string;
   originalName?: string;
   type?: string;
   uploadedAt?: string;
@@ -62,9 +62,9 @@ export interface Assessment {
   createdAt?: string;
   updatedAt?: string;
   documents?: {
-    certificateOfTitle?: { originalName?: string; filename?: string };
-    surveyPlan?: { originalName?: string; filename?: string };
-    certificate107?: { originalName?: string; filename?: string };
+    certificateOfTitle?: { originalName?: string; fileName?: string };
+    surveyPlan?: { originalName?: string; fileName?: string };
+    certificate107?: { originalName?: string; fileName?: string };
   };
   purchasedAssessment?: {
     id: string;
@@ -132,7 +132,7 @@ export interface DocumentWithStatus extends Document {
   // Renamed 'status' to 'displayStatus' and added new states
   displayStatus: 'uploaded' | 'pending_user_upload' | 'pending_admin_delivery'
   uploadedFile?: {
-    filename: string
+    fileName: string
     originalName: string
     type: string
     uploadedAt: string

@@ -21,7 +21,7 @@ import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
 import { DocumentStatus } from '@shared/components/DocumentStatus' // Keep this one
 import { Job, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@/utils/report-utils'
+import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@shared/utils/report-utils'
 // Removed duplicate PropertyDataShape import
 import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
@@ -573,15 +573,15 @@ function JobReportWriter({ jobId }: { jobId: string }) {
           documents: {
             certificateOfTitle: {
               originalName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === 'certificate-of-title')?.uploadedFile?.fileName
             },
             surveyPlan: {
               originalName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === 'survey-plan')?.uploadedFile?.fileName
             },
             certificate107: {
               originalName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.originalName,
-              filename: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.filename
+              fileName: documents.find(doc => doc.id === '10-7-certificate')?.uploadedFile?.fileName
             }
           }
         }
@@ -1337,7 +1337,7 @@ const renderRequiredDocuments = () => {
     // Corrected: Use displayStatus
     displayStatus: 'uploaded',
     uploadedFile: assessment.file ? {
-      filename: assessment.file.id,
+      fileName: assessment.file.id,
       originalName: assessment.file.originalName,
       type: 'application/pdf',
       uploadedAt: new Date().toISOString(),

@@ -66,7 +66,7 @@ async function createDocumentFromWorkTicket(
   const documentVersion: DocumentVersion = {
     version,
     uploadedAt: new Date().toISOString(),
-    filename: path.basename(filePath),
+    fileName: path.basename(filePath),
     originalName: file.name,
     size: file.size,
     type: file.type,
@@ -153,7 +153,7 @@ export async function POST(request: Request) {
         createdDocument = await createDocumentFromWorkTicket(newTicket, file, metadata);
         // Update ticket with document reference only if document creation succeeded
         newTicket.completedDocument = {
-          fileName: createdDocument.versions[0].filename,
+          fileName: createdDocument.versions[0].fileName,
           originalName: createdDocument.versions[0].originalName,
           uploadedAt: createdDocument.versions[0].uploadedAt
         };
@@ -248,7 +248,7 @@ export async function POST(request: Request) {
           // Add a placeholder document to the job's documents field
           job.documents = job.documents || {};
           job.documents[documentKey] = {
-            filename: 'pending',
+            fileName: 'pending',
             originalName: reportTitle,
             type: 'report',
             uploadedAt: new Date().toISOString(),

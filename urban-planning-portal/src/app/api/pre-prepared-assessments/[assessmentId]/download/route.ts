@@ -21,7 +21,7 @@ interface Job {
   };
   documents?: {
     [key: string]: {
-      filename: string;
+      fileName: string;
       originalName: string;
       type: string;
       uploadedAt: string;
@@ -101,7 +101,7 @@ export async function GET(
         return new NextResponse(await readFile(alternativePath), {
           headers: {
             'Content-Type': 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${assessment.file.originalName}"`
+            'Content-Disposition': `attachment; fileName="${assessment.file.originalName}"`
           },
           status: 200
         })
@@ -120,7 +120,7 @@ export async function GET(
       // Set headers for file download
       const headers = new Headers()
       headers.set('Content-Type', 'application/octet-stream')
-      headers.set('Content-Disposition', `attachment; filename="${assessment.file.originalName}"`)
+      headers.set('Content-Disposition', `attachment; fileName="${assessment.file.originalName}"`)
 
       return new NextResponse(fileBuffer, {
         headers,

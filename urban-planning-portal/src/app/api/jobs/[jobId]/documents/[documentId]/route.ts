@@ -16,7 +16,7 @@ export async function DELETE(
 
     // Remove document from job's documents
     if (job.documents && job.documents[params.documentId]) {
-      const documentPath = path.join(process.cwd(), 'data', 'jobs', params.jobId, 'documents', job.documents[params.documentId].filename)
+      const documentPath = path.join(process.cwd(), 'data', 'jobs', params.jobId, 'documents', job.documents[params.documentId].fileName)
 
       try {
         await fs.unlink(documentPath)

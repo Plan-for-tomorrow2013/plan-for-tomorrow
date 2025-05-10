@@ -28,8 +28,8 @@ export async function PUT(
 
     const document = documents[documentIndex]
     const newVersion = document.currentVersion + 1
-    const filename = `${document.id}-v${newVersion}${path.extname(file.name)}`
-    const filePath = path.join(DOCUMENTS_DIR, filename)
+    const fileName = `${document.id}-v${newVersion}${path.extname(file.name)}`
+    const filePath = path.join(DOCUMENTS_DIR, fileName)
 
     // Save the new version
     const buffer = Buffer.from(await file.arrayBuffer())
@@ -39,7 +39,7 @@ export async function PUT(
     const documentVersion = {
       version: newVersion,
       uploadedAt: new Date().toISOString(),
-      filename,
+      fileName,
       originalName: file.name,
       size: file.size,
       uploadedBy: metadata.uploadedBy || 'system'
@@ -79,9 +79,9 @@ export async function DELETE(
     // Delete all version files
     for (const version of document.versions) {
       try {
-        await unlink(path.join(DOCUMENTS_DIR, version.filename))
+        await unlink(path.join(DOCUMENTS_DIR, version.fileName))
       } catch (error) {
-        console.error(`Error deleting file ${version.filename}:`, error)
+        console.error(`Error deleting file ${version.fileName}:`, error)
         // Continue even if a file deletion fails
       }
     }

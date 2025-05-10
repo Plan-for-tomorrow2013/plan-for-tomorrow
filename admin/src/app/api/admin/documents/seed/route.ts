@@ -39,7 +39,7 @@ export async function POST() {
         const sourceFilePath = join(process.cwd(), 'public', 'assessments', doc.sourceFile)
         const fileContent = await readFile(sourceFilePath)
 
-        // Generate a unique filename while keeping the original name pattern
+        // Generate a unique fileName while keeping the original name pattern
         const uniqueFilename = `${doc.sourceFile.split('.')[0]}_${uuidv4()}.pdf`
         
         // Write to the new location
@@ -51,7 +51,7 @@ export async function POST() {
           id: uuidv4(),
           title: doc.title,
           description: doc.description,
-          filename: uniqueFilename,
+          fileName: uniqueFilename,
           originalName: doc.sourceFile,
           type: 'application/pdf',
           uploadedAt: new Date().toISOString(),

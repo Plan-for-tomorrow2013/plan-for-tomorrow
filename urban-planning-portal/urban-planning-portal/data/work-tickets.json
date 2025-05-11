@@ -1,42 +1,26 @@
 [
   {
-    "id": "6d0b8169-9ccb-4be5-9fc5-652c272463ee",
-    "jobId": "063dd408-3d3d-479f-ab6f-26a0bd5a25ed",
+    "id": "6645d9de-20c6-49b8-af27-632dab658c1d",
+    "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
     "jobAddress": "9 Viola Place, Greystanes",
-    "ticketType": "statement-of-environmental-effects",
+    "ticketType": "statementOfEnvironmentalEffects",
     "status": "pending",
-    "createdAt": "2025-05-10T05:16:50.394Z",
-    "statementOfEnvironmentalEffects": {
-      "developmentType": "123",
-      "additionalInfo": "456",
-      "documents": {
-        "certificateOfTitle": {},
-        "surveyPlan": {},
-        "certificate107": {}
-      }
-    }
+    "createdAt": "2025-05-10T09:33:34.031Z"
   },
   {
-    "id": "5bec013d-4b67-4493-bf3e-8c09e7aa4995",
-    "jobId": "094f9c4a-988f-4256-9a3f-1af38299f6fc",
-    "jobAddress": "36 Prince Street Randwick",
-    "ticketType": "complying-development-certificate",
+    "id": "8b9b505d-fea3-4e42-82c2-5ae2ec6d9458",
+    "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "complyingDevelopmentCertificate",
     "status": "pending",
-    "createdAt": "2025-05-10T05:46:31.895Z",
-    "complyingDevelopmentCertificate": {
-      "developmentType": "123",
-      "additionalInfo": "456",
-      "documents": {
-        "certificateOfTitle": {
-          "originalName": "Certificate of Title.pdf",
-          "fileName": "certificate-of-title_1746855968397_Certificate of Title.pdf"
-        },
-        "surveyPlan": {},
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "fileName": "10-7-certificate_1746855934873_10_7_5.pdf"
-        }
-      }
-    }
+    "createdAt": "2025-05-10T09:37:18.693Z"
+  },
+  {
+    "id": "841dc88b-f301-45bb-8a49-0cce1fd45e3a",
+    "jobId": "d6b0509f-08a9-43f7-ab96-11dfcdb52fa2",
+    "jobAddress": "25 Cheviot Street Mount Druitt",
+    "ticketType": "complyingDevelopmentCertificate",
+    "status": "pending",
+    "createdAt": "2025-05-10T10:08:43.689Z"
   }
 ]

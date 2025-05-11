@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 import { getJob } from '@shared/services/jobStorage'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { readFile } from 'fs/promises'
+import { fileURLToPath } from 'url'
+import { getJobDocumentsPath } from '@shared/utils/paths'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 export async function GET(
   request: Request,
@@ -25,7 +30,7 @@ export async function GET(
     }
 
     // Get the file path
-    const filePath = join(process.cwd(), 'data', 'jobs', params.jobId, 'documents', document.fileName)
+    const filePath = join(getJobDocumentsPath(params.jobId), document.fileName)
 
     // Read the file
     const fileBuffer = await readFile(filePath)

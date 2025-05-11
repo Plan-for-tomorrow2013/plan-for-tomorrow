@@ -220,17 +220,17 @@ export async function POST(request: Request) {
         switch (newTicket.ticketType) {
           case 'custom-assessment':
             assessmentKey = 'customAssessment';
-            documentKey = 'custom-assessment-report';
+            documentKey = 'customAssessmentReport';
             reportTitle = 'Custom Assessment Report (Pending)';
             break;
           case 'statement-of-environmental-effects':
             assessmentKey = 'statementOfEnvironmentalEffects';
-            documentKey = 'statement-of-environmental-effects-report';
+            documentKey = 'statementOfEnvironmentalEffectsReport';
             reportTitle = 'Statement of Environmental Effects (Pending)';
             break;
           case 'complying-development-certificate':
             assessmentKey = 'complyingDevelopmentCertificate';
-            documentKey = 'complying-development-certificate-report';
+            documentKey = 'complyingDevelopmentCertificateReport';
             reportTitle = 'Complying Development Certificate (Pending)';
             break;
         }

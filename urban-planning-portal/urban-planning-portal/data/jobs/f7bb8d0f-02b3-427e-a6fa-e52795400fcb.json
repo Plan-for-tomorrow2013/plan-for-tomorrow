@@ -1,10 +1,10 @@
 {
-  "id": "063dd408-3d3d-479f-ab6f-26a0bd5a25ed",
+  "id": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
   "address": "9 Viola Place, Greystanes",
   "currentStage": "design-check",
   "status": "pending",
-  "createdAt": "2025-05-10T05:16:11.387Z",
-  "updatedAt": "2025-05-10T05:16:11.387Z",
+  "createdAt": "2025-05-10T09:31:52.564Z",
+  "updatedAt": "2025-05-10T09:31:52.564Z",
   "propertyData": {
     "coordinates": {
       "longitude": 150.937614203867,
@@ -133,26 +133,19 @@
     }
   },
   "documents": {
-    "10-7-certificate": {
-      "fileName": "10-7-certificate_1746854182074_10_7_5.pdf",
-      "originalName": "10_7_5.pdf",
-      "type": "application/pdf",
-      "uploadedAt": "2025-05-10T05:16:22.076Z",
-      "size": 148265
-    },
-    "certificate-of-title": {
-      "fileName": "certificate-of-title_1746854199657_Certificate of Title.pdf",
+    "certificateOfTitle": {
+      "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf",
       "originalName": "Certificate of Title.pdf",
       "type": "application/pdf",
-      "uploadedAt": "2025-05-10T05:16:39.664Z",
+      "uploadedAt": "2025-05-10T09:31:58.057Z",
       "size": 4136746
     },
-    "statement-of-environmental-effects-report": {
-      "fileName": "pending",
-      "originalName": "Statement of Environmental Effects (Pending)",
-      "type": "report",
-      "uploadedAt": "2025-05-10T05:16:50.397Z",
-      "size": 0
+    "tenSevenCertificate": {
+      "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf",
+      "originalName": "10_7_5.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-10T09:37:10.796Z",
+      "size": 148265
     }
   },
   "customAssessment": {
@@ -161,31 +154,38 @@
   "statementOfEnvironmentalEffects": {
     "uploadedDocuments": {},
     "status": "paid",
-    "type": "statement-of-environmental-effects",
-    "createdAt": "2025-05-10T05:16:50.397Z",
-    "updatedAt": "2025-05-10T05:16:50.397Z",
+    "type": "statementOfEnvironmentalEffects",
+    "createdAt": "2025-05-10T09:33:33.496Z",
+    "updatedAt": "2025-05-10T09:33:33.496Z",
     "developmentType": "123",
     "additionalInfo": "456",
     "documents": {
-      "certificateOfTitle": {},
+      "certificateOfTitle": {
+        "originalName": "Certificate of Title.pdf",
+        "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
+      },
       "surveyPlan": {},
       "certificate107": {}
     }
   },
   "complyingDevelopmentCertificate": {
-    "uploadedDocuments": {}
-  },
-  "statement-of-environmental-effects": {
+    "uploadedDocuments": {},
     "status": "paid",
-    "type": "statement-of-environmental-effects",
-    "createdAt": "2025-05-10T05:16:50.216Z",
-    "updatedAt": "2025-05-10T05:16:50.216Z",
+    "type": "complyingDevelopmentCertificate",
+    "createdAt": "2025-05-10T09:37:18.039Z",
+    "updatedAt": "2025-05-10T09:37:18.039Z",
     "developmentType": "123",
     "additionalInfo": "456",
     "documents": {
-      "certificateOfTitle": {},
+      "certificateOfTitle": {
+        "originalName": "Certificate of Title.pdf",
+        "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
+      },
       "surveyPlan": {},
-      "certificate107": {}
+      "certificate107": {
+        "originalName": "10_7_5.pdf",
+        "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf"
+      }
     }
   }
 }

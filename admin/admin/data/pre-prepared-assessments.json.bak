@@ -1,0 +1,20 @@
+[
+  {
+    "id": "2330f8b0-df33-474f-8772-a643f0d5cf05",
+    "title": "TEST SECTION",
+    "assessments": [
+      {
+        "id": "ba31e83a-8885-4999-9b4a-81c01da86d7d",
+        "title": "TEST TITLE",
+        "content": "TEST CONTENT",
+        "author": "Admin User",
+        "date": "2025-05-02T23:11:27.286Z",
+        "file": {
+          "id": "c91ac710-32e1-43fe-85ca-3509825f0eae",
+          "originalName": "Initial Assessment Check.pdf",
+          "savedPath": "/documents/pre-prepared/Initial Assessment Check.pdf"
+        }
+      }
+    ]
+  }
+]

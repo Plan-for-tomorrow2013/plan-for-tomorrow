@@ -158,7 +158,7 @@ export interface DocumentMetadata {
 
 export const DOCUMENT_TYPES: Document[] = [
   {
-    id: 'certificate-of-title',
+    id: 'certificateOfTitle',
     title: 'Certificate of Title',
     category: 'LEGAL',
     path: '/certificate-of-title',
@@ -171,7 +171,7 @@ export const DOCUMENT_TYPES: Document[] = [
     purchasable: false // Explicitly set for standard docs
   },
   {
-    id: '10-7-certificate',
+    id: 'tenSevenCertificate',
     title: '10.7 Certificate',
     category: 'PLANNING',
     path: '/10-7-certificate',
@@ -184,7 +184,7 @@ export const DOCUMENT_TYPES: Document[] = [
     purchasable: false // Explicitly set for standard docs
   },
   {
-    id: 'survey-plan',
+    id: 'surveyPlan',
     title: 'Survey Plan',
     category: 'TECHNICAL',
     path: '/survey-plan',
@@ -197,7 +197,7 @@ export const DOCUMENT_TYPES: Document[] = [
     purchasable: false // Explicitly set for standard docs
   },
   {
-    id: 'custom-assessment',
+    id: 'customAssessment',
     title: 'Custom Assessment Report',
     category: 'REPORTS',
     path: '/custom-assessment',
@@ -211,7 +211,7 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'statement-of-environmental-effects',
+    id: 'statementOfEnvironmentalEffects',
     title: 'Statement of Environmental Effects',
     category: 'REPORTS',
     path: '/statement-of-environmental-effects',
@@ -225,7 +225,7 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'complying-development-certificate',
+    id: 'complyingDevelopmentCertificate',
     title: 'Complying Development Certificate',
     category: 'REPORTS',
     path: '/complying-development-certificate',

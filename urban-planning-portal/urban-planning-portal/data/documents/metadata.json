@@ -1,21 +1,24 @@
 [
   {
-    "id": "bcb4ea31-6b6e-4a70-95e9-e9c56a427709",
-    "title": "Statement of Environmental Effects - 9 Viola Place, Greystanes",
-    "path": "work-tickets/6d0b8169-9ccb-4be5-9fc5-652c272463ee",
+    "id": "2c5d47a7-3f8b-4c7d-8acd-0ff1c0168154",
+    "title": "statementOfEnvironmentalEffects - 9 Viola Place, Greystanes",
+    "path": "work-tickets/6645d9de-20c6-49b8-af27-632dab658c1d",
     "type": "document",
     "category": "REPORTS",
     "versions": [],
     "currentVersion": 1,
-    "createdAt": "2025-05-10T05:16:50.394Z",
-    "updatedAt": "2025-05-10T05:16:50.394Z",
+    "createdAt": "2025-05-10T09:33:34.031Z",
+    "updatedAt": "2025-05-10T09:33:34.031Z",
     "isActive": true,
     "metadata": {
-      "jobId": "063dd408-3d3d-479f-ab6f-26a0bd5a25ed",
-      "ticketId": "6d0b8169-9ccb-4be5-9fc5-652c272463ee",
-      "ticketType": "statement-of-environmental-effects",
+      "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
+      "ticketId": "6645d9de-20c6-49b8-af27-632dab658c1d",
+      "ticketType": "statementOfEnvironmentalEffects",
       "attachedDocuments": {
-        "certificateOfTitle": {},
+        "certificateOfTitle": {
+          "originalName": "Certificate of Title.pdf",
+          "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
+        },
         "surveyPlan": {},
         "certificate107": {}
       },
@@ -25,7 +28,10 @@
         "developmentType": "123",
         "additionalInfo": "456",
         "documents": {
-          "certificateOfTitle": {},
+          "certificateOfTitle": {
+            "originalName": "Certificate of Title.pdf",
+            "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
+          },
           "surveyPlan": {},
           "certificate107": {}
         }
@@ -34,32 +40,32 @@
     "displayStatus": "pending_admin_delivery"
   },
   {
-    "id": "e353150f-37cd-4960-b539-54cd74f2595c",
-    "title": "Complying Development Certificate - 36 Prince Street Randwick",
-    "path": "work-tickets/5bec013d-4b67-4493-bf3e-8c09e7aa4995",
+    "id": "6fb6b926-a156-4091-9567-451fbfb52922",
+    "title": "complyingDevelopmentCertificate - 9 Viola Place, Greystanes",
+    "path": "work-tickets/8b9b505d-fea3-4e42-82c2-5ae2ec6d9458",
     "type": "document",
     "category": "REPORTS",
     "versions": [],
     "currentVersion": 1,
-    "createdAt": "2025-05-10T05:46:31.895Z",
-    "updatedAt": "2025-05-10T05:46:31.895Z",
+    "createdAt": "2025-05-10T09:37:18.693Z",
+    "updatedAt": "2025-05-10T09:37:18.693Z",
     "isActive": true,
     "metadata": {
-      "jobId": "094f9c4a-988f-4256-9a3f-1af38299f6fc",
-      "ticketId": "5bec013d-4b67-4493-bf3e-8c09e7aa4995",
-      "ticketType": "complying-development-certificate",
+      "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
+      "ticketId": "8b9b505d-fea3-4e42-82c2-5ae2ec6d9458",
+      "ticketType": "complyingDevelopmentCertificate",
       "attachedDocuments": {
         "certificateOfTitle": {
           "originalName": "Certificate of Title.pdf",
-          "fileName": "certificate-of-title_1746855968397_Certificate of Title.pdf"
+          "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
         },
         "surveyPlan": {},
         "certificate107": {
           "originalName": "10_7_5.pdf",
-          "fileName": "10-7-certificate_1746855934873_10_7_5.pdf"
+          "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf"
         }
       },
-      "jobAddress": "36 Prince Street Randwick",
+      "jobAddress": "9 Viola Place, Greystanes",
       "uploadedBy": "professional",
       "reportData": {
         "developmentType": "123",
@@ -67,12 +73,64 @@
         "documents": {
           "certificateOfTitle": {
             "originalName": "Certificate of Title.pdf",
-            "fileName": "certificate-of-title_1746855968397_Certificate of Title.pdf"
+            "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
           },
           "surveyPlan": {},
           "certificate107": {
             "originalName": "10_7_5.pdf",
-            "fileName": "10-7-certificate_1746855934873_10_7_5.pdf"
+            "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf"
+          }
+        }
+      }
+    },
+    "displayStatus": "pending_admin_delivery"
+  },
+  {
+    "id": "bd44032a-4dbb-43b7-9e43-fa8839a5fb79",
+    "title": "complyingDevelopmentCertificate - 25 Cheviot Street Mount Druitt",
+    "path": "work-tickets/841dc88b-f301-45bb-8a49-0cce1fd45e3a",
+    "type": "document",
+    "category": "REPORTS",
+    "versions": [],
+    "currentVersion": 1,
+    "createdAt": "2025-05-10T10:08:43.689Z",
+    "updatedAt": "2025-05-10T10:08:43.689Z",
+    "isActive": true,
+    "metadata": {
+      "jobId": "d6b0509f-08a9-43f7-ab96-11dfcdb52fa2",
+      "ticketId": "841dc88b-f301-45bb-8a49-0cce1fd45e3a",
+      "ticketType": "complyingDevelopmentCertificate",
+      "attachedDocuments": {
+        "certificateOfTitle": {
+          "originalName": "Certificate of Title.pdf",
+          "fileName": "certificateOfTitle_1746869364510_Certificate of Title.pdf"
+        },
+        "surveyPlan": {
+          "originalName": "survey-plan.pdf",
+          "fileName": "surveyPlan_1746871692009_survey-plan.pdf"
+        },
+        "certificate107": {
+          "originalName": "10_7_5.pdf",
+          "fileName": "tenSevenCertificate_1746871706019_10_7_5.pdf"
+        }
+      },
+      "jobAddress": "25 Cheviot Street Mount Druitt",
+      "uploadedBy": "professional",
+      "reportData": {
+        "developmentType": "123",
+        "additionalInfo": "456",
+        "documents": {
+          "certificateOfTitle": {
+            "originalName": "Certificate of Title.pdf",
+            "fileName": "certificateOfTitle_1746869364510_Certificate of Title.pdf"
+          },
+          "surveyPlan": {
+            "originalName": "survey-plan.pdf",
+            "fileName": "surveyPlan_1746871692009_survey-plan.pdf"
+          },
+          "certificate107": {
+            "originalName": "10_7_5.pdf",
+            "fileName": "tenSevenCertificate_1746871706019_10_7_5.pdf"
           }
         }
       }

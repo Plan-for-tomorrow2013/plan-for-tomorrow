@@ -17,7 +17,7 @@ export const getDocumentsMetadataPath = () => path.join(getDocumentsPath(), 'met
 // Job paths (derive from the unambiguous getDataPath)
 export const getJobsPath = () => path.join(getDataPath(), 'jobs');
 export const getJobPath = (jobId: string) => path.join(getJobsPath(), `${jobId}.json`);
-export const getJobDocumentsPath = (jobId: string) => path.join(getJobsPath(), jobId, 'documents');
+export const getJobDocumentsPath = (jobId: string) => path.join(process.cwd(), 'data', 'jobs', jobId, 'documents');
 
 // Work ticket paths (derive from the unambiguous getDataPath)
 export const getWorkTicketsPath = () => path.join(getDataPath(), 'work-tickets.json');

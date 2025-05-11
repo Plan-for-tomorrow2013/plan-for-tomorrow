@@ -2,7 +2,7 @@ import { Job } from '@shared/types/jobs'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Assessment } from '@shared/types/jobs'
 
-export type ReportType = 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate'
+export type ReportType = 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate'
 
 export interface ReportStatus {
   isPaid: boolean
@@ -27,27 +27,27 @@ export const getReportStatus = (doc: DocumentWithStatus, job: Job): ReportStatus
 };
 
 export const getReportData = (doc: DocumentWithStatus, job: Job): Assessment | null => {
-  const data = doc.id === 'statement-of-environmental-effects' ? job.statementOfEnvironmentalEffects :
-               doc.id === 'complying-development-certificate' ? job.complyingDevelopmentCertificate :
-               doc.id === 'custom-assessment' ? job.customAssessment :
+  const data = doc.id === 'statementOfEnvironmentalEffects' ? job.statementOfEnvironmentalEffects :
+               doc.id === 'complyingDevelopmentCertificate' ? job.complyingDevelopmentCertificate :
+               doc.id === 'customAssessment' ? job.customAssessment :
                null;
   return data || null;
 };
 
 export function isReportType(docId: string): boolean {
-  return ['custom-assessment', 'statement-of-environmental-effects', 'complying-development-certificate'].includes(docId)
+  return ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate'].includes(docId)
 }
 
 export function getReportTitle(docId: string): string {
   switch (docId) {
-    case 'statement-of-environmental-effects':
-      return 'Statement of Environmental Effects'
-    case 'complying-development-certificate':
-      return 'Complying Development Certificate'
     case 'custom-assessment':
-      return 'Custom Assessment'
+      return 'Custom Assessment';
+    case 'statement-of-environmental-effects':
+      return 'Statement of Environmental Effects';
+    case 'complying-development-certificate':
+      return 'Complying Development Certificate';
     default:
-      return ''
+      return 'Unknown Report';
   }
 }
 

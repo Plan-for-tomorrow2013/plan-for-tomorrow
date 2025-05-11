@@ -95,19 +95,19 @@ export async function POST(request: Request) {
     }
 
     // Update the job's assessment status based on ticket type
-    if (ticket.ticketType === 'custom-assessment') {
+    if (ticket.ticketType === 'customAssessment') {
       if (!ticket.job.customAssessment) {
         ticket.job.customAssessment = {}
       }
       ticket.job.customAssessment.status = 'completed'
       ticket.job.customAssessment.returnedAt = new Date().toISOString()
-    } else if (ticket.ticketType === 'statement-of-environmental-effects') {
+    } else if (ticket.ticketType === 'statementOfEnvironmentalEffects') {
       if (!ticket.job.statementOfEnvironmentalEffects) {
         ticket.job.statementOfEnvironmentalEffects = {}
       }
       ticket.job.statementOfEnvironmentalEffects.status = 'completed'
       ticket.job.statementOfEnvironmentalEffects.returnedAt = new Date().toISOString()
-    } else if (ticket.ticketType === 'complying-development-certificate') {
+    } else if (ticket.ticketType === 'complyingDevelopmentCertificate') {
       if (!ticket.job.complyingDevelopmentCertificate) {
         ticket.job.complyingDevelopmentCertificate = {}
       }

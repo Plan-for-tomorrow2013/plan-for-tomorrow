@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { getWorkTicketsPath, getJobPath, getDocumentsPath } from '@shared/utils/paths'
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     // Read the work tickets file
-    const workTicketsPath = path.join(process.cwd(), 'data', 'work-tickets.json')
+    const workTicketsPath = getWorkTicketsPath()
     const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
     const workTickets = JSON.parse(workTicketsData)
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
 
     // Define the path to the completed document based on ticket type
     let completedDocPath;
-    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents');
+    const baseDocumentsDir = getDocumentsPath();
 
     // All assessment types use their ticketType as the directory name
     completedDocPath = path.join(
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
     }
 
     // Read the job file
-    const jobPath = path.join(process.cwd(), 'data', 'jobs', `${ticket.jobId}.json`)
+    const jobPath = getJobPath(ticket.jobId)
     let job
     try {
       const jobData = await fs.readFile(jobPath, 'utf-8')

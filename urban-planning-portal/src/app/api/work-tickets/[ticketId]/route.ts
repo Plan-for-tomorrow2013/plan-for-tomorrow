@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
-import path from 'path'
-
-// Helper function to get the work tickets file path
-const getWorkTicketsPath = () => {
-  return path.join(process.cwd(), 'data', 'work-tickets.json')
-}
+import { getWorkTicketsPath } from '@shared/utils/paths'
 
 // Helper function to read work tickets
 async function readWorkTickets() {

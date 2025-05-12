@@ -237,7 +237,7 @@ export default function WorkTicketsPage() {
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         isActive: true,
-                        status: 'uploaded',
+                        displayStatus: 'uploaded',
                         uploadedFile: {
                           fileName: ticket.customAssessment.fileName || '',
                           originalName: ticket.customAssessment.originalName || '',
@@ -274,7 +274,7 @@ export default function WorkTicketsPage() {
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         isActive: true,
-                        status: 'uploaded',
+                        displayStatus: 'uploaded',
                         uploadedFile: {
                           fileName: ticket.statementOfEnvironmentalEffects.fileName || '',
                           originalName: ticket.statementOfEnvironmentalEffects.originalName || '',
@@ -311,7 +311,7 @@ export default function WorkTicketsPage() {
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         isActive: true,
-                        status: 'uploaded',
+                        displayStatus: 'uploaded',
                         uploadedFile: {
                           fileName: ticket.complyingDevelopmentCertificate.fileName || '',
                           originalName: ticket.complyingDevelopmentCertificate.originalName || '',

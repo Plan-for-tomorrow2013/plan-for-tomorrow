@@ -31,6 +31,8 @@ import { DocumentProvider, useDocuments } from '@shared/contexts/document-contex
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'; // Import SiteDetailsProvider and useSiteDetails
 import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
+import { DocumentTile } from '@shared/components/DocumentTile'
+import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -162,7 +164,7 @@ function normalizeSiteDetails(data: any): SiteDetails {
 }
 
 // *** NEW COMPONENT for Job-Specific Content ***
-function JobReportWriter({ jobId }: { jobId: string }) {
+function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
@@ -848,69 +850,43 @@ function JobReportWriter({ jobId }: { jobId: string }) {
   });
 
   // Refactored handleFileUpload to use mutation
-  const handleFileUpload = (documentId: string, file: File) => {
-    if (!jobId) { // Use jobId prop
+  const handleUpload = (docId: string) => {
+    if (!jobId) {
       toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
       return;
     }
-    uploadDocumentMutation.mutate({ documentId, file });
+    createFileInput(async (file) => {
+      await handleDocumentUpload(
+        () => uploadDocument(jobId, docId, file)
+      )
+    })
   }
 
-  const handleDownload = async (documentId: string) => { // Use jobId prop
-    if (!jobId) return;
-    window.open(`/api/jobs/${jobId}/documents/${documentId}/download`, '_blank'); // Use window.open for downloads
-  };
-
-  const handleUpload = (docId: string) => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.pdf,.doc,.docx'
-    input.onchange = async (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0]
-      if (file) {
-        // Use the mutation wrapper
-        handleFileUpload(docId, file);
-        // await uploadDocument(jobId, docId, file) // Avoid direct call if mutation handles it
-      }
+  const handleDownload = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
+      return;
     }
-    input.click()
+    handleDocumentDownload(
+      () => downloadDocument(jobId, docId)
+    )
   }
 
-  // --- Mutation for Removing Document ---
-  const removeDocumentMutation = useMutation<any, Error, { documentId: string }>({
-      mutationFn: async ({ documentId }) => {
-          if (!jobId) throw new Error("No job selected");
-          const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}`, { // Use jobId prop
-              method: 'DELETE',
-          });
-          if (!response.ok) {
-              const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.error || 'Failed to delete document');
-          }
-          return response.json(); // Or handle empty response if API returns 204
-      },
-      onSuccess: (data, variables) => {
-          queryClient.invalidateQueries({ queryKey: ['documents', jobId] }); // Use jobId prop
-          queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Also invalidate job data
-          toast({
-              title: "Success",
-              description: "Document deleted successfully",
-          });
-      },
-      onError: (error) => {
-          console.error('Error deleting document:', error);
-          toast({
-              title: "Delete Error",
-              description: `Failed to delete document: ${error.message}`,
-              variant: "destructive",
-          });
-      },
-  });
-
-  const handleDelete = async (docId: string) => { // Use jobId prop
-    if (confirm('Are you sure you want to delete this document?')) {
-      removeDocumentMutation.mutate({ documentId: docId }); // *** Use mutation ***
+  const handleDelete = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before deleting documents", variant: "destructive" });
+      return;
     }
+    handleDocumentDelete(
+      () => removeDocument(jobId, docId)
+    )
+  }
+
+  const handleCustomDocumentDownload = async (document: CustomDocument) => {
+    await downloadDocumentFromApi({
+      id: document.id,
+      title: document.title
+    })
   }
 
 const renderRequiredDocuments = () => {
@@ -960,58 +936,19 @@ const renderRequiredDocuments = () => {
     }));
 
     const renderDocumentCard = (doc: DocumentWithStatus) => {
-      const isReportPlaceholder = doc.type === 'report' && doc.fileName === 'pending';
-      // Uses handleDownload, handleDelete, handleUpload which now use jobId prop correctly
-      // Corrected: Use displayStatus
-      const isUploaded = doc.displayStatus === 'uploaded'
+      const isReport = isReportType(doc.id)
+      const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
+
       return (
-        <Card key={doc.id} className="relative">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.title}</span>
-                {isReportPlaceholder && (
-                  <span className="text-xs text-yellow-600 ml-2">(Report In Progress)</span>
-                )}
-              </div>
-              {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isUploaded && doc.uploadedFile ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  <span className="text-sm">{doc.uploadedFile.originalName}</span>
-                </div>
-                <div className="text-sm text-gray-500">
-                  Uploaded on {doc.uploadedFile.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1" onClick={() => handleDownload(doc.id)}>
-                    <FileText className="h-4 w-4 mr-2" />Download
-                  </Button>
-                  {!isReportPlaceholder && (
-                    <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ) : doc.displayStatus === 'pending_admin_delivery' ? (
-              <div className="text-sm text-yellow-600 text-center py-4">
-                <span className="font-semibold">Report In Progress</span>
-                <br />
-                We are processing your report. You will be notified when it's ready.
-              </div>
-            ) : (
-              <Button variant="outline" className="w-full" onClick={() => handleUpload(doc.id)}>
-                <Upload className="h-4 w-4 mr-2" />Upload Document
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+        <DocumentTile
+          key={doc.id}
+          document={doc}
+          isReport={isReport}
+          reportStatus={reportStatus}
+          onUpload={() => handleUpload(doc.id)}
+          onDownload={() => handleDownload(doc.id)}
+          onDelete={() => handleDelete(doc.id)}
+        />
       )
     }
 
@@ -1091,7 +1028,7 @@ const renderRequiredDocuments = () => {
       const isDevTypeEmpty = currentFormData.developmentType.trim().length === 0;
       const isCertPresent = !!certificate107Doc;
       const isCertMissing = !certificate107Doc || certificate107Doc.displayStatus !== 'uploaded';
-      const isConfirmButtonDisabled = isDevTypeEmpty || isCertMissing;
+      const isConfirmButtonDisabled = isDevTypeEmpty || (requires107Certificate && isCertMissing);
 
       // In renderCustomAssessmentForm, fix uploadedDocs type:
       const attachedDocs = [
@@ -1240,29 +1177,6 @@ const renderRequiredDocuments = () => {
   const toggleSiteDetails = () => { setIsSiteDetailsOpen(prev => !prev); };
 
   const isReadOnly = false;
-
-  const handleDocumentDownload = async (document: CustomDocument) => {
-    try {
-      const downloadResponse = await fetch(`/api/documents/${document.id}/download`);
-      if (!downloadResponse.ok) throw new Error('Failed to download document');
-
-      const blob = await downloadResponse.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = window.document.createElement('a');
-      a.href = url;
-      a.download = document.title;
-      window.document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      window.document.body.removeChild(a);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to download document",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleAssessmentPurchase = async (assessmentId: string) => {
     try {
@@ -1477,7 +1391,6 @@ const renderRequiredDocuments = () => {
             </Button>
           )}
         </div> {/* Closing inner div */}
-      {/* Corrected: Added missing closing div tag */}
     </div>
   )
 }

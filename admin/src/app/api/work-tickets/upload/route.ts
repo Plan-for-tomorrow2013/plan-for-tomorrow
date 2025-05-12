@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { getJobDocumentsPath, getWorkTicketsPath, getDocumentsMetadataPath, ensureDirectoryExists } from '@shared/utils/paths'
 
 export async function POST(request: Request) {
   try {
@@ -15,18 +16,17 @@ export async function POST(request: Request) {
       )
     }
 
-    // Read the work tickets file from the client portal's data
-    const workTicketsPath = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'work-tickets.json')
+    // Read the work tickets file
+    const workTicketsPath = getWorkTicketsPath()
     let workTickets = []
     try {
       const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
       workTickets = JSON.parse(workTicketsData)
     } catch (readError) {
-      // If the file doesn't exist, start with an empty array
       if ((readError as NodeJS.ErrnoException).code !== 'ENOENT') {
-        throw readError; // Re-throw if it's not a "file not found" error
+        throw readError
       }
-      console.log('Client work tickets file not found, starting fresh.');
+      console.log('Work tickets file not found, starting fresh.')
     }
 
     // Find the ticket to update
@@ -38,36 +38,65 @@ export async function POST(request: Request) {
       )
     }
 
-    const ticket = workTickets[ticketIndex];
-    const ticketType = ticket.ticketType; // Get the actual ticket type
+    const ticket = workTickets[ticketIndex]
+    const ticketType = ticket.ticketType
 
-    // Ensure the ticket has a jobId, crucial for saving to the correct folder
+    // Ensure the ticket has a jobId
     if (!ticket.jobId) {
-      console.error(`Ticket ${ticketId} is missing jobId.`);
+      console.error(`Ticket ${ticketId} is missing jobId.`)
       return NextResponse.json(
         { error: 'Ticket is missing associated Job ID.' },
         { status: 400 }
-      );
+      )
     }
 
-    // Define the job-specific documents directory within the client portal's data structure
-    const jobDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'data', 'jobs', ticket.jobId, 'documents');
-    await fs.mkdir(jobDocumentsDir, { recursive: true });
+    // Ensure the job documents directory exists
+    const jobDocumentsDir = getJobDocumentsPath(ticket.jobId)
+    await ensureDirectoryExists(jobDocumentsDir)
 
     // Define the fileName based on the ticket type
-    const fileExtension = path.extname(file.name);
-    // Use ticketType for the fileName base (e.g., 'statement-of-environmental-effects.pdf')
-    const storedFileName = `${ticketType}${fileExtension}`;
-    const filePath = path.join(jobDocumentsDir, storedFileName);
+    const fileExtension = path.extname(file.name)
+    const storedFileName = `${ticketType}${fileExtension}`
+    const filePath = path.join(jobDocumentsDir, storedFileName)
 
     // Save the file
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, fileBuffer);
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+    await fs.writeFile(filePath, fileBuffer)
 
     // Map ticketType to the expected documentId used by the client portal
-    let clientDocumentId = ticketType; // All assessment types use their ticketType as the documentId
+    let clientDocumentId = ticketType
 
-    // Update the ticket with detailed completed document info
+    // Update document metadata
+    const metadataPath = getDocumentsMetadataPath()
+    let documents = []
+    try {
+      const metadataData = await fs.readFile(metadataPath, 'utf-8')
+      documents = JSON.parse(metadataData)
+    } catch (readError) {
+      if ((readError as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw readError
+      }
+      console.log('Documents metadata file not found, starting fresh.')
+    }
+
+    // Add new document metadata
+    documents.push({
+      id: clientDocumentId,
+      metadata: {
+        ticketId,
+        jobId: ticket.jobId,
+        uploadedAt: new Date().toISOString(),
+        fileName: storedFileName,
+        originalName: file.name,
+        size: file.size,
+        type: file.type
+      }
+    })
+
+    // Save metadata
+    await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+
+    // Update the ticket with completed document info
     workTickets[ticketIndex] = {
       ...ticket,
       status: 'completed',
@@ -79,9 +108,9 @@ export async function POST(request: Request) {
         size: file.size,
         type: file.type,
       }
-    };
+    }
 
-    // Save the updated tickets
+    // Save updated tickets
     await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
 
     return NextResponse.json(workTickets[ticketIndex])

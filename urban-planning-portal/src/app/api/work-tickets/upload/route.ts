@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { getJobDocumentsPath, getWorkTicketsPath, getDocumentsMetadataPath, ensureDirectoryExists } from '@shared/utils/paths'
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     // Read the work tickets file
-    const workTicketsPath = path.join(process.cwd(), 'data', 'work-tickets.json')
+    const workTicketsPath = getWorkTicketsPath();
     const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
     const workTickets = JSON.parse(workTicketsData)
 
@@ -32,11 +33,7 @@ export async function POST(request: Request) {
     const ticket = workTickets[ticketIndex]
 
     // Create appropriate documents directory based on ticket type
-    const baseDocumentsDir = path.join(process.cwd(), 'data', 'documents')
-    let documentsDir;
-
-    // All assessment types use their ticketType as the directory name
-    documentsDir = path.join(baseDocumentsDir, ticket.ticketType);
+    const documentsDir = path.join(getDocumentsMetadataPath(), '..', ticket.ticketType);
     await fs.mkdir(documentsDir, { recursive: true })
 
     // Generate consistent fileName for all assessment types
@@ -61,7 +58,7 @@ export async function POST(request: Request) {
     await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
 
     // Create job documents directory if it doesn't exist
-    const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents')
+    const jobDocDir = getJobDocumentsPath(ticket.jobId);
     await fs.mkdir(jobDocDir, { recursive: true })
 
     // Generate a unique fileName for the document based on ticket type

@@ -13,73 +13,130 @@ import type { Job } from '@shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getDocumentDisplayStatus } from '@shared/utils/report-utils'
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'
+import { useQuery } from '@tanstack/react-query'
+import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete } from '@shared/utils/document-utils'
 
 function DocumentStoreContent({ params }: { params: { jobId: string } }) {
   const router = useRouter()
-  const { documents, isLoading, error, uploadDocument, removeDocument, downloadDocument } = useDocuments()
-  const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
-  const { jobs, isLoading: isJobsLoading, error: jobsError } = useJobs()
-  const job = jobs.find(j => j.id === params.jobId)
+  const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+  // Fetch job data for report status
+  const { data: job, isLoading: isJobLoading, error: jobError } = useQuery<Job>({
+    queryKey: ['job', params.jobId],
+    queryFn: async () => {
+      const response = await fetch(`/api/jobs/${params.jobId}`)
+      if (!response.ok) throw new Error('Failed to fetch job data')
+      return response.json()
+    }
+  })
+
+  const isLoading = isDocsLoading || isJobLoading
+  const error = docsError || jobError?.message
+
+  const handleUpload = (docId: string) => {
+    createFileInput(async (file) => {
+      await handleDocumentUpload(
+        () => uploadDocument(params.jobId, docId, file)
+      )
+    })
+  }
+
+  const handleDownload = (docId: string) => {
+    handleDocumentDownload(
+      () => downloadDocument(params.jobId, docId)
     )
   }
 
-  if (isLoading) {
-    return <div>Loading documents...</div>
+  const handleDelete = (docId: string) => {
+    handleDocumentDelete(
+      () => removeDocument(params.jobId, docId)
+    )
   }
 
-  const handleUpload = (docId: string) => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.pdf,.doc,.docx'
-    input.onchange = async (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0]
-      if (file) {
-        await uploadDocument(params.jobId, docId, file)
+  const renderDocumentUpload = (doc: DocumentWithStatus) => {
+    if (isReportType(doc.id)) {
+      const reportStatus = job ? getReportStatus(doc, job) : { isPaid: false, isCompleted: false, hasFile: false }
+      const reportTitle = getReportTitle(doc.id)
+
+      // Show "In Progress" if the report is paid but not completed
+      if (reportStatus.isPaid && !reportStatus.isCompleted) {
+        return (
+          <Card key={doc.id} className="shadow-md">
+            <CardHeader className="bg-[#323A40] text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{reportTitle}</h3>
+                  <p className="text-sm text-gray-300">{doc.category}</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 text-center">
+              <div className="flex flex-col items-center justify-center space-y-2 py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="font-semibold text-lg">Report In Progress</p>
+                <p className="text-sm text-gray-600 px-4">
+                  Our team is working on your {reportTitle}. You will be notified once it's ready.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )
       }
+
+      // Show completed report if available
+      if (reportStatus.isCompleted && reportStatus.hasFile) {
+        return (
+          <Card key={doc.id} className="shadow-md">
+            <CardHeader className="bg-[#323A40] text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{reportTitle}</h3>
+                  <p className="text-sm text-gray-300">{doc.category}</p>
+                </div>
+                <Check className="h-5 w-5 text-green-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                  <FileText className="h-4 w-4" />
+                  <span>{doc.uploadedFile?.originalName}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Uploaded: {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleDownload(doc.id)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
+
+      // Don't show anything if the report is not paid or completed
+      return null
     }
-    input.click()
-  }
 
-  const handleDownload = async (docId: string) => {
-    await downloadDocument(params.jobId, docId)
-  }
-
-  const handleDelete = async (docId: string) => {
-    if (confirm('Are you sure you want to delete this document?')) {
-      await removeDocument(params.jobId, docId)
-    }
-  }
-
-  const mappedDocuments = job
-    ? documents.map(doc => ({
-        ...doc,
-        displayStatus: getDocumentDisplayStatus(doc, job)
-      }))
-    : [];
-
-  const renderDocumentCard = (doc: DocumentWithStatus) => {
-    // Use displayStatus instead of status
-    const displayStatus = doc.displayStatus
+    // Standard Document Card
+    const isUploaded = doc.displayStatus === 'uploaded'
     return (
       <Card key={doc.id} className="relative">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div><h3 className="text-lg font-semibold">{doc.title}</h3></div>
-            {/* Show checkmark only when uploaded */}
-            {displayStatus === 'uploaded' ? (<Check className="h-5 w-5 text-green-500" />) : null}
+            {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
           </div>
         </CardHeader>
         <CardContent>
-          {/* Conditional rendering based on displayStatus */}
-          {displayStatus === 'uploaded' && doc.uploadedFile ? (
-            // Render uploaded file details and actions
+          {isUploaded && doc.uploadedFile ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
@@ -97,17 +154,11 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
                 </Button>
               </div>
             </div>
-          ) : displayStatus === 'pending_user_upload' ? (
-            // Render upload button for user
+          ) : (
             <Button variant="outline" className="w-full" onClick={() => handleUpload(doc.id)}>
               <Upload className="h-4 w-4 mr-2" />Upload Document
             </Button>
-          ) : displayStatus === 'pending_admin_delivery' ? (
-             // Render pending admin delivery message
-             <div className="text-sm text-gray-500 text-center py-4">
-               Purchase successful. Document pending delivery from admin.
-             </div>
-          ) : null /* Should not happen, but good practice */}
+          )}
         </CardContent>
       </Card>
     )
@@ -122,9 +173,20 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mappedDocuments.map(doc => renderDocumentCard(doc))}
-      </div>
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {isLoading ? (
+        <div>Loading documents...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {documents.map(doc => renderDocumentUpload(doc))}
+        </div>
+      )}
     </div>
   )
 }
@@ -132,9 +194,7 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
 export default function DocumentStorePage({ params }: { params: { jobId: string } }) {
   return (
     <DocumentProvider jobId={params.jobId}>
-      <SiteDetailsProvider jobId={params.jobId}>
-        <DocumentStoreContent params={params} />
-      </SiteDetailsProvider>
+      <DocumentStoreContent params={params} />
     </DocumentProvider>
   )
 }

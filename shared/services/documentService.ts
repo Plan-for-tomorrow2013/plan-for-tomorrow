@@ -17,40 +17,42 @@ class DocumentService {
   // Removed getDocuments - will be derived from job data in context
   // Removed getDocumentById - will be derived from job data in context
 
-  async uploadDocument(upload: DocumentUpload): Promise<any> { // Return type might need adjustment based on actual API response
+  async uploadDocument(upload: DocumentUpload): Promise<any> {
     if (!upload.jobId || !upload.docId) {
-      throw new Error('Job ID and Document ID are required for upload.');
+      throw new Error('Job ID and Document ID are required for upload.')
     }
+
     try {
       const formData = new FormData()
       formData.append('file', upload.file)
-      formData.append('docId', upload.docId) // Send docId directly
+      formData.append('docId', upload.docId)
 
-      // Metadata is no longer sent in the body for this endpoint
-      // const metadata: any = { ... }
-      // formData.append('metadata', JSON.stringify(metadata))
-
-      const response = await fetch(`/api/jobs/${upload.jobId}/documents/upload`, { // Use job-specific endpoint
+      const response = await fetch(`/api/jobs/${upload.jobId}/documents/upload`, {
         method: 'POST',
         body: formData
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to upload document')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to upload document')
       }
 
-      return response.json()
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to upload document')
+      }
+
+      return result.document
     } catch (error) {
       console.error('Error uploading document:', error)
-      throw error
+      throw error instanceof Error ? error : new Error('Failed to upload document')
     }
   }
 
   // TODO: Implement corresponding API endpoint: DELETE /api/jobs/[jobId]/documents/[documentId]
   async removeDocument(documentId: string, jobId: string): Promise<void> {
     try {
-      // Use job-specific endpoint structure
       const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}`, {
         method: 'DELETE'
       })
@@ -66,20 +68,18 @@ class DocumentService {
   }
 
   // TODO: Implement corresponding API endpoint: GET /api/jobs/[jobId]/documents/[documentId]/download
-  async downloadDocument(documentId: string, jobId: string, fileName: string): Promise<Blob> { // Added fileName for potential use
+  async downloadDocument(documentId: string, jobId: string, fileName: string): Promise<Blob> {
     try {
-      // Use job-specific endpoint structure (fileName might be needed for Content-Disposition)
       const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}/download`)
       if (!response.ok) {
-        // Attempt to read error message, but handle cases where it might not be JSON
-        let errorMessage = `Failed to download document (status: ${response.status})`;
+        let errorMessage = `Failed to download document (status: ${response.status})`
         try {
-            const errorBody = await response.json();
-            errorMessage = errorBody.error || errorMessage;
+          const errorBody = await response.json()
+          errorMessage = errorBody.error || errorMessage
         } catch (e) {
-            // Ignore JSON parsing error if response body isn't valid JSON
+          // Ignore JSON parsing error if response body isn't valid JSON
         }
-        throw new Error(errorMessage);
+        throw new Error(errorMessage)
       }
       return response.blob()
     } catch (error) {

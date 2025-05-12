@@ -1,0 +1,197 @@
+{
+  "id": "a8a2f689-5039-4da3-9e8b-c350b963f3cf",
+  "address": "96 Francis Avenue Brighton-le-sands",
+  "currentStage": "design-check",
+  "status": "pending",
+  "createdAt": "2025-05-12T10:25:58.959Z",
+  "updatedAt": "2025-05-12T10:25:58.959Z",
+  "propertyData": {
+    "coordinates": {
+      "longitude": 151.153198932835,
+      "latitude": -33.951816295251
+    },
+    "planningLayers": {
+      "epiLayers": [
+        {
+          "layer": "Local Environmental Plan",
+          "attributes": {
+            "OBJECTID": "133485",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "8/27/2021",
+            "Commenced Date": "8/27/2021",
+            "Currency Date": "8/27/2021",
+            "Amendment": "Null",
+            "Layer Class": "Included",
+            "Legislative Area": "Null",
+            "Legislative Clause": "Null",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio Additional Controls",
+          "attributes": {
+            "OBJECTID": "243561",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "12/16/2022",
+            "Commenced Date": "12/16/2022",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Map Amendment No 1",
+            "Legislative Area": "Area 15",
+            "Legislative Clause": "Clause 4.4",
+            "Legislative Value": "Null",
+            "EPI Type": "Local Environment Plan",
+            "Shape": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "OBJECTID": "159963",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "8/27/2021",
+            "Commenced Date": "8/27/2021",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Null",
+            "Layer Class": "0.5-0.54",
+            "Floor Space Ratio": "0.5",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Floor Space Ratio (n:1)",
+          "attributes": {
+            "OBJECTID": "243561",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "12/16/2022",
+            "Commenced Date": "12/16/2022",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Map Amendment No 1",
+            "Layer Class": "CA",
+            "Floor Space Ratio": "Null",
+            "Additional Controls": "Area 15",
+            "Legislative Clause": "Clause 4.4",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Height of Building",
+          "attributes": {
+            "OBJECTID": "226792",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "8/27/2021",
+            "Commenced Date": "8/27/2021",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Null",
+            "Maximum Building Height": "8.5",
+            "Units": "m",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon",
+            "MAX_B_H_M": "8.5",
+            "MAX_B_H_RL": "Null"
+          }
+        },
+        {
+          "layer": "Land Zoning",
+          "attributes": {
+            "OBJECTID": "719887",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "4/21/2023",
+            "Commenced Date": "4/26/2023",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Map Amendment No 3",
+            "MAP_NAME": "Land Zoning Map",
+            "Land Use": "Low Density Residential",
+            "Zone": "R2",
+            "Purpose": "Null",
+            "Additional Controls": "Null",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        },
+        {
+          "layer": "Minimum Lot Size",
+          "attributes": {
+            "OBJECTID": "297055",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "8/27/2021",
+            "Commenced Date": "8/27/2021",
+            "Currency Date": "11/15/2024",
+            "Amendment": "Null",
+            "Layer Class": "450-474",
+            "Lot Size": "450",
+            "Units": "m²",
+            "Additional Controls": "Null",
+            "Legislative Clause": "Clause 4.1",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "protectionLayers": [
+        {
+          "layer": "Acid Sulfate Soils",
+          "attributes": {
+            "OBJECTID": "20198",
+            "EPI Name": "Bayside Local Environmental Plan 2021",
+            "LGA Name": "BAYSIDE",
+            "Published Date": "8/27/2021",
+            "Commenced Date": "8/27/2021",
+            "Currency Date": "8/27/2021",
+            "Amendment": "Null",
+            "Class": "Class 3",
+            "EPI Type": "Local Environment Plan",
+            "SHAPE": "Polygon"
+          }
+        }
+      ],
+      "localProvisionsLayers": []
+    }
+  },
+  "documents": {
+    "tenSevenCertificate": {
+      "fileName": "tenSevenCertificate_1747045608867_10.7 Certificate Check.pdf",
+      "originalName": "10.7 Certificate Check.pdf",
+      "type": "application/pdf",
+      "uploadedAt": "2025-05-12T10:26:48.870Z",
+      "size": 4136746
+    }
+  },
+  "customAssessment": {
+    "uploadedDocuments": {}
+  },
+  "statementOfEnvironmentalEffects": {
+    "uploadedDocuments": {},
+    "status": "paid",
+    "type": "statementOfEnvironmentalEffects",
+    "createdAt": "2025-05-12T10:27:04.348Z",
+    "updatedAt": "2025-05-12T10:27:04.348Z",
+    "developmentType": "123",
+    "additionalInfo": "456",
+    "documents": {
+      "certificateOfTitle": {},
+      "surveyPlan": {},
+      "certificate107": {
+        "originalName": "10.7 Certificate Check.pdf",
+        "fileName": "tenSevenCertificate_1747045608867_10.7 Certificate Check.pdf"
+      }
+    }
+  },
+  "complyingDevelopmentCertificate": {
+    "uploadedDocuments": {}
+  }
+}

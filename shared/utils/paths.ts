@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs/promises'
 
 // Base paths
 // Use absolute path from environment variable for consistency, fallback to cwd
@@ -17,12 +18,11 @@ export const getDocumentsMetadataPath = () => path.join(getDocumentsPath(), 'met
 // Job paths (derive from the unambiguous getDataPath)
 export const getJobsPath = () => path.join(getDataPath(), 'jobs');
 export const getJobPath = (jobId: string) => path.join(getJobsPath(), `${jobId}.json`);
-export const getJobDocumentsPath = (jobId: string) => path.join(process.cwd(), 'data', 'jobs', jobId, 'documents');
+export const getJobDocumentsPath = (jobId: string) => path.join(getJobsPath(), jobId, 'documents');
 
 // Work ticket paths (derive from the unambiguous getDataPath)
 export const getWorkTicketsPath = () => path.join(getDataPath(), 'work-tickets.json');
-// Note: getWorkTicketPath seems unused based on API routes, but kept for consistency
-export const getWorkTicketPath = (ticketId: string) => path.join(process.cwd(), 'urban-planning-portal', 'urban-planning-portal', 'data', 'work-tickets', `${ticketId}.json`);
+export const getWorkTicketPath = (ticketId: string) => path.join(getDataPath(), 'work-tickets', `${ticketId}.json`);
 
 // Constants
 export const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
@@ -31,11 +31,22 @@ export const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
 // For now, keeping it simple, assuming it's called where getBasePath() is meaningful
 export const validatePaths = () => {
   const paths = [
-    // getPortalPath() is removed as it's ambiguous now
     getDataPath(),
     getJobsPath(),
-    getDocumentsPath()
+    getDocumentsPath(),
+    path.join(getDataPath(), 'work-tickets') // Add work-tickets directory to validation
   ];
   // Validate against the absolute base path
   return paths.every(p => p.startsWith(getBasePath()));
 }
+
+// Helper function to ensure directory exists
+export const ensureDirectoryExists = async (dirPath: string) => {
+  try {
+    await fs.mkdir(dirPath, { recursive: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+      throw error;
+    }
+  }
+};

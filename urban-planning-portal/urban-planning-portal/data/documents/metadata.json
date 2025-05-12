@@ -1,136 +1,38 @@
 [
   {
-    "id": "2c5d47a7-3f8b-4c7d-8acd-0ff1c0168154",
-    "title": "statementOfEnvironmentalEffects - 9 Viola Place, Greystanes",
-    "path": "work-tickets/6645d9de-20c6-49b8-af27-632dab658c1d",
+    "id": "38795d07-fbf2-4e82-ad55-f151253c35fd",
+    "title": "statementOfEnvironmentalEffects - 96 Francis Avenue Brighton-le-sands",
+    "path": "work-tickets/36be2253-d2a1-419f-ba0d-2810999918e9",
     "type": "document",
     "category": "REPORTS",
     "versions": [],
     "currentVersion": 1,
-    "createdAt": "2025-05-10T09:33:34.031Z",
-    "updatedAt": "2025-05-10T09:33:34.031Z",
+    "createdAt": "2025-05-12T10:27:04.535Z",
+    "updatedAt": "2025-05-12T10:27:04.535Z",
     "isActive": true,
     "metadata": {
-      "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
-      "ticketId": "6645d9de-20c6-49b8-af27-632dab658c1d",
+      "jobId": "a8a2f689-5039-4da3-9e8b-c350b963f3cf",
+      "ticketId": "36be2253-d2a1-419f-ba0d-2810999918e9",
       "ticketType": "statementOfEnvironmentalEffects",
       "attachedDocuments": {
-        "certificateOfTitle": {
-          "originalName": "Certificate of Title.pdf",
-          "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
-        },
-        "surveyPlan": {},
-        "certificate107": {}
-      },
-      "jobAddress": "9 Viola Place, Greystanes",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {
-            "originalName": "Certificate of Title.pdf",
-            "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
-          },
-          "surveyPlan": {},
-          "certificate107": {}
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "6fb6b926-a156-4091-9567-451fbfb52922",
-    "title": "complyingDevelopmentCertificate - 9 Viola Place, Greystanes",
-    "path": "work-tickets/8b9b505d-fea3-4e42-82c2-5ae2ec6d9458",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-10T09:37:18.693Z",
-    "updatedAt": "2025-05-10T09:37:18.693Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "f7bb8d0f-02b3-427e-a6fa-e52795400fcb",
-      "ticketId": "8b9b505d-fea3-4e42-82c2-5ae2ec6d9458",
-      "ticketType": "complyingDevelopmentCertificate",
-      "attachedDocuments": {
-        "certificateOfTitle": {
-          "originalName": "Certificate of Title.pdf",
-          "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
-        },
+        "certificateOfTitle": {},
         "surveyPlan": {},
         "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf"
+          "originalName": "10.7 Certificate Check.pdf",
+          "fileName": "tenSevenCertificate_1747045608867_10.7 Certificate Check.pdf"
         }
       },
-      "jobAddress": "9 Viola Place, Greystanes",
+      "jobAddress": "96 Francis Avenue Brighton-le-sands",
       "uploadedBy": "professional",
       "reportData": {
         "developmentType": "123",
         "additionalInfo": "456",
         "documents": {
-          "certificateOfTitle": {
-            "originalName": "Certificate of Title.pdf",
-            "fileName": "certificateOfTitle_1746869518052_Certificate of Title.pdf"
-          },
+          "certificateOfTitle": {},
           "surveyPlan": {},
           "certificate107": {
-            "originalName": "10_7_5.pdf",
-            "fileName": "tenSevenCertificate_1746869830795_10_7_5.pdf"
-          }
-        }
-      }
-    },
-    "displayStatus": "pending_admin_delivery"
-  },
-  {
-    "id": "bd44032a-4dbb-43b7-9e43-fa8839a5fb79",
-    "title": "complyingDevelopmentCertificate - 25 Cheviot Street Mount Druitt",
-    "path": "work-tickets/841dc88b-f301-45bb-8a49-0cce1fd45e3a",
-    "type": "document",
-    "category": "REPORTS",
-    "versions": [],
-    "currentVersion": 1,
-    "createdAt": "2025-05-10T10:08:43.689Z",
-    "updatedAt": "2025-05-10T10:08:43.689Z",
-    "isActive": true,
-    "metadata": {
-      "jobId": "d6b0509f-08a9-43f7-ab96-11dfcdb52fa2",
-      "ticketId": "841dc88b-f301-45bb-8a49-0cce1fd45e3a",
-      "ticketType": "complyingDevelopmentCertificate",
-      "attachedDocuments": {
-        "certificateOfTitle": {
-          "originalName": "Certificate of Title.pdf",
-          "fileName": "certificateOfTitle_1746869364510_Certificate of Title.pdf"
-        },
-        "surveyPlan": {
-          "originalName": "survey-plan.pdf",
-          "fileName": "surveyPlan_1746871692009_survey-plan.pdf"
-        },
-        "certificate107": {
-          "originalName": "10_7_5.pdf",
-          "fileName": "tenSevenCertificate_1746871706019_10_7_5.pdf"
-        }
-      },
-      "jobAddress": "25 Cheviot Street Mount Druitt",
-      "uploadedBy": "professional",
-      "reportData": {
-        "developmentType": "123",
-        "additionalInfo": "456",
-        "documents": {
-          "certificateOfTitle": {
-            "originalName": "Certificate of Title.pdf",
-            "fileName": "certificateOfTitle_1746869364510_Certificate of Title.pdf"
-          },
-          "surveyPlan": {
-            "originalName": "survey-plan.pdf",
-            "fileName": "surveyPlan_1746871692009_survey-plan.pdf"
-          },
-          "certificate107": {
-            "originalName": "10_7_5.pdf",
-            "fileName": "tenSevenCertificate_1746871706019_10_7_5.pdf"
+            "originalName": "10.7 Certificate Check.pdf",
+            "fileName": "tenSevenCertificate_1747045608867_10.7 Certificate Check.pdf"
           }
         }
       }

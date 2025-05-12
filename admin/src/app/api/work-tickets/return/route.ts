@@ -78,9 +78,15 @@ export async function POST(request: Request) {
       if (documentIndex !== -1) {
         documents[documentIndex].metadata.returnedAt = new Date().toISOString()
         await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+      } else {
+        console.warn(`Document metadata not found for ticket ${ticketId}`)
       }
-    } catch (error) {
-      console.error('Error updating document metadata:', error)
+    } catch (readError) {
+      if ((readError as NodeJS.ErrnoException).code === 'ENOENT') {
+        console.warn('Documents metadata file not found, skipping metadata update')
+      } else {
+        console.error('Error updating document metadata:', readError)
+      }
     }
 
     // Update ticket status

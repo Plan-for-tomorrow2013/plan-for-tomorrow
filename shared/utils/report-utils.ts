@@ -41,10 +41,13 @@ export function isReportType(docId: string): boolean {
 export function getReportTitle(docId: string): string {
   switch (docId) {
     case 'customAssessment':
+    case 'custom-assessment':
       return 'Custom Assessment';
     case 'statementOfEnvironmentalEffects':
+    case 'statement-of-environmental-effects':
       return 'Statement of Environmental Effects';
     case 'complyingDevelopmentCertificate':
+    case 'complying-development-certificate':
       return 'Complying Development Certificate';
     default:
       return 'Unknown Report';

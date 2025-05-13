@@ -6,7 +6,7 @@ import { WorkTicket } from '@shared/types/workTickets'
 import { getWorkTicketsPath, getDocumentsPath, getDocumentPath, getDocumentsMetadataPath } from '@shared/utils/paths'
 import { Document, DocumentVersion } from '@shared/types/documents'
 import { getJob, saveJob } from '@shared/services/jobStorage'
-import { Job } from '@shared/types/jobs'
+import { Job, Assessment } from '@shared/types/jobs'
 
 // Helper function to get display name for ticket type
 const getTicketTypeDisplayName = (type: string): string => {
@@ -137,13 +137,19 @@ export async function POST(request: Request) {
         case 'custom-assessment':
           newTicket.customAssessment = metadata.reportData;
           break;
+        case 'statementOfEnvironmentalEffects':
         case 'statement-of-environmental-effects':
           newTicket.statementOfEnvironmentalEffects = metadata.reportData;
           break;
+        case 'complyingDevelopmentCertificate':
         case 'complying-development-certificate':
           newTicket.complyingDevelopmentCertificate = metadata.reportData;
           break;
       }
+    }
+    // Remove reportData property if present
+    if ('reportData' in newTicket) {
+      delete (newTicket as any).reportData;
     }
 
     // Only create document and add reference if a file was actually uploaded
@@ -273,13 +279,52 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const tickets = await readWorkTickets()
-    return NextResponse.json(tickets)
+    const tickets = await readWorkTickets();
+    // Enrich tickets with fileName/originalName and completedDocument for all types
+    const reportKeys: (keyof WorkTicket)[] = [
+      'customAssessment',
+      'statementOfEnvironmentalEffects',
+      'complyingDevelopmentCertificate'
+    ];
+    const enrichedTickets = tickets.map(ticket => {
+      let completedSet = false;
+      reportKeys.forEach(type => {
+        const report = ticket[type] as Assessment | undefined;
+        if (report) {
+          // Try to get fileName/originalName from top level or from certificate107
+          let fileName = report.fileName;
+          let originalName = report.originalName;
+          if (!fileName && report.documents && report.documents.certificate107) {
+            fileName = report.documents.certificate107.fileName;
+            originalName = report.documents.certificate107.originalName;
+          }
+          // Add both camelCase and snake_case
+          if (fileName) {
+            (report as any).fileName = fileName;
+            (report as any).originalName = originalName;
+            (report as any).file_name = fileName;
+            (report as any).original_name = originalName;
+            // Only set completedDocument for the first available report with a fileName
+            if (!completedSet) {
+              ticket.completedDocument = {
+                fileName,
+                originalName,
+                uploadedAt: report.uploadedAt || '',
+                returnedAt: report.returnedAt
+              };
+              completedSet = true;
+            }
+          }
+        }
+      });
+      return ticket;
+    });
+    return NextResponse.json(enrichedTickets);
   } catch (error) {
-    console.error('Error fetching work tickets:', error)
+    console.error('Error fetching work tickets:', error);
     return NextResponse.json(
       { error: 'Failed to fetch work tickets' },
       { status: 500 }
-    )
+    );
   }
 }

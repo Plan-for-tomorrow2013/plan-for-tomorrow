@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   try {
     // --- Construct File Path ---
     // Path needs to go up one level from 'admin' to the root, then into 'urban-planning-portal'
-    const filePath = path.join(
+    const jobFilePath = path.join(
       process.cwd(), // Should be /home/tania/urban-planning-professionals-portal/admin
       '..',          // Go up to /home/tania/urban-planning-professionals-portal
       'urban-planning-portal',
@@ -41,15 +41,28 @@ export async function GET(request: Request) {
       'documents',
       fileName
     );
+    const globalFilePath = path.join(
+      process.cwd(),
+      '..',
+      'urban-planning-portal',
+      'data',
+      'documents',
+      fileName
+    );
+
+    let filePathToUse = jobFilePath;
+    if (!existsSync(jobFilePath) && existsSync(globalFilePath)) {
+      filePathToUse = globalFilePath;
+    }
 
     // --- Check File Existence ---
-    if (!existsSync(filePath)) {
-      console.error(`File not found at path: ${filePath}`);
+    if (!existsSync(filePathToUse)) {
+      console.error(`File not found at path: ${filePathToUse}`);
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
     // --- Read File ---
-    const fileBuffer = await fs.readFile(filePath);
+    const fileBuffer = await fs.readFile(filePathToUse);
 
     // --- Determine Content Type ---
     const contentType = mime.lookup(fileName) || 'application/octet-stream'; // Use mime-types or fallback

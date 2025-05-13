@@ -51,6 +51,51 @@ function DocumentRenderer({ doc, jobId }: { doc: DocumentWithStatus, jobId: stri
   );
 }
 
+// Reusable component for displaying report summary and attached documents
+function ReportSummarySection({ report, jobId }: { report: any, jobId: string }) {
+  if (!report) return null;
+  const docs = report.documents || {};
+  const docList = [
+    { key: 'certificate107', label: '10.7 Certificate', doc: docs.certificate107 },
+    { key: 'certificateOfTitle', label: 'Certificate of Title', doc: docs.certificateOfTitle },
+    { key: 'surveyPlan', label: 'Survey Plan', doc: docs.surveyPlan },
+  ];
+  return (
+    <div className="mb-2">
+      <div className="font-semibold text-sm">Documents to be Attached:</div>
+      <ul className="list-disc list-inside text-xs">
+        {docList.map(({ key, label, doc }) =>
+          doc && (doc.fileName || doc.originalName) ? (
+            <li key={key}>
+              {doc.originalName || label}
+              {doc.fileName && (
+                <>
+                  {' '}
+                  <a
+                    href={`/api/download-document?jobId=${jobId}&fileName=${encodeURIComponent(doc.fileName)}&originalName=${encodeURIComponent(doc.originalName || label)}`}
+                    download={doc.originalName || label}
+                    className="text-blue-600 hover:underline ml-1"
+                  >
+                    (Download)
+                  </a>
+                </>
+              )}
+            </li>
+          ) : null
+        )}
+      </ul>
+      <div className="text-xs mt-1">
+        {report.developmentType && (
+          <div><strong>Development Type:</strong> {report.developmentType}</div>
+        )}
+        {report.additionalInfo && (
+          <div><strong>Additional Info:</strong> {report.additionalInfo}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function WorkTicketsPage() {
   const [tickets, setTickets] = useState<WorkTicket[]>([])
   const [loading, setLoading] = useState(true)
@@ -206,6 +251,11 @@ export default function WorkTicketsPage() {
                     {getTicketTypeDisplayName(ticket.ticketType)} {/* Use helper function */}
                   </h2>
                   <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
+                  {/* Add report summary for all types */}
+                  <ReportSummarySection
+                    report={ticket.customAssessment || ticket.statementOfEnvironmentalEffects || ticket.complyingDevelopmentCertificate}
+                    jobId={ticket.jobId}
+                  />
                 </div>
                 <div className={cn("rounded-md px-2 py-1 text-xs font-semibold", getStatusColor(ticket.status))}>
                   {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}

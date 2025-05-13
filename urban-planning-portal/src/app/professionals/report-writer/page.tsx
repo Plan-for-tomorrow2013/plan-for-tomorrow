@@ -573,28 +573,36 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
       return;
     }
 
+    const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
+    const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
+    const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
+
     const workTicketPayload = {
-        jobId: jobId, // Use jobId prop
-        jobAddress: currentJob.address,
-        ticketType: formType,
-        [formType]: {
-          developmentType: currentFormData.developmentType,
-          additionalInfo: currentFormData.additionalInfo,
-          documents: {
-            certificateOfTitle: {
-              originalName: documents.find(doc => doc.id === 'certificateOfTitle')?.uploadedFile?.originalName,
-              fileName: documents.find(doc => doc.id === 'certificateOfTitle')?.uploadedFile?.fileName
-            },
-            surveyPlan: {
-              originalName: documents.find(doc => doc.id === 'surveyPlan')?.uploadedFile?.originalName,
-              fileName: documents.find(doc => doc.id === 'surveyPlan')?.uploadedFile?.fileName
-            },
-            certificate107: {
-              originalName: documents.find(doc => doc.id === 'tenSevenCertificate')?.uploadedFile?.originalName,
-              fileName: documents.find(doc => doc.id === 'tenSevenCertificate')?.uploadedFile?.fileName
-            }
+      jobId: jobId,
+      jobAddress: currentJob.address,
+      ticketType: formType,
+      [formType]: {
+        developmentType: currentFormData.developmentType,
+        additionalInfo: currentFormData.additionalInfo,
+        documents: {
+          certificateOfTitle: {
+            originalName: certificateOfTitle?.uploadedFile?.originalName,
+            fileName: certificateOfTitle?.uploadedFile?.fileName
+          },
+          surveyPlan: {
+            originalName: surveyPlan?.uploadedFile?.originalName,
+            fileName: surveyPlan?.uploadedFile?.fileName
+          },
+          certificate107: {
+            originalName: certificate107?.uploadedFile?.originalName,
+            fileName: certificate107?.uploadedFile?.fileName
           }
-        }
+        },
+        // --- Add these fields for admin UI compatibility ---
+        fileName: certificate107?.uploadedFile?.fileName || certificateOfTitle?.uploadedFile?.fileName || surveyPlan?.uploadedFile?.fileName,
+        originalName: certificate107?.uploadedFile?.originalName || certificateOfTitle?.uploadedFile?.originalName || surveyPlan?.uploadedFile?.originalName,
+        // Optionally, you can be more specific per type if needed
+      }
     };
 
     const jobUpdatePayload = {

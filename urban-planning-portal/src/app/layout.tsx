@@ -1,9 +1,9 @@
-import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "@shared/styles/globals.css"
 import { Toaster } from "@shared/components/ui/toaster"
 import { Providers } from "@shared/components/providers"
+import QueryProvider from "./QueryProvider"
 import { existsSync, mkdirSync } from 'fs'
 import path from 'path'
 
@@ -34,16 +34,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
-          {children}
-          <Toaster />
-        </Providers>
+        <QueryProvider>
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
+        </QueryProvider>
       </body>
     </html>
   )

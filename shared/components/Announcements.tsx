@@ -7,6 +7,7 @@ import { Plus } from "lucide-react"
 import { useToast } from "@shared/components/ui/use-toast"
 import { Announcement } from "@shared/types/announcements"
 import dynamic from 'next/dynamic'
+import 'react-quill/dist/quill.snow.css'
 
 // Dynamically import the rich text editor to avoid SSR issues
 const RichTextEditor = dynamic(() => import('@shared/components/RichTextEditor').then(mod => mod.RichTextEditor), {

@@ -6,5 +6,13 @@
     "ticketType": "statementOfEnvironmentalEffects",
     "status": "pending",
     "createdAt": "2025-05-12T10:27:04.535Z"
+  },
+  {
+    "id": "04d611d1-4d06-4dd7-9b98-4c0eefc22a10",
+    "jobId": "e9c2ac24-f5f0-46d2-8491-5965c0daa708",
+    "jobAddress": "9 Viola Place, Greystanes",
+    "ticketType": "statementOfEnvironmentalEffects",
+    "status": "pending",
+    "createdAt": "2025-05-13T00:08:11.972Z"
   }
 ]

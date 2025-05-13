@@ -7,7 +7,7 @@ const absoluteBasePath = process.env.PROJECT_ROOT || process.cwd();
 export const getBasePath = () => absoluteBasePath;
 
 // Define the single, unambiguous data location relative to the project root
-export const getDataPath = () => path.join(getBasePath(), 'urban-planning-portal', 'data');
+export const getDataPath = () => '/home/tania/urban-planning-portal/data';
 
 // Document paths (derive from the unambiguous getDataPath)
 export const getDocumentsPath = () => path.join(getDataPath(), 'documents');

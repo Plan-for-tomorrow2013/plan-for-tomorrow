@@ -38,5 +38,45 @@
       }
     },
     "displayStatus": "pending_admin_delivery"
+  },
+  {
+    "id": "a27c5e52-b6ba-4d72-a031-c1020475ce82",
+    "title": "statementOfEnvironmentalEffects - 9 Viola Place, Greystanes",
+    "path": "work-tickets/04d611d1-4d06-4dd7-9b98-4c0eefc22a10",
+    "type": "document",
+    "category": "REPORTS",
+    "versions": [],
+    "currentVersion": 1,
+    "createdAt": "2025-05-13T00:08:11.972Z",
+    "updatedAt": "2025-05-13T00:08:11.972Z",
+    "isActive": true,
+    "metadata": {
+      "jobId": "e9c2ac24-f5f0-46d2-8491-5965c0daa708",
+      "ticketId": "04d611d1-4d06-4dd7-9b98-4c0eefc22a10",
+      "ticketType": "statementOfEnvironmentalEffects",
+      "attachedDocuments": {
+        "certificateOfTitle": {},
+        "surveyPlan": {},
+        "certificate107": {
+          "originalName": "10.7 Certificate Check.pdf",
+          "fileName": "tenSevenCertificate_1747094866757_10.7 Certificate Check.pdf"
+        }
+      },
+      "jobAddress": "9 Viola Place, Greystanes",
+      "uploadedBy": "professional",
+      "reportData": {
+        "developmentType": "123",
+        "additionalInfo": "456",
+        "documents": {
+          "certificateOfTitle": {},
+          "surveyPlan": {},
+          "certificate107": {
+            "originalName": "10.7 Certificate Check.pdf",
+            "fileName": "tenSevenCertificate_1747094866757_10.7 Certificate Check.pdf"
+          }
+        }
+      }
+    },
+    "displayStatus": "pending_admin_delivery"
   }
 ]

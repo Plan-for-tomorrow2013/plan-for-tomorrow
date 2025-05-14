@@ -29,7 +29,29 @@ export async function GET(
     }
 
     const jobData = await readFile(jobPath, 'utf-8')
-    return NextResponse.json(JSON.parse(jobData))
+    const job = JSON.parse(jobData)
+
+    console.log('Job loaded:', job);
+    if (job.completedDocument) {
+      console.log('Found completedDocument:', job.completedDocument);
+    }
+
+    // Surface completedDocument into the relevant report property for the frontend
+    if (job.completedDocument && job.completedDocument.documentId === 'statementOfEnvironmentalEffects') {
+      if (job.statementOfEnvironmentalEffects) {
+        job.statementOfEnvironmentalEffects.fileName = job.completedDocument.fileName;
+        job.statementOfEnvironmentalEffects.originalName = job.completedDocument.originalName;
+        job.statementOfEnvironmentalEffects.uploadedAt = job.completedDocument.uploadedAt;
+        job.statementOfEnvironmentalEffects.size = job.completedDocument.size;
+        job.statementOfEnvironmentalEffects.type = job.completedDocument.type;
+        job.statementOfEnvironmentalEffects.status = 'completed';
+        console.log('SURFACED (direct):', job.statementOfEnvironmentalEffects);
+      }
+    }
+
+    console.log('Job after surfacing:', job);
+
+    return NextResponse.json(job)
   } catch (error) {
     console.error('Error getting job:', error)
     return NextResponse.json({ error: 'Failed to get job' }, { status: 500 })

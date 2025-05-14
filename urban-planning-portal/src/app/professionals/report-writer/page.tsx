@@ -597,11 +597,10 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
             originalName: certificate107?.uploadedFile?.originalName,
             fileName: certificate107?.uploadedFile?.fileName
           }
-        },
-        // --- Add these fields for admin UI compatibility ---
-        fileName: certificate107?.uploadedFile?.fileName || certificateOfTitle?.uploadedFile?.fileName || surveyPlan?.uploadedFile?.fileName,
-        originalName: certificate107?.uploadedFile?.originalName || certificateOfTitle?.uploadedFile?.originalName || surveyPlan?.uploadedFile?.originalName,
-        // Optionally, you can be more specific per type if needed
+        }
+        // Removed incorrect top-level fileName and originalName that were based on input documents.
+        // The Assessment object in the work ticket should primarily contain the request details.
+        // Output file details are handled by ticket.completedDocument and job[reportKey].completedDocument.
       }
     };
 

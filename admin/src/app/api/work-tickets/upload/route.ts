@@ -97,9 +97,11 @@ export async function POST(request: Request) {
     await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
 
     // Update the ticket with completed document info
-    workTickets[ticketIndex] = {
+    console.log('[UPLOAD] Ticket object BEFORE update:', JSON.stringify(ticket, null, 2));
+
+    const newTicketData = {
       ...ticket,
-      status: 'completed',
+      // status: 'completed', // Let's manage ticket status more granularly, e.g. 'uploaded' or rely on completedDocument presence
       completedDocument: {
         documentId: clientDocumentId,
         originalName: file.name,
@@ -108,10 +110,16 @@ export async function POST(request: Request) {
         size: file.size,
         type: file.type,
       }
-    }
+    };
+    workTickets[ticketIndex] = newTicketData;
+
+    console.log('[UPLOAD] Ticket object AFTER update (before save):', JSON.stringify(workTickets[ticketIndex], null, 2));
+    console.log('[UPLOAD] Entire workTickets array BEFORE save (first 2 tickets):', JSON.stringify(workTickets.slice(0,2), null, 2));
+
 
     // Save updated tickets
     await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
+    console.log('[UPLOAD] Successfully wrote workTicketsPath');
 
     return NextResponse.json(workTickets[ticketIndex])
   } catch (error) {

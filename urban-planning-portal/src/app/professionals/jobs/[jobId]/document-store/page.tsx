@@ -102,10 +102,12 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-[#323A40]">
                   <FileText className="h-4 w-4" />
-                  <span>{doc.uploadedFile?.originalName}</span>
+                  {/* Access file details from reportStatus.reportData.completedDocument */}
+                  <span>{(reportStatus as any).reportData?.completedDocument?.originalName || 'Report File'}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Uploaded: {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+                  {/* Access uploadedAt from reportStatus.reportData.completedDocument */}
+                  Uploaded: {(reportStatus as any).reportData?.completedDocument?.uploadedAt ? new Date((reportStatus as any).reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
                 </p>
                 <Button
                   variant="outline"

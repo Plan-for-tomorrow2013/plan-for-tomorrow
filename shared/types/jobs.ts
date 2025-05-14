@@ -15,6 +15,15 @@ export interface Assessment {
     surveyPlan?: { originalName?: string; fileName?: string };
     certificate107?: { originalName?: string; fileName?: string };
   };
+  completedDocument?: {
+    documentId?: string; // Matches workTicket.completedDocument.documentId
+    originalName: string;
+    fileName: string;
+    uploadedAt: string;
+    size: number;
+    type: string; // e.g., 'application/pdf'
+    returnedAt?: string; // Matches workTicket.completedDocument.returnedAt
+  };
   uploadedDocuments?: {
     [key: string]: {
       fileName: string;

@@ -15,7 +15,13 @@ export interface ReportStatus {
 export const getReportStatus = (doc: DocumentWithStatus, job: Job): ReportStatus => {
   const reportData = getReportData(doc, job);
   const status = reportData?.status;
-  const hasFile = Boolean(reportData?.fileName || reportData?.originalName);
+  // Check for file details within a nested 'completedDocument' object,
+  // or fall back to top-level properties for backward compatibility or other structures.
+  const completedDoc = reportData?.completedDocument as any; // Cast to any to access potential properties
+  const hasFile = Boolean(
+    (completedDoc?.fileName || completedDoc?.originalName) ||
+    (reportData?.fileName || reportData?.originalName)
+  );
 
   return {
     isPaid: status === 'paid' || status === 'completed',

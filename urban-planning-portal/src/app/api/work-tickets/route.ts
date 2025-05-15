@@ -134,6 +134,7 @@ export async function POST(request: Request) {
     // Add report-specific data based on ticket type
     if (metadata.reportData) {
       switch (metadata.ticketType) {
+        case 'customAssessment':
         case 'custom-assessment':
           newTicket.customAssessment = metadata.reportData;
           break;

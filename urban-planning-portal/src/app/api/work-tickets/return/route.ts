@@ -42,11 +42,14 @@ export async function POST(request: Request) {
     let completedDocPath;
     const baseDocumentsDir = getDocumentsPath();
 
-    // All assessment types use their ticketType as the directory name
+    // All assessment types use their ticketType as the directory name.
+    // ticket.completedDocument.fileName now accurately holds the full name of the file
+    // as it was saved in the shared staging directory by the upload route
+    // (e.g., "[ticketId]-[originalName].pdf").
     completedDocPath = path.join(
-      baseDocumentsDir,
-      ticket.ticketType,
-      `${ticketId}-${ticket.completedDocument.fileName}`
+      baseDocumentsDir, // e.g., data/documents
+      ticket.ticketType, // e.g., customAssessment
+      ticket.completedDocument.fileName // e.g., [ticketId]-[originalName].pdf
     );
 
     // Check if the completed document exists
@@ -99,8 +102,21 @@ export async function POST(request: Request) {
       job.documents = {}
     }
 
-    // Add the document to the job's documents
-    job.documents[ticket.ticketType] = {
+    // The ticket.ticketType (e.g., 'customAssessment') is already the correct ID
+    // that matches DOCUMENT_TYPES[n].id and is used by the frontend for downloads.
+    const docIdForJobDocuments = ticket.ticketType; // e.g., 'customAssessment' (camelCase)
+
+    // Add the document to the job's documents using this camelCase ID
+    job.documents[docIdForJobDocuments] = {
+      fileName: newFileName,
+      originalName: ticket.completedDocument.fileName,
+      type: ticket.completedDocument.type || 'application/pdf', // Use the actual type from the completed document
+      uploadedAt: new Date().toISOString(),
+      size: (await fs.stat(completedDocPath)).size
+    };
+
+    // Prepare file details for assessment
+    const fileDetails = {
       fileName: newFileName,
       originalName: ticket.completedDocument.fileName,
       type: 'application/pdf',
@@ -108,25 +124,40 @@ export async function POST(request: Request) {
       size: (await fs.stat(completedDocPath)).size
     }
 
-    // Update the job's assessment status based on ticket type
+    // Update the job's assessment status and file details based on ticket type
     if (ticket.ticketType === 'customAssessment') {
       if (!job.customAssessment) {
         job.customAssessment = {};
       }
       job.customAssessment.status = 'completed';
       job.customAssessment.returnedAt = new Date().toISOString();
+      job.customAssessment.fileName = fileDetails.fileName;
+      job.customAssessment.originalName = fileDetails.originalName;
+      job.customAssessment.uploadedAt = fileDetails.uploadedAt;
+      job.customAssessment.size = fileDetails.size;
+      job.customAssessment.completedDocument = fileDetails;
     } else if (ticket.ticketType === 'statementOfEnvironmentalEffects') {
       if (!job.statementOfEnvironmentalEffects) {
         job.statementOfEnvironmentalEffects = {};
       }
       job.statementOfEnvironmentalEffects.status = 'completed';
       job.statementOfEnvironmentalEffects.returnedAt = new Date().toISOString();
+      job.statementOfEnvironmentalEffects.fileName = fileDetails.fileName;
+      job.statementOfEnvironmentalEffects.originalName = fileDetails.originalName;
+      job.statementOfEnvironmentalEffects.uploadedAt = fileDetails.uploadedAt;
+      job.statementOfEnvironmentalEffects.size = fileDetails.size;
+      job.statementOfEnvironmentalEffects.completedDocument = fileDetails;
     } else if (ticket.ticketType === 'complyingDevelopmentCertificate') {
       if (!job.complyingDevelopmentCertificate) {
         job.complyingDevelopmentCertificate = {};
       }
       job.complyingDevelopmentCertificate.status = 'completed';
       job.complyingDevelopmentCertificate.returnedAt = new Date().toISOString();
+      job.complyingDevelopmentCertificate.fileName = fileDetails.fileName;
+      job.complyingDevelopmentCertificate.originalName = fileDetails.originalName;
+      job.complyingDevelopmentCertificate.uploadedAt = fileDetails.uploadedAt;
+      job.complyingDevelopmentCertificate.size = fileDetails.size;
+      job.complyingDevelopmentCertificate.completedDocument = fileDetails;
     } else {
       throw new Error('Invalid ticket type');
     }

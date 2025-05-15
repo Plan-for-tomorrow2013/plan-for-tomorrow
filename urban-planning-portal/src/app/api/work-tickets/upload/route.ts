@@ -36,83 +36,34 @@ export async function POST(request: Request) {
     const documentsDir = path.join(getDocumentsMetadataPath(), '..', ticket.ticketType);
     await fs.mkdir(documentsDir, { recursive: true })
 
-    // Generate consistent fileName for all assessment types
-    const fileName = `${ticketId}-${file.name}`;
+    // Generate consistent fileName for the file in the shared/staging directory
+    const actualSavedFileNameInSharedStore = `${ticketId}-${file.name}`;
 
-    // Save the file
+    // Save the file to the shared/staging directory
     const fileBuffer = Buffer.from(await file.arrayBuffer())
-    const filePath = path.join(documentsDir, fileName)
-    await fs.writeFile(filePath, fileBuffer)
+    const filePathInSharedStore = path.join(documentsDir, actualSavedFileNameInSharedStore)
+    await fs.writeFile(filePathInSharedStore, fileBuffer)
 
-    // Update the ticket with the completed document info
+    // Update the ticket with accurate completed document info
     workTickets[ticketIndex] = {
       ...workTickets[ticketIndex],
-      status: 'completed',
+      status: 'completed', // This status indicates the admin has uploaded the file;
+                           // 'return' step will finalize it for the job.
       completedDocument: {
-        fileName: file.name,
-        uploadedAt: new Date().toISOString(),
+        fileName: actualSavedFileNameInSharedStore, // Name of the file in the shared staging area
+        originalName: file.name,                   // Original name of the uploaded file
+        type: file.type || 'application/pdf',      // Actual file type from the uploaded file
+        size: file.size,                           // Actual file size from the uploaded file
+        uploadedAt: new Date().toISOString(),      // Timestamp of this admin upload
       }
     }
 
-    // Save the updated tickets
+    // Save the updated tickets (work-tickets.json)
     await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
 
-    // Create job documents directory if it doesn't exist
-    const jobDocDir = getJobDocumentsPath(ticket.jobId);
-    await fs.mkdir(jobDocDir, { recursive: true })
-
-    // Generate a unique fileName for the document based on ticket type
-    const timestamp = Date.now()
-    const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
-    const jobDocPath = path.join(jobDocDir, newFileName)
-
-    // Copy the document to the job's document store
-    try {
-      await fs.copyFile(filePath, jobDocPath)
-    } catch (error) {
-      console.error('Error copying document:', error)
-      return NextResponse.json(
-        { error: 'Failed to copy document to job store' },
-        { status: 500 }
-      )
-    }
-
-    // Initialize documents object if it doesn't exist
-    if (!ticket.job.documents) {
-      ticket.job.documents = {}
-    }
-
-    // Add the document to the job's documents based on ticket type
-    ticket.job.documents[ticket.ticketType] = {
-      fileName: newFileName,
-      originalName: file.name,
-      type: 'application/pdf',
-      uploadedAt: new Date().toISOString(),
-      size: (await fs.stat(filePath)).size
-    }
-
-    // Update the job's assessment status based on ticket type
-    if (ticket.ticketType === 'customAssessment') {
-      if (!ticket.job.customAssessment) {
-        ticket.job.customAssessment = {}
-      }
-      ticket.job.customAssessment.status = 'completed'
-      ticket.job.customAssessment.returnedAt = new Date().toISOString()
-    } else if (ticket.ticketType === 'statementOfEnvironmentalEffects') {
-      if (!ticket.job.statementOfEnvironmentalEffects) {
-        ticket.job.statementOfEnvironmentalEffects = {}
-      }
-      ticket.job.statementOfEnvironmentalEffects.status = 'completed'
-      ticket.job.statementOfEnvironmentalEffects.returnedAt = new Date().toISOString()
-    } else if (ticket.ticketType === 'complyingDevelopmentCertificate') {
-      if (!ticket.job.complyingDevelopmentCertificate) {
-        ticket.job.complyingDevelopmentCertificate = {}
-      }
-      ticket.job.complyingDevelopmentCertificate.status = 'completed'
-      ticket.job.complyingDevelopmentCertificate.returnedAt = new Date().toISOString()
-    } else {
-      throw new Error('Invalid ticket type')
-    }
+    // All logic below this point related to updating the job file (job.json)
+    // or copying to the job-specific document store is removed from this endpoint.
+    // That responsibility lies with the /api/work-tickets/return endpoint.
 
     return NextResponse.json(workTickets[ticketIndex])
   } catch (error) {

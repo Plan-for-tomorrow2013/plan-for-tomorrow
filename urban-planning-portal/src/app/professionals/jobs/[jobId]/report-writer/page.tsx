@@ -111,7 +111,13 @@ function ReportWriterContent({ params }: { params: { jobId: string } }) {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleDownload(doc.id)}
+                  onClick={() => {
+                    // ---- ADD THIS LINE ----
+                    console.log('[ReportWriter] React Download Button clicked for docId:', doc.id, 'Job ID:', params.jobId);
+                    // ----------------------
+                    handleDownload(doc.id);
+                  }}
+                  disabled={false}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Report

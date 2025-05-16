@@ -869,13 +869,15 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     })
   }
 
-  const handleDownload = (docId: string) => {
+  const handleDownload = (docId: string) => { // This is the existing handleDownload
     if (!jobId) {
       toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
       return;
     }
-    handleDocumentDownload(
-      () => downloadDocument(jobId, docId)
+    handleDocumentDownload( // This is from document-utils
+      () => {
+        return downloadDocument(jobId, docId); // downloadDocument is from useDocuments context
+      }
     )
   }
 
@@ -945,6 +947,51 @@ const renderRequiredDocuments = () => {
     const renderDocumentCard = (doc: DocumentWithStatus) => {
       const isReport = isReportType(doc.id)
       const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
+
+      // Determine if this specific document tile should have a "Download Report" button
+      // that we are interested in debugging.
+      // This is based on the logic from the old report-writer page:
+      // reportStatus.isCompleted && reportStatus.hasFile
+      const shouldBeDownloadableReport = isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
+
+      // Show completed report if available
+      if (shouldBeDownloadableReport) {
+        return (
+          <Card key={doc.id} className="shadow-md">
+            <CardHeader className="bg-[#323A40] text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{getReportTitle(doc.id)}</h3>
+                  <p className="text-sm text-gray-300">{doc.category}</p>
+                </div>
+                <Check className="h-5 w-5 text-green-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                  <FileText className="h-4 w-4" />
+                  <span>{getReportTitle(doc.id)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Uploaded: {reportStatus?.reportData?.completedDocument?.uploadedAt ? new Date(reportStatus.reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    handleDownload(doc.id);
+                  }}
+                  disabled={false}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
 
       return (
         <DocumentTile

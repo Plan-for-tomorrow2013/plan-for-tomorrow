@@ -50,8 +50,9 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
 
           if (docType.purchasable) {
             // For purchasable documents, check job assessment status
-            const assessmentKey = docType.id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) as keyof Job
-            assessmentData = job[assessmentKey] as Assessment | undefined
+            const assessmentKey = docType.id.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) as keyof Job;
+            assessmentData = job[assessmentKey] as Assessment | undefined;
+
             if (assessmentData && (assessmentData.status === 'paid' || assessmentData.status === 'completed')) {
               shouldDisplay = true
             }
@@ -65,8 +66,12 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
 
             // Check job.documents first (primary source for uploaded files)
-            const jobDocData = job.documents?.[docType.id]
-            const assessmentFileName = assessmentData?.fileName
+            const jobDocData = job.documents?.[docType.id];
+            // Try to get fileName from assessmentData.fileName OR assessmentData.completedDocument.fileName
+            let assessmentFileName = assessmentData?.fileName;
+            if (!assessmentFileName && assessmentData?.completedDocument) {
+              assessmentFileName = (assessmentData.completedDocument as any)?.fileName;
+            }
 
             if (jobDocData && jobDocData.fileName) {
               displayStatus = 'uploaded'
@@ -93,15 +98,36 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             }
             // Otherwise, it remains 'pending_user_upload' for standard docs
 
-            displayableDocuments.push({
+            // Now, determine the displayStatus based on whether an uploadedFile was found
+            if (uploadedFile) {
+              displayStatus = 'uploaded';
+            } else if (docType.purchasable && assessmentData && (assessmentData.status === 'paid' || assessmentData.status === 'completed')) {
+              displayStatus = 'pending_admin_delivery';
+            }
+            // else it remains 'pending_user_upload'
+
+            // Construct the document object that will be passed to getDocumentDisplayStatus
+            // AND will be part of the final displayableDocuments array.
+            const currentProcessedDoc: DocumentWithStatus = {
               ...docType,
-              displayStatus: getDocumentDisplayStatus({
-                ...docType,
-                uploadedFile: uploadedFile,
-                displayStatus: displayStatus
-              }, job),
-              uploadedFile: uploadedFile
-            })
+              uploadedFile: uploadedFile, // uploadedFile is now part of this object
+              displayStatus: displayStatus, // This is the status *before* getDocumentDisplayStatus potentially refines it
+              // Ensure all other required fields for DocumentWithStatus are present
+              description: docType.description || '',
+              versions: docType.versions || [],
+              currentVersion: docType.currentVersion || 1,
+              createdAt: docType.createdAt || new Date().toISOString(),
+              updatedAt: docType.updatedAt || new Date().toISOString(),
+              isActive: docType.isActive !== undefined ? docType.isActive : true,
+            };
+
+            // Get the final display status
+            const finalDisplayStatus = getDocumentDisplayStatus(currentProcessedDoc, job);
+
+            displayableDocuments.push({
+              ...currentProcessedDoc, // Use the object that already has uploadedFile
+              displayStatus: finalDisplayStatus, // Override with the result from getDocumentDisplayStatus
+            });
           }
         })
         // --- End New Logic ---
@@ -115,7 +141,8 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
         throw new Error(`Failed to process job documents: ${error instanceof Error ? error.message : String(error)}`)
       }
     },
-    // Add options like staleTime or refetchOnWindowFocus if needed
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true, // Continue polling even when tab is not active
   })
 
   // Upload document mutation

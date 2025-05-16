@@ -41,9 +41,12 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
     })
   }
 
-  const handleDownload = (docId: string) => {
+  const handleDownload = (docId: string) => {    console.log('[DocumentStore] Download button clicked for', docId);
     handleDocumentDownload(
-      () => downloadDocument(params.jobId, docId)
+      () => {
+        console.log('[DocumentStore] Calling downloadDocument for', params.jobId, docId);
+        return downloadDocument(params.jobId, docId);
+      }
     )
   }
 
@@ -102,17 +105,18 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-[#323A40]">
                   <FileText className="h-4 w-4" />
-                  {/* Access file details from reportStatus.reportData.completedDocument */}
-                  <span>{(reportStatus as any).reportData?.completedDocument?.originalName || 'Report File'}</span>
+                  <span>{reportTitle}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {/* Access uploadedAt from reportStatus.reportData.completedDocument */}
                   Uploaded: {(reportStatus as any).reportData?.completedDocument?.uploadedAt ? new Date((reportStatus as any).reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
                 </p>
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => handleDownload(doc.id)}
+                  onClick={() => {
+                    handleDownload(doc.id);
+                  }}
+                  disabled={false}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Report

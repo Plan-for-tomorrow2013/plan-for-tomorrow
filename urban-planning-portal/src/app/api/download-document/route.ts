@@ -4,40 +4,39 @@ import path from 'path';
 import { stat } from 'fs/promises'; // For checking file existence
 
 export async function GET(request: Request) {
+  // Original code below, temporarily commented out for testing
+
   const { searchParams } = new URL(request.url);
   const jobId = searchParams.get('jobId');
   const fileName = searchParams.get('fileName'); // This is the stored filename, potentially with a unique prefix/timestamp
   const originalName = searchParams.get('originalName') || fileName; // Fallback to fileName if originalName is not provided
 
-  console.log(`[API ADMIN /api/download-document] Received request: jobId=${jobId}, fileName=${fileName}, originalName=${originalName}`);
+  console.log(`[API /api/download-document] Received request: jobId=${jobId}, fileName=${fileName}, originalName=${originalName}`);
 
   if (!jobId || !fileName) {
-    console.log('[API ADMIN /api/download-document] Missing jobId or fileName.');
+    console.log('[API /api/download-document] Missing jobId or fileName.');
     return NextResponse.json({ error: 'Missing jobId or fileName query parameters' }, { status: 400 });
   }
 
   try {
-    // Hardcoded base path to the jobs data directory, relative to the monorepo root.
-    // Assumes the admin app's process.cwd() might be admin/ but files are at monorepo_root/data/jobs
-    // To ensure robustness, we construct path from a known root or adjust based on actual process.cwd() for admin app.
-    // For WSL, the direct Linux path is most reliable if the server runs in WSL.
+    // Hardcoded base path to the jobs data directory
     const documentsBasePath = '/home/tania/urban-planning-professionals-portal/data/jobs';
-    console.log(`[API ADMIN /api/download-document] Hardcoded documentsBasePath: ${documentsBasePath}`);
+    console.log(`[API /api/download-document] Hardcoded documentsBasePath: ${documentsBasePath}`);
 
-    const filePath = path.join(documentsBasePath, jobId!, 'documents', fileName!);
-    console.log(`[API ADMIN /api/download-document] Constructed filePath (jobId: ${jobId}, fileName: ${fileName}): ${filePath}`);
+    const filePath = path.join(documentsBasePath, jobId!, 'documents', fileName!); // Added non-null assertions for type safety if strict null checks are on
+    console.log(`[API /api/download-document] Constructed filePath (jobId: ${jobId}, fileName: ${fileName}): ${filePath}`);
 
     // Check if file exists before attempting to read
     try {
       await stat(filePath);
-      console.log(`[API ADMIN /api/download-document] File confirmed to exist at: ${filePath}`);
+      console.log(`[API /api/download-document] File confirmed to exist at: ${filePath}`);
     } catch (e: any) {
       if (e.code === 'ENOENT') {
-        console.error(`[API ADMIN /api/download-document] File not found (ENOENT) at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`);
+        console.error(`[API /api/download-document] File not found (ENOENT) at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`);
         return NextResponse.json({ error: 'File not found on server.' }, { status: 404 });
       }
       // Other errors (e.g., permissions)
-      console.error(`[API ADMIN /api/download-document] Error accessing file with stat at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`, e);
+      console.error(`[API /api/download-document] Error accessing file with stat at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`, e);
       return NextResponse.json({ error: 'Error accessing file.' }, { status: 500 });
     }
 
@@ -56,6 +55,7 @@ export async function GET(request: Request) {
 
     const response = new NextResponse(fileBuffer);
     response.headers.set('Content-Type', contentType);
+    // Use the originalName for the download attribute if available
     response.headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName || fileName)}"`);
 
     return response;
@@ -63,4 +63,5 @@ export async function GET(request: Request) {
     console.error('Error serving file download:', error);
     return NextResponse.json({ error: 'Failed to download file' }, { status: 500 });
   }
+
 }

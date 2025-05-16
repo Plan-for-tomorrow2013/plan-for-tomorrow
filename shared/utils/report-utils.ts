@@ -68,7 +68,9 @@ export function getReportTitle(docId: string): string {
  */
 export function getDocumentDisplayStatus(doc: DocumentWithStatus, job: Job): 'uploaded' | 'pending_user_upload' | 'pending_admin_delivery' {
   // 1. If the document has an uploaded file, it's uploaded
-  if (doc.uploadedFile) return 'uploaded';
+  if (doc.uploadedFile) {
+    return 'uploaded';
+  }
 
   // 2. Paid reports: check if paid but not delivered
   if (isReportType(doc.id)) {

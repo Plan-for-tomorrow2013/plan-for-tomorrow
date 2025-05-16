@@ -34,8 +34,8 @@ export function useJobs() {
   } = useQuery<Job[], Error>({ // Specify types for data and error
     queryKey: ['jobs'], // Unique key for this query
     queryFn: fetchJobs, // The function to fetch data
-    // Optional: Add configuration like staleTime, refetchInterval, etc.
-    // staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true, // Continue polling even when tab is not active
   })
 
   // Construct the error message based on React Query's error object

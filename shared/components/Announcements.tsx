@@ -8,6 +8,8 @@ import { useToast } from "@shared/components/ui/use-toast"
 import { Announcement } from "@shared/types/announcements"
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
+import sanitizeHtml from 'sanitize-html'
+import { stripHtml } from 'string-strip-html'
 
 // Dynamically import the rich text editor to avoid SSR issues
 const RichTextEditor = dynamic(() => import('@shared/components/RichTextEditor').then(mod => mod.RichTextEditor), {
@@ -95,7 +97,11 @@ export function Announcements({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {announcements.map((announcement) => (
+          {announcements
+            .slice() // copy array
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, 5)
+            .map((announcement) => (
             <div key={announcement.id} className="border-b pb-4 last:border-0 last:pb-0">
               <div className="flex items-start justify-between">
                 <h3 className="font-medium">{announcement.title}</h3>
@@ -103,15 +109,13 @@ export function Announcements({
                   {new Date(announcement.date).toLocaleDateString()}
                 </span>
               </div>
-              {enableRichText && announcement.isRichText ? (
-                <div className="mt-1 prose prose-sm max-w-none">
-                  <RichTextEditor
-                    value={announcement.content}
-                    readOnly={true}
-                  />
-                </div>
+              {announcement.isRichText ? (
+                <div
+                  className="mt-1 prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(announcement.content) }}
+                />
               ) : (
-                <p className="mt-1 text-sm text-muted-foreground">{announcement.content}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{stripHtml(announcement.content).result}</p>
               )}
               <p className="mt-2 text-xs text-muted-foreground">Posted by {announcement.author}</p>
             </div>

@@ -22,5 +22,13 @@
     "isRichText": false,
     "id": "c1e5c84b-3681-44fd-b878-36f31debd412",
     "date": "2025-05-13T00:21:59.783Z"
+  },
+  {
+    "title": "new announcement",
+    "content": "<p>123458</p>",
+    "author": "Tania",
+    "isRichText": true,
+    "id": "078c5c17-1584-4dfd-9efc-39c7feeabf03",
+    "date": "2025-05-17T10:15:58.402Z"
   }
 ]

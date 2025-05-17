@@ -9,6 +9,8 @@ import { Loader2, Plus, Trash2, Edit2 } from "lucide-react"
 import { PageHeader } from "@shared/components/ui/page-header"
 import { Announcement, AnnouncementResponse } from "@shared/types/announcements"
 import dynamic from 'next/dynamic'
+import sanitizeHtml from 'sanitize-html'
+import { stripHtml } from 'string-strip-html'
 
 const RichTextEditor = dynamic(() => import('@shared/components/RichTextEditor').then(mod => mod.RichTextEditor), {
   ssr: false,
@@ -212,10 +214,20 @@ export default function AnnouncementsPage() {
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Content</label>
-                <RichTextEditor
-                  value={formData.content}
-                  onChange={(content: string) => setFormData(prev => ({ ...prev, content }))}
-                />
+                {formData.isRichText ? (
+                  <RichTextEditor
+                    value={formData.content}
+                    onChange={(content: string) => setFormData(prev => ({ ...prev, content }))}
+                  />
+                ) : (
+                  <textarea
+                    className="w-full border rounded p-2"
+                    value={formData.content}
+                    onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                    rows={5}
+                    placeholder="Announcement content"
+                  />
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Author</label>
@@ -290,14 +302,12 @@ export default function AnnouncementsPage() {
                     </div>
                   </div>
                   {announcement.isRichText ? (
-                    <div className="mt-1 prose prose-sm max-w-none">
-                      <RichTextEditor
-                        value={announcement.content}
-                        readOnly
-                      />
-                    </div>
+                    <div
+                      className="mt-1 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(announcement.content) }}
+                    />
                   ) : (
-                    <p className="mt-1 text-sm text-muted-foreground">{announcement.content}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{stripHtml(announcement.content).result}</p>
                   )}
                   <p className="mt-2 text-xs text-muted-foreground">Posted by {announcement.author}</p>
                   <p className="text-xs text-muted-foreground">

@@ -233,6 +233,14 @@ export default function JobPage({ params }: Props) {
       color: '#727E86'
     },
     {
+      name: 'Certifying Authority',
+      id: 'certifying-authority',
+      description: 'View and manage your approval',
+      icon: DollarSign,
+      href: `/professionals/jobs/${params.jobId}/certifying-authority`,
+      color: '#727E86'
+    },
+    {
       name: 'Complete',
       id: 'complete',
       description: 'View completed tasks',
@@ -249,7 +257,6 @@ export default function JobPage({ params }: Props) {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <Alert className="mb-6 bg-[#EEDA54]/20 border-[#EEDA54]">
-        <CheckCircle2 className="h-4 w-4 text-[#532200]" />
         <AlertTitle className="text-[#532200] font-semibold">Job Details</AlertTitle>
         <AlertDescription className="text-[#532200]">
           {job.address}
@@ -272,6 +279,28 @@ export default function JobPage({ params }: Props) {
             </Card>
           </Link>
         ))}
+      </div>
+
+      {/* New Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4">Client Portal</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tiles.map((tile) => (
+          <Link key={tile.id} href={tile.href}>
+            <Card className="hover:bg-gray-50 transition-colors cursor-pointer border-l-4" style={{ borderLeftColor: tile.color }}>
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <tile.icon className="h-6 w-6" style={{ color: tile.color }} />
+                  <div>
+                    <h3 className="font-semibold">{tile.name}</h3>
+                    <p className="text-sm text-gray-500">{tile.description}</p>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          </Link>
+        ))}
+        </div>
       </div>
     </div>
   )

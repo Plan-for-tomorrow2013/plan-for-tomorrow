@@ -18,7 +18,8 @@ import {
   FileCheck,
   Building2,
   Recycle,
-  LucideIcon
+  LucideIcon,
+  DollarSign
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -41,6 +42,16 @@ export function Navigation({ role, className }: NavigationProps) {
       icon: Home
     },
     {
+      title: "Jobs",
+      icon: Briefcase,
+      href: `${prefix}/jobs`,
+    },
+    {
+      title: "Knowledge Base",
+      href: `${prefix}/knowledge-base`,
+      icon: BookOpen
+    },
+    {
       title: "Initial Assessment",
       href: `${prefix}/initial-assessment`,
       icon: ClipboardCheck
@@ -51,40 +62,35 @@ export function Navigation({ role, className }: NavigationProps) {
       icon: FileText
     },
     {
-      title: "Knowledge Base",
-      href: `${prefix}/knowledge-base`,
-      icon: BookOpen
-    },
-  ]
-
-  const secondaryNav: { label: string; icon: LucideIcon; href: string }[] = [
-    {
-      label: "Jobs",
-      icon: Briefcase,
-      href: `${prefix}/jobs`,
-    },
-    {
-      label: "Design Check",
+      title: "Design Check",
       icon: FileCheck,
       href: `${prefix}/design-check`,
     },
     {
-      label: "Quotes",
+      title: "Quotes",
       icon: Calculator,
       href: `${prefix}/quotes`,
     },
     {
-      label: "Account",
+      title: "Certifying Authority",
+      icon: DollarSign,
+      href: `${prefix}/certifying-authority`,
+    },
+  ]
+
+  const secondaryNav: { title: string; icon: LucideIcon; href: string }[] = [
+    {
+      title: "Account",
       icon: Settings,
       href: `${prefix}/account`,
     },
     {
-      label: "Help",
+      title: "Help",
       icon: HelpCircle,
       href: `${prefix}/help`,
     },
     {
-      label: "Log Out",
+      title: "Log Out",
       icon: LogOut,
       href: `${prefix}/logout`,
     },
@@ -94,6 +100,10 @@ export function Navigation({ role, className }: NavigationProps) {
     <ScrollArea className={cn("h-full py-6", className)}>
       <div className="space-y-4">
         <div className="px-3 py-2">
+          <div className="mb-4 flex items-center">
+            <img src="/logo.png" alt="Logo" className="h-8 mr-2" />
+            <span className="text-lg font-bold tracking-tight">Urban Planning Portal</span>
+          </div>
           <div className="space-y-1">
             <div className="flex flex-col space-y-1">
               {mainNav.map((route) => (
@@ -119,7 +129,7 @@ export function Navigation({ role, className }: NavigationProps) {
                   >
                     <Link href={route.href}>
                       <route.icon className="mr-2 h-4 w-4" />
-                      {route.label}
+                      {route.title}
                     </Link>
                   </Button>
                 </div>

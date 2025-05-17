@@ -460,26 +460,8 @@ export default function DashboardPage() {
             {jobDetails && (
               <Card>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                     {[
-                      {
-                        name: 'Planning Layers',
-                        id: 'planning-layers',
-                        description: 'View planning layer details and attributes',
-                        color: '#EA6B3D',
-                      },
-                      {
-                        name: 'Site Details',
-                        id: 'site-details',
-                        description: 'Site specifications and requirements',
-                        color: '#CDC532',
-                      },
-                      {
-                        name: 'Document Store',
-                        id: 'document-store',
-                        description: 'Access and manage documents',
-                        color: '#EEDA54',
-                      },
                       {
                         name: 'Initial Assessment',
                         id: 'initial-assessment',
@@ -502,6 +484,12 @@ export default function DashboardPage() {
                         name: 'Quotes',
                         id: 'quotes',
                         description: 'Manage cost estimates',
+                        color: '#727E86',
+                      },
+                      {
+                        name: 'Certifying Authority',
+                        id: 'certifying-authority',
+                        description: 'Track your approval',
                         color: '#727E86',
                       },
                       {

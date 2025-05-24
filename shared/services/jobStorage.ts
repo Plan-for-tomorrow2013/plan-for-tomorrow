@@ -24,10 +24,12 @@ export async function saveJob(jobId: string, jobData: Job): Promise<void> {
     if (!existsSync(jobDir)) {
       mkdirSync(jobDir, { recursive: true })
     }
-
+    // console.log(`[jobStorage saveJob] Saving job ${jobId} to path: ${jobPath}`);
+    // console.log(`[jobStorage saveJob] Data for ${jobId}:`, JSON.stringify(jobData, null, 2)); // Optional: log full data
     writeFileSync(jobPath, JSON.stringify(jobData, null, 2))
+    // console.log(`[jobStorage saveJob] Successfully saved job ${jobId}`);
   } catch (error) {
-    console.error(`Error saving job ${jobId}:`, error)
+    // console.error(`[jobStorage saveJob] Error saving job ${jobId}:`, error)
     throw error
   }
 }
@@ -35,14 +37,19 @@ export async function saveJob(jobId: string, jobData: Job): Promise<void> {
 export function getJob(jobId: string): Job {
   try {
     const jobPath = getJobPath(jobId)
+    // console.log(`[jobStorage getJob] Attempting to get job ${jobId} from path: ${jobPath}`);
     if (!existsSync(jobPath)) {
+      // console.error(`[jobStorage getJob] Job ${jobId} not found at path: ${jobPath}`);
       throw new Error(`Job ${jobId} not found`)
     }
 
-    const jobData = readFileSync(jobPath, 'utf-8')
-    return JSON.parse(jobData)
+    const jobDataString = readFileSync(jobPath, 'utf-8')
+    // console.log(`[jobStorage getJob] Raw data for ${jobId}:`, jobDataString); // Optional: log raw string
+    const jobDataObject = JSON.parse(jobDataString)
+    // console.log(`[jobStorage getJob] Successfully retrieved job ${jobId}`);
+    return jobDataObject
   } catch (error) {
-    console.error(`Error getting job ${jobId}:`, error)
+    // console.error(`[jobStorage getJob] Error getting job ${jobId}:`, error)
     throw error
   }
 }

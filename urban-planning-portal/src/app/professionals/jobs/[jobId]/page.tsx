@@ -280,28 +280,6 @@ export default function JobPage({ params }: Props) {
           </Link>
         ))}
       </div>
-
-      {/* New Section */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Client Portal</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tiles.map((tile) => (
-          <Link key={tile.id} href={tile.href}>
-            <Card className="hover:bg-gray-50 transition-colors cursor-pointer border-l-4" style={{ borderLeftColor: tile.color }}>
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <tile.icon className="h-6 w-6" style={{ color: tile.color }} />
-                  <div>
-                    <h3 className="font-semibold">{tile.name}</h3>
-                    <p className="text-sm text-gray-500">{tile.description}</p>
-                  </div>
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
-        </div>
-      </div>
     </div>
   )
 }

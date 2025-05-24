@@ -20,7 +20,7 @@ import { toast } from "@shared/components/ui/use-toast"
 import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo'
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
 import { DocumentStatus } from '@shared/components/DocumentStatus' // Keep this one
-import { Job, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
+import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@shared/utils/report-utils'
 import { getDocumentDisplayStatus } from '@shared/utils/report-utils'
 // Removed duplicate PropertyDataShape import
@@ -38,6 +38,11 @@ interface CustomAssessmentForm {
   developmentType: string;
   additionalInfo: string;
   uploadedDocuments: Record<string, boolean>;
+  documents: {
+    certificateOfTitle?: { originalName?: string; fileName?: string };
+    surveyPlan?: { originalName?: string; fileName?: string };
+    certificate107?: { originalName?: string; fileName?: string };
+  };
   selectedTab: string;
 }
 
@@ -83,6 +88,7 @@ interface PrePreparedAssessment {
     id: string;
   };
   purchaseDate?: string;
+  isPurchased?: boolean;
 }
 
 interface ReportSectionProps {
@@ -92,6 +98,11 @@ interface ReportSectionProps {
   onDownload: () => void
   onDelete: () => void
   isLoading: boolean
+}
+
+interface PurchasedPrePreparedAssessment {
+  id: string;
+  purchaseDate: string;
 }
 
 // Place this at the top of your file, before any usage
@@ -163,36 +174,75 @@ function normalizeSiteDetails(data: any): SiteDetails {
   };
 }
 
-// *** NEW COMPONENT for Job-Specific Content ***
 function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
-  console.log('[ReportWriter] documents from context:', documents);
+  // console.log('[ReportWriter] documents from context:', documents);
   const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
   const [documentError, setDocumentError] = useState<string | null>(null)
+
+  // Add transformUploadedDocuments function inside component
+  const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
+    if (!documents) return {};
+    return Object.keys(documents).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+  };
+
   // Combined state for both report forms (Keep this)
   const [formState, setFormState] = useState<ReportWriterFormState>({
     'customAssessment': {
-      formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' },
+      formData: {
+        developmentType: '',
+        additionalInfo: '',
+        uploadedDocuments: {},
+        documents: {
+          certificateOfTitle: undefined,
+          surveyPlan: undefined,
+          certificate107: undefined
+        },
+        selectedTab: 'details'
+      },
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
-      purchaseInitiated: false, // Initialize flag
+      purchaseInitiated: false,
     },
     'statementOfEnvironmentalEffects': {
-      formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' },
+      formData: {
+        developmentType: '',
+        additionalInfo: '',
+        uploadedDocuments: {},
+        documents: {
+          certificateOfTitle: undefined,
+          surveyPlan: undefined,
+          certificate107: undefined
+        },
+        selectedTab: 'details'
+      },
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
-      purchaseInitiated: false, // Initialize flag
+      purchaseInitiated: false,
     },
     'complyingDevelopmentCertificate': {
-      formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' },
+      formData: {
+        developmentType: '',
+        additionalInfo: '',
+        uploadedDocuments: {},
+        documents: {
+          certificateOfTitle: undefined,
+          surveyPlan: undefined,
+          certificate107: undefined
+        },
+        selectedTab: 'details'
+      },
       paymentComplete: false,
       showPaymentButton: false,
       hasUnsavedChanges: false,
-      purchaseInitiated: false, // Initialize flag
+      purchaseInitiated: false,
     },
   });
 
@@ -204,36 +254,51 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   // Add this after other state declarations
   const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
 
-  // Load form data from local storage when the job ID changes
+  // Add loadFormData function inside component
+  const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => {
+    const storedData = localStorage.getItem(`formData_${jobId}_${formType}`);
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        return {
+          developmentType: parsedData.developmentType || '',
+          additionalInfo: parsedData.additionalInfo || '',
+          uploadedDocuments: parsedData.uploadedDocuments || {},
+          documents: {
+            certificateOfTitle: parsedData.documents?.certificateOfTitle,
+            surveyPlan: parsedData.documents?.surveyPlan,
+            certificate107: parsedData.documents?.certificate107
+          },
+          selectedTab: parsedData.selectedTab || 'details'
+        };
+      } catch (error) {
+        console.error('Error parsing stored form data:', error);
+      }
+    }
+    return {
+      developmentType: '',
+      additionalInfo: '',
+      uploadedDocuments: {},
+      documents: {
+        certificateOfTitle: undefined,
+        surveyPlan: undefined,
+        certificate107: undefined
+      },
+      selectedTab: 'details'
+    };
+  };
+
+  // Effect to load form data from local storage
   useEffect(() => {
-    if (!jobId) { // Use jobId prop
+    if (!jobId) {
       // Reset state including purchaseInitiated
       setFormState({
-        'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       });
       return;
     }
-
-    const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => { // Ensure return type matches
-      const savedData = localStorage.getItem(`${formType}-${jobId}`); // Use jobId prop
-      if (savedData) {
-        try {
-          const parsedData = JSON.parse(savedData);
-          if (parsedData && typeof parsedData.developmentType === 'string' && typeof parsedData.additionalInfo === 'string') {
-            return parsedData;
-          } else {
-            console.warn(`Invalid data found in local storage for ${formType}, resetting.`);
-            localStorage.removeItem(`${formType}-${jobId}`); // Use jobId prop
-          }
-        } catch (error) {
-          console.error(`Failed to parse ${formType} data from local storage:`, error);
-          localStorage.removeItem(`${formType}-${jobId}`); // Use jobId prop
-        }
-      }
-      return { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }; // Default empty form
-    };
 
     // Correctly update form state by spreading previous state
     setFormState(prev => ({
@@ -260,7 +325,6 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
 
   }, [jobId]); // Depend on jobId prop
 
-
   // --- React Query for fetching selected job details ---
   const {
     data: currentJob,
@@ -272,6 +336,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     queryKey: ['job', jobId],
     queryFn: () => fetchJobDetails(jobId),
     enabled: !!jobId, // Enable only when jobId is present
+    staleTime: 0, // Always refetch after invalidation
   });
   // --- End React Query ---
 
@@ -292,15 +357,6 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   // Effect to update local component state based on fetched job data
   useEffect(() => {
     if (currentJob) {
-      // Helper function to transform uploaded documents into boolean record
-      const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
-        if (!documents) return {}
-        return Object.keys(documents).reduce((acc, key) => {
-          acc[key] = true
-          return acc
-        }, {} as Record<string, boolean>)
-      }
-
       // Update form state based on job data
       setFormState(prev => ({
         'customAssessment': {
@@ -315,6 +371,11 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
                 developmentType: currentJob.customAssessment?.developmentType || '',
                 additionalInfo: currentJob.customAssessment?.additionalInfo || '',
                 uploadedDocuments: transformUploadedDocuments(currentJob.customAssessment?.uploadedDocuments),
+                documents: {
+                  certificateOfTitle: currentJob.customAssessment?.documents?.certificateOfTitle,
+                  surveyPlan: currentJob.customAssessment?.documents?.surveyPlan,
+                  certificate107: currentJob.customAssessment?.documents?.certificate107
+                },
                 selectedTab: 'details'
               },
         },
@@ -330,6 +391,11 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
                 developmentType: currentJob.statementOfEnvironmentalEffects?.developmentType || '',
                 additionalInfo: currentJob.statementOfEnvironmentalEffects?.additionalInfo || '',
                 uploadedDocuments: transformUploadedDocuments(currentJob.statementOfEnvironmentalEffects?.uploadedDocuments),
+                documents: {
+                  certificateOfTitle: currentJob.statementOfEnvironmentalEffects?.documents?.certificateOfTitle,
+                  surveyPlan: currentJob.statementOfEnvironmentalEffects?.documents?.surveyPlan,
+                  certificate107: currentJob.statementOfEnvironmentalEffects?.documents?.certificate107
+                },
                 selectedTab: 'details'
               },
         },
@@ -345,6 +411,11 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
                 developmentType: currentJob.complyingDevelopmentCertificate?.developmentType || '',
                 additionalInfo: currentJob.complyingDevelopmentCertificate?.additionalInfo || '',
                 uploadedDocuments: transformUploadedDocuments(currentJob.complyingDevelopmentCertificate?.uploadedDocuments),
+                documents: {
+                  certificateOfTitle: currentJob.complyingDevelopmentCertificate?.documents?.certificateOfTitle,
+                  surveyPlan: currentJob.complyingDevelopmentCertificate?.documents?.surveyPlan,
+                  certificate107: currentJob.complyingDevelopmentCertificate?.documents?.certificate107
+                },
                 selectedTab: 'details'
               },
         },
@@ -372,9 +443,9 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
       // Reset states if no job is selected
       // Reset states including purchaseInitiated if no job is selected
       setFormState({
-        'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
+        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       })
       setPurchasedAssessments({})
       updateSiteDetails({}) // Assuming updateSiteDetails({}) resets the site details state
@@ -794,6 +865,64 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
 
   // Update the renderPrePreparedAssessmentCard function
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
+    // Check if assessment is in purchasedPrePreparedAssessments
+    const purchasedMap = currentJob?.purchasedPrePreparedAssessments;
+    const keysInPurchasedMap = purchasedMap ? Object.keys(purchasedMap) : [];
+    const originalIdToCheck = assessment.id; // Keep original for logging
+
+    // Normalize idToCheck: remove hyphens AND convert to lowercase
+    const finalIdToCompare = originalIdToCheck
+      ? originalIdToCheck.replace(/-/g, '').toLowerCase()
+      : '';
+
+    let isPurchased = false;
+    if (purchasedMap && finalIdToCompare) {
+      for (const key of keysInPurchasedMap) {
+        // Normalize key from map: convert to lowercase (it's already hyphen-less due to camelcaseKeys)
+        const normalizedKeyFromMap = key.toLowerCase();
+
+        // Detailed log for each comparison
+        // console.log(
+        //   `[ReportWriter ID CHECK] Comparing:`,
+        //   {
+        //     normalizedKeyFromMap: `"${normalizedKeyFromMap}" (len: ${normalizedKeyFromMap.length})`,
+        //     finalIdToCompare: `"${finalIdToCompare}" (len: ${finalIdToCompare.length})`,
+        //     areEqual: normalizedKeyFromMap === finalIdToCompare
+        //   }
+        // );
+        if (normalizedKeyFromMap === finalIdToCompare) {
+          isPurchased = true;
+          break;
+        }
+      }
+    }
+
+    // console.log(
+    //   `[ReportWriter renderPrePreparedAssessmentCard for "${assessment.title}"] FINAL`,
+    //   {
+    //     idBeingChecked: originalIdToCheck,
+    //     normalizedIdForCheck: finalIdToCompare, // Log the fully normalized ID used for comparison
+    //     purchasedMapExists: !!purchasedMap,
+    //     keysInMap: keysInPurchasedMap, // Original keys from map (hyphen-less, mixed case)
+    //     isPurchasedOutcome: isPurchased,
+    //     fullPurchasedMap: purchasedMap // Log the full map for inspection
+    //   }
+    // );
+
+    if (isPurchased) {
+      return (
+        <div className="border rounded-lg p-4 bg-green-50">
+          <div className="text-center py-4">
+            <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <h4 className="font-medium mb-2">Report Complete</h4>
+            <p className="text-sm text-gray-600 mb-4">
+              Your assessment "{assessment.title}" is available for download in the Documents section above.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card key={assessment.id} className="shadow-md">
         <CardHeader className="bg-[#323A40] text-white">
@@ -813,12 +942,12 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           </div>
           <div className="space-y-2">
             <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => handleAssessmentDownload(assessment)}
+              variant="default"
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={() => handleAssessmentPurchase(assessment.id)}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              Download Assessment
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Purchase Assessment
             </Button>
           </div>
         </CardContent>
@@ -1232,32 +1361,49 @@ const renderRequiredDocuments = () => {
 
   const isReadOnly = false;
 
-  const handleAssessmentPurchase = async (assessmentId: string) => {
+  const handleAssessmentPurchase = async (assessmentId: string): Promise<void> => {
     try {
-      if (!jobId) { // Use jobId prop
-        throw new Error('No job selected');
+      if (!jobId) {
+        toast({ title: "Error", description: "No job selected", variant: "destructive" });
+        return;
       }
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, { // *** Use jobId prop ***
+
+      // Find the assessment details from the loaded data
+      const assessment = prePreparedAssessmentsData
+        .flatMap(section => section.assessments)
+        .find(a => a.id === assessmentId);
+
+      if (!assessment) {
+        toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
+        return;
+      }
+
+      // Directly call the purchase endpoint
+      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assessmentId }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assessment }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to purchase assessment');
       }
 
-      const data = await response.json();
+      // Update local state/UI
       setPurchasedAssessments(prev => ({
         ...prev,
         [assessmentId]: true
       }));
+
       toast({
         title: "Success",
-        description: "Assessment purchased successfully",
+        description: "Assessment purchased successfully.",
       });
+
+      // Refetch job data to force UI update
+      await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+      await refetchJob();
+
     } catch (error) {
       console.error('Error purchasing assessment:', error);
       toast({
@@ -1318,6 +1464,81 @@ const renderRequiredDocuments = () => {
     } : undefined
   });
 
+  // Add this after other useEffect hooks
+  useEffect(() => {
+    const handlePaymentSuccess = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const paymentSuccess = params.get('payment_success');
+      const assessmentId = params.get('assessment_id');
+
+      if (paymentSuccess === 'true' && assessmentId && jobId) {
+        try {
+          // Get the assessment details first
+          const assessmentResponse = await fetch(`/api/pre-prepared-assessments/${assessmentId}`);
+          if (!assessmentResponse.ok) {
+            throw new Error('Failed to fetch assessment details');
+          }
+          const assessment = await assessmentResponse.json();
+
+          // Update job with purchased assessment
+          const response = await fetch(`/api/jobs/${jobId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              purchasedPrePreparedAssessments: {
+                [assessmentId]: {
+                  id: assessment.id,
+                  purchaseDate: new Date().toISOString(),
+                  title: assessment.title,
+                  content: assessment.content,
+                  file: assessment.file
+                }
+              }
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to update job with purchased assessment');
+          }
+
+          // Update local state
+          setPurchasedAssessments(prev => ({
+            ...prev,
+            [assessmentId]: true
+          }));
+
+          // Invalidate queries to refresh data
+          queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+          queryClient.invalidateQueries({ queryKey: ['prePreparedAssessments'] });
+
+          // Remove payment success params from URL
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete('payment_success');
+          newUrl.searchParams.delete('assessment_id');
+          window.history.replaceState({}, '', newUrl.toString());
+
+          toast({
+            title: "Success",
+            description: "Assessment purchased successfully",
+          });
+        } catch (error) {
+          console.error('Error updating purchased assessment:', error);
+          toast({
+            title: "Error",
+            description: "Failed to update purchased assessment",
+            variant: "destructive"
+          });
+        }
+      }
+    };
+
+    if (jobId) {
+      handlePaymentSuccess();
+    }
+  }, [jobId, queryClient]); // Added queryClient to dependencies
+
   // --- Main Render Logic for JobReportWriter ---
   const isLoading = isDocsLoading || isJobLoading; // Combined loading state
 
@@ -1329,6 +1550,8 @@ const renderRequiredDocuments = () => {
   if (!currentJob && !isJobLoading) return <div>Job data not available. Select a job or check for errors.</div>; // Refined check
   // We need currentJob for the rest of the render, so ensure it exists if not loading/error
   if (!currentJob) return <div>Loading...</div>; // Fallback if somehow still null
+
+  console.log('DEBUG propertyData:', currentJob.propertyData);
 
   return (
     <div className="space-y-6">

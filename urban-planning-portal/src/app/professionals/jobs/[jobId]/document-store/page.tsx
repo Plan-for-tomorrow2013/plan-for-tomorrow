@@ -155,9 +155,11 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
                 <Button variant="outline" className="flex-1" onClick={() => handleDownload(doc.id)}>
                   <FileText className="h-4 w-4 mr-2" />Download
                 </Button>
-                <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
-                  <X className="h-4 w-4" />
-                </Button>
+                {doc.path !== '/pre-prepared-assessment' && (
+                  <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
           ) : (

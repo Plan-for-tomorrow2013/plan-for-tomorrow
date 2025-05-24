@@ -18,10 +18,14 @@ export async function POST(
     // Add the purchased assessment to the job
     const purchasedAssessment = {
       id: assessment.id,
+      section: assessment.section,
       title: assessment.title,
       content: assessment.content,
+      date: assessment.date, // Original assessment date
+      author: assessment.author,
       purchaseDate: new Date().toISOString(),
-      file: assessment.file
+      file: assessment.file,
+      status: 'completed' // Mark as completed upon purchase
     }
 
     // Initialize or update purchasedPrePreparedAssessments and documents in one update
@@ -46,6 +50,7 @@ export async function POST(
     }
 
     // Save the updated job
+    // console.log('[API POST purchase] updatedJob before saveJob:', JSON.stringify(updatedJob, null, 2));
     await saveJob(jobId, updatedJob)
 
     return NextResponse.json({

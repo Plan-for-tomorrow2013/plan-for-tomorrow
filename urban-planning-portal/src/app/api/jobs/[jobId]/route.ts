@@ -31,9 +31,10 @@ export async function GET(
     const jobData = await readFile(jobPath, 'utf-8')
     const job = JSON.parse(jobData)
 
-    console.log('Job loaded:', job);
+    // console.log(`[API GET JobId ${params.jobId}] Job data read from ${jobPath}:`, JSON.stringify(job, null, 2));
+    // console.log('Job loaded:', job); // Original log, can be removed or kept
     if (job.completedDocument) {
-      console.log('Found completedDocument:', job.completedDocument);
+      // console.log(`[API GET JobId ${params.jobId}] Found completedDocument:`, job.completedDocument);
     }
 
     // Surface completedDocument into the relevant report property for the frontend
@@ -45,15 +46,15 @@ export async function GET(
         job.statementOfEnvironmentalEffects.size = job.completedDocument.size;
         job.statementOfEnvironmentalEffects.type = job.completedDocument.type;
         job.statementOfEnvironmentalEffects.status = 'completed';
-        console.log('SURFACED (direct):', job.statementOfEnvironmentalEffects);
+        // console.log('SURFACED (direct):', job.statementOfEnvironmentalEffects);
       }
     }
 
-    console.log('Job after surfacing:', job);
+    // console.log('Job after surfacing:', job);
 
     return NextResponse.json(job)
   } catch (error) {
-    console.error('Error getting job:', error)
+    // console.error('Error getting job:', error)
     return NextResponse.json({ error: 'Failed to get job' }, { status: 500 })
   }
 }

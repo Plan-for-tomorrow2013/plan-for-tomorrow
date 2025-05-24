@@ -123,7 +123,7 @@ export function DocumentTile({
                   <FileText className="h-4 w-4 mr-2" />Download
                 </Button>
               )}
-              {onDelete && (
+              {onDelete && doc.path !== '/pre-prepared-assessment' && (
                 <Button variant="destructive" size="icon" onClick={onDelete}>
                   <X className="h-4 w-4" />
                 </Button>

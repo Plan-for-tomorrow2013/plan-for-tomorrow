@@ -131,6 +131,7 @@ export interface DocumentRemove {
 export interface DocumentWithStatus extends Document {
   // Renamed 'status' to 'displayStatus' and added new states
   displayStatus: 'uploaded' | 'pending_user_upload' | 'pending_admin_delivery'
+  originalAssessmentId?: string; // Added to store the original assessment ID for pre-prepared items
   uploadedFile?: {
     fileName: string
     originalName: string

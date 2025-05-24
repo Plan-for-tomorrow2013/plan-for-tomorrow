@@ -130,7 +130,51 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             });
           }
         })
-        // --- End New Logic ---
+
+        // Add purchased pre-prepared assessments as documents
+        if (job.purchasedPrePreparedAssessments) {
+          Object.values(job.purchasedPrePreparedAssessments).forEach(assessment => {
+            if (assessment.file) {
+              // Infer file type from extension (default to PDF)
+              const ext = assessment.file.originalName.split('.').pop()?.toLowerCase();
+              let fileType = 'application/pdf';
+              if (ext === 'doc' || ext === 'docx') fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              if (ext === 'pdf') fileType = 'application/pdf';
+
+              const uploadedFile = {
+                fileName: assessment.file.originalName,
+                originalName: assessment.file.originalName,
+                type: fileType,
+                uploadedAt: assessment.purchaseDate || job.updatedAt || new Date().toISOString(),
+                size: 0 // Size unknown
+              };
+
+              const doc: DocumentWithStatus = {
+                id: assessment.file.id, // Use file.id for the document ID
+                originalAssessmentId: assessment.id, // Store the original assessment ID
+                title: assessment.title,
+                category: 'Assessment',
+                path: '/pre-prepared-assessment',
+                type: 'document',
+                versions: [],
+                currentVersion: 1,
+                createdAt: assessment.purchaseDate || job.createdAt || new Date().toISOString(),
+                updatedAt: assessment.purchaseDate || job.updatedAt || new Date().toISOString(),
+                isActive: true,
+                uploadedFile,
+                displayStatus: 'uploaded', // Will be refined below
+                description: assessment.content || '',
+              };
+
+              // Use the same display status logic as other documents
+              const finalDisplayStatus = getDocumentDisplayStatus(doc, job);
+              displayableDocuments.push({
+                ...doc,
+                displayStatus: finalDisplayStatus,
+              });
+            }
+          });
+        }
 
         console.log('Processed documents for display:', displayableDocuments)
 

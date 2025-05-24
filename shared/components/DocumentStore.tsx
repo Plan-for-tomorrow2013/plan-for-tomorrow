@@ -79,7 +79,7 @@ export function BaseDocumentStore({
                       Select
                     </Button>
                   )}
-                  {!isInProgress && (
+                  {!isInProgress && doc.path !== '/pre-prepared-assessment' && (
                     <Button
                       variant="ghost"
                       size="sm"

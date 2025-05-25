@@ -33,6 +33,7 @@ import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
+import { DetailedInitialAssessment, InitialAssessment } from '@shared/components/DetailedInitialAssessment'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -124,7 +125,7 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
     throw new Error(`Failed to fetch job details for ID ${jobId}. Status: ${response.status}`);
   }
   const data = await response.json();
-  return camelcaseKeys(data, { deep: true });
+  return data; // Removed camelcaseKeys to preserve original propertyData keys
 };
 
 // Define fetch function for pre-prepared assessments
@@ -178,9 +179,29 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
-  // console.log('[ReportWriter] documents from context:', documents);
   const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
   const [documentError, setDocumentError] = useState<string | null>(null)
+
+  // Add initialAssessment state with other state declarations
+  const [initialAssessment, setInitialAssessment] = useState<InitialAssessment>({
+    frontSetbackR: '',
+    frontSetbackP: '',
+    sideSetback1R: '',
+    sideSetback1P: '',
+    sideSetback2R: '',
+    sideSetback2P: '',
+    rearSetbackR: '',
+    rearSetbackP: '',
+    siteCoverageR: '',
+    siteCoverageP: '',
+    landscapeAreaR: '',
+    landscapeAreaP: ''
+  });
+
+  // Add handleInitialAssessmentChange with other handlers
+  const handleInitialAssessmentChange = (details: InitialAssessment) => {
+    setInitialAssessment(details);
+  };
 
   // Add transformUploadedDocuments function inside component
   const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
@@ -250,9 +271,30 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
   const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
   const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
+  const [isInitialAssessmentOpen, setIsInitialAssessmentOpen] = useState(false)
 
   // Add this after other state declarations
   const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
+
+  // First, add this state near your other state declarations
+  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+
+  // Helper to get/set overlay state per job in localStorage
+  const getOverlayStateForJob = (jobId: string) => {
+    if (!jobId) return true; // default to visible
+    const stored = localStorage.getItem(`soeOverlayVisible_${jobId}`);
+    return stored === null ? true : stored === "true";
+  };
+
+  const setOverlayStateForJob = (jobId: string, visible: boolean) => {
+    if (!jobId) return;
+    localStorage.setItem(`soeOverlayVisible_${jobId}`, visible ? "true" : "false");
+  };
+
+  // Sync overlay state with jobId and localStorage
+  useEffect(() => {
+    setIsOverlayVisible(getOverlayStateForJob(jobId));
+  }, [jobId]);
 
   // Add loadFormData function inside component
   const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => {
@@ -1358,6 +1400,7 @@ const renderRequiredDocuments = () => {
   const toggleDocuments = () => { setIsDocumentsOpen(prev => !prev); };
   const togglePropertyInfo = () => { setIsPropertyInfoOpen(prev => !prev); };
   const toggleSiteDetails = () => { setIsSiteDetailsOpen(prev => !prev); };
+  const toggleInitialAssessment = () => { setIsInitialAssessmentOpen(prev => !prev); };
 
   const isReadOnly = false;
 
@@ -1623,6 +1666,64 @@ const renderRequiredDocuments = () => {
                 {renderRequiredDocuments()} {/* Uses documents from useDocuments() */}
               </div>
             )}
+          </div>
+
+          {/* Initial Assessment Section */}
+          <div className="border rounded-lg p-4">
+            <button
+              onClick={toggleInitialAssessment}
+              className="flex items-center justify-between w-full"
+            >
+              <h2 className="text-xl font-semibold">Initial Assessment</h2>
+              {isInitialAssessmentOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            </button>
+            {isInitialAssessmentOpen && (
+              <div className="mt-4">
+                <DetailedInitialAssessment
+                  initialAssessment={initialAssessment}
+                  onInitialAssessmentChange={handleInitialAssessmentChange}
+                  readOnly={isReadOnly}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Statement of Environmental Effects Generator Section */}
+          <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
+            {/* The actual content that will be revealed */}
+            <div className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}>
+              <div className="space-y-4">
+                <p>This is the actual content that will be revealed!</p>
+                {/* Add your form elements, inputs, etc. here */}
+
+                {/* Show Overlay Again Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsOverlayVisible(true);
+                    setOverlayStateForJob(jobId, true);
+                  }}
+                >
+                  Show Overlay Again
+                </Button>
+              </div>
+            </div>
+
+            {/* The overlay that covers the content */}
+            <div
+              className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
+                ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              onClick={() => {
+                setIsOverlayVisible(false);
+                setOverlayStateForJob(jobId, false);
+              }}
+            >
+              <div className="flex flex-col items-center justify-center w-full p-8">
+                <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
+                <p>Statement of Environmental Effects Generator</p>
+                <p className="text-[#532200] text-sm mt-2">Click to preview</p>
+              </div>
+            </div>
           </div>
 
           {/* Pre-prepared Assessments Section */}

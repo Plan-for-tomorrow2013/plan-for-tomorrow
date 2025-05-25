@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/
 import { Badge } from "@shared/components/ui/badge";
 import { Skeleton } from "@shared/components/ui/skeleton";
 import { useQuery } from '@tanstack/react-query';
-import { Job } from '@/types/jobs';
+import { Job } from '@shared/types/jobs';
 
 interface PaginatedResponse {
   data: Job[];

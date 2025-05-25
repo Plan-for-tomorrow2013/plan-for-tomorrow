@@ -16,6 +16,11 @@ interface UserStatsProps {
   reportsWrittenDiff: number
   initialAssessments?: number
   initialAssessmentsDiff?: number
+  quotesSent?: number
+  quotesSentDiff?: number
+  underAssessment?: number
+  underAssessmentDiff?: number
+  completedJobsDiff?: number
 }
 
 interface StatCardProps {
@@ -24,9 +29,10 @@ interface StatCardProps {
   diff?: number
   icon: LucideIcon
   showDiff?: boolean
+  completionRate?: number
 }
 
-function StatCard({ title, value, diff, icon: Icon, showDiff = true }: StatCardProps) {
+function StatCard({ title, value, diff, icon: Icon, showDiff = true, completionRate }: StatCardProps) {
   return (
     <Card>
       <CardContent className="pt-6">
@@ -37,6 +43,11 @@ function StatCard({ title, value, diff, icon: Icon, showDiff = true }: StatCardP
             {showDiff && diff !== undefined && (
               <p className="text-xs text-muted-foreground">
                 {diff > 0 ? "+" : ""}{diff} from last month
+              </p>
+            )}
+            {completionRate !== undefined && (
+              <p className="text-xs text-muted-foreground">
+                Completion rate: {completionRate}%
               </p>
             )}
           </div>
@@ -56,7 +67,12 @@ export function UserStats({
   designChecksDiff,
   reportsWrittenDiff,
   initialAssessments,
-  initialAssessmentsDiff
+  initialAssessmentsDiff,
+  quotesSent,
+  quotesSentDiff,
+  underAssessment,
+  underAssessmentDiff,
+  completedJobsDiff
 }: UserStatsProps) {
   const totalJobs = role === 'admin'
     ? (initialAssessments || 0) + designChecks + reportsWritten
@@ -67,39 +83,45 @@ export function UserStats({
       <h1 className="text-2xl font-bold flex items-center gap-2">
         Welcome, {username}
       </h1>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
-        {role === 'admin' && initialAssessments !== undefined && (
-          <StatCard
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+        <StatCard
             title="Initial Assessments"
-            value={initialAssessments}
+            value={initialAssessments || 0}
             diff={initialAssessmentsDiff}
             icon={ClipboardCheck}
           />
-        )}
         <StatCard
           title="Design Checks"
-          value={designChecks}
+          value={designChecks || 0}
           diff={designChecksDiff}
           icon={FileCheck}
         />
         <StatCard
           title="Reports Written"
-          value={reportsWritten}
+          value={reportsWritten || 0}
           diff={reportsWrittenDiff}
           icon={FileSpreadsheet}
         />
         <StatCard
-          title="Completed Jobs"
-          value={completedJobs}
+          title="Quotes Sent"
+          value={quotesSent || 0}
+          diff={quotesSentDiff}
           icon={CheckCircle}
-          showDiff={false}
+        />
+        <StatCard
+          title="Under Assessment"
+          value={underAssessment || 0}
+          diff={underAssessmentDiff}
+          icon={CheckCircle}
+        />
+        <StatCard
+          title="Completed Jobs"
+          value={completedJobs || 0}
+          diff={completedJobsDiff}
+          icon={CheckCircle}
+          completionRate={totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : undefined}
         />
       </div>
-      {totalJobs > 0 && (
-        <p className="text-sm text-muted-foreground">
-          Completion rate: {Math.round((completedJobs / totalJobs) * 100)}%
-        </p>
-      )}
     </div>
   )
 }

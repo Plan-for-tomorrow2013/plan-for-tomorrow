@@ -55,6 +55,7 @@ export async function POST(request: Request) {
     const content = formData.get('content') as string;
     const author = formData.get('author') as string; // Assuming author comes from session or elsewhere
     const file = formData.get('file') as File | null;
+    const lepName = formData.get('lepName') as string | null;
 
     if (!sectionTitle || !title || !content) {
       return NextResponse.json(
@@ -88,6 +89,7 @@ export async function POST(request: Request) {
       content,
       author: author || "Admin User", // Use provided author or default
       date: new Date().toISOString(),
+      lepName: lepName || '', // Add lepName to the assessment
       file: file ? {
         id: uuidv4(), // Generate a unique ID for the file
         originalName: file.name,

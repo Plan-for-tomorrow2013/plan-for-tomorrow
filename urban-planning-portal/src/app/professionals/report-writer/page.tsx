@@ -34,6 +34,7 @@ import camelcaseKeys from 'camelcase-keys'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
 import { DetailedInitialAssessment, InitialAssessment } from '@shared/components/DetailedInitialAssessment'
+import { LEPFilter } from '@shared/components/LEPFilter'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -90,6 +91,7 @@ interface PrePreparedAssessment {
   };
   purchaseDate?: string;
   isPurchased?: boolean;
+  lepName?: string;
 }
 
 interface ReportSectionProps {
@@ -395,6 +397,25 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   });
   // --- End React Query ---
 
+  const [currentLEP, setCurrentLEP] = useState<string | null>(null);
+
+  // Add LEP change handler
+  const handleLEPChange = (lepName: string | null) => {
+    setCurrentLEP(lepName);
+  };
+
+  // Filter pre-prepared assessments based on LEP
+  const filteredAssessments = React.useMemo(() => {
+    if (!prePreparedAssessmentsData) return [];
+
+    return prePreparedAssessmentsData.map(section => ({
+      ...section,
+      assessments: section.assessments.filter(assessment =>
+        !assessment.lepName || // Include assessments without LEP
+        assessment.lepName === currentLEP // Include assessments matching current LEP
+      )
+    })).filter(section => section.assessments.length > 0); // Remove empty sections
+  }, [prePreparedAssessmentsData, currentLEP]);
 
   // Effect to update local component state based on fetched job data
   useEffect(() => {
@@ -908,48 +929,10 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   // Update the renderPrePreparedAssessmentCard function
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
     // Check if assessment is in purchasedPrePreparedAssessments
-    const purchasedMap = currentJob?.purchasedPrePreparedAssessments;
-    const keysInPurchasedMap = purchasedMap ? Object.keys(purchasedMap) : [];
-    const originalIdToCheck = assessment.id; // Keep original for logging
+    const purchasedAssessments = currentJob?.purchasedPrePreparedAssessments || {};
 
-    // Normalize idToCheck: remove hyphens AND convert to lowercase
-    const finalIdToCompare = originalIdToCheck
-      ? originalIdToCheck.replace(/-/g, '').toLowerCase()
-      : '';
-
-    let isPurchased = false;
-    if (purchasedMap && finalIdToCompare) {
-      for (const key of keysInPurchasedMap) {
-        // Normalize key from map: convert to lowercase (it's already hyphen-less due to camelcaseKeys)
-        const normalizedKeyFromMap = key.toLowerCase();
-
-        // Detailed log for each comparison
-        // console.log(
-        //   `[ReportWriter ID CHECK] Comparing:`,
-        //   {
-        //     normalizedKeyFromMap: `"${normalizedKeyFromMap}" (len: ${normalizedKeyFromMap.length})`,
-        //     finalIdToCompare: `"${finalIdToCompare}" (len: ${finalIdToCompare.length})`,
-        //     areEqual: normalizedKeyFromMap === finalIdToCompare
-        //   }
-        // );
-        if (normalizedKeyFromMap === finalIdToCompare) {
-          isPurchased = true;
-          break;
-        }
-      }
-    }
-
-    // console.log(
-    //   `[ReportWriter renderPrePreparedAssessmentCard for "${assessment.title}"] FINAL`,
-    //   {
-    //     idBeingChecked: originalIdToCheck,
-    //     normalizedIdForCheck: finalIdToCompare, // Log the fully normalized ID used for comparison
-    //     purchasedMapExists: !!purchasedMap,
-    //     keysInMap: keysInPurchasedMap, // Original keys from map (hyphen-less, mixed case)
-    //     isPurchasedOutcome: isPurchased,
-    //     fullPurchasedMap: purchasedMap // Log the full map for inspection
-    //   }
-    // );
+    // Check if this assessment is in the purchased list
+    const isPurchased = assessment.id in purchasedAssessments;
 
     if (isPurchased) {
       return (
@@ -958,7 +941,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h4 className="font-medium mb-2">Report Complete</h4>
             <p className="text-sm text-gray-600 mb-4">
-              Your assessment "{assessment.title}" is available for download in the Documents section above.
+              Your report is available for download in the Documents section above.
             </p>
           </div>
         </div>
@@ -1412,7 +1395,7 @@ const renderRequiredDocuments = () => {
       }
 
       // Find the assessment details from the loaded data
-      const assessment = prePreparedAssessmentsData
+      const assessment = filteredAssessments
         .flatMap(section => section.assessments)
         .find(a => a.id === assessmentId);
 
@@ -1726,17 +1709,32 @@ const renderRequiredDocuments = () => {
             </div>
           </div>
 
+          {/* LEP Filter Section */}
+          {currentJob?.propertyData && (
+            <LEPFilter
+              propertyData={currentJob.propertyData}
+              onLEPChange={handleLEPChange}
+            />
+          )}
+
           {/* Pre-prepared Assessments Section */}
           <div className="border rounded-lg p-4">
             <h2 className="text-xl font-semibold mb-4">Pre-prepared Assessments</h2>
             {isPrePreparedLoading ? (
               <div>Loading assessments...</div>
             ) : (
-              prePreparedAssessmentsData.map((section) => (
+              filteredAssessments.map((section) => (
                 <div key={section.title} className="space-y-4 mb-6">
                   <h3 className="text-lg font-medium">{section.title}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {section.assessments.map((assessment) => renderPrePreparedAssessmentCard(assessment))}
+                    {section.assessments.map((assessment) => {
+                      console.log('Assessment:', {
+                        id: assessment.id,
+                        purchasedAssessments,
+                        isPurchased: assessment.isPurchased
+                      });
+                      return renderPrePreparedAssessmentCard(assessment);
+                    })}
                   </div>
                 </div>
               ))
@@ -1836,7 +1834,7 @@ export default function ReportWriterPage() {
         </DocumentProvider>
       ) : (
         <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to view the report writer details and manage documents.</p>
+          <p>Please select a job from the dropdown above to access Report Writer.</p>
         </div>
       )}
     </div>

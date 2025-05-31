@@ -20,6 +20,7 @@ interface PrePreparedAssessments {
     originalName: string
     id: string
   }
+  lepName?: string
 }
 
 export default function PrePreparedAssessmentsPage() {
@@ -34,6 +35,7 @@ export default function PrePreparedAssessmentsPage() {
     author: '',
     file: null as File | null,
     fileName: '',
+    lepName: '',
   })
   useEffect(() => {
     fetchPrePreparedAssessments()
@@ -86,6 +88,7 @@ export default function PrePreparedAssessmentsPage() {
     formDataToSubmit.append('title', formData.title);
     formDataToSubmit.append('content', formData.content);
     formDataToSubmit.append('author', formData.author);
+    formDataToSubmit.append('lepName', formData.lepName);
     if (formData.file) {
       formDataToSubmit.append('file', formData.file);
     }
@@ -116,7 +119,7 @@ export default function PrePreparedAssessmentsPage() {
         return updatedSections;
       });
 
-      setFormData({ section: '', title: '', content: '', author: '', file: null, fileName: '' });
+      setFormData({ section: '', title: '', content: '', author: '', file: null, fileName: '', lepName: '' });
       toast({ title: "Success", description: "Pre-Prepared Assessments created successfully" });
     } catch (error) {
       console.error('Error:', error);
@@ -297,6 +300,17 @@ export default function PrePreparedAssessmentsPage() {
                   required
                   className="min-h-[100px]"
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">LEP Name (Optional)</label>
+                <Input
+                  value={formData.lepName}
+                  onChange={e => setFormData(prev => ({ ...prev, lepName: e.target.value }))}
+                  placeholder="e.g. Wollondilly Local Environmental Plan 2011"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Leave empty for sections that apply to all LEPs
+                </p>
               </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">Upload Document</label>

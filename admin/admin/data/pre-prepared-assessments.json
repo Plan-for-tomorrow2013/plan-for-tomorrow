@@ -26,6 +26,18 @@
           "originalName": "Quote QU1055.pdf",
           "savedPath": "/documents/pre-prepared/Quote QU1055.pdf"
         }
+      },
+      {
+        "id": "c031c732-372b-45fe-9b7a-37a39d41260b",
+        "title": "Check LEP",
+        "content": "Check LEP",
+        "author": "Admin User",
+        "date": "2025-05-25T22:05:56.602Z",
+        "file": {
+          "id": "aad14cf7-bc1c-4f47-b26a-a4960c4cdf5e",
+          "originalName": "10.7 Certificate Check.pdf",
+          "savedPath": "/documents/pre-prepared/10.7 Certificate Check.pdf"
+        }
       }
     ]
   },
@@ -67,6 +79,25 @@
           "id": "833454c6-6c73-47f6-a13c-f0ee31fc1d72",
           "originalName": "Certificate of Title.pdf",
           "savedPath": "/documents/pre-prepared/Certificate of Title.pdf"
+        }
+      }
+    ]
+  },
+  {
+    "id": "e8dd27e8-c136-4ee0-91e6-824e019c0c90",
+    "title": "TEST LEP",
+    "assessments": [
+      {
+        "id": "aeba2244-1b70-4038-8458-e0ee17d986d7",
+        "title": "TEST LEP",
+        "content": "TEST LEP",
+        "author": "Admin User",
+        "date": "2025-05-25T23:13:00.061Z",
+        "lepName": "Cumberland Local Environmental Plan 2021",
+        "file": {
+          "id": "e3a69109-5719-4d14-ac65-911953c9e45e",
+          "originalName": "statementOfEnvironmentalEffects.pdf",
+          "savedPath": "/documents/pre-prepared/statementOfEnvironmentalEffects.pdf"
         }
       }
     ]

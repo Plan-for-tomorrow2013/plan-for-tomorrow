@@ -4,30 +4,6 @@
     "title": "TEST SECTION",
     "assessments": [
       {
-        "id": "ba31e83a-8885-4999-9b4a-81c01da86d7d",
-        "title": "TEST TITLE",
-        "content": "TEST CONTENT",
-        "author": "Admin User",
-        "date": "2025-05-02T23:11:27.286Z",
-        "file": {
-          "id": "c91ac710-32e1-43fe-85ca-3509825f0eae",
-          "originalName": "Initial Assessment Check.pdf",
-          "savedPath": "/documents/pre-prepared/Initial Assessment Check.pdf"
-        }
-      },
-      {
-        "id": "ed2793aa-4a2d-41f2-989a-5c2a888dacf1",
-        "title": "Extra assessment",
-        "content": "testing dowload",
-        "author": "Admin User",
-        "date": "2025-05-24T00:25:20.312Z",
-        "file": {
-          "id": "0392224b-f7a1-4a02-8878-fabb149b0250",
-          "originalName": "Quote QU1055.pdf",
-          "savedPath": "/documents/pre-prepared/Quote QU1055.pdf"
-        }
-      },
-      {
         "id": "c031c732-372b-45fe-9b7a-37a39d41260b",
         "title": "Check LEP",
         "content": "Check LEP",
@@ -37,48 +13,6 @@
           "id": "aad14cf7-bc1c-4f47-b26a-a4960c4cdf5e",
           "originalName": "10.7 Certificate Check.pdf",
           "savedPath": "/documents/pre-prepared/10.7 Certificate Check.pdf"
-        }
-      }
-    ]
-  },
-  {
-    "id": "8d4be5b8-8e13-4cbe-87dd-0e5629bf7d17",
-    "title": "TEST REFACTOR",
-    "assessments": [
-      {
-        "id": "e9f8d246-056a-492b-ba13-586fb276e5fb",
-        "title": "TEST REFACTOR",
-        "content": "TEST REFACTOR",
-        "author": "Admin User",
-        "date": "2025-05-13T00:22:48.104Z",
-        "file": {
-          "id": "35351f5f-e0f9-46e4-9e89-86155c198ab0",
-          "originalName": "Certificate of Title.pdf",
-          "savedPath": "/documents/pre-prepared/Certificate of Title.pdf"
-        }
-      },
-      {
-        "id": "6710777d-ae5d-4fcd-85a6-b6911ee9cd09",
-        "title": "test payment",
-        "content": "test payment",
-        "author": "Admin User",
-        "date": "2025-05-24T02:40:56.980Z",
-        "file": {
-          "id": "226deb33-f713-49a4-99bb-00a64e5d7417",
-          "originalName": "Initial Assessment Check.pdf",
-          "savedPath": "/documents/pre-prepared/Initial Assessment Check.pdf"
-        }
-      },
-      {
-        "id": "c709bdbb-e092-4171-8bdb-efc7ebe157f5",
-        "title": "PURCHASE TEST",
-        "content": "PURCHASE TEST",
-        "author": "Admin User",
-        "date": "2025-05-24T03:34:18.450Z",
-        "file": {
-          "id": "833454c6-6c73-47f6-a13c-f0ee31fc1d72",
-          "originalName": "Certificate of Title.pdf",
-          "savedPath": "/documents/pre-prepared/Certificate of Title.pdf"
         }
       }
     ]
@@ -98,6 +32,83 @@
           "id": "e3a69109-5719-4d14-ac65-911953c9e45e",
           "originalName": "statementOfEnvironmentalEffects.pdf",
           "savedPath": "/documents/pre-prepared/statementOfEnvironmentalEffects.pdf"
+        }
+      }
+    ]
+  },
+  {
+    "id": "7c3bfadd-bd58-4c2d-91b2-d64b29f2e82b",
+    "title": "TEST REFACTOR ASSESSMENT CARD",
+    "assessments": [
+      {
+        "id": "84ef44a4-1c7f-4f09-a0be-c43178c3cc57",
+        "title": "server-side API route",
+        "content": "server-side API route",
+        "author": "Admin User",
+        "date": "2025-05-31T07:11:57.261Z",
+        "lepName": "",
+        "file": {
+          "id": "52ecdac6-3382-400b-b14f-f9e4ae649058",
+          "originalName": "Invoice INV-2203 (1).pdf",
+          "savedPath": "/documents/pre-prepared/Invoice INV-2203 (1).pdf"
+        }
+      },
+      {
+        "id": "410175e8-46f3-48f8-9389-a0f8c2ef6be5",
+        "title": "new AssessmentContext",
+        "content": "new AssessmentContext",
+        "author": "Admin User",
+        "date": "2025-05-31T07:14:41.235Z",
+        "lepName": "",
+        "file": {
+          "id": "e0f5e873-3b69-4d82-8943-ffc4e23462fb",
+          "originalName": "Invoice INV-2203.pdf",
+          "savedPath": "/documents/pre-prepared/Invoice INV-2203.pdf"
+        }
+      },
+      {
+        "id": "e4662272-2417-4843-876a-05564cfc2067",
+        "title": "Updated the assessment store",
+        "content": "Updated the assessment store",
+        "author": "Admin User",
+        "date": "2025-05-31T07:18:21.377Z",
+        "lepName": "",
+        "file": {
+          "id": "b632f5b9-3b11-4c35-a971-0493854cf93d",
+          "originalName": "Invoice INV-2203 (1).pdf",
+          "savedPath": "/documents/pre-prepared/Invoice INV-2203 (1).pdf"
+        }
+      },
+      {
+        "id": "99cdb5b9-1249-4237-9029-85ed43d9acc9",
+        "title": "Created a centralized AssessmentService",
+        "content": "Created a centralized AssessmentService",
+        "author": "Admin User",
+        "date": "2025-05-31T07:20:32.890Z",
+        "lepName": "",
+        "file": {
+          "id": "715ce7d6-2aa9-4421-844d-4e1ae55b0a63",
+          "originalName": "Invoice INV-2203.pdf",
+          "savedPath": "/documents/pre-prepared/Invoice INV-2203.pdf"
+        }
+      }
+    ]
+  },
+  {
+    "id": "9d7e818f-60a7-4d8d-b768-53f490d338a1",
+    "title": "Iinitial assessment test",
+    "assessments": [
+      {
+        "id": "ba0b8f67-8318-43bb-ad8e-0f0f97ee8fa2",
+        "title": "initial assessment test",
+        "content": "initial assessment test",
+        "author": "Admin User",
+        "date": "2025-06-01T05:41:42.398Z",
+        "lepName": "Cumberland Local Environmental Plan 2021",
+        "file": {
+          "id": "0f4a267c-d487-4075-bf5b-5de2c7c40aa2",
+          "originalName": "Initial Assessment Check.pdf",
+          "savedPath": "/documents/pre-prepared/Initial Assessment Check.pdf"
         }
       }
     ]

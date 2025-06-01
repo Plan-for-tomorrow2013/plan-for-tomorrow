@@ -356,7 +356,7 @@ export default function PrePreparedAssessmentsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {Array.isArray(section.assessments) && section.assessments.map(assessment => (
-                    <div key={assessment.id} className="bg-white p-4 rounded-lg shadow"> {/* Adjusted padding and shadow */}
+                    <div key={assessment.id} className="bg-white p-4 rounded-lg outline outline-1 outline-gray-200"> {/* Adjusted padding and shadow */}
                       <h4 className="text-lg font-semibold mb-2">{assessment.title}</h4>
                       <p className="text-sm text-gray-600">{assessment.content}</p>
                       <p className="text-sm text-gray-500">{new Date(assessment.date).toLocaleDateString()}</p>

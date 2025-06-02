@@ -47,6 +47,7 @@ export interface Job {
   statementOfEnvironmentalEffects?: Assessment;
   complyingDevelopmentCertificate?: Assessment;
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
+  purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   documents?: {
     [key: string]: {
       fileName: string;

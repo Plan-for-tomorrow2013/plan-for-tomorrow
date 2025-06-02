@@ -44,6 +44,15 @@ export async function DELETE(
           }
         })
       }
+      // Also clean up from purchasedPrePreparedInitialAssessments
+      if (job.purchasedPrePreparedInitialAssessments) {
+        const assessments = job.purchasedPrePreparedInitialAssessments
+        Object.entries(assessments).forEach(([key, assessment]) => {
+          if ((assessment as PurchasedPrePreparedAssessments).file?.id === params.documentId) {
+            delete assessments[key].file
+          }
+        })
+      }
 
       await saveJob(params.jobId, job)
     }

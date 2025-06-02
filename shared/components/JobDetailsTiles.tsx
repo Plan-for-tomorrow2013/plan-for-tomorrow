@@ -4,7 +4,7 @@ import React from "react"
 import { ClipboardCheck, FileText, BarChart3, DollarSign, CheckCircle, LucideIcon } from "lucide-react"
 import { cn } from "@shared/lib/utils"
 
-export type JobStage = "pre-prepared-assessments" | "design-check" | "report-writer" | "quotes" | "complete"
+export type JobStage = "initial-assessment" | "design-check" | "report-writer" | "quotes" | "complete"
 export type StageStatus = 'completed' | 'pending'
 
 interface JobDetailsTilesProps {
@@ -38,10 +38,10 @@ export function JobDetailsTiles({
 }: JobDetailsTilesProps) {
   const stages: { id: JobStage; label: string; icon: LucideIcon; href: string; status: StageStatus }[] = [
     ...(showPrePreparedAssessments ? [{
-      id: "pre-prepared-assessments" as JobStage,
-      label: "Pre-prepared Assessments",
+      id: "initial-assessment" as JobStage,
+      label: "Initial Assessment",
       icon: ClipboardCheck,
-      href: "/pre-prepared-assessments",
+      href: "/initial-assessment",
       status: customAssessment?.status === 'completed' ? 'completed' as StageStatus : 'pending' as StageStatus
     }] : []),
     {
@@ -125,6 +125,7 @@ export function JobDetailsTiles({
 }
 
 export const jobStages: { id: JobStage; label: string; icon: LucideIcon; href: string }[] = [
+  { id: "initial-assessment" as JobStage, label: "Initial Assessment", icon: ClipboardCheck, href: "/initial-assessment" },
   { id: "design-check" as JobStage, label: "Design Check", icon: BarChart3, href: "/design-check" },
   { id: "report-writer" as JobStage, label: "Report Writer", icon: FileText, href: "/report-writer" },
   { id: "quotes" as JobStage, label: "Quotes", icon: DollarSign, href: "/quotes" }

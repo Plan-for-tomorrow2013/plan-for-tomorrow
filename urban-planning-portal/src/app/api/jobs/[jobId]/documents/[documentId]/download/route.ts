@@ -46,7 +46,7 @@ export async function GET(
         type = assessment.completedDocument.type || 'application/pdf'
         console.log('[DOWNLOAD API] Found completedDocument:', assessment.completedDocument)
       } else {
-        // --- New logic: check purchasedPrePreparedAssessments ---
+        // --- Check purchasedPrePreparedAssessments (regular) ---
         if (job.purchasedPrePreparedAssessments) {
           const found = Object.values(job.purchasedPrePreparedAssessments).find(
             (a) => a.file && a.file.id === params.documentId
@@ -54,18 +54,16 @@ export async function GET(
           if (found && found.file) {
             fileName = found.file.id;
             originalName = found.file.originalName;
-            // Infer type from extension
             const ext = originalName.split('.').pop()?.toLowerCase();
             if (ext === 'doc' || ext === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
             else type = 'application/pdf';
-            // Serve from pre-prepared directory
             const prePreparedPath = join('/home/tania/urban-planning-professionals-portal/urban-planning-portal/public/documents/pre-prepared', originalName);
             try {
               const fileBuffer = await readFile(prePreparedPath);
               return new NextResponse(fileBuffer, {
                 headers: {
                   'Content-Type': type,
-                  'Content-Disposition': `attachment; filename="${originalName}"`,
+                  'Content-Disposition': `attachment; filename=\"${originalName}\"`,
                 },
               });
             } catch (fileError) {
@@ -77,7 +75,36 @@ export async function GET(
             }
           }
         }
-        // --- End new logic ---
+        // --- Check purchasedPrePreparedInitialAssessments (initial) ---
+        if (job.purchasedPrePreparedInitialAssessments) {
+          const found = Object.values(job.purchasedPrePreparedInitialAssessments).find(
+            (a) => a.file && a.file.id === params.documentId
+          );
+          if (found && found.file) {
+            fileName = found.file.id;
+            originalName = found.file.originalName;
+            const ext = originalName.split('.').pop()?.toLowerCase();
+            if (ext === 'doc' || ext === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            else type = 'application/pdf';
+            // Use a separate directory if you store initial files elsewhere, or reuse the same as regular
+            const prePreparedPath = join('/home/tania/urban-planning-professionals-portal/urban-planning-portal/public/documents/pre-prepared', originalName);
+            try {
+              const fileBuffer = await readFile(prePreparedPath);
+              return new NextResponse(fileBuffer, {
+                headers: {
+                  'Content-Type': type,
+                  'Content-Disposition': `attachment; filename=\"${originalName}\"`,
+                },
+              });
+            } catch (fileError) {
+              console.error('[DOWNLOAD API] Error reading pre-prepared initial file:', prePreparedPath, fileError);
+              return NextResponse.json(
+                { error: 'Failed to read pre-prepared initial file' },
+                { status: 500 }
+              );
+            }
+          }
+        }
       }
     } else {
       fileName = document.fileName

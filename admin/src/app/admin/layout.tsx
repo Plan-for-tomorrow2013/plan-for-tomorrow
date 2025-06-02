@@ -47,10 +47,13 @@ export default function RootLayout({
                   <Link href="/admin/dashboard">Dashboard</Link>
                 </li>
                 <li>
-                  <Link href="/admin/pre-prepared-assessments">Pre-prepared Assessments</Link>
+                  <Link href="/admin/pre-prepared-assessments">Pre-prepared Report Writer Assessments</Link>
                 </li>
                 <li>
                   <Link href="/admin/report-writer">Report Writer</Link>
+                </li>
+                <li>
+                  <Link href="/admin/initial-assessment">Initial Assessment</Link>
                 </li>
                 <li>
                   <Link href="/admin/knowledge-base">Knowledge Base</Link>

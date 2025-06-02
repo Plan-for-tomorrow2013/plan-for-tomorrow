@@ -125,17 +125,16 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
 
 // Define fetch function for pre-prepared assessments
 const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSection[]> => {
-    const response = await fetch('/api/pre-prepared-assessments');
+    const response = await fetch('/api/pre-prepared-initial-assessments');
     if (!response.ok) {
         const errorBody = await response.text();
-        console.error("Failed to fetch pre-prepared assessments:", response.status, errorBody);
-        throw new Error(`Failed to fetch pre-prepared assessments. Status: ${response.status}`);
+        console.error("Failed to fetch pre-prepared initial assessments:", response.status, errorBody);
+        throw new Error(`Failed to fetch pre-prepared initial assessments. Status: ${response.status}`);
     }
     const data = await response.json();
-    // Add validation if necessary
     if (!Array.isArray(data)) {
-        console.error("Invalid pre-prepared assessments data received:", data);
-        throw new Error('Invalid pre-prepared assessments data received');
+        console.error("Invalid pre-prepared initial assessments data received:", data);
+        throw new Error('Invalid pre-prepared initial assessments data received');
     }
     return camelcaseKeys(data, { deep: true });
 };
@@ -390,9 +389,9 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       }))
 
       // Update purchased assessments state from fetched job data
-      if (currentJob.purchasedPrePreparedAssessments) {
+      if (currentJob.purchasedPrePreparedInitialAssessments) {
         setPurchasedAssessments(
-          Object.keys(currentJob.purchasedPrePreparedAssessments).reduce(
+          Object.keys(currentJob.purchasedPrePreparedInitialAssessments).reduce(
             (acc, assessmentId) => ({ ...acc, [assessmentId]: true }),
             {}
           )
@@ -749,11 +748,12 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
   }
 
 
-  // --- Mutation for Purchasing Pre-prepared Assessments ---
-  const purchasePrePreparedMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
-    mutationFn: async ({ assessment }) => { // Use jobId prop inside
-      if (!jobId) throw new Error("No job selected"); // *** Use jobId prop ***
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, { // *** Use jobId prop ***
+  // --- Mutation for Purchasing Pre-prepared Initial Assessments ---
+  const purchasePrePreparedInitialMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
+    mutationFn: async ({ assessment }) => {
+      if (!jobId) throw new Error("No job selected");
+      // 1. Call the purchase endpoint
+      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-initial-assessments/purchase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -763,7 +763,8 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             title: assessment.title,
             content: assessment.content,
             author: assessment.author,
-            file: assessment.file
+            file: assessment.file,
+            date: assessment.date,
           }
         }),
       });
@@ -771,21 +772,34 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to purchase assessment');
       }
-      return response.json();
+      // 2. PATCH the job to add to purchasedPrePreparedInitialAssessments
+      const purchased = await response.json();
+      const patchRes = await fetch(`/api/jobs/${jobId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          purchasedPrePreparedInitialAssessments: {
+            [assessment.id]: {
+              ...assessment,
+              purchaseDate: new Date().toISOString(),
+              status: 'paid',
+            }
+          }
+        }),
+      });
+      if (!patchRes.ok) {
+        throw new Error('Failed to update job with purchased assessment');
+      }
+      return purchased;
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Use jobId prop
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [variables.assessment.id]: true
-      }));
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       toast({
         title: "Success",
         description: "Assessment purchased successfully.",
       });
     },
     onError: (error) => {
-      console.error('Error purchasing pre-prepared assessments:', error);
       toast({
         title: "Purchase Error",
         description: `Failed to purchase assessment: ${error.message}`,
@@ -794,63 +808,11 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     },
   });
 
-  // Handle pre-prepared assessments purchase and download
-  const handlePrePreparedAssessments = async (assessment: PrePreparedAssessment) => {
-    try {
-      // Fetch job details using jobId prop
-      const jobResponse = await fetch(`/api/jobs/${jobId}`); // *** Use jobId prop ***
-      if (!jobResponse.ok) {
-        throw new Error('Failed to fetch job details');
-      }
-      const jobData = await jobResponse.json();
-
-      // Check if assessment is already purchased
-      const isPurchased = jobData.purchasedPrePreparedAssessments?.some(
-        (purchased: { id: string }) => purchased.id === assessment.id
-      );
-
-      if (!isPurchased) {
-        // Handle payment through Stripe
-        const response = await fetch('/api/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jobId: jobId, // Use jobId prop
-            assessmentId: assessment.id,
-            type: 'pre-prepared-assessment',
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create checkout session');
-        }
-
-        const { url } = await response.json();
-        window.location.href = url;
-      } else {
-        // Download the assessment
-        if (assessment.file) {
-          window.open(`/api/documents/${assessment.file.id}/download`, '_blank');
-        }
-      }
-    } catch (error) {
-      console.error('Error handling pre-prepared assessments:', error);
-      toast({
-        title: "Error",
-        description: "Failed to process assessment. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Update the renderPrePreparedAssessmentCard function
+  // --- Tile rendering logic ---
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
-    // Check if assessment is in purchasedPrePreparedAssessments
-    const purchasedAssessments = currentJob?.purchasedPrePreparedAssessments || {};
+    // Use the correct property for initial assessments!
+    const purchasedAssessments = currentJob?.purchasedPrePreparedInitialAssessments || {};
 
-    // Check if this assessment is in the purchased list
     const isPurchased = assessment.id in purchasedAssessments;
 
     if (isPurchased) {
@@ -889,14 +851,28 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
               variant="default"
               className="w-full bg-green-600 hover:bg-green-700"
               onClick={() => handleAssessmentPurchase(assessment.id)}
+              disabled={purchasePrePreparedInitialMutation.isPending}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
-              Purchase Assessment
+              {purchasePrePreparedInitialMutation.isPending ? "Processing..." : "Purchase Assessment"}
             </Button>
           </div>
         </CardContent>
       </Card>
     );
+  };
+
+  // --- Handler for purchase button ---
+  const handleAssessmentPurchase = async (assessmentId: string): Promise<void> => {
+    const assessment = filteredAssessments
+      .flatMap(section => section.assessments)
+      .find(a => a.id === assessmentId);
+
+    if (!assessment) {
+      toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
+      return;
+    }
+    purchasePrePreparedInitialMutation.mutate({ assessment });
   };
 
   // --- Mutation for Uploading Document ---
@@ -1288,184 +1264,6 @@ const renderRequiredDocuments = () => {
   const toggleInitialAssessment = () => { setIsInitialAssessmentOpen(prev => !prev); };
 
   const isReadOnly = false;
-
-  const handleAssessmentPurchase = async (assessmentId: string): Promise<void> => {
-    try {
-      if (!jobId) {
-        toast({ title: "Error", description: "No job selected", variant: "destructive" });
-        return;
-      }
-
-      // Find the assessment details from the loaded data
-      const assessment = filteredAssessments
-        .flatMap(section => section.assessments)
-        .find(a => a.id === assessmentId);
-
-      if (!assessment) {
-        toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
-        return;
-      }
-
-      // Directly call the purchase endpoint
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assessment }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to purchase assessment');
-      }
-
-      // Update local state/UI
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [assessmentId]: true
-      }));
-
-      toast({
-        title: "Success",
-        description: "Assessment purchased successfully.",
-      });
-
-      // Refetch job data to force UI update
-      await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-      await refetchJob();
-
-    } catch (error) {
-      console.error('Error purchasing assessment:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to purchase assessment",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Corrected: Change parameter type to PrePreparedAssessment
-  const handleAssessmentDownload = async (assessment: PrePreparedAssessment) => {
-    try {
-      if (!assessment.file) {
-        throw new Error('No file available for download');
-      }
-      const response = await fetch(`/api/pre-prepared-assessments/${assessment.file.id}/download`);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = assessment.file.originalName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error downloading assessment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to download assessment",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Update the document creation to use the correct properties
-  const createDocumentFromAssessment = (assessment: PurchasedPrePreparedAssessments): DocumentWithStatus => ({
-    id: assessment.id,
-    title: assessment.title,
-    category: 'Pre-prepared Assessments',
-    description: assessment.content,
-    path: '/document-store',
-    type: 'document',
-    versions: [],
-    currentVersion: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    // Corrected: Use displayStatus
-    displayStatus: 'uploaded',
-    uploadedFile: assessment.file ? {
-      fileName: assessment.file.id,
-      originalName: assessment.file.originalName,
-      type: 'application/pdf',
-      uploadedAt: new Date().toISOString(),
-      size: 0
-    } : undefined
-  });
-
-  // Add this after other useEffect hooks
-  useEffect(() => {
-    const handlePaymentSuccess = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const paymentSuccess = params.get('payment_success');
-      const assessmentId = params.get('assessment_id');
-
-      if (paymentSuccess === 'true' && assessmentId && jobId) {
-        try {
-          // Get the assessment details first
-          const assessmentResponse = await fetch(`/api/pre-prepared-assessments/${assessmentId}`);
-          if (!assessmentResponse.ok) {
-            throw new Error('Failed to fetch assessment details');
-          }
-          const assessment = await assessmentResponse.json();
-
-          // Update job with purchased assessment
-          const response = await fetch(`/api/jobs/${jobId}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              purchasedPrePreparedAssessments: {
-                [assessmentId]: {
-                  id: assessment.id,
-                  purchaseDate: new Date().toISOString(),
-                  title: assessment.title,
-                  content: assessment.content,
-                  file: assessment.file
-                }
-              }
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to update job with purchased assessment');
-          }
-
-          // Update local state
-          setPurchasedAssessments(prev => ({
-            ...prev,
-            [assessmentId]: true
-          }));
-
-          // Invalidate queries to refresh data
-          queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-          queryClient.invalidateQueries({ queryKey: ['prePreparedAssessments'] });
-
-          // Remove payment success params from URL
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete('payment_success');
-          newUrl.searchParams.delete('assessment_id');
-          window.history.replaceState({}, '', newUrl.toString());
-
-          toast({
-            title: "Success",
-            description: "Assessment purchased successfully",
-          });
-        } catch (error) {
-          console.error('Error updating purchased assessment:', error);
-          toast({
-            title: "Error",
-            description: "Failed to update purchased assessment",
-            variant: "destructive"
-          });
-        }
-      }
-    };
-
-    if (jobId) {
-      handlePaymentSuccess();
-    }
-  }, [jobId, queryClient]); // Added queryClient to dependencies
 
   // --- Main Render Logic for JobReportWriter ---
   const isLoading = isDocsLoading || isJobLoading; // Combined loading state

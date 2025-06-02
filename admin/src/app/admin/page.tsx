@@ -32,12 +32,22 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Pre-prepared Assessments</h2>
+          <h2 className="text-lg font-semibold mb-2">Pre-prepared Report Writer Assessments</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Review and manage pre-prepared assessments from users.
+            Review and manage pre-prepared report writer assessments from users.
           </p>
           <Link href="/admin/pre-prepared-assessments" className="text-sm text-blue-500 hover:text-blue-700">
-            Go to Pre-prepared Assessments →
+            Go to Pre-prepared Report Writer Assessments →
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Pre-prepared Initial Assessment Assessments</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage pre-prepared initial assessment assessments from users.
+          </p>
+          <Link href="/admin/pre-prepared-initial-assessments" className="text-sm text-blue-500 hover:text-blue-700">
+            Go to Pre-prepared Initial Assessment Assessments →
           </Link>
         </div>
 

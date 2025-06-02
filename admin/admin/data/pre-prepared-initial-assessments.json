@@ -1,0 +1,21 @@
+[
+  {
+    "id": "99464ba6-589d-43d8-a1eb-88d60d5b9167",
+    "title": "TEST - create initial assessment",
+    "assessments": [
+      {
+        "id": "0ec232ba-5d34-4de1-ab63-b356cc3bb5b3",
+        "title": "TEST - create initial assessment",
+        "content": "TEST - create initial assessment - no LEP",
+        "author": "Admin User",
+        "date": "2025-06-02T05:16:16.891Z",
+        "lepName": "",
+        "file": {
+          "id": "b56855b3-82ed-4572-981a-3e6a0539f3d3",
+          "originalName": "10.7 Certificate Check.pdf",
+          "savedPath": "/documents/pre-prepared/10.7 Certificate Check.pdf"
+        }
+      }
+    ]
+  }
+]

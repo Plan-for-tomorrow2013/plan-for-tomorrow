@@ -103,6 +103,49 @@ export async function PATCH(
       }
     }
 
+    // Handle purchasedPrePreparedInitialAssessments: merge and add files to documents
+    if (updates.purchasedPrePreparedInitialAssessments) {
+      updatedJob.purchasedPrePreparedInitialAssessments = {
+        ...currentJob.purchasedPrePreparedInitialAssessments,
+        ...updates.purchasedPrePreparedInitialAssessments,
+      };
+      // Add files to documents
+      Object.values(updates.purchasedPrePreparedInitialAssessments).forEach((assessment) => {
+        const a = assessment as any; // or as PurchasedPrePreparedAssessments
+        if (a.file) {
+          updatedJob.documents = updatedJob.documents || {};
+          updatedJob.documents[a.file.id] = {
+            fileName: a.file.id,
+            originalName: a.file.originalName,
+            type: 'application/pdf', // or infer from extension
+            uploadedAt: new Date().toISOString(),
+            size: 0 // or actual size if available
+          };
+        }
+      });
+    }
+
+    // (Optional) Do the same for purchasedPrePreparedAssessments if not already handled elsewhere
+    if (updates.purchasedPrePreparedAssessments) {
+      updatedJob.purchasedPrePreparedAssessments = {
+        ...currentJob.purchasedPrePreparedAssessments,
+        ...updates.purchasedPrePreparedAssessments,
+      };
+      Object.values(updates.purchasedPrePreparedAssessments).forEach((assessment) => {
+        const a = assessment as any; // or as PurchasedPrePreparedAssessments
+        if (a.file) {
+          updatedJob.documents = updatedJob.documents || {};
+          updatedJob.documents[a.file.id] = {
+            fileName: a.file.id,
+            originalName: a.file.originalName,
+            type: 'application/pdf',
+            uploadedAt: new Date().toISOString(),
+            size: 0
+          };
+        }
+      });
+    }
+
     // Write updated job data back to file
     await fs.writeFile(jobPath, JSON.stringify(updatedJob, null, 2))
 

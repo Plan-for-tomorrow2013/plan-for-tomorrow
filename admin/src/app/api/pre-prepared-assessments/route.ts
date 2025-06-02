@@ -4,7 +4,7 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
 // Admin data directory (for the JSON file)
-const adminDataDir = path.join(process.cwd(), 'admin', 'data');
+const adminDataDir = path.join(process.cwd(), 'data');
 const prePreparedAssessmentsPath = path.join(adminDataDir, 'pre-prepared-assessments.json');
 // Client portal public directory (for the actual files)
 const clientPublicDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'public', 'documents', 'pre-prepared');

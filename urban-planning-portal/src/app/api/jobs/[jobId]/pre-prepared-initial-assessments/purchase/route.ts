@@ -28,6 +28,17 @@ export async function POST(
       status: 'completed' // Mark as completed upon purchase
     }
 
+    // Use a document key like 'pre-prepared-initial-${assessment.id}'
+    const docKey = `pre-prepared-initial-${assessment.id}`;
+    // Use the actual file name for fileName and originalName
+    const fileName = assessment.file.fileName || assessment.file.originalName;
+    const originalName = assessment.file.originalName;
+    const fileType = assessment.file.type || 'application/pdf';
+    const fileSize = assessment.file.size || 0;
+
+    // Set savedPath to the API route (for consistency with working logic)
+    const savedPath = `/api/pre-prepared-initial-assessments/${assessment.id}/download`;
+
     // Initialize or update purchasedPrePreparedInitialAssessments and documents in one update
     const updatedJob = {
       ...job,
@@ -35,22 +46,20 @@ export async function POST(
         ...(job.purchasedPrePreparedInitialAssessments || {}),
         [assessment.id]: purchasedAssessment
       },
-      // Add to documents store using file.id as the key
       documents: {
         ...(job.documents || {}),
-        [assessment.file.id]: {
-          fileName: assessment.file.id,
-          originalName: assessment.file.originalName,
-          type: assessment.file.type || 'application/pdf',
+        [docKey]: {
+          fileName,
+          originalName,
+          type: fileType,
           uploadedAt: new Date().toISOString(),
-          size: assessment.file.size || 0,
-          savedPath: `/api/pre-prepared-initial-assessments/${assessment.id}/download`
+          size: fileSize,
+          savedPath
         }
       }
     }
 
     // Save the updated job
-    // console.log('[API POST purchase] updatedJob before saveJob:', JSON.stringify(updatedJob, null, 2));
     await saveJob(jobId, updatedJob)
 
     return NextResponse.json({

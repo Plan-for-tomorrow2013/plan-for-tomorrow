@@ -24,6 +24,38 @@ export async function GET(
       )
     }
 
+    // --- Always prioritize purchasedPrePreparedInitialAssessments (initial) ---
+    if (job.purchasedPrePreparedInitialAssessments) {
+      const found = Object.values(job.purchasedPrePreparedInitialAssessments).find(
+        (a) => a.file && a.file.id === params.documentId
+      );
+      if (found && found.file) {
+        const fileName = found.file.id;
+        const originalName = found.file.originalName;
+        let type;
+        const ext = originalName.split('.').pop()?.toLowerCase();
+        if (ext === 'doc' || ext === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        else type = 'application/pdf';
+        const prePreparedPath = join('/home/tania/urban-planning-professionals-portal/urban-planning-portal/public/documents/pre-prepared', originalName);
+        try {
+          const fileBuffer = await readFile(prePreparedPath);
+          return new NextResponse(fileBuffer, {
+            headers: {
+              'Content-Type': type,
+              'Content-Disposition': `attachment; filename="${originalName}"`,
+            },
+          });
+        } catch (fileError) {
+          console.error('[DOWNLOAD API] Error reading pre-prepared initial file:', prePreparedPath, fileError);
+          return NextResponse.json(
+            { error: 'Failed to read pre-prepared initial file' },
+            { status: 500 }
+          );
+        }
+      }
+    }
+
+    // --- Check job.documents ---
     let document = job.documents?.[params.documentId]
     let fileName, originalName, type
     console.log('[DOWNLOAD API] Document from job.documents:', document)
@@ -70,36 +102,6 @@ export async function GET(
               console.error('[DOWNLOAD API] Error reading pre-prepared file:', prePreparedPath, fileError);
               return NextResponse.json(
                 { error: 'Failed to read pre-prepared file' },
-                { status: 500 }
-              );
-            }
-          }
-        }
-        // --- Check purchasedPrePreparedInitialAssessments (initial) ---
-        if (job.purchasedPrePreparedInitialAssessments) {
-          const found = Object.values(job.purchasedPrePreparedInitialAssessments).find(
-            (a) => a.file && a.file.id === params.documentId
-          );
-          if (found && found.file) {
-            fileName = found.file.id;
-            originalName = found.file.originalName;
-            const ext = originalName.split('.').pop()?.toLowerCase();
-            if (ext === 'doc' || ext === 'docx') type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            else type = 'application/pdf';
-            // Use a separate directory if you store initial files elsewhere, or reuse the same as regular
-            const prePreparedPath = join('/home/tania/urban-planning-professionals-portal/urban-planning-portal/public/documents/pre-prepared', originalName);
-            try {
-              const fileBuffer = await readFile(prePreparedPath);
-              return new NextResponse(fileBuffer, {
-                headers: {
-                  'Content-Type': type,
-                  'Content-Disposition': `attachment; filename=\"${originalName}\"`,
-                },
-              });
-            } catch (fileError) {
-              console.error('[DOWNLOAD API] Error reading pre-prepared initial file:', prePreparedPath, fileError);
-              return NextResponse.json(
-                { error: 'Failed to read pre-prepared initial file' },
                 { status: 500 }
               );
             }

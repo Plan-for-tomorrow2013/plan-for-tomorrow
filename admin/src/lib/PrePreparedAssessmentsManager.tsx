@@ -35,7 +35,7 @@ interface PrePreparedAssessmentsManagerProps {
   apiEndpoint: string
   downloadEndpoint: string
   sectionEndpoint: string
-  assessmentType: 'initial' | 'regular'
+  assessmentType: 'initial' | 'regular' | 'waste-management' | 'complying-development' | 'nathers' | 'development-applications'
 }
 
 export function PrePreparedAssessmentsManager({

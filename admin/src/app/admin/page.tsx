@@ -32,6 +32,29 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Dashboard Announcements</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Create and manage announcements on the dashboard.
+          </p>
+          <a
+            href="/admin/announcements"
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to Dashboard Announcements →
+          </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Pre-prepared Initial Assessments</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage pre-prepared initial assessments from users.
+          </p>
+          <Link href="/admin/pre-prepared-initial-assessments" className="text-sm text-blue-500 hover:text-blue-700">
+            Go to Pre-prepared Initial Assessments →
+          </Link>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-2">Pre-prepared Report Writer Assessments</h2>
           <p className="text-sm text-muted-foreground mb-4">
             Review and manage pre-prepared report writer assessments from users.
@@ -42,17 +65,7 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Pre-prepared Initial Assessment Assessments</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Review and manage pre-prepared initial assessment assessments from users.
-          </p>
-          <Link href="/admin/pre-prepared-initial-assessments" className="text-sm text-blue-500 hover:text-blue-700">
-            Go to Pre-prepared Initial Assessment Assessments →
-          </Link>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Knowledge Base</h2>
+          <h2 className="text-lg font-semibold mb-2">Knowledge Base - Development Applications</h2>
           <p className="text-sm text-muted-foreground mb-4">
             Review and manage the knowledge base for Development Applications.
           </p>
@@ -65,17 +78,44 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-2">Announcements</h2>
+          <h2 className="text-lg font-semibold mb-2">Knowledge Base - Complying Development</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Create and manage announcements for users and staff.
+            Review and manage the knowledge base for Complying Development.
           </p>
           <a
-            href="/admin/announcements"
+            href="/admin/kb-complying-development"
             className="text-sm text-blue-500 hover:text-blue-700"
           >
-            Go to Announcements →
+            Go to KB - Complying Development →
           </a>
         </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Knowledge Base - NatHERS & BASIX</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage the knowledge base for NatHERS & BASIX.
+          </p>
+          <a
+            href="/admin/kb-nathers"
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to KB - NatHERS & BASIX →
+          </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Knowledge Base - Waste Management</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage the knowledge base for Waste Management.
+          </p>
+          <a
+            href="/admin/kb-waste-management"
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to KB - Waste Management →
+          </a>
+        </div>
+
       </div>
     </div> {/* Added missing closing div tag */}
     </>

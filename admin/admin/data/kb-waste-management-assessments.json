@@ -1,0 +1,34 @@
+[
+  {
+    "id": "8866083b-33b1-4735-a75b-8190418acdb7",
+    "title": "TEST Waste Management",
+    "assessments": [
+      {
+        "id": "95870346-7079-4986-8700-183acd1d5aa7",
+        "title": "TEST Waste Management",
+        "content": "TEST Waste Management",
+        "author": "Admin User",
+        "date": "2025-06-04T08:53:33.582Z",
+        "lepName": "",
+        "file": {
+          "id": "c5c395a8-9f64-4881-9aed-6b69ae84049c",
+          "originalName": "Invoice INV-2217.pdf",
+          "savedPath": "/documents/pre-prepared/Invoice INV-2217.pdf"
+        }
+      },
+      {
+        "id": "5676b2f4-c1aa-497d-8e6c-0a5e51b68426",
+        "title": "TEST download",
+        "content": "TEST download",
+        "author": "Admin User",
+        "date": "2025-06-04T09:02:59.454Z",
+        "lepName": "",
+        "file": {
+          "id": "298370cc-a283-4f75-80eb-29c05f29aead",
+          "originalName": "Quote QU1064.pdf",
+          "savedPath": "/documents/kb-waste-management-assessments/Quote QU1064.pdf"
+        }
+      }
+    ]
+  }
+]

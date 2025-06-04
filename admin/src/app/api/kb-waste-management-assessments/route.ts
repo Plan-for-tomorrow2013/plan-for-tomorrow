@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 // Admin data directory (for the JSON file)
 const adminDataDir = path.join(process.cwd(), 'admin', 'data');
-const prePreparedAssessmentsPath = path.join(adminDataDir, 'pre-prepared-assessments.json');
+const kbWasteManagementAssessmentsPath = path.join(adminDataDir, 'kb-waste-management-assessments.json');
 // Client portal public directory (for the actual files)
-const clientPublicDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'public', 'documents', 'pre-prepared');
+const clientPublicDocumentsDir = path.join(process.cwd(), '..', 'urban-planning-portal', 'public', 'documents', 'kb-waste-management-assessments');
 
 // Ensure necessary directories and files exist
 async function ensureInfrastructure() {
@@ -15,12 +15,12 @@ async function ensureInfrastructure() {
     await fs.mkdir(adminDataDir, { recursive: true }); // Ensure admin data dir exists
     await fs.mkdir(clientPublicDocumentsDir, { recursive: true }); // Ensure client public dir exists
     // Try to access the JSON file to see if it exists
-    await fs.access(prePreparedAssessmentsPath);
+    await fs.access(kbWasteManagementAssessmentsPath);
   } catch (error: any) {
     // Check if the error is because the file doesn't exist
     if (error.code === 'ENOENT') {
       // If the file doesn't exist, create it with an empty array
-      await fs.writeFile(prePreparedAssessmentsPath, '[]')
+      await fs.writeFile(kbWasteManagementAssessmentsPath, '[]')
     } else {
       // If it's another error, rethrow it
       console.error("Error ensuring infrastructure:", error);
@@ -29,23 +29,23 @@ async function ensureInfrastructure() {
   }
 }
 
-// GET /api/pre-prepared-assessments
+// GET /api/pre-prepared-initial-assessments
 export async function GET() {
   try {
     await ensureInfrastructure() // Ensure file and dirs exist
-    const data = await fs.readFile(prePreparedAssessmentsPath, 'utf8')
-    const prePreparedAssessments = JSON.parse(data)
-    return NextResponse.json(prePreparedAssessments)
+    const data = await fs.readFile(kbWasteManagementAssessmentsPath, 'utf8')
+    const kbWasteManagementAssessments = JSON.parse(data)
+    return NextResponse.json(kbWasteManagementAssessments)
   } catch (error) {
-    console.error('Error reading pre-prepared assessments:', error)
+    console.error('Error reading kb waste management assessments:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch pre-prepared assessments' },
+      { error: 'Failed to fetch kb waste management assessments' },
       { status: 500 }
     )
   }
 }
 
-// POST /api/pre-prepared-assessments
+// POST /api/kb-waste-management-assessments
 export async function POST(request: Request) {
   try {
     await ensureInfrastructure();
@@ -65,11 +65,11 @@ export async function POST(request: Request) {
     }
 
     // Read existing assessments
-    const data = await fs.readFile(prePreparedAssessmentsPath, 'utf8');
-    const prePreparedAssessments = JSON.parse(data);
+    const data = await fs.readFile(kbWasteManagementAssessmentsPath, 'utf8');
+    const kbWasteManagementAssessments = JSON.parse(data);
 
     // Check if the section already exists
-    let sectionIndex = prePreparedAssessments.findIndex((section: { title: string }) => section.title === sectionTitle);
+    let sectionIndex = kbWasteManagementAssessments.findIndex((section: { title: string }) => section.title === sectionTitle);
     if (sectionIndex === -1) {
       // Create a new section if it doesn't exist
       const newSection = {
@@ -77,9 +77,9 @@ export async function POST(request: Request) {
         title: sectionTitle,
         assessments: [],
       };
-      prePreparedAssessments.push(newSection);
+      kbWasteManagementAssessments.push(newSection);
       // Set sectionIndex to the index of the newly added section
-      sectionIndex = prePreparedAssessments.length - 1; // Update sectionIndex to the new section's index
+      sectionIndex = kbWasteManagementAssessments.length - 1; // Update sectionIndex to the new section's index
     }
 
     // Create the new assessment
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       file: file ? {
         id: uuidv4(), // Generate a unique ID for the file
         originalName: file.name,
-        savedPath: `/documents/pre-prepared/${file.name}`, // Adjust as needed
+        savedPath: `/documents/kb-waste-management-assessments/${file.name}`, // Path to kb-waste-management-assessments directory
       } : null,
     };
 
@@ -124,17 +124,17 @@ export async function POST(request: Request) {
     // --- END FILE SAVING LOGIC ---
 
     // Add the new assessment to the corresponding section
-    prePreparedAssessments[sectionIndex].assessments.push(newAssessment);
+    kbWasteManagementAssessments[sectionIndex].assessments.push(newAssessment);
 
     // Write the updated sections back to the JSON file
-    await fs.writeFile(prePreparedAssessmentsPath, JSON.stringify(prePreparedAssessments, null, 2));
+    await fs.writeFile(kbWasteManagementAssessmentsPath, JSON.stringify(kbWasteManagementAssessments, null, 2));
 
     return NextResponse.json(newAssessment, { status: 201 }); // Return 201 Created status
 
   } catch (error) {
-    console.error('Error creating pre-prepared assessments:', error);
+    console.error('Error creating kb waste management assessments:', error);
     return NextResponse.json(
-      { error: 'Failed to create pre-prepared assessments' },
+      { error: 'Failed to create kb waste management assessments' },
       { status: 500 }
     );
   }

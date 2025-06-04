@@ -7,9 +7,9 @@ export default function KBWasteManagementPage() {
     <PrePreparedAssessmentsManager
       title="Knowledge Base - Waste Management"
       description="Create and manage Knowledge Base - Waste Management"
-      apiEndpoint="/api/kb-waste-management"
-      downloadEndpoint="/api/kb-waste-management"
-      sectionEndpoint="/api/kb-waste-management/sections"
+      apiEndpoint="/api/kb-waste-management-assessments"
+      downloadEndpoint="/api/kb-waste-management-assessments"
+      sectionEndpoint="/api/kb-waste-management-sections"
       assessmentType="waste-management"
     />
   )

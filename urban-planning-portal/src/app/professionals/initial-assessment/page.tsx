@@ -335,9 +335,9 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       error: prePreparedError,
       isError: isPrePreparedError,
   } = useQuery<PrePreparedAssessmentSection[], Error>({
-      queryKey: ['prePreparedAssessments'], // Unique key
-      queryFn: fetchPrePreparedAssessments, // Use the fetch function
-      staleTime: 1000 * 60 * 10, // Example: Cache for 10 minutes
+      queryKey: ['prePreparedAssessments', 'initial-assessment'],
+      queryFn: fetchPrePreparedAssessments,
+      staleTime: 1000 * 60 * 10,
   });
   // --- End React Query ---
 

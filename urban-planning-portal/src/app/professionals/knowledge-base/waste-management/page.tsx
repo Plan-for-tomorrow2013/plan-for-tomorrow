@@ -107,16 +107,16 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
 
 // Define fetch function for pre-prepared assessments
 const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSection[]> => {
-    const response = await fetch('/api/pre-prepared-initial-assessments');
+    const response = await fetch('/api/kb-waste-management-assessments');
     if (!response.ok) {
         const errorBody = await response.text();
-        console.error("Failed to fetch pre-prepared initial assessments:", response.status, errorBody);
-        throw new Error(`Failed to fetch pre-prepared initial assessments. Status: ${response.status}`);
+        console.error("Failed to fetch kb waste management assessments:", response.status, errorBody);
+        throw new Error(`Failed to fetch kb waste management assessments. Status: ${response.status}`);
     }
     const data = await response.json();
     if (!Array.isArray(data)) {
-        console.error("Invalid pre-prepared initial assessments data received:", data);
-        throw new Error('Invalid pre-prepared initial assessments data received');
+        console.error("Invalid kb waste management assessments data received:", data);
+        throw new Error('Invalid kb waste management assessments data received');
     }
     return camelcaseKeys(data, { deep: true });
 };
@@ -245,7 +245,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       error: prePreparedError,
       isError: isPrePreparedError,
   } = useQuery<PrePreparedAssessmentSection[], Error>({
-      queryKey: ['prePreparedAssessments'],
+      queryKey: ['prePreparedAssessments', 'waste-management'],
       queryFn: fetchPrePreparedAssessments,
       staleTime: 1000 * 60 * 10,
   });
@@ -290,9 +290,9 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         },
       }))
 
-      if (currentJob.purchasedPrePreparedInitialAssessments) {
+      if (currentJob.purchasedKbWasteManagementAssessments) {
         setPurchasedAssessments(
-          Object.keys(currentJob.purchasedPrePreparedInitialAssessments).reduce(
+          Object.keys(currentJob.purchasedKbWasteManagementAssessments).reduce(
             (acc, assessmentId) => ({ ...acc, [assessmentId]: true }),
             {}
           )
@@ -505,11 +505,11 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     }
   };
 
-  // --- Mutation for Purchasing Pre-prepared Initial Assessments ---
-  const purchasePrePreparedInitialMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
+  // --- Mutation for Purchasing Kb Waste Management Assessments ---
+  const purchaseKbWasteManagementAssessmentMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
     mutationFn: async ({ assessment }) => {
       if (!jobId) throw new Error("No job selected");
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-initial-assessments/purchase`, {
+      const response = await fetch(`/api/jobs/${jobId}/kb-waste-management-assessments/purchase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -533,7 +533,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          purchasedPrePreparedInitialAssessments: {
+          purchasedKbWasteManagementAssessments: {
             [assessment.id]: {
               ...assessment,
               purchaseDate: new Date().toISOString(),
@@ -565,7 +565,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
   // --- Tile rendering logic ---
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
-    const purchasedAssessments = currentJob?.purchasedPrePreparedInitialAssessments || {};
+    const purchasedAssessments = currentJob?.purchasedKbWasteManagementAssessments || {};
     const isPurchased = assessment.id in purchasedAssessments;
 
     if (isPurchased) {
@@ -604,10 +604,10 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
               variant="default"
               className="w-full bg-green-600 hover:bg-green-700"
               onClick={() => handleAssessmentPurchase(assessment.id)}
-              disabled={purchasePrePreparedInitialMutation.isPending}
+              disabled={purchaseKbWasteManagementAssessmentMutation.isPending}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
-              {purchasePrePreparedInitialMutation.isPending ? "Processing..." : "Purchase Assessment"}
+              {purchaseKbWasteManagementAssessmentMutation.isPending ? "Processing..." : "Purchase Assessment"}
             </Button>
           </div>
         </CardContent>
@@ -625,7 +625,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
       return;
     }
-    purchasePrePreparedInitialMutation.mutate({ assessment });
+    purchaseKbWasteManagementAssessmentMutation.mutate({ assessment });
   };
 
   // Updated renderCustomAssessmentForm function
@@ -802,11 +802,11 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             />
           )}
 
-          {/* Pre-prepared Assessments Section */}
+          {/* Waste Management Resources Section */}
           <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Pre-prepared Assessments</h2>
+            <h2 className="text-xl font-semibold mb-4">Waste Management Resources</h2>
             {isPrePreparedLoading ? (
-              <div>Loading assessments...</div>
+              <div>Loading Resources...</div>
             ) : (
               filteredAssessments.map((section) => (
                 <div key={section.title} className="space-y-4 mb-6">

@@ -25,7 +25,7 @@ interface Section {
 }
 
 // Define the path to the JSON data file
-const dataFilePath = path.resolve(process.cwd(), 'admin', 'admin', 'data', 'pre-prepared-assessments.json');
+const dataFilePath = path.resolve(process.cwd(), 'admin/data/kb-waste-management-assessments.json');
 // Define the base path for the public documents in the client portal project
 const documentsBasePath = path.resolve(process.cwd(), '../urban-planning-portal/public');
 

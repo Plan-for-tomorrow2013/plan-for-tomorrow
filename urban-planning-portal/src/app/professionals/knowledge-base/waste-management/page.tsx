@@ -23,6 +23,8 @@ import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
 import { LEPFilter } from '@shared/components/LEPFilter'
 import { DocumentWithStatus } from '@shared/types/documents'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
+import PdfViewer from "@/components/PdfViewer"
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -150,6 +152,8 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
   // Add this after other state declarations
   const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
+  const [selectedAssessment, setSelectedAssessment] = useState<PrePreparedAssessment | null>(null);
+  // pdfUrl state is no longer needed as PdfViewer will directly receive the path
 
   // First, add this state near your other state declarations
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
@@ -508,8 +512,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
   // --- Mutation for Purchasing Kb Waste Management Assessments ---
   const purchaseKbWasteManagementAssessmentMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
     mutationFn: async ({ assessment }) => {
-      if (!jobId) throw new Error("No job selected");
-      const response = await fetch(`/api/jobs/${jobId}/kb-waste-management-assessments/purchase`, {
+      const response = await fetch('/api/kb-waste-management-assessments/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -528,27 +531,14 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to purchase assessment');
       }
-      const purchased = await response.json();
-      const patchRes = await fetch(`/api/jobs/${jobId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          purchasedKbWasteManagementAssessments: {
-            [assessment.id]: {
-              ...assessment,
-              purchaseDate: new Date().toISOString(),
-              status: 'paid',
-            }
-          }
-        }),
-      });
-      if (!patchRes.ok) {
-        throw new Error('Failed to update job with purchased assessment');
-      }
-      return purchased;
+      return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+    onSuccess: (data) => {
+      // Update local state with the purchased assessment
+      setPurchasedAssessments(prev => ({
+        ...prev,
+        [data.assessment.id]: true
+      }));
       toast({
         title: "Success",
         description: "Assessment purchased successfully.",
@@ -565,7 +555,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
   // --- Tile rendering logic ---
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
-    const purchasedAssessments = currentJob?.purchasedKbWasteManagementAssessments || {};
     const isPurchased = assessment.id in purchasedAssessments;
 
     if (isPurchased) {
@@ -575,8 +564,28 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h4 className="font-medium mb-2">Report Complete</h4>
             <p className="text-sm text-gray-600 mb-4">
-              Your report is available for download in the Documents section above.
+              Your report is available for viewing.
             </p>
+            <Button
+              variant="default"
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                if (assessment.file) {
+                  setSelectedAssessment({ // Use selectedAssessment to trigger dialog, pass pdfPath
+                    ...assessment,
+                    file: {
+                      ...assessment.file,
+                      id: `/api/kb-waste-management-assessments/${assessment.file.id}/download`
+                    }
+                  });
+                } else {
+                  setSelectedAssessment(assessment);
+                }
+              }}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Assessment
+            </Button>
           </div>
         </div>
       );
@@ -839,6 +848,35 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             </Button>
           )}
         </div>
+
+        {/* Assessment View Dialog for Text Content */}
+        <Dialog open={!!selectedAssessment} onOpenChange={() => setSelectedAssessment(null)}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedAssessment?.title}</DialogTitle>
+              <DialogDescription>
+                {selectedAssessment?.section} • Posted by {selectedAssessment?.author} on {selectedAssessment?.date && new Date(selectedAssessment.date).toLocaleDateString()}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4 space-y-4">
+              <div className="prose max-w-none">
+                <p className="text-gray-700">{selectedAssessment?.content}</p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Assessment PDF Dialog using PdfViewer */}
+        <Dialog open={!!selectedAssessment && !!selectedAssessment.file?.id && selectedAssessment.file.id.startsWith('/api/')} onOpenChange={() => setSelectedAssessment(null)}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Assessment PDF</DialogTitle>
+            </DialogHeader>
+            {selectedAssessment && selectedAssessment.file?.id && selectedAssessment.file.id.startsWith('/api/') && (
+              <PdfViewer pdfPath={selectedAssessment.file.id} />
+            )}
+          </DialogContent>
+        </Dialog>
     </div>
   )
 }

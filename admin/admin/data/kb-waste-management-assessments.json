@@ -30,5 +30,24 @@
         }
       }
     ]
+  },
+  {
+    "id": "9f7b8599-1412-4f66-86ef-07cd31555bce",
+    "title": "TEST view PDF",
+    "assessments": [
+      {
+        "id": "a6133c0a-f98c-4acb-b90c-a0b5315ab261",
+        "title": "TEST view PDF",
+        "content": "TEST view PDF",
+        "author": "Admin User",
+        "date": "2025-06-05T09:34:09.450Z",
+        "lepName": "",
+        "file": {
+          "id": "289d4e84-f0b2-41dd-88ff-22fc523ca623",
+          "originalName": "EXAMPLE - Residential Waste Management.pdf",
+          "savedPath": "/documents/kb-waste-management-assessments/EXAMPLE - Residential Waste Management.pdf"
+        }
+      }
+    ]
   }
 ]

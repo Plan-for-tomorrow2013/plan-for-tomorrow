@@ -151,7 +151,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
   });
 
   // Add this after other state declarations
-  const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
   const [selectedAssessment, setSelectedAssessment] = useState<PrePreparedAssessment | null>(null);
   // pdfUrl state is no longer needed as PdfViewer will directly receive the path
 
@@ -293,17 +292,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
               },
         },
       }))
-
-      if (currentJob.purchasedKbWasteManagementAssessments) {
-        setPurchasedAssessments(
-          Object.keys(currentJob.purchasedKbWasteManagementAssessments).reduce(
-            (acc, assessmentId) => ({ ...acc, [assessmentId]: true }),
-            {}
-          )
-        )
-      } else {
-        setPurchasedAssessments({})
-      }
     } else if (!jobId) {
       setFormState({
         'customAssessment': {
@@ -318,7 +306,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
           purchaseInitiated: false
         },
       })
-      setPurchasedAssessments({})
     }
   }, [currentJob, jobId, isJobError, jobError])
 
@@ -509,132 +496,34 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     }
   };
 
-  // --- Mutation for Purchasing Kb Waste Management Assessments ---
-  const purchaseKbWasteManagementAssessmentMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
-    mutationFn: async ({ assessment }) => {
-      const response = await fetch('/api/kb-waste-management-assessments/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assessment: {
-            id: assessment.id,
-            section: assessment.section,
-            title: assessment.title,
-            content: assessment.content,
-            author: assessment.author,
-            file: assessment.file,
-            date: assessment.date,
-          }
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to purchase assessment');
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      // Update local state with the purchased assessment
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [data.assessment.id]: true
-      }));
-      toast({
-        title: "Success",
-        description: "Assessment purchased successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Purchase Error",
-        description: `Failed to purchase assessment: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
   // --- Tile rendering logic ---
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
-    const isPurchased = assessment.id in purchasedAssessments;
-
-    if (isPurchased) {
-      return (
-        <div className="border rounded-lg p-4 bg-green-50">
-          <div className="text-center py-4">
-            <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h4 className="font-medium mb-2">Report Complete</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              Your report is available for viewing.
-            </p>
-            <Button
-              variant="default"
-              className="w-full bg-green-600 hover:bg-green-700"
-              onClick={() => {
-                if (assessment.file) {
-                  setSelectedAssessment({ // Use selectedAssessment to trigger dialog, pass pdfPath
-                    ...assessment,
-                    file: {
-                      ...assessment.file,
-                      id: `/api/kb-waste-management-assessments/${assessment.file.id}/download`
-                    }
-                  });
-                } else {
-                  setSelectedAssessment(assessment);
-                }
-              }}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              View Assessment
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
     return (
-      <Card key={assessment.id} className="shadow-md">
-        <CardHeader className="bg-[#323A40] text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-medium">{assessment.title}</h3>
-              <p className="text-sm text-gray-300">{assessment.section}</p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          <div>
-            <p className="text-sm text-gray-600 mb-2">{assessment.content}</p>
-            <p className="text-xs text-gray-500">
-              Posted by {assessment.author} on {new Date(assessment.date).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Button
-              variant="default"
-              className="w-full bg-green-600 hover:bg-green-700"
-              onClick={() => handleAssessmentPurchase(assessment.id)}
-              disabled={purchaseKbWasteManagementAssessmentMutation.isPending}
-            >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              {purchaseKbWasteManagementAssessmentMutation.isPending ? "Processing..." : "Purchase Assessment"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="border rounded-lg p-4 bg-green-50">
+        <div className="text-center py-4">
+          <h4 className="font-medium mb-2">{assessment.title}</h4>
+          <p className="text-sm text-gray-600 mb-4">
+            {assessment.content}
+          </p>
+          <Button
+            variant="default"
+            className="w-full bg-green-600 hover:bg-green-700"
+            onClick={() => {
+              if (assessment.file) {
+                router.push(
+                  `/professionals/knowledge-base/waste-management/document?path=${encodeURIComponent(
+                    `/api/kb-waste-management-assessments/${assessment.file.id}/download`
+                  )}&title=${encodeURIComponent(assessment.title)}`
+                );
+              }
+            }}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Assessment
+          </Button>
+        </div>
+      </div>
     );
-  };
-
-  // --- Handler for purchase button ---
-  const handleAssessmentPurchase = async (assessmentId: string): Promise<void> => {
-    const assessment = filteredAssessments
-      .flatMap(section => section.assessments)
-      .find(a => a.id === assessmentId);
-
-    if (!assessment) {
-      toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
-      return;
-    }
-    purchaseKbWasteManagementAssessmentMutation.mutate({ assessment });
   };
 
   // Updated renderCustomAssessmentForm function
@@ -822,11 +711,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
                   <h3 className="text-lg font-medium">{section.title}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {section.assessments.map((assessment) => {
-                      console.log('Assessment:', {
-                        id: assessment.id,
-                        purchasedAssessments,
-                        isPurchased: assessment.isPurchased
-                      });
                       return renderPrePreparedAssessmentCard(assessment);
                     })}
                   </div>
@@ -863,18 +747,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
                 <p className="text-gray-700">{selectedAssessment?.content}</p>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Assessment PDF Dialog using PdfViewer */}
-        <Dialog open={!!selectedAssessment && !!selectedAssessment.file?.id && selectedAssessment.file.id.startsWith('/api/')} onOpenChange={() => setSelectedAssessment(null)}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Assessment PDF</DialogTitle>
-            </DialogHeader>
-            {selectedAssessment && selectedAssessment.file?.id && selectedAssessment.file.id.startsWith('/api/') && (
-              <PdfViewer pdfPath={selectedAssessment.file.id} />
-            )}
           </DialogContent>
         </Dialog>
     </div>

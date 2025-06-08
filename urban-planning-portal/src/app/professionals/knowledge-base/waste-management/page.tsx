@@ -130,7 +130,21 @@ const formatDate = (dateString: string) => {
   }
 };
 
-function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
+function JobInitialAssessment({
+  jobId,
+  jobs,
+  isLoadingJobs,
+  jobsError,
+  selectedJobId,
+  setSelectedJobId
+}: {
+  jobId: string;
+  jobs?: Job[];
+  isLoadingJobs: boolean;
+  jobsError: string | null;
+  selectedJobId: string | undefined;
+  setSelectedJobId: (id: string) => void;
+}): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -155,6 +169,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
   // First, add this state near your other state declarations
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
+  const [isAssessmentOverlayVisible, setIsAssessmentOverlayVisible] = useState(true);
 
   // Helper to get/set overlay state per job in localStorage
   const getOverlayStateForJob = (jobId: string) => {
@@ -168,9 +183,22 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     localStorage.setItem(`soeOverlayVisible_${jobId}`, visible ? "true" : "false");
   };
 
+  // Helper to get/set assessment overlay state per job in localStorage
+  const getAssessmentOverlayStateForJob = (jobId: string) => {
+    if (!jobId) return true; // default to visible
+    const stored = localStorage.getItem(`assessmentOverlayVisible_${jobId}`);
+    return stored === null ? true : stored === "true";
+  };
+
+  const setAssessmentOverlayStateForJob = (jobId: string, visible: boolean) => {
+    if (!jobId) return;
+    localStorage.setItem(`assessmentOverlayVisible_${jobId}`, visible ? "true" : "false");
+  };
+
   // Sync overlay state with jobId and localStorage
   useEffect(() => {
     setIsOverlayVisible(getOverlayStateForJob(jobId));
+    setIsAssessmentOverlayVisible(getAssessmentOverlayStateForJob(jobId));
   }, [jobId]);
 
   // Add loadFormData function inside component
@@ -689,9 +717,65 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
           </div>
 
           {/* Waste Management Assessment Section */}
-          <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Waste Management Assessment</h2>
-            {renderCustomAssessmentForm('wasteManagementAssessment')}
+          <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
+            {/* The actual content that will be revealed */}
+            <div className={`transition-opacity duration-300 ${isAssessmentOverlayVisible ? 'opacity-0' : 'opacity-100'}`}>
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold mb-4">Waste Management Assessment</h2>
+                {renderCustomAssessmentForm('wasteManagementAssessment')}
+
+                {/* Show Overlay Again Button */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAssessmentOverlayVisible(true);
+                    setAssessmentOverlayStateForJob(jobId, true);
+                  }}
+                >
+                  Back to Resources
+                </Button>
+              </div>
+            </div>
+
+            {/* The overlay that covers the content */}
+            <div
+              className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
+                ${isAssessmentOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+              <div className="flex flex-col items-center justify-center w-full p-8">
+                <p className="text-[#532200] font-semibold text-lg mb-2">Waste Management Assessment</p>
+                <p>Get a waste management report for your project.</p>
+
+                {/* Job Selection Dropdown */}
+                <div className="w-full max-w-md mt-4">
+                  {isLoadingJobs ? (
+                    <div>Loading jobs...</div>
+                  ) : jobsError ? (
+                    <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
+                  ) : (
+                    <Select
+                      value={selectedJobId}
+                      onValueChange={(value) => {
+                        setSelectedJobId(value);
+                        setIsAssessmentOverlayVisible(false);
+                        setAssessmentOverlayStateForJob(value, false);
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a job" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jobs?.map((job) => (
+                          <SelectItem key={job.id} value={job.id}>
+                            {job.address}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Save Changes Button */}
@@ -746,37 +830,15 @@ export default function WasteManagementPage() {
 
   return (
     <div className="space-y-6">
-      {/* Job Selection */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Waste Management</h1>
-        {isLoadingJobs ? (
-            <div>Loading jobs...</div>
-        ) : jobsError ? (
-            <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
-        ) : (
-            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Select a job" />
-                </SelectTrigger>
-                <SelectContent>
-                    {jobs?.map((job) => (
-                        <SelectItem key={job.id} value={job.id}>
-                            {job.address}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        )}
-      </div>
-
-      {/* Conditional Rendering of Job-Specific Content */}
-      {selectedJobId ? (
-        <JobInitialAssessment jobId={selectedJobId} />
-      ) : (
-        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to access Waste Management.</p>
-        </div>
-      )}
+      <h1 className="text-2xl font-bold">Waste Management</h1>
+      <JobInitialAssessment
+        jobId={selectedJobId || ''}
+        jobs={jobs}
+        isLoadingJobs={isLoadingJobs}
+        jobsError={jobsError}
+        selectedJobId={selectedJobId}
+        setSelectedJobId={setSelectedJobId}
+      />
     </div>
   );
 }

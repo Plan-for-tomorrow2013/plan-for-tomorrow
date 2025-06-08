@@ -16,18 +16,26 @@ import { Input } from "@shared/components/ui/input"
 import { Textarea } from "@shared/components/ui/textarea"
 import { toast } from "@shared/components/ui/use-toast"
 import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@shared/utils/report-utils'
+import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType, getDocumentDisplayStatus } from '@shared/utils/report-utils'
 import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
 import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
+import { Document, DOCUMENT_TYPES } from '@shared/types/documents'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
 import PdfViewer from "@/components/PdfViewer"
+import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
+import { DocumentTile } from '@shared/components/DocumentTile'
+import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
 
 interface CustomAssessmentForm {
   developmentType: string;
   additionalInfo: string;
+  uploadedDocuments: Record<string, boolean>;
+  documents: {
+    architecturalPlan?: { originalName?: string; fileName?: string };
+  };
   selectedTab: string;
 }
 
@@ -147,6 +155,8 @@ function JobInitialAssessment({
 }): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
+  const [documentError, setDocumentError] = useState<string | null>(null)
 
   // Combined state for both report forms
   const [formState, setFormState] = useState<WasteManagementFormState>({
@@ -154,6 +164,10 @@ function JobInitialAssessment({
       formData: {
         developmentType: '',
         additionalInfo: '',
+        uploadedDocuments: {},
+        documents: {
+          architecturalPlan: undefined,
+        },
         selectedTab: 'details'
       },
       paymentComplete: false,
@@ -195,6 +209,15 @@ function JobInitialAssessment({
     localStorage.setItem(`assessmentOverlayVisible_${jobId}`, visible ? "true" : "false");
   };
 
+  // Add transformUploadedDocuments function inside component
+  const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
+    if (!documents) return {};
+    return Object.keys(documents).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {} as Record<string, boolean>);
+  };
+
   // Sync overlay state with jobId and localStorage
   useEffect(() => {
     setIsOverlayVisible(getOverlayStateForJob(jobId));
@@ -210,6 +233,10 @@ function JobInitialAssessment({
         return {
           developmentType: parsedData.developmentType || '',
           additionalInfo: parsedData.additionalInfo || '',
+          uploadedDocuments: parsedData.uploadedDocuments || {},
+          documents: {
+            architecturalPlan: parsedData.documents?.architecturalPlan,
+          },
           selectedTab: parsedData.selectedTab || 'details'
         };
       } catch (error) {
@@ -219,6 +246,10 @@ function JobInitialAssessment({
     return {
       developmentType: '',
       additionalInfo: '',
+      uploadedDocuments: {},
+      documents: {
+        architecturalPlan: undefined,
+      },
       selectedTab: 'details'
     };
   };
@@ -231,6 +262,10 @@ function JobInitialAssessment({
           formData: {
             developmentType: '',
             additionalInfo: '',
+            uploadedDocuments: {},
+            documents: {
+              architecturalPlan: undefined,
+            },
             selectedTab: 'details'
           },
           paymentComplete: false,
@@ -297,6 +332,10 @@ function JobInitialAssessment({
             : {
                 developmentType: currentJob.wasteManagementAssessment?.developmentType || '',
                 additionalInfo: currentJob.wasteManagementAssessment?.additionalInfo || '',
+                uploadedDocuments: transformUploadedDocuments(currentJob.wasteManagementAssessment?.uploadedDocuments),
+                documents: {
+                  architecturalPlan: currentJob.wasteManagementAssessment?.documents?.architecturalPlan,
+                },
                 selectedTab: 'details'
               },
         },
@@ -307,6 +346,10 @@ function JobInitialAssessment({
           formData: {
             developmentType: '',
             additionalInfo: '',
+            uploadedDocuments: {},
+            documents: {
+              architecturalPlan: undefined,
+            },
             selectedTab: 'details'
           },
           paymentComplete: false,
@@ -452,13 +495,21 @@ function JobInitialAssessment({
       return;
     }
 
+    const wasteManagementPlan = documents.find(doc => doc.id === 'wasteManagementPlan');
+
     const workTicketPayload = {
       jobId: jobId,
       jobAddress: currentJob.address,
       ticketType: formType,
       [formType]: {
         developmentType: currentFormData.developmentType,
-        additionalInfo: currentFormData.additionalInfo
+        additionalInfo: currentFormData.additionalInfo,
+        documents: {
+          wasteManagementPlan: {
+            originalName: wasteManagementPlan?.uploadedFile?.originalName,
+            fileName: wasteManagementPlan?.uploadedFile?.fileName
+          }
+        }
       }
     };
 
@@ -469,7 +520,13 @@ function JobInitialAssessment({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         developmentType: currentFormData.developmentType,
-        additionalInfo: currentFormData.additionalInfo
+        additionalInfo: currentFormData.additionalInfo,
+        documents: {
+          architecturalPlan: {
+            originalName: wasteManagementPlan?.uploadedFile?.originalName,
+            fileName: wasteManagementPlan?.uploadedFile?.fileName
+          }
+        }
       }
     };
 
@@ -478,6 +535,8 @@ function JobInitialAssessment({
       await updateJobMutation.mutateAsync({ jobId: jobId, payload: jobUpdatePayload });
 
       await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+      await queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
+
 
       setFormState(prev => ({
         ...prev,
@@ -535,6 +594,177 @@ function JobInitialAssessment({
     );
   };
 
+  // --- Mutation for Uploading Document ---
+  const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
+      mutationFn: async ({ documentId, file }) => {
+          if (!jobId) throw new Error("No job selected");
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('docId', documentId);
+
+          const response = await fetch(`/api/jobs/${jobId}/documents/upload`, {
+              method: 'POST',
+              body: formData,
+          });
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Failed to upload document');
+          }
+          return response.json();
+      },
+    onSuccess: (data, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
+        queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+        toast({
+            title: "Success",
+            description: "Document uploaded successfully",
+        });
+    },
+  });
+
+  // Refactored handleFileUpload to use mutation
+  const handleUpload = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
+      return;
+    }
+    createFileInput(async (file) => {
+      await handleDocumentUpload(
+        () => uploadDocument(jobId, docId, file)
+      )
+    })
+  }
+
+  const handleDownload = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
+      return;
+    }
+    handleDocumentDownload(
+      () => {
+        return downloadDocument(jobId, docId);
+      }
+    )
+  }
+
+  const handleDelete = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before deleting documents", variant: "destructive" });
+      return;
+    }
+    handleDocumentDelete(
+      () => removeDocument(jobId, docId)
+    )
+  }
+
+  const handleCustomDocumentDownload = async (document: CustomDocument) => {
+    await downloadDocumentFromApi({
+      id: document.id,
+      title: document.title
+    })
+  }
+
+  const renderRequiredDocuments = () => {
+    if (isDocsLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="mt-4 text-gray-600">Loading documents...</p>
+        </div>
+      );
+    }
+
+    if (docsError) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
+          <AlertCircle className="h-8 w-8 text-red-500" />
+          <p className="mt-4 text-red-600">Error loading documents: {docsError}</p>
+          <p className="text-sm text-gray-600 mt-2">Please check the console for details or try again.</p>
+        </div>
+      );
+    }
+
+    if (!documents || documents.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg">
+          <FileText className="h-8 w-8 text-gray-400" />
+          <p className="mt-4 text-gray-600">No documents available</p>
+          <p className="text-sm text-gray-500 mt-2">Upload your first document to get started</p>
+        </div>
+      );
+    }
+
+    const mappedDocuments = documents.map(doc => ({
+      ...doc,
+      displayStatus: getDocumentDisplayStatus(doc, currentJob || {} as Job)
+    }));
+
+    const renderDocumentCard = (doc: DocumentWithStatus) => {
+      const isReport = isReportType(doc.id)
+      const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
+
+      const shouldBeDownloadableReport = isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
+
+      if (shouldBeDownloadableReport) {
+        return (
+          <Card key={doc.id} className="shadow-md">
+            <CardHeader className="bg-[#323A40] text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{getReportTitle(doc.id)}</h3>
+                  <p className="text-sm text-gray-300">{doc.category}</p>
+                </div>
+                <Check className="h-5 w-5 text-green-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-[#323A40]">
+                  <FileText className="h-4 w-4" />
+                  <span>{getReportTitle(doc.id)}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Uploaded: {reportStatus?.reportData?.completedDocument?.uploadedAt ? new Date(reportStatus.reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    handleDownload(doc.id);
+                  }}
+                  disabled={false}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
+
+      return (
+        <DocumentTile
+          key={doc.id}
+          document={doc}
+          isReport={isReport}
+          reportStatus={reportStatus}
+          onUpload={() => handleUpload(doc.id)}
+          onDownload={() => handleDownload(doc.id)}
+          onDelete={() => handleDelete(doc.id)}
+        />
+      )
+    }
+
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {mappedDocuments.map(doc => renderDocumentCard(doc))}
+        </div>
+      </>
+    )
+  }
+
   // Updated renderCustomAssessmentForm function
   const renderCustomAssessmentForm = (formType: keyof WasteManagementFormState) => {
     if (!currentJob) return null;
@@ -572,19 +802,89 @@ function JobInitialAssessment({
     } else if (purchaseInitiated) {
       const currentFormData = formState[formType].formData;
       const showPaymentBtn = formState[formType].showPaymentButton;
+      const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
+
+      const attachedDocs = [
+        architecturalPlanDoc,
+      ].filter((doc): doc is DocumentWithStatus => !!doc);
+
+      const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
+      const isConfirmButtonDisabled = currentFormData.developmentType.trim().length === 0 || isArchitecturalPlanMissing;
 
       return (
         <div className="space-y-6">
           <div className="space-y-4">
-            <div><label className="block text-sm font-medium mb-2">Development Type</label><Input placeholder="Enter the type of development" value={currentFormData.developmentType} onChange={handleFormChange(formType, 'developmentType')} /></div>
-            <div><label className="block text-sm font-medium mb-2">Additional Information</label><Textarea placeholder="Enter any additional information about your development" value={currentFormData.additionalInfo} onChange={handleFormChange(formType, 'additionalInfo')} rows={4} /></div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Development Type</label>
+              <Input
+                placeholder="Enter the type of development"
+                value={currentFormData.developmentType}
+                onChange={handleFormChange(formType, 'developmentType')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Additional Information</label>
+              <Textarea
+                placeholder="Enter any additional information about your development"
+                value={currentFormData.additionalInfo}
+                onChange={handleFormChange(formType, 'additionalInfo')}
+                rows={4}
+              />
+            </div>
+
+            {/* Attached Documents Section */}
+            <div className="space-y-2 border-t pt-4 mt-4">
+              <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
+              <p className="text-xs text-gray-500">The following documents will be included with your submission:</p>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                {attachedDocs.map(doc => (
+                  <li key={doc.id} className="flex items-center justify-between">
+                    <span>
+                      {doc.title}
+                      {doc.uploadedFile?.originalName && ` (${doc.uploadedFile.originalName})`}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      doc.displayStatus === 'uploaded'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {doc.displayStatus === 'uploaded' ? 'Uploaded' : 'Required'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Document Requirements Section */}
+            <div className="space-y-3 border-t pt-4 mt-4">
+              <h4 className="font-medium text-gray-700">Document Requirements</h4>
+              <p className="text-xs text-gray-500">Please ensure the following document is available in the document store before proceeding.</p>
+              {architecturalPlanDoc && (
+                <DocumentTile
+                  document={architecturalPlanDoc}
+                  isReport={false}
+                  reportStatus={undefined}
+                  onUpload={() => handleUpload(architecturalPlanDoc.id)}
+                  onDownload={() => handleDownload(architecturalPlanDoc.id)}
+                  onDelete={() => handleDelete(architecturalPlanDoc.id)}
+                />
+              )}
+            </div>
+
+            {isArchitecturalPlanMissing && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Please ensure the Architectural Plans are available in the document store before proceeding.
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="pt-4">
               {!showPaymentBtn ? (
                 <Button
                   className="w-full"
                   onClick={() => handleConfirmDetails(formType)}
-                  disabled={currentFormData.developmentType.trim().length === 0}
+                  disabled={isConfirmButtonDisabled}
                 >
                   Confirm Details & Proceed
                 </Button>
@@ -598,7 +898,7 @@ function JobInitialAssessment({
                 </Button>
               )}
               {(createWorkTicketMutation.isPending || updateJobMutation.isPending) && (
-                 <p className="text-sm text-gray-500 text-center mt-2">Processing payment...</p>
+                <p className="text-sm text-gray-500 text-center mt-2">Processing payment...</p>
               )}
             </div>
           </div>
@@ -829,16 +1129,18 @@ export default function WasteManagementPage() {
   }, [selectedJobId, router]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Waste Management</h1>
-      <JobInitialAssessment
-        jobId={selectedJobId || ''}
-        jobs={jobs}
-        isLoadingJobs={isLoadingJobs}
-        jobsError={jobsError}
-        selectedJobId={selectedJobId}
-        setSelectedJobId={setSelectedJobId}
-      />
-    </div>
+    <DocumentProvider jobId={selectedJobId || ''}>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Waste Management</h1>
+        <JobInitialAssessment
+          jobId={selectedJobId || ''}
+          jobs={jobs}
+          isLoadingJobs={isLoadingJobs}
+          jobsError={jobsError}
+          selectedJobId={selectedJobId}
+          setSelectedJobId={setSelectedJobId}
+        />
+      </div>
+    </DocumentProvider>
   );
 }

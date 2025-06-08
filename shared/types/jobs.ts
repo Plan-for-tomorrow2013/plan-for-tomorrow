@@ -14,6 +14,7 @@ export interface Assessment {
     certificateOfTitle?: { originalName?: string; fileName?: string };
     surveyPlan?: { originalName?: string; fileName?: string };
     certificate107?: { originalName?: string; fileName?: string };
+    architecturalPlan?: { originalName?: string; fileName?: string };
   };
   completedDocument?: {
     documentId?: string; // Matches workTicket.completedDocument.documentId

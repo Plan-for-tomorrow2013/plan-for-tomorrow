@@ -611,7 +611,24 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
      }
      console.log('[handleConfirmDetails] 10.7 Cert check passed.');
 
-     // 3. All checks passed - Proceed to update state
+     // 3. Check Architectural Plan (if required)
+     const requiresArchitecturalPlan = formType === 'statementOfEnvironmentalEffects' || formType === 'complyingDevelopmentCertificate';
+     console.log(`[handleConfirmDetails] Requires Architectural Plan: ${requiresArchitecturalPlan}`);
+     const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
+     const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
+     console.log(`[handleConfirmDetails] Checking Architectural Plan status: ${architecturalPlanDoc?.displayStatus}`);
+     if (requiresArchitecturalPlan && isArchitecturalPlanMissing) {
+       console.log('[handleConfirmDetails] Architectural Plan missing/not uploaded. Showing toast and returning.');
+       toast({
+         title: "Missing Document",
+         description: "Please upload the Architectural Plan before proceeding.",
+         variant: "destructive",
+       });
+       return; // Exit if validation fails
+     }
+     console.log('[handleConfirmDetails] Architectural Plan check passed.');
+
+     // 4. All checks passed - Proceed to update state
      console.log('[handleConfirmDetails] All checks passed. Setting showPaymentButton = true.');
      setFormState(prev => ({
        ...prev,
@@ -710,6 +727,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
     const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
     const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
+    const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
 
     const workTicketPayload = {
       jobId: jobId,
@@ -730,11 +748,12 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           certificate107: {
             originalName: certificate107?.uploadedFile?.originalName,
             fileName: certificate107?.uploadedFile?.fileName
+          },
+          architecturalPlan: {
+            originalName: architecturalPlan?.uploadedFile?.originalName,
+            fileName: architecturalPlan?.uploadedFile?.fileName
           }
         }
-        // Removed incorrect top-level fileName and originalName that were based on input documents.
-        // The Assessment object in the work ticket should primarily contain the request details.
-        // Output file details are handled by ticket.completedDocument and job[reportKey].completedDocument.
       }
     };
 
@@ -1228,27 +1247,33 @@ const renderRequiredDocuments = () => {
       const certificate107Doc = documents.find(doc => doc.id === 'tenSevenCertificate');
       const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
       const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
+      const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
 
       // Only require 10.7 certificate for custom assessment and complying development certificate
       const requires107Certificate = formType === 'customAssessment' || formType === 'complyingDevelopmentCertificate';
+
+      // Only require architectural plan for statement of environmental effects and complying development certificate
+      const requiresArchitecturalPlan = formType === 'statementOfEnvironmentalEffects' || formType === 'complyingDevelopmentCertificate';
 
       // Explicitly calculate disable conditions here for clarity
       const isDevTypeEmpty = currentFormData.developmentType.trim().length === 0;
       const isCertPresent = !!certificate107Doc;
       const isCertMissing = !certificate107Doc || certificate107Doc.displayStatus !== 'uploaded';
-      const isConfirmButtonDisabled = isDevTypeEmpty || (requires107Certificate && isCertMissing);
+      const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
+      const isConfirmButtonDisabled = isDevTypeEmpty || (requires107Certificate && isCertMissing) || (requiresArchitecturalPlan && isArchitecturalPlanMissing);
 
       // In renderCustomAssessmentForm, fix uploadedDocs type:
       const attachedDocs = [
         certificate107Doc,
         certificateOfTitle,
         surveyPlan,
+        architecturalPlanDoc,
       ].filter((doc): doc is DocumentWithStatus => !!doc);
 
       // Add debug logging
-      console.log('[AttachedDocs] 10.7 Cert:', certificate107Doc, 'All docs:', documents);
+      console.log('[AttachedDocs] 10.7 Cert:', certificate107Doc, 'Architectural Plan:', architecturalPlanDoc, 'All docs:', documents);
 
-      console.log('DEBUG:', { formType, certificate107Doc, isCertMissing, documents });
+      console.log('DEBUG:', { formType, certificate107Doc, isCertMissing, architecturalPlanDoc, isArchitecturalPlanMissing, documents });
 
       return (
         <div className="space-y-6">
@@ -1273,36 +1298,45 @@ const renderRequiredDocuments = () => {
               </div>
             )}
 
-            {/* Document Requirements - Only shown if 10.7 Cert is required */}
-            {requires107Certificate && !isCertPresent && (
-              <div className="space-y-3 border-t pt-4 mt-4">
-                 <h4 className="font-medium text-gray-700">Document Requirements</h4>
-                 <p className="text-xs text-gray-500">Please ensure the following document is available in the document store before proceeding.</p>
-                 {/* Only render DocumentStatus if certificate107Doc is defined */}
-                 {certificate107Doc ? (
-                   <DocumentStatus document={certificate107Doc} />
-                 ) : null}
-               </div>
-            )} {/* End of conditional rendering for Document Requirements */}
+            {/* Document Requirements Section */}
+            <div className="space-y-3 border-t pt-4 mt-4">
+              <h4 className="font-medium text-gray-700">Document Requirements</h4>
+              <p className="text-xs text-gray-500">Please ensure the following documents are available in the document store before proceeding:</p>
 
-            {/* 10.7 Cert Alert - only show for required report types */}
-            {/* Corrected: Check displayStatus */}
-            {requires107Certificate && !isCertPresent && (
-              <Alert variant="destructive">
-                <AlertDescription>Please ensure the 10.7 Certificate is available in the document store before proceeding.</AlertDescription>
-              </Alert>
-            )}
+              {/* 10.7 Certificate Requirements */}
+              {requires107Certificate && !isCertPresent && (
+                <div className="mt-2">
+                  {certificate107Doc ? (
+                    <DocumentStatus document={certificate107Doc} />
+                  ) : (
+                    <Alert variant="destructive">
+                      <AlertDescription>Please ensure the 10.7 Certificate is available in the document store before proceeding.</AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
+
+              {/* Architectural Plan Requirements */}
+              {requiresArchitecturalPlan && !architecturalPlanDoc && (
+                <div className="mt-2">
+                  {architecturalPlanDoc ? (
+                    <DocumentStatus document={architecturalPlanDoc} />
+                  ) : (
+                    <Alert variant="destructive">
+                      <AlertDescription>Please ensure the Architectural Plan is available in the document store before proceeding.</AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Buttons */}
             <div className="pt-4">
               {!showPaymentBtn ? (
                 <Button
                   className="w-full"
-                  onClick={() => {
-                      // Add log directly in onClick to see if it fires when disabled
-                      console.log(`Confirm Details button clicked. Disabled state: ${isConfirmButtonDisabled}`);
-                      handleConfirmDetails(formType);
-                  }}
-                  disabled={isConfirmButtonDisabled} // Use the calculated boolean
+                  onClick={() => handleConfirmDetails(formType)}
+                  disabled={isConfirmButtonDisabled}
                 >
                   Confirm Details & Proceed
                 </Button>
@@ -1316,15 +1350,10 @@ const renderRequiredDocuments = () => {
                 </Button>
               )}
               {(createWorkTicketMutation.isPending || updateJobMutation.isPending) && (
-                 <p className="text-sm text-gray-500 text-center mt-2">Processing payment...</p>
+                <p className="text-sm text-gray-500 text-center mt-2">Processing payment...</p>
               )}
             </div>
           </div>
-          {(formType === 'customAssessment' || formType === 'complyingDevelopmentCertificate') && isCertMissing && (
-            <div className="text-sm text-red-600 mt-2">
-              Please attach the 10.7 Certificate to proceed.
-            </div>
-          )}
         </div>
       );
     } else {

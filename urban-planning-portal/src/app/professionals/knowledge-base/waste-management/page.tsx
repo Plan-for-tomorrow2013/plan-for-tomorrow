@@ -21,7 +21,6 @@ import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
 import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
-import { LEPFilter } from '@shared/components/LEPFilter'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
 import PdfViewer from "@/components/PdfViewer"
@@ -41,7 +40,7 @@ interface ReportFormState {
 }
 
 interface WasteManagementFormState {
-  'customAssessment': ReportFormState
+  'wasteManagementAssessment': ReportFormState
 }
 
 interface PrePreparedAssessmentSection {
@@ -92,7 +91,7 @@ interface PurchasedPrePreparedAssessment {
 
 // Place this at the top of your file, before any usage
 function reportTypeToId(formType: keyof WasteManagementFormState): string {
-  return 'custom-assessment';
+  return 'waste-management-assessment';
 }
 
 // Define fetch function for individual job details
@@ -137,7 +136,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
   // Combined state for both report forms
   const [formState, setFormState] = useState<WasteManagementFormState>({
-    'customAssessment': {
+    'wasteManagementAssessment': {
       formData: {
         developmentType: '',
         additionalInfo: '',
@@ -200,7 +199,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
   useEffect(() => {
     if (!jobId) {
       setFormState({
-        'customAssessment': {
+        'wasteManagementAssessment': {
           formData: {
             developmentType: '',
             additionalInfo: '',
@@ -217,9 +216,9 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
     setFormState(prev => ({
       ...prev,
-      'customAssessment': {
-        ...prev['customAssessment'],
-        formData: loadFormData('customAssessment'),
+      'wasteManagementAssessment': {
+        ...prev['wasteManagementAssessment'],
+        formData: loadFormData('wasteManagementAssessment'),
         hasUnsavedChanges: false,
         purchaseInitiated: false,
       },
@@ -253,48 +252,30 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       staleTime: 1000 * 60 * 10,
   });
 
-  const [currentLEP, setCurrentLEP] = useState<string | null>(null);
-
-  // Add LEP change handler
-  const handleLEPChange = (lepName: string | null) => {
-    setCurrentLEP(lepName);
-  };
-
-  // Filter pre-prepared assessments based on LEP
-  const filteredAssessments = React.useMemo(() => {
-    if (!prePreparedAssessmentsData) return [];
-
-    return prePreparedAssessmentsData.map(section => ({
-      ...section,
-      assessments: section.assessments.filter(assessment =>
-        !assessment.lepName ||
-        assessment.lepName === currentLEP
-      )
-    })).filter(section => section.assessments.length > 0);
-  }, [prePreparedAssessmentsData, currentLEP]);
+  const filteredAssessments = prePreparedAssessmentsData || [];
 
   // Effect to update local component state based on fetched job data
   useEffect(() => {
     if (currentJob) {
       setFormState(prev => ({
-        'customAssessment': {
-          ...prev['customAssessment'],
-          paymentComplete: currentJob.customAssessment?.status === 'paid',
-          showPaymentButton: currentJob.customAssessment?.status === 'paid'
+        'wasteManagementAssessment': {
+          ...prev['wasteManagementAssessment'],
+          paymentComplete: currentJob.wasteManagementAssessment?.status === 'paid',
+          showPaymentButton: currentJob.wasteManagementAssessment?.status === 'paid'
             ? false
-            : prev['customAssessment'].purchaseInitiated && !prev['customAssessment'].paymentComplete,
-          formData: prev['customAssessment'].hasUnsavedChanges
-            ? prev['customAssessment'].formData
+            : prev['wasteManagementAssessment'].purchaseInitiated && !prev['wasteManagementAssessment'].paymentComplete,
+          formData: prev['wasteManagementAssessment'].hasUnsavedChanges
+            ? prev['wasteManagementAssessment'].formData
             : {
-                developmentType: currentJob.customAssessment?.developmentType || '',
-                additionalInfo: currentJob.customAssessment?.additionalInfo || '',
+                developmentType: currentJob.wasteManagementAssessment?.developmentType || '',
+                additionalInfo: currentJob.wasteManagementAssessment?.additionalInfo || '',
                 selectedTab: 'details'
               },
         },
       }))
     } else if (!jobId) {
       setFormState({
-        'customAssessment': {
+        'wasteManagementAssessment': {
           formData: {
             developmentType: '',
             additionalInfo: '',
@@ -438,7 +419,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
     const currentFormData = formState[formType].formData;
 
-    if (!['customAssessment'].includes(formType)) {
+    if (!['wasteManagementAssessment'].includes(formType)) {
       toast({ title: "Error", description: "Invalid report type.", variant: "destructive" });
       return;
     }
@@ -454,9 +435,9 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     };
 
     const jobUpdatePayload = {
-      customAssessment: {
+      wasteManagementAssessment: {
         status: 'paid' as const,
-        type: 'customAssessment' as const,
+        type: 'wasteManagementAssessment' as const,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         developmentType: currentFormData.developmentType,
@@ -482,14 +463,14 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
       toast({
         title: "Success",
-        description: `Your ${formType === 'customAssessment' ? 'Custom Assessment Report' : ''} has been purchased successfully.`,
+        description: `Your Waste Management Report has been purchased successfully.`,
       });
     } catch (error) {
       console.error(`Error processing ${formType} payment sequence:`, error);
       if (!createWorkTicketMutation.isError && !updateJobMutation.isError) {
          toast({
            title: "Payment Processing Error",
-           description: `An unexpected error occurred during payment for ${formType === 'customAssessment' ? 'Custom Assessment Report' : ''}. Please try again.`,
+           description: `An unexpected error occurred during payment for Waste Management Report. Please try again.`,
            variant: "destructive",
          });
       }
@@ -541,9 +522,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h4 className="font-medium mb-2">Report Complete</h4>
             <p className="text-sm text-gray-600 mb-4">
-              Your {formType === 'customAssessment'
-                ? 'Custom Assessment Report'
-                : ''} is available for download in the Documents section above.
+              Your Waste Management Report is available for download in the Documents section above.
             </p>
           </div>
         </div>
@@ -557,9 +536,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             </svg>
             <h4 className="font-medium mb-2">Report In Progress</h4>
             <p className="text-sm text-gray-600">
-              We are processing your {formType === 'customAssessment'
-                ? 'Custom Assessment Report'
-                : ''}. You will be notified when it's ready.
+              We are processing your Waste Management Report. You will be notified when it's ready.
             </p>
           </div>
         </div>
@@ -606,7 +583,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             className="w-full max-w-xs"
             onClick={() => handleInitiatePurchase(formType)}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase {getReportTitle(reportTypeToId(formType))}
+            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Waste Management Report
           </Button>
         </div>
       );
@@ -619,15 +596,15 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     let changesSaved = false;
     const updatedFormState = { ...formState };
 
-    if (formState['customAssessment'].hasUnsavedChanges) {
-      localStorage.setItem(`customAssessment-${jobId}`, JSON.stringify(formState['customAssessment'].formData));
-      updatedFormState['customAssessment'] = { ...updatedFormState['customAssessment'], hasUnsavedChanges: false };
+    if (formState['wasteManagementAssessment'].hasUnsavedChanges) {
+      localStorage.setItem(`wasteManagementAssessment-${jobId}`, JSON.stringify(formState['wasteManagementAssessment'].formData));
+      updatedFormState['wasteManagementAssessment'] = { ...updatedFormState['wasteManagementAssessment'], hasUnsavedChanges: false };
       changesSaved = true;
     }
 
     if (changesSaved) {
       setFormState(updatedFormState);
-      if (updatedFormState['customAssessment'].hasUnsavedChanges === false) {
+      if (updatedFormState['wasteManagementAssessment'].hasUnsavedChanges === false) {
         toast({ title: "Form Data Saved", description: "Unsaved form changes saved locally." });
       }
     } else {
@@ -654,7 +631,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 
       {/* Main Content */}
       <div className="space-y-6">
-          {/* Statement of Environmental Effects Generator Section */}
+          {/* Waste Management Calculator Section */}
           <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
             {/* The actual content that will be revealed */}
             <div className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}>
@@ -692,14 +669,6 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             </div>
           </div>
 
-          {/* LEP Filter Section */}
-          {currentJob?.propertyData && (
-            <LEPFilter
-              propertyData={currentJob.propertyData}
-              onLEPChange={handleLEPChange}
-            />
-          )}
-
           {/* Waste Management Resources Section */}
           <div className="border rounded-lg p-4">
             <h2 className="text-xl font-semibold mb-4">Waste Management Resources</h2>
@@ -719,10 +688,10 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             )}
           </div>
 
-          {/* Custom Assessment Section */}
+          {/* Waste Management Assessment Section */}
           <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Custom Assessment</h2>
-            {renderCustomAssessmentForm('customAssessment')}
+            <h2 className="text-xl font-semibold mb-4">Waste Management Assessment</h2>
+            {renderCustomAssessmentForm('wasteManagementAssessment')}
           </div>
 
           {/* Save Changes Button */}

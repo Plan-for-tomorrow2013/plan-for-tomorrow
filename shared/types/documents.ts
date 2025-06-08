@@ -65,6 +65,7 @@ export interface Assessment {
     certificateOfTitle?: { originalName?: string; fileName?: string };
     surveyPlan?: { originalName?: string; fileName?: string };
     certificate107?: { originalName?: string; fileName?: string };
+    architecturalPlan?: { originalName?: string; fileName?: string };
   };
   purchasedAssessment?: {
     id: string;
@@ -86,6 +87,18 @@ export interface StatementOfEnvironmentalEffects extends Assessment {
 }
 
 export interface ComplyingDevelopmentCertificate extends Assessment {
+  jobId: string;
+  uploadedDocuments: Record<string, boolean>;
+  selectedTab: string;
+}
+
+export interface NathersAssessment extends Assessment {
+  jobId: string;
+  uploadedDocuments: Record<string, boolean>;
+  selectedTab: string;
+}
+
+export interface WasteManagementAssessment extends Assessment {
   jobId: string;
   uploadedDocuments: Record<string, boolean>;
   selectedTab: string;
@@ -198,6 +211,19 @@ export const DOCUMENT_TYPES: Document[] = [
     purchasable: false // Explicitly set for standard docs
   },
   {
+    id: 'architecturalPlan',
+    title: 'Architectural Plan',
+    category: 'PLANNING',
+    path: '/architectural-plan',
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    purchasable: false // Explicitly set for standard docs
+  },
+  {
     id: 'customAssessment',
     title: 'Custom Assessment Report',
     category: 'REPORTS',
@@ -230,6 +256,34 @@ export const DOCUMENT_TYPES: Document[] = [
     title: 'Complying Development Certificate',
     category: 'REPORTS',
     path: '/complying-development-certificate',
+    adminOnly: true,
+    purchasable: true, // Mark as purchasable
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'wasteManagementAssessment',
+    title: 'Waste Management Assessment',
+    category: 'SPECIALIST',
+    path: '/waste-management-assessment',
+    adminOnly: true,
+    purchasable: true, // Mark as purchasable
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'nathersAssessment',
+    title: 'Nathers Assessment',
+    category: 'SPECIALIST',
+    path: '/nathers-assessment',
     adminOnly: true,
     purchasable: true, // Mark as purchasable
     type: 'document',

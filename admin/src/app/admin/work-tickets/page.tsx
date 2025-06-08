@@ -59,6 +59,7 @@ function ReportSummarySection({ report, jobId }: { report: any, jobId: string })
     { key: 'certificate107', label: '10.7 Certificate', doc: docs.certificate107 },
     { key: 'certificateOfTitle', label: 'Certificate of Title', doc: docs.certificateOfTitle },
     { key: 'surveyPlan', label: 'Survey Plan', doc: docs.surveyPlan },
+    { key: 'architecturalPlan', label: 'Architectural Plan', doc: docs.architecturalPlan },
   ];
   return (
     <div className="mb-2">

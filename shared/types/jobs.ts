@@ -46,6 +46,8 @@ export interface Job {
   customAssessment?: Assessment;
   statementOfEnvironmentalEffects?: Assessment;
   complyingDevelopmentCertificate?: Assessment;
+  nathersAssessment?: Assessment;
+  wasteManagementAssessment?: Assessment;
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedKbWasteManagementAssessments?: Record<string, PurchasedPrePreparedAssessments>;

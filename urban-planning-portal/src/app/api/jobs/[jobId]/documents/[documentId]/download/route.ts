@@ -70,7 +70,10 @@ export async function GET(
         assessment = job.complyingDevelopmentCertificate
       } else if (params.documentId === 'customAssessment') {
         assessment = job.customAssessment
+      } else if (params.documentId === 'wasteManagementAssessment') {
+        assessment = job.wasteManagementAssessment
       }
+
       console.log('[DOWNLOAD API] Assessment:', assessment)
       if (assessment && assessment.completedDocument) {
         fileName = assessment.completedDocument.fileName

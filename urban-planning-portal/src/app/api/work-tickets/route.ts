@@ -17,6 +17,8 @@ const getTicketTypeDisplayName = (type: string): string => {
       return 'Statement of Environmental Effects'
     case 'complying-development-certificate':
       return 'Complying Development Certificate'
+    case 'waste-management-assessment':
+      return 'Waste Management Assessment'
     default:
       return type
   }
@@ -146,6 +148,10 @@ export async function POST(request: Request) {
         case 'complying-development-certificate':
           newTicket.complyingDevelopmentCertificate = metadata.reportData;
           break;
+        case 'wasteManagementAssessment':
+        case 'waste-management-assessment':
+          newTicket.wasteManagementAssessment = metadata.reportData;
+          break;
       }
     }
     // Remove reportData property if present
@@ -221,7 +227,7 @@ export async function POST(request: Request) {
       const job = getJob(newTicket.jobId);
       if (job) {
         // Determine which assessment field to update
-        let assessmentKey: keyof Pick<Job, 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate'> | null = null;
+        let assessmentKey: keyof Pick<Job, 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment'> | null = null;
         let documentKey: string | null = null;
         let reportTitle: string | null = null;
         switch (newTicket.ticketType) {
@@ -239,6 +245,11 @@ export async function POST(request: Request) {
             assessmentKey = 'complyingDevelopmentCertificate';
             documentKey = 'complyingDevelopmentCertificateReport';
             reportTitle = 'Complying Development Certificate (Pending)';
+            break;
+          case 'waste-management-assessment':
+            assessmentKey = 'wasteManagementAssessment';
+            documentKey = 'wasteManagementAssessmentReport';
+            reportTitle = 'Waste Management Assessment (Pending)';
             break;
         }
         if (assessmentKey && documentKey && reportTitle) {
@@ -285,7 +296,8 @@ export async function GET() {
     const reportKeys: (keyof WorkTicket)[] = [
       'customAssessment',
       'statementOfEnvironmentalEffects',
-      'complyingDevelopmentCertificate'
+      'complyingDevelopmentCertificate',
+      'wasteManagementAssessment'
     ];
     const enrichedTickets = tickets.map(ticket => {
       let completedSet = false;

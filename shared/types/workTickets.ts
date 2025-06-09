@@ -4,7 +4,7 @@ export interface WorkTicket {
   id: string
   jobId: string
   jobAddress: string
-  ticketType: 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate'
+  ticketType: 'custom-assessment' | 'statement-of-environmental-effects' | 'complying-development-certificate' | 'waste-management-assessment'
   status: 'pending' | 'in-progress' | 'completed'
   createdAt: string
   completedDocument?: {
@@ -16,4 +16,5 @@ export interface WorkTicket {
   customAssessment?: Assessment
   statementOfEnvironmentalEffects?: Assessment
   complyingDevelopmentCertificate?: Assessment
+  wasteManagementAssessment?: Assessment
 }

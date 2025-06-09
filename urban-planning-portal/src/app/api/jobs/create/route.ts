@@ -48,6 +48,9 @@ export async function POST(request: Request) {
       },
       complyingDevelopmentCertificate: {
         uploadedDocuments: {}
+      },
+      wasteManagementAssessment: {
+        uploadedDocuments: {}
       }
     }
 

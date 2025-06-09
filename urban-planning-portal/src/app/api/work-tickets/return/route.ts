@@ -158,6 +158,17 @@ export async function POST(request: Request) {
       job.complyingDevelopmentCertificate.uploadedAt = fileDetails.uploadedAt;
       job.complyingDevelopmentCertificate.size = fileDetails.size;
       job.complyingDevelopmentCertificate.completedDocument = fileDetails;
+    } else if (ticket.ticketType === 'wasteManagementAssessment') {
+      if (!job.wasteManagementAssessment) {
+        job.wasteManagementAssessment = {};
+      }
+      job.wasteManagementAssessment.status = 'completed';
+      job.wasteManagementAssessment.returnedAt = new Date().toISOString();
+      job.wasteManagementAssessment.fileName = fileDetails.fileName;
+      job.wasteManagementAssessment.originalName = fileDetails.originalName;
+      job.wasteManagementAssessment.uploadedAt = fileDetails.uploadedAt;
+      job.wasteManagementAssessment.size = fileDetails.size;
+      job.wasteManagementAssessment.completedDocument = fileDetails;
     } else {
       throw new Error('Invalid ticket type');
     }

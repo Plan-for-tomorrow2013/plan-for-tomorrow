@@ -49,6 +49,9 @@ export interface Job {
   complyingDevelopmentCertificate?: Assessment;
   nathersAssessment?: Assessment;
   wasteManagementAssessment?: Assessment;
+  certifyingAuthority?: {
+    webAddress?: string;
+  };
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedKbWasteManagementAssessments?: Record<string, PurchasedPrePreparedAssessments>;

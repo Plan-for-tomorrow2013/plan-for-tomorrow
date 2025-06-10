@@ -309,17 +309,19 @@ export function PrePreparedAssessmentsManager({
                   className="min-h-[100px]"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">LEP Name (Optional)</label>
-                <Input
-                  value={formData.lepName}
-                  onChange={e => setFormData(prev => ({ ...prev, lepName: e.target.value }))}
-                  placeholder="e.g. Wollondilly Local Environmental Plan 2011"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Leave empty for sections that apply to all LEPs
-                </p>
-              </div>
+              {assessmentType !== 'waste-management' && assessmentType !== 'nathers' && (
+                <div>
+                  <label className="text-sm font-medium mb-1 block">LEP Name (Optional)</label>
+                  <Input
+                    value={formData.lepName}
+                    onChange={e => setFormData(prev => ({ ...prev, lepName: e.target.value }))}
+                    placeholder="e.g. Cumberland Local Environmental Plan 2020"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Leave empty for sections that apply to all LEPs
+                  </p>
+                </div>
+              )}
               <div>
                 <label className="text-sm font-medium mb-1 block">Upload Document</label>
                 <input

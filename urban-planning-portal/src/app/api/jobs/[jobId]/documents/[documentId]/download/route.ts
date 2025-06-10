@@ -72,6 +72,8 @@ export async function GET(
         assessment = job.customAssessment
       } else if (params.documentId === 'wasteManagementAssessment') {
         assessment = job.wasteManagementAssessment
+      } else if (params.documentId === 'nathersAssessment') {
+        assessment = job.nathersAssessment
       }
 
       console.log('[DOWNLOAD API] Assessment:', assessment)

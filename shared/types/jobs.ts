@@ -55,6 +55,7 @@ export interface Job {
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedKbWasteManagementAssessments?: Record<string, PurchasedPrePreparedAssessments>;
+  purchasedKbNathersAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   documents?: {
     [key: string]: {
       fileName: string;

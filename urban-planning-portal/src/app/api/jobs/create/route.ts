@@ -51,6 +51,9 @@ export async function POST(request: Request) {
       },
       wasteManagementAssessment: {
         uploadedDocuments: {}
+      },
+      nathersAssessment: {
+        uploadedDocuments: {}
       }
     }
 

@@ -19,6 +19,8 @@ const getTicketTypeDisplayName = (type: string): string => {
       return 'Complying Development Certificate'
     case 'waste-management-assessment':
       return 'Waste Management Assessment'
+    case 'nathers-assessment':
+      return 'Nathers Assessment'
     default:
       return type
   }
@@ -152,6 +154,10 @@ export async function POST(request: Request) {
         case 'waste-management-assessment':
           newTicket.wasteManagementAssessment = metadata.reportData;
           break;
+        case 'nathersAssessment':
+        case 'nathers-assessment':
+          newTicket.nathersAssessment = metadata.reportData;
+          break;
       }
     }
     // Remove reportData property if present
@@ -227,7 +233,7 @@ export async function POST(request: Request) {
       const job = getJob(newTicket.jobId);
       if (job) {
         // Determine which assessment field to update
-        let assessmentKey: keyof Pick<Job, 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment'> | null = null;
+        let assessmentKey: keyof Pick<Job, 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment' | 'nathersAssessment'> | null = null;
         let documentKey: string | null = null;
         let reportTitle: string | null = null;
         switch (newTicket.ticketType) {
@@ -250,6 +256,11 @@ export async function POST(request: Request) {
             assessmentKey = 'wasteManagementAssessment';
             documentKey = 'wasteManagementAssessmentReport';
             reportTitle = 'Waste Management Assessment (Pending)';
+            break;
+          case 'nathers-assessment':
+            assessmentKey = 'nathersAssessment';
+            documentKey = 'nathersAssessmentReport';
+            reportTitle = 'Nathers Assessment (Pending)';
             break;
         }
         if (assessmentKey && documentKey && reportTitle) {
@@ -297,7 +308,8 @@ export async function GET() {
       'customAssessment',
       'statementOfEnvironmentalEffects',
       'complyingDevelopmentCertificate',
-      'wasteManagementAssessment'
+      'wasteManagementAssessment',
+      'nathersAssessment'
     ];
     const enrichedTickets = tickets.map(ticket => {
       let completedSet = false;

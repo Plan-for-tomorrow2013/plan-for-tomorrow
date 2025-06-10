@@ -1,0 +1,21 @@
+[
+  {
+    "id": "b0774400-f85c-4d18-8ee6-eb2b7ae3ddd4",
+    "title": "TEST NatHERS Section",
+    "assessments": [
+      {
+        "id": "55871e51-4a51-45e6-ba43-24941601d512",
+        "title": "TEST NatHERS Title",
+        "content": "TEST NatHERS Title",
+        "author": "Admin User",
+        "date": "2025-06-10T10:05:51.712Z",
+        "lepName": "",
+        "file": {
+          "id": "0f09cbd3-dc5b-4657-9595-263570f0649f",
+          "originalName": "nathersAssessment.pdf",
+          "savedPath": "/documents/kb-nathers-assessments/nathersAssessment.pdf"
+        }
+      }
+    ]
+  }
+]

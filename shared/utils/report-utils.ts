@@ -2,7 +2,7 @@ import { Job } from '@shared/types/jobs'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Assessment } from '@shared/types/jobs'
 
-export type ReportType = 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment'
+export type ReportType = 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment' | 'nathersAssessment'
 
 export interface ReportStatus {
   isPaid: boolean
@@ -37,12 +37,13 @@ export const getReportData = (doc: DocumentWithStatus, job: Job): Assessment | n
                doc.id === 'complyingDevelopmentCertificate' ? job.complyingDevelopmentCertificate :
                doc.id === 'customAssessment' ? job.customAssessment :
                doc.id === 'wasteManagementAssessment' ? job.wasteManagementAssessment :
+               doc.id === 'nathersAssessment' ? job.nathersAssessment :
                null;
   return data || null;
 };
 
 export function isReportType(docId: string): boolean {
-  return ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate', 'wasteManagementAssessment'].includes(docId)
+  return ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate', 'wasteManagementAssessment', 'nathersAssessment'].includes(docId)
 }
 
 export function getReportTitle(docId: string): string {
@@ -59,6 +60,9 @@ export function getReportTitle(docId: string): string {
     case 'wasteManagementAssessment':
     case 'waste-management-assessment':
       return 'Waste Management Assessment';
+    case 'nathersAssessment':
+    case 'nathers-assessment':
+      return 'Nathers Assessment';
     default:
       return 'Unknown Report';
   }

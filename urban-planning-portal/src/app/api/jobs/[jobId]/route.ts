@@ -90,7 +90,7 @@ export async function PATCH(
     const updatedJob = { ...currentJob, ...updates };
 
     // Handle all assessment types consistently
-    const assessmentTypes = ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate', 'wasteManagementAssessment'];
+    const assessmentTypes = ['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate', 'wasteManagementAssessment', 'nathersAssessment'];
 
     for (const type of assessmentTypes) {
       if (updates[type]) {

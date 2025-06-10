@@ -169,7 +169,17 @@ export async function POST(request: Request) {
       job.wasteManagementAssessment.uploadedAt = fileDetails.uploadedAt;
       job.wasteManagementAssessment.size = fileDetails.size;
       job.wasteManagementAssessment.completedDocument = fileDetails;
-    } else {
+    } else if (ticket.ticketType === 'nathersAssessment') {
+      if (!job.nathersAssessment) {
+        job.nathersAssessment = {};
+      }
+      job.nathersAssessment.status = 'completed';
+      job.nathersAssessment.returnedAt = new Date().toISOString();
+      job.nathersAssessment.fileName = fileDetails.fileName;
+      job.nathersAssessment.originalName = fileDetails.originalName;
+      job.nathersAssessment.uploadedAt = fileDetails.uploadedAt;
+      job.nathersAssessment.size = fileDetails.size;
+      job.nathersAssessment.completedDocument = fileDetails;
       throw new Error('Invalid ticket type');
     }
 

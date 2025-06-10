@@ -39,6 +39,9 @@ export async function DELETE(
       if (job.wasteManagementAssessment?.uploadedDocuments?.[params.documentId]) {
         delete job.wasteManagementAssessment.uploadedDocuments[params.documentId]
       }
+      if (job.nathersAssessment?.uploadedDocuments?.[params.documentId]) {
+        delete job.nathersAssessment.uploadedDocuments[params.documentId]
+      }
       if (job.purchasedPrePreparedAssessments) {
         const assessments = job.purchasedPrePreparedAssessments
         Object.entries(assessments).forEach(([key, assessment]) => {

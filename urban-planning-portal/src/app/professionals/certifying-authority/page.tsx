@@ -107,21 +107,40 @@ function CertifyingAuthorityContent({ jobId }: { jobId: string }): JSX.Element {
               {!isValidUrl && (
                 <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
               )}
+              {isValidUrl && webAddress && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-700">
+                    <strong>Note:</strong> Some websites may not display in the preview above due to their security settings.
+                    If you can't see the website content, please use the "Open in New Tab" button below to view it directly.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
       {webAddress && isValidUrl && (
-        <Card>
-          <CardContent className="flex justify-center p-6">
-            <Button asChild variant="default" size="lg">
-              <a href={webAddress} target="_blank" rel="noopener noreferrer">
-                Open in New Tab
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
+        <>
+          <Card>
+            <CardContent className="p-0">
+              <iframe
+                src={webAddress}
+                className="w-full h-[800px] border-0"
+                title="Certifying Authority Website"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex justify-center p-6">
+              <Button asChild variant="default" size="lg">
+                <a href={webAddress} target="_blank" rel="noopener noreferrer">
+                  Open in New Tab
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   );

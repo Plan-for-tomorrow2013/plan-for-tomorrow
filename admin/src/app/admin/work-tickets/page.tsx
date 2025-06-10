@@ -20,6 +20,8 @@ const getTicketTypeDisplayName = (type: string): string => {
       return 'Statement of Environmental Effects'
     case 'complying-development-certificate':
       return 'Complying Development Certificate'
+    case 'waste-management-assessment':
+      return 'Waste Management Assessment'
     default:
       return type
   }
@@ -111,7 +113,11 @@ export default function WorkTicketsPage() {
           throw new Error('Failed to fetch work tickets')
         }
         const data = await response.json()
-        setTickets(data)
+        // Sort tickets by createdAt in descending order (newest first)
+        const sortedTickets = data.sort((a: WorkTicket, b: WorkTicket) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        setTickets(sortedTickets)
       } catch (error) {
         console.error('Error fetching work tickets:', error)
         setError('Failed to load work tickets')
@@ -120,7 +126,14 @@ export default function WorkTicketsPage() {
       }
     }
 
+    // Initial fetch
     fetchTickets()
+
+    // Set up polling every 30 seconds
+    const pollInterval = setInterval(fetchTickets, 30000)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(pollInterval)
   }, [])
 
   const getStatusColor = (status: string) => {
@@ -254,7 +267,7 @@ export default function WorkTicketsPage() {
                   <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
                   {/* Add report summary for all types */}
                   <ReportSummarySection
-                    report={ticket.customAssessment || ticket.statementOfEnvironmentalEffects || ticket.complyingDevelopmentCertificate}
+                    report={ticket.customAssessment || ticket.statementOfEnvironmentalEffects || ticket.complyingDevelopmentCertificate || ticket.wasteManagementAssessment}
                     jobId={ticket.jobId}
                   />
                 </div>
@@ -369,6 +382,43 @@ export default function WorkTicketsPage() {
                           type: 'application/pdf',
                           uploadedAt: ticket.complyingDevelopmentCertificate.uploadedAt || new Date().toISOString(),
                           size: ticket.complyingDevelopmentCertificate.size || 0
+                        }
+                      }}
+                      jobId={ticket.jobId}
+                    />
+                  </div>
+                )}
+
+                {ticket.ticketType === 'waste-management-assessment' && ticket.wasteManagementAssessment && (
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="font-medium text-sm mb-1">Development Details</h3>
+                      <p className="text-xs mb-1">
+                        <strong>Type:</strong> {ticket.wasteManagementAssessment.developmentType}
+                      </p>
+                      <p className="text-xs truncate">
+                        <strong>Info:</strong> {ticket.wasteManagementAssessment.additionalInfo}
+                      </p>
+                    </div>
+                    <DocumentRenderer
+                      doc={{
+                        id: 'waste-management-assessment',
+                        title: 'Waste Management Assessment',
+                        path: 'waste-management-assessment',
+                        type: 'document',
+                        category: 'REPORTS',
+                        versions: [],
+                        currentVersion: 1,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        isActive: true,
+                        displayStatus: 'uploaded',
+                        uploadedFile: {
+                          fileName: ticket.wasteManagementAssessment.fileName || '',
+                          originalName: ticket.wasteManagementAssessment.originalName || '',
+                          type: 'application/pdf',
+                          uploadedAt: ticket.wasteManagementAssessment.uploadedAt || new Date().toISOString(),
+                          size: ticket.wasteManagementAssessment.size || 0
                         }
                       }}
                       jobId={ticket.jobId}

@@ -268,7 +268,7 @@ export const DOCUMENT_TYPES: Document[] = [
   {
     id: 'wasteManagementAssessment',
     title: 'Waste Management Assessment',
-    category: 'SPECIALIST',
+    category: 'REPORTS',
     path: '/waste-management-assessment',
     adminOnly: true,
     purchasable: true, // Mark as purchasable
@@ -282,7 +282,7 @@ export const DOCUMENT_TYPES: Document[] = [
   {
     id: 'nathersAssessment',
     title: 'Nathers Assessment',
-    category: 'SPECIALIST',
+    category: 'REPORTS',
     path: '/nathers-assessment',
     adminOnly: true,
     purchasable: true, // Mark as purchasable

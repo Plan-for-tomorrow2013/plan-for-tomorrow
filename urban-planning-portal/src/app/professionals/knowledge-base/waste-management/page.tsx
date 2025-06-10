@@ -495,7 +495,7 @@ function JobInitialAssessment({
       return;
     }
 
-    const wasteManagementPlan = documents.find(doc => doc.id === 'wasteManagementPlan');
+    const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
 
     const workTicketPayload = {
       jobId: jobId,
@@ -505,9 +505,9 @@ function JobInitialAssessment({
         developmentType: currentFormData.developmentType,
         additionalInfo: currentFormData.additionalInfo,
         documents: {
-          wasteManagementPlan: {
-            originalName: wasteManagementPlan?.uploadedFile?.originalName,
-            fileName: wasteManagementPlan?.uploadedFile?.fileName
+          architecturalPlan: {
+            originalName: architecturalPlan?.uploadedFile?.originalName,
+            fileName: architecturalPlan?.uploadedFile?.fileName
           }
         }
       }
@@ -523,8 +523,8 @@ function JobInitialAssessment({
         additionalInfo: currentFormData.additionalInfo,
         documents: {
           architecturalPlan: {
-            originalName: wasteManagementPlan?.uploadedFile?.originalName,
-            fileName: wasteManagementPlan?.uploadedFile?.fileName
+            originalName: architecturalPlan?.uploadedFile?.originalName,
+            fileName: architecturalPlan?.uploadedFile?.fileName
           }
         }
       }
@@ -858,7 +858,7 @@ function JobInitialAssessment({
             {isArchitecturalPlanMissing && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  Please ensure the Architectural Plans are available in the document store before proceeding.
+                Please attach the Architectural Plans to proceed.
                 </AlertDescription>
               </Alert>
             )}

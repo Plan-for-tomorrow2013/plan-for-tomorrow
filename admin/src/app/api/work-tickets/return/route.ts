@@ -78,6 +78,9 @@ export async function POST(request: Request) {
       case 'complyingDevelopmentCertificate': // Changed from 'complying-development-certificate'
         reportKey = 'complyingDevelopmentCertificate'
         break
+      case 'wasteManagementAssessment':
+        reportKey = 'wasteManagementAssessment'
+        break
       default:
         console.warn(`Unknown or unhandled ticket type: ${ticketType} for ticket ${ticketId}. Job data will not be updated for this report type.`)
     }

@@ -3,8 +3,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 
 // Correct path pointing to the admin portal's kb development application assessments data
-// Use the absolute path directly, without path.join or process.cwd()
-const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application.json';
+const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application-assessments.json';
 
 // GET /api/kb-development-application-assessments
 // Reads kb development application assessments from the admin portal's data file.

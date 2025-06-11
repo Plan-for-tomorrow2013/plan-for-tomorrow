@@ -309,7 +309,7 @@ export function PrePreparedAssessmentsManager({
                   className="min-h-[100px]"
                 />
               </div>
-              {assessmentType !== 'waste-management' && assessmentType !== 'nathers' && assessmentType !== 'development-application' && (
+              {assessmentType !== 'waste-management' && assessmentType !== 'nathers' && assessmentType !== 'development-application' && assessmentType !== 'complying-development' && (
                 <div>
                   <label className="text-sm font-medium mb-1 block">LEP Name (Optional)</label>
                   <Input

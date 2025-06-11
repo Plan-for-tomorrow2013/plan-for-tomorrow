@@ -1,0 +1,21 @@
+[
+  {
+    "id": "741ac1e4-0408-4b5b-8646-6e737c29a453",
+    "title": "Complying development test",
+    "assessments": [
+      {
+        "id": "91fd1411-c88d-4bd6-8d8b-9163a212105b",
+        "title": "Complying development title test",
+        "content": "Complying development content test",
+        "author": "Admin User",
+        "date": "2025-06-11T08:28:18.832Z",
+        "lepName": "",
+        "file": {
+          "id": "5e63ee03-90cf-45b5-bbe9-77fb1401aca5",
+          "originalName": "250514 - 323 Clovelly Road Clovelly - DA - Issue A.pdf",
+          "savedPath": "/documents/kb-complying-development-assessments/250514 - 323 Clovelly Road Clovelly - DA - Issue A.pdf"
+        }
+      }
+    ]
+  }
+]

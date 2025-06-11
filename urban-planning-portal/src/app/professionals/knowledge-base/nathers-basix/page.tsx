@@ -28,6 +28,7 @@ import PdfViewer from "@/components/PdfViewer"
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
+import { PageHeader } from '@shared/components/ui/page-header'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -1022,7 +1023,10 @@ export default function NathersPage() {
   return (
     <DocumentProvider jobId={selectedJobId || ''}>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Nathers</h1>
+        <PageHeader
+          title="Nathers"
+          backHref="/professionals/knowledge-base"
+        />
 
         {/* Nathers Resources Section (always visible) */}
         <div className="border rounded-lg p-4">

@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
 import Link from 'next/link'
 import camelcaseKeys from 'camelcase-keys'
+import { PageHeader } from '@shared/components/ui/page-header'
 
 interface PrePreparedAssessmentSection {
   title: string;
@@ -75,7 +76,10 @@ export default function DevelopmentApplicationPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Development Application</h1>
+      <PageHeader
+        title="Development Application"
+        backHref="/professionals/knowledge-base"
+      />
 
       {/* Development Application Resources Section */}
       <div className="border rounded-lg p-4">

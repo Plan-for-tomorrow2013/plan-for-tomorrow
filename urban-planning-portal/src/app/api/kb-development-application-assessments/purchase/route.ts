@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 
 // Path to the kb development application data file
-const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application.json';
+const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application-assessments.json';
 
 // POST /api/kb-development-application-assessments/purchase
 export async function POST(request: Request) {

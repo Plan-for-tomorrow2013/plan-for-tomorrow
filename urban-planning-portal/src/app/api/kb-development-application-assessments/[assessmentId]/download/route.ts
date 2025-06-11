@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application.json';
+const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application-assessments.json';
 
 export async function GET(request: Request, { params }: { params: { assessmentId: string } }) {
   try {
@@ -25,7 +25,7 @@ export async function GET(request: Request, { params }: { params: { assessmentId
     }
 
     // For now, read from disk. Later, fetch from Supabase Storage.
-    const filePath = path.join(process.cwd(), 'public', 'documents', 'kb-development-application', fileMeta.originalName);
+    const filePath = path.join(process.cwd(), 'public', 'documents', 'kb-development-application-assessments', fileMeta.originalName);
     console.log('Resolved file path:', filePath);
     await fs.access(filePath);
     const fileBuffer = await fs.readFile(filePath);

@@ -28,6 +28,7 @@ import PdfViewer from "@/components/PdfViewer"
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
+import { PageHeader } from '@shared/components/ui/page-header'
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -1022,8 +1023,10 @@ export default function WasteManagementPage() {
   return (
     <DocumentProvider jobId={selectedJobId || ''}>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Waste Management</h1>
-
+        <PageHeader
+        title="Waste Management"
+        backHref="/professionals/knowledge-base"
+      />
         {/* Waste Management Resources Section (always visible) */}
         <div className="border rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-4">Waste Management Resources</h2>

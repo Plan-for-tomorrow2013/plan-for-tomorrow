@@ -1,0 +1,21 @@
+[
+  {
+    "id": "e2fd604a-bad5-40d6-af15-fe5021164bc1",
+    "title": "TEST Development Application Section",
+    "assessments": [
+      {
+        "id": "6a46a141-c897-495d-a889-b26bebde730c",
+        "title": "TEST Development Application title",
+        "content": "TEST Development Application content",
+        "author": "Admin User",
+        "date": "2025-06-11T02:11:42.854Z",
+        "lepName": "",
+        "file": {
+          "id": "3e58dc90-d648-42a0-93ef-04ee042825d2",
+          "originalName": "Invoice INV-2223.pdf",
+          "savedPath": "/documents/kb-development-application-assessments/Invoice INV-2223.pdf"
+        }
+      }
+    ]
+  }
+]

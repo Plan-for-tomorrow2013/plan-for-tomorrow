@@ -35,7 +35,7 @@ interface PrePreparedAssessmentsManagerProps {
   apiEndpoint: string
   downloadEndpoint: string
   sectionEndpoint: string
-  assessmentType: 'initial' | 'regular' | 'waste-management' | 'complying-development' | 'nathers' | 'development-applications'
+  assessmentType: 'initial' | 'regular' | 'waste-management' | 'complying-development' | 'nathers' | 'development-application'
 }
 
 export function PrePreparedAssessmentsManager({
@@ -309,7 +309,7 @@ export function PrePreparedAssessmentsManager({
                   className="min-h-[100px]"
                 />
               </div>
-              {assessmentType !== 'waste-management' && assessmentType !== 'nathers' && (
+              {assessmentType !== 'waste-management' && assessmentType !== 'nathers' && assessmentType !== 'development-application' && (
                 <div>
                   <label className="text-sm font-medium mb-1 block">LEP Name (Optional)</label>
                   <Input

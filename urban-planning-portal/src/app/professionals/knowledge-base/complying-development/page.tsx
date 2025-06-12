@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import Link from 'next/link'
 import camelcaseKeys from 'camelcase-keys'
 import { PageHeader } from '@shared/components/ui/page-header'
+import { Button } from '@shared/components/ui/button'
 
 interface PrePreparedAssessmentSection {
   title: string;
@@ -47,6 +48,7 @@ const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSecti
 
 export default function ComplyingDevelopmentPage() {
   const router = useRouter();
+  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
 
   const {
     data: prePreparedAssessmentsData = [],
@@ -63,14 +65,17 @@ export default function ComplyingDevelopmentPage() {
 
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
     return (
-      <Link
-        href={`/professionals/knowledge-base/complying-development/document?path=${encodeURIComponent(
-          `/api/kb-complying-development-assessments/${assessment.file?.id}/download`
-        )}&title=${encodeURIComponent(assessment.title)}`}
-        className="text-blue-600 underline block mb-2"
-      >
-        {assessment.title}
-      </Link>
+      <div className="mb-4">
+        <Link
+          href={`/professionals/knowledge-base/complying-development/document?path=${encodeURIComponent(
+            `/api/kb-complying-development-assessments/${assessment.file?.id}/download`
+          )}&title=${encodeURIComponent(assessment.title)}`}
+          className="text-blue-600 underline block mb-2"
+        >
+          {assessment.title}
+        </Link>
+        <p className="text-sm text-gray-600 mb-2">{assessment.content}</p>
+      </div>
     );
   };
 
@@ -96,6 +101,36 @@ export default function ComplyingDevelopmentPage() {
             </div>
           ))
         )}
+      </div>
+
+      {/* Do It Yourself Section */}
+      <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
+        {/* The actual content that will be revealed */}
+        <div className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Complying Development Calculator</h2>
+            <p className="text-gray-600">Use our calculator to determine if your development qualifies as complying development.</p>
+            {/* Add your calculator form elements here */}
+            <Button
+              variant="outline"
+              onClick={() => setIsOverlayVisible(true)}
+            >
+              Hide Calculator
+            </Button>
+          </div>
+        </div>
+        {/* The overlay that covers the content */}
+        <div
+          className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
+            ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => setIsOverlayVisible(false)}
+        >
+          <div className="flex flex-col items-center justify-center w-full p-8">
+            <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
+            <p>Use our calculator to determine if your development qualifies as complying development.</p>
+            <p className="text-[#532200] text-sm mt-2">Click to preview</p>
+          </div>
+        </div>
       </div>
 
       {/* Assessment View Dialog for Text Content */}

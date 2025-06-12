@@ -16,8 +16,8 @@ interface UserStatsProps {
   reportsWrittenDiff: number
   initialAssessments?: number
   initialAssessmentsDiff?: number
-  quotesSent?: number
-  quotesSentDiff?: number
+  consultantsSent?: number
+  consultantsSentDiff?: number
   underAssessment?: number
   underAssessmentDiff?: number
   completedJobsDiff?: number
@@ -68,8 +68,8 @@ export function UserStats({
   reportsWrittenDiff,
   initialAssessments,
   initialAssessmentsDiff,
-  quotesSent,
-  quotesSentDiff,
+  consultantsSent,
+  consultantsSentDiff,
   underAssessment,
   underAssessmentDiff,
   completedJobsDiff
@@ -103,9 +103,9 @@ export function UserStats({
           icon={FileSpreadsheet}
         />
         <StatCard
-          title="Quotes Sent"
-          value={quotesSent || 0}
-          diff={quotesSentDiff}
+          title="Consultants Sent"
+          value={consultantsSent || 0}
+          diff={consultantsSentDiff}
           icon={CheckCircle}
         />
         <StatCard

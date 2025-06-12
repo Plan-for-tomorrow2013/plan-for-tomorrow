@@ -225,11 +225,11 @@ export default function JobPage({ params }: Props) {
       color: '#532200'
     },
     {
-      name: 'Quotes',
-      id: 'quotes',
-      description: 'View and manage quotes',
+      name: 'Consultants',
+      id: 'consultants',
+      description: 'View and manage consultants',
       icon: DollarSign,
-      href: `/professionals/jobs/${params.jobId}/quotes`,
+      href: `/professionals/jobs/${params.jobId}/consultants`,
       color: '#727E86'
     },
     {

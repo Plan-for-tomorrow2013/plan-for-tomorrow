@@ -67,9 +67,9 @@ export function Navigation({ role, className }: NavigationProps) {
       href: `${prefix}/design-check`,
     },
     {
-      title: "Quotes",
+      title: "Consultants",
       icon: Calculator,
-      href: `${prefix}/quotes`,
+      href: `${prefix}/consultants`,
     },
     {
       title: "Certifying Authority",

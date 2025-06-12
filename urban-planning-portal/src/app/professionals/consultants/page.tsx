@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from "@shared/components/ui/button"
@@ -19,22 +19,217 @@ import { Textarea } from "@shared/components/ui/textarea"
 import { toast } from "@shared/components/ui/use-toast"
 import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo'
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
-import { DocumentStatus } from '@shared/components/DocumentStatus' // Keep this one
-import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
+import { DocumentStatus } from '@shared/components/DocumentStatus'
+import { Job } from '@shared/types/jobs'
 import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType } from '@shared/utils/report-utils'
 import { getDocumentDisplayStatus } from '@shared/utils/report-utils'
-// Removed duplicate PropertyDataShape import
-import { Progress } from "@shared/components/ui/progress"
 import { Loader2 } from 'lucide-react'
 import { DocumentUpload } from "@shared/components/DocumentUpload"
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
-import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'; // Import SiteDetailsProvider and useSiteDetails
+import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'
 import { AlertTitle } from "@shared/components/ui/alert"
 import camelcaseKeys from 'camelcase-keys'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
-import { DetailedInitialAssessment, InitialAssessment } from '@shared/components/DetailedInitialAssessment'
 import { LEPFilter } from '@shared/components/LEPFilter'
+import { DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { CategoryCard } from "@shared/components/CategoryCard"
+import { SearchBar } from "@shared/components/SearchBar"
+
+export default function ConsultantsPage() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
+
+  const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs()
+  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined)
+  const router = useRouter()
+
+  const categories = [
+    {
+      id: "nathers-basix",
+      title: "NatHERS & BASIX",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/nathers-basix",
+      description: "Energy efficiency and sustainability consultants",
+    },
+    {
+      id: "waste-management",
+      title: "Waste Management",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/waste-management",
+      description: "Waste management consultants and services",
+    },
+    {
+      id: "cost-estimate",
+      title: "Cost Estimate",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/cost-estimate",
+      description: "Cost estimation and quantity surveying",
+    },
+    {
+      id: "stormwater",
+      title: "Stormwater",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/stormwater",
+      description: "Stormwater management consultants",
+    },
+    {
+      id: "traffic",
+      title: "Traffic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/traffic",
+      description: "Traffic impact assessment consultants",
+    },
+    {
+      id: "surveyor",
+      title: "Surveyor",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/surveyor",
+      description: "Land and construction surveyors",
+    },
+    {
+      id: "bushfire",
+      title: "Bushfire",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/bushfire",
+      description: "Bushfire assessment consultants",
+    },
+    {
+      id: "flooding",
+      title: "Flooding",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/flooding",
+      description: "Flood assessment consultants",
+    },
+    {
+      id: "acoustic",
+      title: "Acoustic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/acoustic",
+      description: "Acoustic assessment consultants",
+    },
+    {
+      id: "landscaping",
+      title: "Landscaping",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/landscaping",
+      description: "Landscape architects and consultants",
+    },
+    {
+      id: "heritage",
+      title: "Heritage",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/heritage",
+      description: "Heritage impact consultants",
+    },
+    {
+      id: "biodiversity",
+      title: "Biodiversity",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/biodiversity",
+      description: "Biodiversity assessment consultants",
+    },
+    {
+      id: "lawyer",
+      title: "Lawyer",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/lawyer",
+      description: "Planning and property lawyers",
+    },
+    {
+      id: "certifiers",
+      title: "Certifiers",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/certifiers",
+      description: "Building certifiers and inspectors",
+    },
+    {
+      id: "arborist",
+      title: "Arborist",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/consultants/arborist",
+      description: "Tree assessment and arborist services",
+    },
+  ]
+
+  const visibleCategories = categories.slice(0, 6)
+  const scrollableCategories = categories.slice(6)
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setShowLeftArrow(scrollLeft > 0)
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 600
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      })
+    }
+  }
+
+  // Effect to set initial job ID from URL query param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const jobId = params.get('job')
+    if (jobId && jobs?.find(j => j.id === jobId)) {
+      setSelectedJobId(jobId)
+    }
+  }, [jobs])
+
+  // Update URL when job selection changes
+  useEffect(() => {
+    if (selectedJobId) {
+      router.push(`/professionals/consultants?job=${selectedJobId}`, { scroll: false })
+    }
+  }, [selectedJobId, router])
+
+  return (
+    <div className="space-y-6">
+      {/* Job Selection */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Consultants</h1>
+        {isLoadingJobs ? (
+            <div>Loading jobs...</div>
+        ) : jobsError ? (
+            <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
+        ) : (
+            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Select a job" />
+                </SelectTrigger>
+                <SelectContent>
+                    {jobs?.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                            {job.address}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        )}
+      </div>
+
+      {/* Job-specific content */}
+      {selectedJobId ? (
+        <DocumentProvider jobId={selectedJobId}>
+          <SiteDetailsProvider jobId={selectedJobId}>
+            <JobConsultants jobId={selectedJobId} />
+          </SiteDetailsProvider>
+        </DocumentProvider>
+      ) : (
+        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
+          <p>Please select a job from the dropdown above to access Consultants.</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -56,15 +251,10 @@ interface ReportFormState {
   purchaseInitiated: boolean // Added flag for purchase initiation
 }
 
-interface ReportWriterFormState {
+interface ConsultantsFormState {
   'customAssessment': ReportFormState
   'statementOfEnvironmentalEffects': ReportFormState
   'complyingDevelopmentCertificate': ReportFormState
-}
-
-interface PrePreparedAssessmentSection {
-  title: string;
-  assessments: PrePreparedAssessment[];
 }
 
 interface CustomDocument {
@@ -78,22 +268,6 @@ interface CustomDocument {
 
 type PurchasedAssessments = Record<string, boolean>;
 
-interface PrePreparedAssessment {
-  id: string;
-  section: string;
-  title: string;
-  content: string;
-  date: string;
-  author: string;
-  file?: {
-    originalName: string;
-    id: string;
-  };
-  purchaseDate?: string;
-  isPurchased?: boolean;
-  lepName?: string;
-}
-
 interface ReportSectionProps {
   doc: DocumentWithStatus
   job: Job
@@ -103,13 +277,7 @@ interface ReportSectionProps {
   isLoading: boolean
 }
 
-interface PurchasedPrePreparedAssessment {
-  id: string;
-  purchaseDate: string;
-}
-
-// Place this at the top of your file, before any usage
-function reportTypeToId(formType: keyof ReportWriterFormState): string {
+function reportTypeToId(formType: keyof ConsultantsFormState): string {
   switch (formType) {
     case 'customAssessment': return 'custom-assessment';
     case 'statementOfEnvironmentalEffects': return 'statement-of-environmental-effects';
@@ -118,7 +286,6 @@ function reportTypeToId(formType: keyof ReportWriterFormState): string {
   }
 }
 
-// Define fetch function for individual job details
 const fetchJobDetails = async (jobId: string): Promise<Job> => {
   const response = await fetch(`/api/jobs/${jobId}`);
   if (!response.ok) {
@@ -127,24 +294,7 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
     throw new Error(`Failed to fetch job details for ID ${jobId}. Status: ${response.status}`);
   }
   const data = await response.json();
-  return data; // Removed camelcaseKeys to preserve original propertyData keys
-};
-
-// Define fetch function for pre-prepared assessments
-const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSection[]> => {
-    const response = await fetch('/api/pre-prepared-assessments');
-    if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("Failed to fetch pre-prepared assessments:", response.status, errorBody);
-        throw new Error(`Failed to fetch pre-prepared assessments. Status: ${response.status}`);
-    }
-    const data = await response.json();
-    // Add validation if necessary
-    if (!Array.isArray(data)) {
-        console.error("Invalid pre-prepared assessments data received:", data);
-        throw new Error('Invalid pre-prepared assessments data received');
-    }
-    return camelcaseKeys(data, { deep: true });
+  return data;
 };
 
 const formatDate = (dateString: string) => {
@@ -155,7 +305,6 @@ const formatDate = (dateString: string) => {
   }
 };
 
-// Helper to normalize any site details object to SiteDetails shape
 function normalizeSiteDetails(data: any): SiteDetails {
   return {
     siteArea: data?.siteArea || '',
@@ -177,35 +326,147 @@ function normalizeSiteDetails(data: any): SiteDetails {
   };
 }
 
-function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
+function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
   const { siteDetails, updateSiteDetails, saveSiteDetails, hasUnsavedChanges: hasUnsavedSiteDetails } = useSiteDetails()
   const [documentError, setDocumentError] = useState<string | null>(null)
 
-  // Add initialAssessment state with other state declarations
-  const [initialAssessment, setInitialAssessment] = useState<InitialAssessment>({
-    frontSetbackR: '',
-    frontSetbackP: '',
-    sideSetback1R: '',
-    sideSetback1P: '',
-    sideSetback2R: '',
-    sideSetback2P: '',
-    rearSetbackR: '',
-    rearSetbackP: '',
-    siteCoverageR: '',
-    siteCoverageP: '',
-    landscapeAreaR: '',
-    landscapeAreaP: ''
-  });
+  // Category Tiles logic (must be at the top, before any early returns)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(true)
 
-  // Add handleInitialAssessmentChange with other handlers
-  const handleInitialAssessmentChange = (details: InitialAssessment) => {
-    setInitialAssessment(details);
-  };
+  const categories = [
+    {
+      id: "nathers-basix",
+      title: "NatHERS & BASIX",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/nathers-basix",
+      description: "Energy efficiency and sustainability consultants",
+    },
+    {
+      id: "waste-management",
+      title: "Waste Management",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/waste-management",
+      description: "Waste management consultants and services",
+    },
+    {
+      id: "cost-estimate",
+      title: "Cost Estimate",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/cost-estimate",
+      description: "Cost estimation and quantity surveying",
+    },
+    {
+      id: "stormwater",
+      title: "Stormwater",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/stormwater",
+      description: "Stormwater management consultants",
+    },
+    {
+      id: "traffic",
+      title: "Traffic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/traffic",
+      description: "Traffic impact assessment consultants",
+    },
+    {
+      id: "surveyor",
+      title: "Surveyor",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/surveyor",
+      description: "Land and construction surveyors",
+    },
+    {
+      id: "bushfire",
+      title: "Bushfire",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/bushfire",
+      description: "Bushfire assessment consultants",
+    },
+    {
+      id: "flooding",
+      title: "Flooding",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/flooding",
+      description: "Flood assessment consultants",
+    },
+    {
+      id: "acoustic",
+      title: "Acoustic",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/acoustic",
+      description: "Acoustic assessment consultants",
+    },
+    {
+      id: "landscaping",
+      title: "Landscaping",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/landscaping",
+      description: "Landscape architects and consultants",
+    },
+    {
+      id: "heritage",
+      title: "Heritage",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/heritage",
+      description: "Heritage impact consultants",
+    },
+    {
+      id: "biodiversity",
+      title: "Biodiversity",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/biodiversity",
+      description: "Biodiversity assessment consultants",
+    },
+    {
+      id: "lawyer",
+      title: "Lawyer",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/lawyer",
+      description: "Planning and property lawyers",
+    },
+    {
+      id: "certifiers",
+      title: "Certifiers",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/certifiers",
+      description: "Building certifiers and inspectors",
+    },
+    {
+      id: "arborist",
+      title: "Arborist",
+      icon: "/placeholder.svg?height=100&width=100",
+      href: "/professionals/consultants/arborist",
+      description: "Tree assessment and arborist services",
+    },
+  ]
 
-  // Add transformUploadedDocuments function inside component
+  const visibleCategories = categories.slice(0, 6)
+  const scrollableCategories = categories.slice(6)
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setShowLeftArrow(scrollLeft > 0)
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 600
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      })
+    }
+  }
+
   const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
     if (!documents) return {};
     return Object.keys(documents).reduce((acc, key) => {
@@ -214,8 +475,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     }, {} as Record<string, boolean>);
   };
 
-  // Combined state for both report forms (Keep this)
-  const [formState, setFormState] = useState<ReportWriterFormState>({
+  const [formState, setFormState] = useState<ConsultantsFormState>({
     'customAssessment': {
       formData: {
         developmentType: '',
@@ -273,33 +533,12 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false)
   const [isPropertyInfoOpen, setIsPropertyInfoOpen] = useState(false)
   const [isSiteDetailsOpen, setIsSiteDetailsOpen] = useState(false)
-  const [isInitialAssessmentOpen, setIsInitialAssessmentOpen] = useState(false)
 
   // Add this after other state declarations
   const [purchasedAssessments, setPurchasedAssessments] = useState<PurchasedAssessments>({})
 
-  // First, add this state near your other state declarations
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
-
-  // Helper to get/set overlay state per job in localStorage
-  const getOverlayStateForJob = (jobId: string) => {
-    if (!jobId) return true; // default to visible
-    const stored = localStorage.getItem(`soeOverlayVisible_${jobId}`);
-    return stored === null ? true : stored === "true";
-  };
-
-  const setOverlayStateForJob = (jobId: string, visible: boolean) => {
-    if (!jobId) return;
-    localStorage.setItem(`soeOverlayVisible_${jobId}`, visible ? "true" : "false");
-  };
-
-  // Sync overlay state with jobId and localStorage
-  useEffect(() => {
-    setIsOverlayVisible(getOverlayStateForJob(jobId));
-  }, [jobId]);
-
   // Add loadFormData function inside component
-  const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => {
+  const loadFormData = (formType: keyof ConsultantsFormState): CustomAssessmentForm => {
     const storedData = localStorage.getItem(`formData_${jobId}_${formType}`);
     if (storedData) {
       try {
@@ -354,20 +593,20 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
         purchaseInitiated: false, // Reset on load
       },
       'statementOfEnvironmentalEffects': {
-        ...prev['statementOfEnvironmentalEffects'], // Spread specific form type state
+        ...prev['statementOfEnvironmentalEffects'],
         formData: loadFormData('statementOfEnvironmentalEffects'),
         hasUnsavedChanges: false,
-        purchaseInitiated: false, // Reset on load
+        purchaseInitiated: false,
       },
       'complyingDevelopmentCertificate': {
-        ...prev['complyingDevelopmentCertificate'], // Spread specific form type state
+        ...prev['complyingDevelopmentCertificate'],
         formData: loadFormData('complyingDevelopmentCertificate'),
         hasUnsavedChanges: false,
-        purchaseInitiated: false, // Reset on load
+        purchaseInitiated: false,
       },
     }));
 
-  }, [jobId]); // Depend on jobId prop
+  }, [jobId]);
 
   // --- React Query for fetching selected job details ---
   const {
@@ -375,47 +614,13 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     isLoading: isJobLoading,
     error: jobError,
     isError: isJobError,
-    refetch: refetchJob, // Add refetch if needed elsewhere
-  } = useQuery<Job, Error>({ // *** Use jobId prop ***
+    refetch: refetchJob,
+  } = useQuery<Job, Error>({
     queryKey: ['job', jobId],
     queryFn: () => fetchJobDetails(jobId),
-    enabled: !!jobId, // Enable only when jobId is present
-    staleTime: 0, // Always refetch after invalidation
+    enabled: !!jobId,
+    staleTime: 0,
   });
-  // --- End React Query ---
-
-  // --- React Query for fetching pre-prepared assessments ---
-  const {
-      data: prePreparedAssessmentsData = [], // Default to empty array
-      isLoading: isPrePreparedLoading,
-      error: prePreparedError,
-      isError: isPrePreparedError,
-  } = useQuery<PrePreparedAssessmentSection[], Error>({
-      queryKey: ['prePreparedAssessments'], // Unique key
-      queryFn: fetchPrePreparedAssessments, // Use the fetch function
-      staleTime: 1000 * 60 * 10, // Example: Cache for 10 minutes
-  });
-  // --- End React Query ---
-
-  const [currentLEP, setCurrentLEP] = useState<string | null>(null);
-
-  // Add LEP change handler
-  const handleLEPChange = (lepName: string | null) => {
-    setCurrentLEP(lepName);
-  };
-
-  // Filter pre-prepared assessments based on LEP
-  const filteredAssessments = React.useMemo(() => {
-    if (!prePreparedAssessmentsData) return [];
-
-    return prePreparedAssessmentsData.map(section => ({
-      ...section,
-      assessments: section.assessments.filter(assessment =>
-        !assessment.lepName || // Include assessments without LEP
-        assessment.lepName === currentLEP // Include assessments matching current LEP
-      )
-    })).filter(section => section.assessments.length > 0); // Remove empty sections
-  }, [prePreparedAssessmentsData, currentLEP]);
 
   // Effect to update local component state based on fetched job data
   useEffect(() => {
@@ -543,7 +748,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   }
 
   // Generalized form change handler
-  const handleFormChange = (formType: keyof ReportWriterFormState, field: keyof CustomAssessmentForm) => (
+  const handleFormChange = (formType: keyof ConsultantsFormState, field: keyof CustomAssessmentForm) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
      if (!jobId) return; // Use jobId prop
@@ -561,7 +766,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   };
 
   // Handler to initiate the purchase flow for a specific report type
-  const handleInitiatePurchase = (formType: keyof ReportWriterFormState) => {
+  const handleInitiatePurchase = (formType: keyof ConsultantsFormState) => {
     setFormState(prev => ({
       ...prev,
       [formType]: {
@@ -571,9 +776,8 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     }));
   };
 
-
   // Generalized confirm details handler - Restructured for sequential validation
-  const handleConfirmDetails = (formType: keyof ReportWriterFormState) => {
+  const handleConfirmDetails = (formType: keyof ConsultantsFormState) => {
      console.log(`[handleConfirmDetails] Called for formType: ${formType}`);
      if (!jobId) {
         console.log('[handleConfirmDetails] No jobId, returning.');
@@ -708,9 +912,8 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     },
   })
 
-
   // Generalized payment handler - Refactored with useMutation
-  const handlePayment = async (formType: keyof ReportWriterFormState) => {
+  const handlePayment = async (formType: keyof ConsultantsFormState) => {
     if (!jobId || !currentJob) { // Use jobId prop
       toast({ title: "Error", description: "Job data not loaded.", variant: "destructive" });
       return;
@@ -821,8 +1024,8 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           return response.json();
       },
       onSuccess: (data, variables) => {
-          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] }); // Use jobId from variables
-          updateSiteDetails({}); // Reset local unsaved changes state in useSiteDetails hook
+          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
+          updateSiteDetails({});
           toast({
               title: "Success",
               description: "Site details saved successfully.",
@@ -838,9 +1041,8 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
       },
   });
 
-  // Updated save function for Site Details - uses useMutation
   const handleSaveSiteDetails = () => {
-    if (!jobId) { // Use jobId prop
+    if (!jobId) {
       toast({ title: "Error", description: "No job selected.", variant: "destructive" })
       return
     }
@@ -848,158 +1050,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails }) // Use jobId prop
   }
 
-
-  // --- Mutation for Purchasing Pre-prepared Assessments ---
-  const purchasePrePreparedMutation = useMutation<any, Error, { assessment: PrePreparedAssessment }>({
-    mutationFn: async ({ assessment }) => { // Use jobId prop inside
-      if (!jobId) throw new Error("No job selected"); // *** Use jobId prop ***
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, { // *** Use jobId prop ***
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assessment: {
-            id: assessment.id,
-            section: assessment.section,
-            title: assessment.title,
-            content: assessment.content,
-            author: assessment.author,
-            file: assessment.file
-          }
-        }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to purchase assessment');
-      }
-      return response.json();
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Use jobId prop
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [variables.assessment.id]: true
-      }));
-      toast({
-        title: "Success",
-        description: "Assessment purchased successfully.",
-      });
-    },
-    onError: (error) => {
-      console.error('Error purchasing pre-prepared assessments:', error);
-      toast({
-        title: "Purchase Error",
-        description: `Failed to purchase assessment: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Handle pre-prepared assessments purchase and download
-  const handlePrePreparedAssessments = async (assessment: PrePreparedAssessment) => {
-    try {
-      // Fetch job details using jobId prop
-      const jobResponse = await fetch(`/api/jobs/${jobId}`); // *** Use jobId prop ***
-      if (!jobResponse.ok) {
-        throw new Error('Failed to fetch job details');
-      }
-      const jobData = await jobResponse.json();
-
-      // Check if assessment is already purchased
-      const isPurchased = jobData.purchasedPrePreparedAssessments?.some(
-        (purchased: { id: string }) => purchased.id === assessment.id
-      );
-
-      if (!isPurchased) {
-        // Handle payment through Stripe
-        const response = await fetch('/api/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            jobId: jobId, // Use jobId prop
-            assessmentId: assessment.id,
-            type: 'pre-prepared-assessment',
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create checkout session');
-        }
-
-        const { url } = await response.json();
-        window.location.href = url;
-      } else {
-        // Download the assessment
-        if (assessment.file) {
-          window.open(`/api/documents/${assessment.file.id}/download`, '_blank');
-        }
-      }
-    } catch (error) {
-      console.error('Error handling pre-prepared assessments:', error);
-      toast({
-        title: "Error",
-        description: "Failed to process assessment. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Update the renderPrePreparedAssessmentCard function
-  const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
-    // Check if assessment is in purchasedPrePreparedAssessments
-    const purchasedAssessments = currentJob?.purchasedPrePreparedAssessments || {};
-
-    // Check if this assessment is in the purchased list
-    const isPurchased = assessment.id in purchasedAssessments;
-
-    if (isPurchased) {
-      return (
-        <div className="border rounded-lg p-4 bg-green-50">
-          <div className="text-center py-4">
-            <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h4 className="font-medium mb-2">Report Complete</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              Your report is available for download in the Documents section above.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <Card key={assessment.id} className="shadow-md">
-        <CardHeader className="bg-[#323A40] text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-medium">{assessment.title}</h3>
-              <p className="text-sm text-gray-300">{assessment.section}</p>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          <div>
-            <p className="text-sm text-gray-600 mb-2">{assessment.content}</p>
-            <p className="text-xs text-gray-500">
-              Posted by {assessment.author} on {new Date(assessment.date).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Button
-              variant="default"
-              className="w-full bg-green-600 hover:bg-green-700"
-              onClick={() => handleAssessmentPurchase(assessment.id)}
-            >
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              Purchase Assessment
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  // --- Mutation for Uploading Document ---
+   // --- Mutation for Uploading Document ---
   const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
       mutationFn: async ({ documentId, file }) => {
           if (!jobId) throw new Error("No job selected"); // Use jobId prop
@@ -1071,12 +1122,11 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     })
   }
 
-const renderRequiredDocuments = () => {
-  // Debug logging
-  console.log('[ReportWriter] Rendering required documents:', {
-      documentCount: documents.length,
-      documentTypes: documents.map(doc => doc.type)
-    });
+  const renderRequiredDocuments = () => {
+    console.log('[Consultants] Rendering required documents:', {
+        documentCount: documents.length,
+        documentTypes: documents.map(doc => doc.type)
+      });
 
     // Show loading state if documents are being fetched
     if (isDocsLoading) { // Use specific loading state
@@ -1094,7 +1144,6 @@ const renderRequiredDocuments = () => {
         <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
           <AlertCircle className="h-8 w-8 text-red-500" />
           <p className="mt-4 text-red-600">Error loading documents: {docsError}</p>
-          {/* Corrected: Removed out-of-scope {error} variable */}
           <p className="text-sm text-gray-600 mt-2">Please check the console for details or try again.</p>
         </div>
       );
@@ -1121,9 +1170,6 @@ const renderRequiredDocuments = () => {
       const isReport = isReportType(doc.id)
       const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
 
-      // Determine if this specific document tile should have a "Download Report" button
-      // that we are interested in debugging.
-      // This is based on the logic from the old report-writer page:
       // reportStatus.isCompleted && reportStatus.hasFile
       const shouldBeDownloadableReport = isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
 
@@ -1192,7 +1238,7 @@ const renderRequiredDocuments = () => {
   }
 
   // Updated renderCustomAssessmentForm function
-  const renderCustomAssessmentForm = (formType: keyof ReportWriterFormState) => {
+  const renderCustomAssessmentForm = (formType: keyof ConsultantsFormState) => {
     // At the start of renderCustomAssessmentForm, add a guard for currentJob
     if (!currentJob) return null;
     // Remove any previous or duplicate declarations of isPaid and isCompleted in this function
@@ -1412,189 +1458,10 @@ const renderRequiredDocuments = () => {
   const toggleDocuments = () => { setIsDocumentsOpen(prev => !prev); };
   const togglePropertyInfo = () => { setIsPropertyInfoOpen(prev => !prev); };
   const toggleSiteDetails = () => { setIsSiteDetailsOpen(prev => !prev); };
-  const toggleInitialAssessment = () => { setIsInitialAssessmentOpen(prev => !prev); };
 
   const isReadOnly = false;
 
-  const handleAssessmentPurchase = async (assessmentId: string): Promise<void> => {
-    try {
-      if (!jobId) {
-        toast({ title: "Error", description: "No job selected", variant: "destructive" });
-        return;
-      }
-
-      // Find the assessment details from the loaded data
-      const assessment = filteredAssessments
-        .flatMap(section => section.assessments)
-        .find(a => a.id === assessmentId);
-
-      if (!assessment) {
-        toast({ title: "Error", description: "Assessment not found", variant: "destructive" });
-        return;
-      }
-
-      // Directly call the purchase endpoint
-      const response = await fetch(`/api/jobs/${jobId}/pre-prepared-assessments/purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assessment }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to purchase assessment');
-      }
-
-      // Update local state/UI
-      setPurchasedAssessments(prev => ({
-        ...prev,
-        [assessmentId]: true
-      }));
-
-      toast({
-        title: "Success",
-        description: "Assessment purchased successfully.",
-      });
-
-      // Refetch job data to force UI update
-      await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-      await refetchJob();
-
-    } catch (error) {
-      console.error('Error purchasing assessment:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to purchase assessment",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Corrected: Change parameter type to PrePreparedAssessment
-  const handleAssessmentDownload = async (assessment: PrePreparedAssessment) => {
-    try {
-      if (!assessment.file) {
-        throw new Error('No file available for download');
-      }
-      const response = await fetch(`/api/pre-prepared-assessments/${assessment.file.id}/download`);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = assessment.file.originalName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error downloading assessment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to download assessment",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Update the document creation to use the correct properties
-  const createDocumentFromAssessment = (assessment: PurchasedPrePreparedAssessments): DocumentWithStatus => ({
-    id: assessment.id,
-    title: assessment.title,
-    category: 'Pre-prepared Assessments',
-    description: assessment.content,
-    path: '/document-store',
-    type: 'document',
-    versions: [],
-    currentVersion: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    // Corrected: Use displayStatus
-    displayStatus: 'uploaded',
-    uploadedFile: assessment.file ? {
-      fileName: assessment.file.id,
-      originalName: assessment.file.originalName,
-      type: 'application/pdf',
-      uploadedAt: new Date().toISOString(),
-      size: 0
-    } : undefined
-  });
-
-  // Add this after other useEffect hooks
-  useEffect(() => {
-    const handlePaymentSuccess = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const paymentSuccess = params.get('payment_success');
-      const assessmentId = params.get('assessment_id');
-
-      if (paymentSuccess === 'true' && assessmentId && jobId) {
-        try {
-          // Get the assessment details first
-          const assessmentResponse = await fetch(`/api/pre-prepared-assessments/${assessmentId}`);
-          if (!assessmentResponse.ok) {
-            throw new Error('Failed to fetch assessment details');
-          }
-          const assessment = await assessmentResponse.json();
-
-          // Update job with purchased assessment
-          const response = await fetch(`/api/jobs/${jobId}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              purchasedPrePreparedAssessments: {
-                [assessmentId]: {
-                  id: assessment.id,
-                  purchaseDate: new Date().toISOString(),
-                  title: assessment.title,
-                  content: assessment.content,
-                  file: assessment.file
-                }
-              }
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to update job with purchased assessment');
-          }
-
-          // Update local state
-          setPurchasedAssessments(prev => ({
-            ...prev,
-            [assessmentId]: true
-          }));
-
-          // Invalidate queries to refresh data
-          queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-          queryClient.invalidateQueries({ queryKey: ['prePreparedAssessments'] });
-
-          // Remove payment success params from URL
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.delete('payment_success');
-          newUrl.searchParams.delete('assessment_id');
-          window.history.replaceState({}, '', newUrl.toString());
-
-          toast({
-            title: "Success",
-            description: "Assessment purchased successfully",
-          });
-        } catch (error) {
-          console.error('Error updating purchased assessment:', error);
-          toast({
-            title: "Error",
-            description: "Failed to update purchased assessment",
-            variant: "destructive"
-          });
-        }
-      }
-    };
-
-    if (jobId) {
-      handlePaymentSuccess();
-    }
-  }, [jobId, queryClient]); // Added queryClient to dependencies
-
-  // --- Main Render Logic for JobReportWriter ---
+  // --- Main Render Logic for JobConsultants ---
   const isLoading = isDocsLoading || isJobLoading; // Combined loading state
 
   // Corrected: Refined loading/error handling
@@ -1612,16 +1479,13 @@ const renderRequiredDocuments = () => {
     <div className="space-y-6">
       {/* Loading States - Removed as handled above */}
       {/* {isJobLoading && <div>Loading job details...</div>} */}
-      {isPrePreparedLoading && <div>Loading assessments...</div>}
 
       {/* Error States - Removed Job Error as handled above */}
       {/* {isJobError && <Alert variant="destructive"><AlertDescription>{jobError?.message}</AlertDescription></Alert>} */}
-      {isPrePreparedError && <Alert variant="destructive"><AlertDescription>{prePreparedError?.message}</AlertDescription></Alert>}
       {/* Display document context error if it exists */}
       {docsError && <Alert variant="destructive"><AlertTitle>Document Error</AlertTitle><AlertDescription>{docsError}</AlertDescription></Alert>}
       {/* Display specific document error state if it exists */}
       {documentError && <Alert variant="destructive"><AlertTitle>Operation Error</AlertTitle><AlertDescription>{documentError}</AlertDescription></Alert>}
-
 
       {/* Main Content */}
       <div className="space-y-6">
@@ -1674,100 +1538,28 @@ const renderRequiredDocuments = () => {
               {isDocumentsOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
             </button>
             {isDocumentsOpen && (
-              <div className="mt-4"> {/* Removed extra grid classes here */}
-                {renderRequiredDocuments()} {/* Uses documents from useDocuments() */}
-              </div>
-            )}
-          </div>
-
-          {/* Initial Assessment Section */}
-          <div className="border rounded-lg p-4">
-            <button
-              onClick={toggleInitialAssessment}
-              className="flex items-center justify-between w-full"
-            >
-              <h2 className="text-xl font-semibold">Initial Assessment</h2>
-              {isInitialAssessmentOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-            </button>
-            {isInitialAssessmentOpen && (
               <div className="mt-4">
-                <DetailedInitialAssessment
-                  initialAssessment={initialAssessment}
-                  onInitialAssessmentChange={handleInitialAssessmentChange}
-                  readOnly={isReadOnly}
-                />
+                {renderRequiredDocuments()}
               </div>
             )}
           </div>
 
-          {/* Statement of Environmental Effects Generator Section */}
-          <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
-            {/* The actual content that will be revealed */}
-            <div className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="space-y-4">
-                <p>This is the actual content that will be revealed!</p>
-                {/* Add your form elements, inputs, etc. here */}
-
-                {/* Show Overlay Again Button */}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsOverlayVisible(true);
-                    setOverlayStateForJob(jobId, true);
-                  }}
-                >
-                  Show Overlay Again
-                </Button>
-              </div>
+          {/* Category Tiles Section (no scrolling, just a responsive grid) */}
+          <div className="max-w-6xl mx-auto my-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {categories.map((category) => (
+                <Link key={category.id} href={category.href} passHref legacyBehavior>
+                  <a style={{ textDecoration: 'none' }}>
+                    <CategoryCard
+                      title={category.title}
+                      icon={category.icon}
+                      href={category.href}
+                      description={category.description}
+                    />
+                  </a>
+                </Link>
+              ))}
             </div>
-
-            {/* The overlay that covers the content */}
-            <div
-              className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
-                ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-              onClick={() => {
-                setIsOverlayVisible(false);
-                setOverlayStateForJob(jobId, false);
-              }}
-            >
-              <div className="flex flex-col items-center justify-center w-full p-8">
-                <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
-                <p>Statement of Environmental Effects Generator</p>
-                <p className="text-[#532200] text-sm mt-2">Click to preview</p>
-              </div>
-            </div>
-          </div>
-
-          {/* LEP Filter Section */}
-          {currentJob?.propertyData && (
-            <LEPFilter
-              propertyData={currentJob.propertyData}
-              onLEPChange={handleLEPChange}
-            />
-          )}
-
-          {/* Pre-prepared Assessments Section */}
-          <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Pre-prepared Assessments</h2>
-            {isPrePreparedLoading ? (
-              <div>Loading assessments...</div>
-            ) : (
-              filteredAssessments.map((section) => (
-                <div key={section.title} className="space-y-4 mb-6">
-                  <h3 className="text-lg font-medium">{section.title}</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {section.assessments.map((assessment) => {
-                      console.log('Assessment:', {
-                        id: assessment.id,
-                        purchasedAssessments,
-                        isPurchased: assessment.isPurchased
-                      });
-                      return renderPrePreparedAssessmentCard(assessment);
-                    })}
-                  </div>
-                </div>
-              ))
-            )}
           </div>
 
           {/* Statement of Environmental Effects Section */}
@@ -1792,74 +1584,4 @@ const renderRequiredDocuments = () => {
         </div> {/* Closing inner div */}
     </div>
   )
-}
-
-// *** MAIN PAGE COMPONENT (Handles Job Selection) ***
-export default function ReportWriterPage() {
-  const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs();
-  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined);
-  const router = useRouter();
-
-  // Effect to set initial job ID from URL query param
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const jobId = params.get('job');
-    if (jobId && jobs?.find(j => j.id === jobId)) { // Ensure the job exists in the list
-      setSelectedJobId(jobId);
-    } else if (jobs && jobs.length > 0 && !jobId) {
-        // Optionally select the first job if none is in the URL
-        // setSelectedJobId(jobs[0].id);
-    }
-  }, [jobs]); // Depend on jobs loading
-
-  // Update URL when job selection changes
-  useEffect(() => {
-    if (selectedJobId) {
-      router.push(`/professionals/report-writer?job=${selectedJobId}`, { scroll: false });
-    }
-    // Optional: handle case where selection is cleared
-    // else { router.push('/professionals/report-writer', { scroll: false }); }
-  }, [selectedJobId, router]);
-
-
-  return (
-    <div className="space-y-6">
-      {/* Job Selection */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Report Writer</h1>
-        {isLoadingJobs ? (
-            <div>Loading jobs...</div>
-        ) : jobsError ? (
-            <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
-        ) : (
-            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-                <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Select a job" />
-                </SelectTrigger>
-                <SelectContent>
-                    {jobs?.map((job) => (
-                        <SelectItem key={job.id} value={job.id}>
-                            {job.address}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        )}
-      </div>
-
-      {/* Conditional Rendering of Job-Specific Content with Providers */}
-      {selectedJobId ? (
-        // *** Wrap the JobReportWriter with Providers ***
-        <DocumentProvider jobId={selectedJobId}>
-          <SiteDetailsProvider jobId={selectedJobId}>
-            <JobReportWriter jobId={selectedJobId} />
-          </SiteDetailsProvider>
-        </DocumentProvider>
-      ) : (
-        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to access Report Writer.</p>
-        </div>
-      )}
-    </div>
-  );
 }

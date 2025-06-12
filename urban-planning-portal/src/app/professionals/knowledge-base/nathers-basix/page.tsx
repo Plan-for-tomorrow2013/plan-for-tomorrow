@@ -568,14 +568,17 @@ function JobInitialAssessment({
   // --- Tile rendering logic ---
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
     return (
-      <Link
-        href={`/professionals/knowledge-base/nathers-basix/document?path=${encodeURIComponent(
-          `/api/kb-nathers-assessments/${assessment.file?.id}/download`
-        )}&title=${encodeURIComponent(assessment.title)}`}
-        className="text-blue-600 underline block mb-2"
-      >
-        {assessment.title}
-      </Link>
+      <div className="mb-4">
+        <Link
+          href={`/professionals/knowledge-base/nathers-basix/document?path=${encodeURIComponent(
+            `/api/kb-nathers-assessments/${assessment.file?.id}/download`
+          )}&title=${encodeURIComponent(assessment.title)}`}
+          className="text-blue-600 underline block mb-2"
+        >
+          {assessment.title}
+        </Link>
+        <p className="text-sm text-gray-600 mb-2">{assessment.content}</p>
+      </div>
     );
   };
 
@@ -1006,14 +1009,17 @@ export default function NathersPage() {
 
   const renderPrePreparedAssessmentCard = (assessment: PrePreparedAssessment) => {
     return (
-      <Link
-        href={`/professionals/knowledge-base/nathers-basix/document?path=${encodeURIComponent(
-          `/api/kb-nathers-assessments/${assessment.file?.id}/download`
-        )}&title=${encodeURIComponent(assessment.title)}`}
-        className="text-blue-600 underline block mb-2"
-      >
-        {assessment.title}
-      </Link>
+      <div className="mb-4">
+        <Link
+          href={`/professionals/knowledge-base/nathers-basix/document?path=${encodeURIComponent(
+            `/api/kb-nathers-assessments/${assessment.file?.id}/download`
+          )}&title=${encodeURIComponent(assessment.title)}`}
+          className="text-blue-600 underline block mb-2"
+        >
+          {assessment.title}
+        </Link>
+        <p className="text-sm text-gray-600 mb-2">{assessment.content}</p>
+      </div>
     );
   };
 

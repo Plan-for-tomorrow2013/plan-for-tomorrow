@@ -481,8 +481,8 @@ export default function DashboardPage() {
                         color: '#532200',
                       },
                       {
-                        name: 'Quotes',
-                        id: 'quotes',
+                        name: 'Consultants',
+                        id: 'consultants',
                         description: 'Manage cost estimates',
                         color: '#727E86',
                       },

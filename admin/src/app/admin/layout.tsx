@@ -65,7 +65,7 @@ export default function RootLayout({
                   <Link href="/admin/design-check">Design Check</Link>
                 </li>
                 <li>
-                  <Link href="/admin/quotes">Quotes</Link>
+                  <Link href="/admin/consultants">Consultants</Link>
                 </li>
                 <li>
                   <Link href="/admin/account">Account</Link>

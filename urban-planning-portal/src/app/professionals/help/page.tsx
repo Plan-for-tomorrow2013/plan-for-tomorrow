@@ -120,7 +120,7 @@ export default function HelpPage() {
           <ul className="list-disc pl-6 space-y-2">
             <li>• Design Check Guide</li>
             <li>• Report Writer Guide</li>
-            <li>• Quotes Guide</li>
+            <li>• Consultants Guide</li>
           </ul>
         </section>
 

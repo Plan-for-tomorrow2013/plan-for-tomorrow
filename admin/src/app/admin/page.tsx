@@ -116,6 +116,19 @@ export default function AdminPage() {
           </a>
         </div>
 
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-2">Consultants</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Review and manage the consultants.
+          </p>
+          <a
+            href="/admin/consultants"
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
+            Go to Consultants →
+          </a>
+        </div>
+
       </div>
     </div> {/* Added missing closing div tag */}
     </>

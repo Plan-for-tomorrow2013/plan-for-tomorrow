@@ -2,21 +2,25 @@
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Search, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ConsultantCard } from "../components/consultant-card"
 import { Input } from "@shared/components/ui/input"
 
 const categoryTitles: { [key: string]: string } = {
-  "nathers-basix": "NatHERS & BASIX",
-  "waste-management": "Waste Management",
-  "cost-estimate": "Cost Estimate",
-  stormwater: "Stormwater",
-  certifiers: "Certifiers",
-  arborist: "Arborist",
+  "Cost Estimate": "Cost Estimate",
+  "Stormwater": "Stormwater",
+  "NatHERS & BASIX": "NatHERS & BASIX",
+  "Waste Management": "Waste Management",
+  "Certifiers": "Certifiers",
+  "Arborist": "Arborist",
 }
 
 export default function QuoteCategoryPage({ params }: { params: { category: string } }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobParam = searchParams.get('job')
+  const [jobId, categoryFromParam] = jobParam?.split('/') || [null, null]
+  const currentCategory = categoryFromParam || params.category
   const [searchQuery, setSearchQuery] = useState("")
   const [consultants, setConsultants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +29,7 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(`/api/consultants?category=${encodeURIComponent(params.category)}`)
+    fetch(`/api/consultants?category=${encodeURIComponent(currentCategory)}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch consultants')
         return res.json()
@@ -33,7 +37,7 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
       .then(data => setConsultants(data))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
-  }, [params.category])
+  }, [currentCategory])
 
   const filteredConsultants = consultants.filter(
     (consultant) =>
@@ -46,21 +50,31 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
     setConsultants(consultants.map((c) => (c.id === id ? { ...c, notes } : c)))
   }
 
+  const handleBack = () => {
+    if (jobId) {
+      router.push(`/professionals/consultants?job=${jobId}`)
+    } else {
+      router.push('/professionals/consultants')
+    }
+  }
+
+  const categoryTitle = categoryTitles[currentCategory as keyof typeof categoryTitles] || currentCategory
+
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <button
-            onClick={() => router.back()}
+            onClick={handleBack}
             className="flex items-center text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to job
+            Back to categories
           </button>
         </div>
 
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{categoryTitles[params.category]} Consultants</h1>
+          <h1 className="text-2xl font-bold">{categoryTitle} Consultants</h1>
         </div>
 
         <div className="mb-6">

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from "@shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@shared/components/ui/card"
-import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download, AlertCircle } from "@shared/components/ui/icons"
+import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download, AlertCircle, ChevronLeft, ChevronRight } from "@shared/components/ui/icons"
 import { ShoppingCart } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
@@ -32,9 +32,117 @@ import camelcaseKeys from 'camelcase-keys'
 import { DocumentTile } from '@shared/components/DocumentTile'
 import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
 import { LEPFilter } from '@shared/components/LEPFilter'
-import { DollarSign, ChevronLeft, ChevronRight } from "lucide-react"
+import { DollarSign } from "lucide-react"
 import { CategoryCard } from "@shared/components/CategoryCard"
 import { SearchBar } from "@shared/components/SearchBar"
+
+const categories = [
+  {
+    id: "nathers-basix",
+    title: "NatHERS & BASIX",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/nathers-basix",
+    description: "Energy efficiency and sustainability consultants",
+  },
+  {
+    id: "waste-management",
+    title: "Waste Management",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/waste-management",
+    description: "Waste management consultants and services",
+  },
+  {
+    id: "cost-estimate",
+    title: "Cost Estimate",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/cost-estimate",
+    description: "Cost estimation and quantity surveying",
+  },
+  {
+    id: "stormwater",
+    title: "Stormwater",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/stormwater",
+    description: "Stormwater management consultants",
+  },
+  {
+    id: "traffic",
+    title: "Traffic",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/traffic",
+    description: "Traffic impact assessment consultants",
+  },
+  {
+    id: "surveyor",
+    title: "Surveyor",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/surveyor",
+    description: "Land and construction surveyors",
+  },
+  {
+    id: "bushfire",
+    title: "Bushfire",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/bushfire",
+    description: "Bushfire assessment consultants",
+  },
+  {
+    id: "flooding",
+    title: "Flooding",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/flooding",
+    description: "Flood assessment consultants",
+  },
+  {
+    id: "acoustic",
+    title: "Acoustic",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/acoustic",
+    description: "Acoustic assessment consultants",
+  },
+  {
+    id: "landscaping",
+    title: "Landscaping",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/landscaping",
+    description: "Landscape architects and consultants",
+  },
+  {
+    id: "heritage",
+    title: "Heritage",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/heritage",
+    description: "Heritage impact consultants",
+  },
+  {
+    id: "biodiversity",
+    title: "Biodiversity",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/biodiversity",
+    description: "Biodiversity assessment consultants",
+  },
+  {
+    id: "lawyer",
+    title: "Lawyer",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/lawyer",
+    description: "Planning and property lawyers",
+  },
+  {
+    id: "certifiers",
+    title: "Certifiers",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/certifiers",
+    description: "Building certifiers and inspectors",
+  },
+  {
+    id: "arborist",
+    title: "Arborist",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/arborist",
+    description: "Tree assessment and arborist services",
+  },
+]
 
 export default function ConsultantsPage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -44,114 +152,6 @@ export default function ConsultantsPage() {
   const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs()
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined)
   const router = useRouter()
-
-  const categories = [
-    {
-      id: "nathers-basix",
-      title: "NatHERS & BASIX",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/nathers-basix",
-      description: "Energy efficiency and sustainability consultants",
-    },
-    {
-      id: "waste-management",
-      title: "Waste Management",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/waste-management",
-      description: "Waste management consultants and services",
-    },
-    {
-      id: "cost-estimate",
-      title: "Cost Estimate",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/cost-estimate",
-      description: "Cost estimation and quantity surveying",
-    },
-    {
-      id: "stormwater",
-      title: "Stormwater",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/stormwater",
-      description: "Stormwater management consultants",
-    },
-    {
-      id: "traffic",
-      title: "Traffic",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/traffic",
-      description: "Traffic impact assessment consultants",
-    },
-    {
-      id: "surveyor",
-      title: "Surveyor",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/surveyor",
-      description: "Land and construction surveyors",
-    },
-    {
-      id: "bushfire",
-      title: "Bushfire",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/bushfire",
-      description: "Bushfire assessment consultants",
-    },
-    {
-      id: "flooding",
-      title: "Flooding",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/flooding",
-      description: "Flood assessment consultants",
-    },
-    {
-      id: "acoustic",
-      title: "Acoustic",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/acoustic",
-      description: "Acoustic assessment consultants",
-    },
-    {
-      id: "landscaping",
-      title: "Landscaping",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/landscaping",
-      description: "Landscape architects and consultants",
-    },
-    {
-      id: "heritage",
-      title: "Heritage",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/heritage",
-      description: "Heritage impact consultants",
-    },
-    {
-      id: "biodiversity",
-      title: "Biodiversity",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/biodiversity",
-      description: "Biodiversity assessment consultants",
-    },
-    {
-      id: "lawyer",
-      title: "Lawyer",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/lawyer",
-      description: "Planning and property lawyers",
-    },
-    {
-      id: "certifiers",
-      title: "Certifiers",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/certifiers",
-      description: "Building certifiers and inspectors",
-    },
-    {
-      id: "arborist",
-      title: "Arborist",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/consultants/arborist",
-      description: "Tree assessment and arborist services",
-    },
-  ]
 
   const visibleCategories = categories.slice(0, 6)
   const scrollableCategories = categories.slice(6)
@@ -338,116 +338,14 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
 
-  const categories = [
-    {
-      id: "nathers-basix",
-      title: "NatHERS & BASIX",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/nathers-basix",
-      description: "Energy efficiency and sustainability consultants",
-    },
-    {
-      id: "waste-management",
-      title: "Waste Management",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/waste-management",
-      description: "Waste management consultants and services",
-    },
-    {
-      id: "cost-estimate",
-      title: "Cost Estimate",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/cost-estimate",
-      description: "Cost estimation and quantity surveying",
-    },
-    {
-      id: "stormwater",
-      title: "Stormwater",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/stormwater",
-      description: "Stormwater management consultants",
-    },
-    {
-      id: "traffic",
-      title: "Traffic",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/traffic",
-      description: "Traffic impact assessment consultants",
-    },
-    {
-      id: "surveyor",
-      title: "Surveyor",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/surveyor",
-      description: "Land and construction surveyors",
-    },
-    {
-      id: "bushfire",
-      title: "Bushfire",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/bushfire",
-      description: "Bushfire assessment consultants",
-    },
-    {
-      id: "flooding",
-      title: "Flooding",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/flooding",
-      description: "Flood assessment consultants",
-    },
-    {
-      id: "acoustic",
-      title: "Acoustic",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/acoustic",
-      description: "Acoustic assessment consultants",
-    },
-    {
-      id: "landscaping",
-      title: "Landscaping",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/landscaping",
-      description: "Landscape architects and consultants",
-    },
-    {
-      id: "heritage",
-      title: "Heritage",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/heritage",
-      description: "Heritage impact consultants",
-    },
-    {
-      id: "biodiversity",
-      title: "Biodiversity",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/biodiversity",
-      description: "Biodiversity assessment consultants",
-    },
-    {
-      id: "lawyer",
-      title: "Lawyer",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/lawyer",
-      description: "Planning and property lawyers",
-    },
-    {
-      id: "certifiers",
-      title: "Certifiers",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/certifiers",
-      description: "Building certifiers and inspectors",
-    },
-    {
-      id: "arborist",
-      title: "Arborist",
-      icon: "/placeholder.svg?height=100&width=100",
-      href: "/professionals/consultants/arborist",
-      description: "Tree assessment and arborist services",
-    },
-  ]
+  // Create job-specific categories
+  const jobCategories = categories.map(category => ({
+    ...category,
+    href: `/professionals/consultants/${category.id}?job=${jobId}`
+  }))
 
-  const visibleCategories = categories.slice(0, 6)
-  const scrollableCategories = categories.slice(6)
+  const visibleCategories = jobCategories.slice(0, 6)
+  const scrollableCategories = jobCategories.slice(6)
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {

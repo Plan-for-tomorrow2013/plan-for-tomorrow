@@ -5,7 +5,7 @@ import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Upload } from "lucide-react"
 import { Document } from "../types/documents"
-import { useToast } from "../lib/toast-context"
+import { useToast } from "@shared/components/ui/use-toast"
 
 interface DocumentUploadProps {
   onUploadComplete?: (document: Document) => void

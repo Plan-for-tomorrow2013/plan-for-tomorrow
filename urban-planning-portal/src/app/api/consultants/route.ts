@@ -22,12 +22,16 @@ export async function GET(request: Request) {
 
     // Get the category from the query parameters
     const url = new URL(request.url)
-    const category = url.searchParams.get('category')
+    const category = decodeURIComponent(url.searchParams.get('category') || '')
 
     if (category) {
-      // Filter consultants by category
+      // Normalize the category by replacing hyphens with spaces
+      const normalizedCategory = category.replace(/-/g, ' ')
+
+      // Filter consultants by category (case-insensitive)
       const filteredConsultants = consultants.filter(
-        (consultant: { category: string }) => consultant.category === category
+        (consultant: { category: string }) =>
+          consultant.category.toLowerCase() === normalizedCategory.toLowerCase()
       )
       return NextResponse.json(filteredConsultants)
     }

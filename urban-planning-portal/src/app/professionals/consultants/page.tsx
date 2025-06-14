@@ -341,7 +341,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   // Create job-specific categories
   const jobCategories = categories.map(category => ({
     ...category,
-    href: `/professionals/consultants/${category.id}?job=${jobId}`
+    href: `/professionals/consultants/${jobId}/${category.id}`
   }))
 
   const visibleCategories = jobCategories.slice(0, 6)
@@ -1442,10 +1442,10 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
             )}
           </div>
 
-          {/* Category Tiles Section (no scrolling, just a responsive grid) */}
+          {/* Category Tiles Section */}
           <div className="max-w-6xl mx-auto my-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {categories.map((category) => (
+              {jobCategories.map((category) => (
                 <Link key={category.id} href={category.href} passHref legacyBehavior>
                   <a style={{ textDecoration: 'none' }}>
                     <CategoryCard

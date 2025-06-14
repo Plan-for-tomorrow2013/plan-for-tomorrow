@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Search, Loader2 } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ConsultantCard } from "../components/consultant-card"
+import { useRouter } from "next/navigation"
+import { ConsultantCard } from "../../components/consultant-card"
 import { Input } from "@shared/components/ui/input"
 
 const categoryTitles: { [key: string]: string } = {
@@ -15,12 +15,8 @@ const categoryTitles: { [key: string]: string } = {
   "Arborist": "Arborist",
 }
 
-export default function QuoteCategoryPage({ params }: { params: { category: string } }) {
+export default function QuoteCategoryPage({ params }: { params: { jobId: string; category: string } }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const jobParam = searchParams.get('job')
-  const [jobId, categoryFromParam] = jobParam?.split('/') || [null, null]
-  const currentCategory = categoryFromParam || params.category
   const [searchQuery, setSearchQuery] = useState("")
   const [consultants, setConsultants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +25,7 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(`/api/consultants?category=${encodeURIComponent(currentCategory)}`)
+    fetch(`/api/consultants?category=${encodeURIComponent(params.category)}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch consultants')
         return res.json()
@@ -37,7 +33,7 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
       .then(data => setConsultants(data))
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
-  }, [currentCategory])
+  }, [params.category])
 
   const filteredConsultants = consultants.filter(
     (consultant) =>
@@ -51,14 +47,10 @@ export default function QuoteCategoryPage({ params }: { params: { category: stri
   }
 
   const handleBack = () => {
-    if (jobId) {
-      router.push(`/professionals/consultants?job=${jobId}`)
-    } else {
-      router.push('/professionals/consultants')
-    }
+    router.push(`/professionals/consultants?job=${params.jobId}`)
   }
 
-  const categoryTitle = categoryTitles[currentCategory as keyof typeof categoryTitles] || currentCategory
+  const categoryTitle = categoryTitles[params.category as keyof typeof categoryTitles] || params.category
 
   return (
     <div className="p-6">

@@ -22,6 +22,8 @@ export async function GET(
   try {
     // No need to ensure directory here, getJobPath implies base structure
     const jobPath = getJobPath(params.jobId) // Use utility
+    console.log('Job path:', jobPath)
+    console.log('Job exists:', existsSync(jobPath))
 
     if (!existsSync(jobPath)) {
       console.error(`Job not found at expected path: ${jobPath}`) // Add log

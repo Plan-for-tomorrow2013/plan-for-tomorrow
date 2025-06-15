@@ -31,6 +31,31 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
   const [consultants, setConsultants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [job, setJob] = useState<any>(null)
+
+  useEffect(() => {
+    // Fetch job details
+    console.log('Fetching job:', params.jobId)
+    fetch(`/api/jobs/${params.jobId}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch job details')
+        return res.json()
+      })
+      .then(data => {
+        console.log('Job data:', data)
+        if (data.redirectUrl) {
+          // If we got a redirect URL, navigate to it
+          console.log('Redirecting to:', data.redirectUrl)
+          router.push(data.redirectUrl)
+          return
+        }
+        setJob(data)
+      })
+      .catch(err => {
+        console.error('Error with job:', err)
+        setError(err.message)
+      })
+  }, [params.jobId, router])
 
   useEffect(() => {
     setLoading(true)
@@ -51,6 +76,16 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
       consultant.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
       consultant.notes.toLowerCase().includes(searchQuery.toLowerCase()),
   )
+
+  // Transform job data into the format expected by ConsultantCard
+  const jobsData = job ? [{
+    id: job.id,
+    address: job.address,
+    documents: Object.entries(job.documents || {}).map(([id, doc]: [string, any]) => ({
+      id,
+      name: doc.originalName
+    }))
+  }] : []
 
   return (
     <div className="container mx-auto p-6">
@@ -89,7 +124,7 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
               <ConsultantCard
                 key={consultant.id}
                 consultant={consultant}
-                jobs={[]}
+                jobs={jobsData}
               />
             ))}
           </div>

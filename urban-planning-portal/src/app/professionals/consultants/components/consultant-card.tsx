@@ -17,6 +17,7 @@ import {
 import { Input } from "@shared/components/ui/input"
 import { Label } from "@shared/components/ui/label"
 import { useToast } from "@shared/components/ui/use-toast"
+import { updateConsultantNotes } from "../actions"
 
 interface Consultant {
   id: string
@@ -26,15 +27,15 @@ interface Consultant {
   company: string
   notes: string
   category: string
+  logo?: string
 }
 
 interface ConsultantCardProps {
   consultant: Consultant
-  onUpdateNotes: (id: string, notes: string) => void
   jobs: Array<{ id: string; address: string; documents: Array<{ id: string; name: string }> }>
 }
 
-export function ConsultantCard({ consultant, onUpdateNotes, jobs }: ConsultantCardProps) {
+export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [notes, setNotes] = useState(consultant.notes)
   const [selectedJob, setSelectedJob] = useState("")
@@ -43,13 +44,21 @@ export function ConsultantCard({ consultant, onUpdateNotes, jobs }: ConsultantCa
   const [specialDetails, setSpecialDetails] = useState("")
   const { toast } = useToast()
 
-  const handleSaveNotes = () => {
-    onUpdateNotes(consultant.id, notes)
-    setIsEditing(false)
-    toast({
-      title: "Notes Updated",
-      description: "Consultant notes have been saved successfully.",
-    })
+  const handleSaveNotes = async () => {
+    try {
+      await updateConsultantNotes(consultant.id, notes)
+      setIsEditing(false)
+      toast({
+        title: "Notes Updated",
+        description: "Consultant notes have been saved successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update notes. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleRequestQuote = async () => {
@@ -104,7 +113,14 @@ export function ConsultantCard({ consultant, onUpdateNotes, jobs }: ConsultantCa
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center gap-3">
+        {consultant.logo ? (
+          <img src={consultant.logo} alt="Logo" className="h-10 w-10 rounded-full object-cover border" />
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold border">
+            {consultant.name ? consultant.name[0] : '?'}
+          </div>
+        )}
         <CardTitle>{consultant.name}</CardTitle>
       </CardHeader>
       <CardContent>

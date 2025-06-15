@@ -60,7 +60,8 @@ export async function POST(request: Request) {
       fileName,
       originalName: file.name,
       size: file.size,
-      uploadedBy: metadata.uploadedBy || 'system'
+      uploadedBy: metadata.uploadedBy || 'system',
+      type: file.type
     }
 
     // Create document metadata

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@shared/components/ui/button"
 import { Input } from "@shared/components/ui/input"
 import { Label } from "@shared/components/ui/label"
@@ -20,10 +20,9 @@ import { useToast } from "@shared/components/ui/use-toast"
 
 interface ConsultantFormProps {
   category: string
-  onAdd: (consultant: any) => void
 }
 
-export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
+export function ConsultantForm({ category }: ConsultantFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,27 +30,57 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
     company: "",
     notes: "",
   })
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    setLogoFile(file)
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (ev) => setLogoPreview(ev.target?.result as string)
+      reader.readAsDataURL(file)
+    } else {
+      setLogoPreview(null)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     try {
-      const response = await fetch("/api/consultants", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          category,
-        }),
-      })
+      let response
+      if (logoFile) {
+        const formDataToSend = new FormData()
+        Object.entries(formData).forEach(([key, value]) => formDataToSend.append(key, value))
+        formDataToSend.append('logo', logoFile)
+        formDataToSend.append('category', category)
+        response = await fetch("/api/consultants", {
+          method: "POST",
+          body: formDataToSend,
+        })
+      } else {
+        response = await fetch("/api/consultants", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            category,
+          }),
+        })
+      }
 
       if (!response.ok) throw new Error("Failed to add consultant")
 
       const consultant = await response.json()
-      onAdd(consultant)
+
+      // Close the dialog after successful submission
+      setIsOpen(false)
 
       toast({
         title: "Consultant Added",
@@ -66,6 +95,9 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
         company: "",
         notes: "",
       })
+      setLogoFile(null)
+      setLogoPreview(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     } catch (error) {
       toast({
         title: "Error",
@@ -76,7 +108,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>Add New Consultant</Button>
       </DialogTrigger>
@@ -86,7 +118,7 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
           <DialogDescription>Add a new consultant for {category}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -127,6 +159,21 @@ export function ConsultantForm({ category, onAdd }: ConsultantFormProps) {
               value={formData.company}
               onChange={(e) => setFormData({ ...formData, company: e.target.value })}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="logo">Logo</Label>
+            <input
+              type="file"
+              id="logo"
+              accept="image/*"
+              onChange={handleLogoChange}
+              ref={fileInputRef}
+              className="w-full"
+            />
+            {logoPreview && (
+              <img src={logoPreview} alt="Logo preview" className="h-12 w-12 rounded-full mt-2 object-cover border" />
+            )}
           </div>
 
           <div className="space-y-2">

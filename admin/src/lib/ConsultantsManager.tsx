@@ -38,8 +38,17 @@ const categories = [
   "Waste Management",
   "Cost Estimate",
   "Stormwater",
+  "Traffic",
+  "Surveyor",
+  "Bushfire",
+  "Flooding",
+  "Acoustic",
+  "Landscaping",
+  "Heritage",
+  "Biodiversity",
+  "Lawyer",
   "Certifiers",
-  "Arborist",
+  "Arborist"
 ]
 
 export function ConsultantsManager({

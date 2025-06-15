@@ -1,0 +1,132 @@
+import { NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import path from 'path'
+import { getJobDocumentsPath, getConsultantTicketsPath, getDocumentsMetadataPath, ensureDirectoryExists } from '@shared/utils/paths'
+
+export async function POST(request: Request) {
+  try {
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    const ticketId = formData.get('ticketId') as string
+
+    if (!file || !ticketId) {
+      return NextResponse.json(
+        { error: 'File and ticket ID are required' },
+        { status: 400 }
+      )
+    }
+
+    // Read the consultant tickets file
+    const consultantTicketsPath = getConsultantTicketsPath()
+    let consultantTickets = []
+    try {
+      const consultantTicketsData = await fs.readFile(consultantTicketsPath, 'utf-8')
+      consultantTickets = JSON.parse(consultantTicketsData)
+    } catch (readError) {
+      if ((readError as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw readError
+      }
+      console.log('Consultant tickets file not found, starting fresh.')
+    }
+
+    // Find the ticket to update
+    const ticketIndex = consultantTickets.findIndex((ticket: any) => ticket.id === ticketId)
+    if (ticketIndex === -1) {
+      return NextResponse.json(
+        { error: 'Ticket not found' },
+        { status: 404 }
+      )
+    }
+
+    const ticket = consultantTickets[ticketIndex]
+    const ticketType = ticket.ticketType
+
+    // Ensure the ticket has a jobId
+    if (!ticket.jobId) {
+      console.error(`Ticket ${ticketId} is missing jobId.`)
+      return NextResponse.json(
+        { error: 'Ticket is missing associated Job ID.' },
+        { status: 400 }
+      )
+    }
+
+    // Ensure the job documents directory exists
+    const jobDocumentsDir = getJobDocumentsPath(ticket.jobId)
+    await ensureDirectoryExists(jobDocumentsDir)
+
+    // Define the fileName based on the ticket type
+    const fileExtension = path.extname(file.name)
+    const storedFileName = `${ticketType}${fileExtension}`
+    const filePath = path.join(jobDocumentsDir, storedFileName)
+
+    // Save the file
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+    await fs.writeFile(filePath, fileBuffer)
+
+    // Map ticketType to the expected documentId used by the client portal
+    let clientDocumentId = ticketType
+
+    // Update document metadata
+    const metadataPath = getDocumentsMetadataPath()
+    let documents = []
+    try {
+      const metadataData = await fs.readFile(metadataPath, 'utf-8')
+      documents = JSON.parse(metadataData)
+    } catch (readError) {
+      if ((readError as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw readError
+      }
+      console.log('Documents metadata file not found, starting fresh.')
+    }
+
+    // Add new document metadata
+    documents.push({
+      id: clientDocumentId,
+      metadata: {
+        ticketId,
+        jobId: ticket.jobId,
+        uploadedAt: new Date().toISOString(),
+        fileName: storedFileName,
+        originalName: file.name,
+        size: file.size,
+        type: file.type
+      }
+    })
+
+    // Save metadata
+    await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+
+    // Update the ticket with completed document info
+    console.log('[UPLOAD] Ticket object BEFORE update:', JSON.stringify(ticket, null, 2));
+
+    const newTicketData = {
+      ...ticket,
+      // status: 'completed', // Let's manage ticket status more granularly, e.g. 'uploaded' or rely on completedDocument presence
+      completedDocument: {
+        documentId: clientDocumentId,
+        originalName: file.name,
+        fileName: storedFileName,
+        uploadedAt: new Date().toISOString(),
+        size: file.size,
+        type: file.type,
+      }
+    };
+    consultantTickets[ticketIndex] = newTicketData;
+
+    console.log('[UPLOAD] Ticket object AFTER update (before save):', JSON.stringify(consultantTickets[ticketIndex], null, 2));
+    console.log('[UPLOAD] Entire consultantTickets array BEFORE save (first 2 tickets):', JSON.stringify(consultantTickets.slice(0,2), null, 2));
+
+
+    // Save updated tickets
+    await fs.writeFile(consultantTicketsPath, JSON.stringify(consultantTickets, null, 2))
+    console.log('[UPLOAD] Successfully wrote consultantTicketsPath');
+
+    return NextResponse.json(consultantTickets[ticketIndex])
+  } catch (error) {
+    console.error('Error handling file upload:', error)
+    return NextResponse.json(
+      { error: 'Failed to process file upload' },
+      { status: 500 }
+    )
+  }
+}

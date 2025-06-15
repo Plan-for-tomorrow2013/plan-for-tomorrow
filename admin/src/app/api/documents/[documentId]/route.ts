@@ -42,7 +42,8 @@ export async function PUT(
       fileName,
       originalName: file.name,
       size: file.size,
-      uploadedBy: metadata.uploadedBy || 'system'
+      uploadedBy: metadata.uploadedBy || 'system',
+      type: file.type
     }
 
     // Update document metadata

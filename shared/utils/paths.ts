@@ -24,6 +24,10 @@ export const getJobDocumentsPath = (jobId: string) => path.join(getJobsPath(), j
 export const getWorkTicketsPath = () => path.join(getDataPath(), 'work-tickets.json');
 export const getWorkTicketPath = (ticketId: string) => path.join(getDataPath(), 'work-tickets', `${ticketId}.json`);
 
+// Consultant ticket paths (derive from the unambiguous getDataPath)
+export const getConsultantTicketsPath = () => path.join(getDataPath(), 'consultant-tickets.json');
+export const getConsultantTicketPath = (ticketId: string) => path.join(getDataPath(), 'consultant-tickets', `${ticketId}.json`);
+
 // Constants
 export const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
 

@@ -1,3 +1,20 @@
+export type ConsultantCategory =
+  | "NatHERS & BASIX"
+  | "Waste Management"
+  | "Cost Estimate"
+  | "Stormwater"
+  | "Traffic"
+  | "Surveyor"
+  | "Bushfire"
+  | "Flooding"
+  | "Acoustic"
+  | "Landscaping"
+  | "Heritage"
+  | "Biodiversity"
+  | "Lawyer"
+  | "Certifiers"
+  | "Arborist";
+
 export interface Assessment {
   status?: 'paid' | 'completed';
   returnedAt?: string;
@@ -10,6 +27,11 @@ export interface Assessment {
   additionalInfo?: string;
   createdAt?: string;
   updatedAt?: string;
+  category?: ConsultantCategory;
+  consultant?: {
+    name: string;
+    notes: string;
+  };
   documents?: {
     certificateOfTitle?: { originalName?: string; fileName?: string };
     surveyPlan?: { originalName?: string; fileName?: string };
@@ -17,13 +39,13 @@ export interface Assessment {
     architecturalPlan?: { originalName?: string; fileName?: string };
   };
   completedDocument?: {
-    documentId?: string; // Matches workTicket.completedDocument.documentId
+    documentId?: string;
     originalName: string;
     fileName: string;
     uploadedAt: string;
     size: number;
-    type: string; // e.g., 'application/pdf'
-    returnedAt?: string; // Matches workTicket.completedDocument.returnedAt
+    type: string;
+    returnedAt?: string;
   };
   uploadedDocuments?: {
     [key: string]: {
@@ -51,6 +73,13 @@ export interface Job {
   wasteManagementAssessment?: Assessment;
   certifyingAuthority?: {
     webAddress?: string;
+  };
+  consultants?: {
+    [key in ConsultantCategory]?: {
+      name: string;
+      notes: string;
+      assessment?: Assessment;
+    };
   };
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;

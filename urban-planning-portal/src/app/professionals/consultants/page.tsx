@@ -141,7 +141,7 @@ const categories = [
     icon: "/placeholder.svg?height=100&width=100",
     href: "/professionals/consultants/arborist",
     description: "Tree assessment and arborist services",
-  },
+  }
 ]
 
 export default function ConsultantsPage() {

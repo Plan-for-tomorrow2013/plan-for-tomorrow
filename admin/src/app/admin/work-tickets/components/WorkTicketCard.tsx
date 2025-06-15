@@ -3,8 +3,8 @@ import { Button } from "@shared/components/ui/button"
 import { FileText, Clock, Upload, Bell } from 'lucide-react'
 import { cn } from '@shared/lib/utils'
 import { WorkTicket } from '@shared/types/workTickets'
-import { DocumentRenderer } from '@/app/admin/work-tickets/components/DocumentRenderer'
-import { ReportSummarySection } from '@/app/admin/work-tickets/components/ReportSummarySection'
+import { DocumentRenderer } from '@/components/DocumentRenderer'
+import { ReportSummarySection } from '@/components/ReportSummarySection'
 
 // Helper function to get display name for ticket type
 const getTicketTypeDisplayName = (type: string): string => {

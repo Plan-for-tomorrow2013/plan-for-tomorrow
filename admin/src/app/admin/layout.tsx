@@ -68,6 +68,9 @@ export default function RootLayout({
                   <Link href="/admin/consultants">Consultants</Link>
                 </li>
                 <li>
+                  <Link href="/admin/consultants-tickets">Consultant Tickets</Link>
+                </li>
+                <li>
                   <Link href="/admin/account">Account</Link>
                 </li>
                 <li>

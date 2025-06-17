@@ -226,10 +226,10 @@ export default function JobPage({ params }: Props) {
     },
     {
       name: 'Consultants',
-      id: 'consultants',
+      id: 'consultant-store',
       description: 'View and manage consultants',
       icon: DollarSign,
-      href: `/professionals/jobs/${params.jobId}/consultants`,
+      href: `/professionals/jobs/${params.jobId}/consultant-store`,
       color: '#727E86'
     },
     {

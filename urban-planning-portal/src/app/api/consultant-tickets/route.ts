@@ -8,23 +8,30 @@ import { Document, DocumentVersion } from '@shared/types/documents'
 import { getJob, saveJob } from '@shared/services/jobStorage'
 import { Job, Assessment } from '@shared/types/jobs'
 
-// Helper function to get display name for ticket type
-const getTicketTypeDisplayName = (type: string): string => {
-  switch (type) {
-    case 'custom-assessment':
-      return 'Custom Assessment'
-    case 'statement-of-environmental-effects':
-      return 'Statement of Environmental Effects'
-    case 'complying-development-certificate':
-      return 'Complying Development Certificate'
-    case 'waste-management-assessment':
-      return 'Waste Management Assessment'
-    case 'nathers-assessment':
-      return 'Nathers Assessment'
+// Helper function to get consultant category display name
+const getConsultantCategoryDisplayName = (category: string): string => {
+  switch (category) {
+    case 'NatHERS & BASIX':
+    case 'Waste Management':
+    case 'Cost Estimate':
+    case 'Stormwater':
+    case 'Traffic':
+    case 'Surveyor':
+    case 'Bushfire':
+    case 'Flooding':
+    case 'Acoustic':
+    case 'Landscaping':
+    case 'Heritage':
+    case 'Biodiversity':
+    case 'Lawyer':
+    case 'Certifiers':
+    case 'Arborist':
+    case 'Geotechnical':
+      return category;
     default:
-      return type
+      return category;
   }
-}
+};
 
 // Helper function to read consultant tickets
 async function readConsultantTickets(): Promise<ConsultantTicket[]> {
@@ -80,7 +87,7 @@ async function createDocumentFromConsultantTicket(
   // Create document
   const document: Document = {
     id: documentId,
-    title: `${getTicketTypeDisplayName(ticket.category)} - ${ticket.jobAddress}`,
+    title: `${getConsultantCategoryDisplayName(ticket.category)} - ${ticket.jobAddress}`,
     path: `consultant-tickets/${ticket.id}`,
     type: 'document',
     category: 'REPORTS',
@@ -129,6 +136,8 @@ export async function POST(request: Request) {
       jobId: metadata.jobId,
       jobAddress: metadata.jobAddress,
       category: metadata.category,
+      consultantId: metadata.consultantId,
+      consultantName: metadata.consultantName,
       status: 'pending',
       createdAt: new Date().toISOString(),
       assessment: metadata.assessment,
@@ -159,14 +168,34 @@ export async function POST(request: Request) {
         // Proceed without document, but log the error
       }
     } else {
-      // Always create a document entry for every consultant ticket, referencing attached documents by jobId
-      const documentId = uuidv4();
+      // Full mapping for all ConsultantCategory values
+      const categoryToDocumentId: Record<string, { id: string, title: string }> = {
+        'NatHERS & BASIX': { id: 'nathersBasixAssessment', title: 'NatHERS & BASIX' },
+        'Waste Management': { id: 'wasteManagementAssessment', title: 'Waste Management' },
+        'Cost Estimate': { id: 'costEstimateAssessment', title: 'Cost Estimate' },
+        'Stormwater': { id: 'stormwaterAssessment', title: 'Stormwater' },
+        'Traffic': { id: 'trafficAssessment', title: 'Traffic' },
+        'Surveyor': { id: 'surveyorAssessment', title: 'Surveyor' },
+        'Bushfire': { id: 'bushfireAssessment', title: 'Bushfire' },
+        'Flooding': { id: 'floodingAssessment', title: 'Flooding' },
+        'Acoustic': { id: 'acousticAssessment', title: 'Acoustic' },
+        'Landscaping': { id: 'landscapingAssessment', title: 'Landscaping' },
+        'Heritage': { id: 'heritageAssessment', title: 'Heritage' },
+        'Biodiversity': { id: 'biodiversityAssessment', title: 'Biodiversity' },
+        'Lawyer': { id: 'lawyerAssessment', title: 'Lawyer' },
+        'Certifiers': { id: 'certifiersAssessment', title: 'Certifiers' },
+        'Arborist': { id: 'arboristAssessment', title: 'Arborist' },
+        'Geotechnical': { id: 'geotechnicalAssessment', title: 'Geotechnical' },
+      };
+      const docInfo = categoryToDocumentId[newTicket.category] || { id: newTicket.category.replace(/\s+/g, '').replace(/&/g, '').replace(/[^a-zA-Z0-9]/g, '') + 'Assessment', title: newTicket.category };
+      const documentId = docInfo.id;
+      const documentTitle = docInfo.title;
       const now = new Date().toISOString();
       // Reference attached documents by jobId (from assessment.documents if present)
       const attachedDocuments = metadata?.assessment?.documents || {};
       const document = {
         id: documentId,
-        title: `${getTicketTypeDisplayName(newTicket.category)} - ${newTicket.jobAddress}`,
+        title: `${documentTitle} - ${newTicket.jobAddress}`,
         path: `consultant-tickets/${newTicket.id}`,
         type: 'document',
         category: 'REPORTS',
@@ -192,6 +221,24 @@ export async function POST(request: Request) {
       } catch (error) {
         await fs.writeFile(metadataPath, JSON.stringify([document], null, 2))
       }
+      // Update the job's consultants field for this category with assessment status 'paid'
+      try {
+        const job = getJob(newTicket.jobId);
+        if (job) {
+          job.consultants = job.consultants ?? {};
+          job.consultants[newTicket.category] = job.consultants[newTicket.category] ?? { name: '', notes: '' };
+          (job.consultants[newTicket.category] as { assessment?: Assessment }).assessment = {
+            ...((job.consultants[newTicket.category] as { assessment?: Assessment }).assessment || {}),
+            ...newTicket.assessment,
+            status: 'paid',
+            createdAt: now,
+            updatedAt: now,
+          };
+          await saveJob(newTicket.jobId, job);
+        }
+      } catch (err) {
+        console.error('Error updating job consultants assessment field:', err);
+      }
     }
 
     // Read existing tickets
@@ -202,25 +249,6 @@ export async function POST(request: Request) {
 
     // Save updated tickets
     await writeConsultantTickets(tickets);
-
-    // --- Update the job's assessment field to reflect the new report ---
-    try {
-      const job = getJob(newTicket.jobId);
-      if (job) {
-        job.consultants = job.consultants ?? {};
-        job.consultants[newTicket.category] = job.consultants[newTicket.category] ?? { name: '', notes: '' };
-        (job.consultants[newTicket.category] as { assessment?: Assessment }).assessment = {
-          ...((job.consultants[newTicket.category] as { assessment?: Assessment }).assessment || {}),
-          ...newTicket.assessment,
-          status: 'paid',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        await saveJob(newTicket.jobId, job);
-      }
-    } catch (err) {
-      console.error('Error updating job assessment field:', err);
-    }
 
     return NextResponse.json(newTicket);
   } catch (error) {

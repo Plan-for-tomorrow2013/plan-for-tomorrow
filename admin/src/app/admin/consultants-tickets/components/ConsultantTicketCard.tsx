@@ -65,7 +65,7 @@ export function ConsultantTicketCard({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-medium">
-              {getTicketTypeDisplayName(ticket.category)}
+              {ticket.consultantName ? `${ticket.consultantName} — ` : ''}{getTicketTypeDisplayName(ticket.category)}
             </h2>
             <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
             <ReportSummarySection

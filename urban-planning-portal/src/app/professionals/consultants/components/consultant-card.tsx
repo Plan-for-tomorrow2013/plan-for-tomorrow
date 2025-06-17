@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Mail, Phone, Edit2, Save, X, Clock } from "lucide-react"
 import { Button } from "@shared/components/ui/button"
 import { Textarea } from "@shared/components/ui/textarea"
@@ -35,16 +35,26 @@ interface Consultant {
 interface ConsultantCardProps {
   consultant: Consultant
   jobs: Array<{ id: string; address: string; documents: Array<{ id: string; name: string }> }>
+  initialReportStatus?: 'pending' | 'in_progress' | 'completed' | null
+  onReportStatusChange?: (status: 'pending' | 'in_progress' | 'completed') => void
 }
 
-export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
+export function ConsultantCard({ consultant, jobs, initialReportStatus, onReportStatusChange }: ConsultantCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [notes, setNotes] = useState(consultant.notes)
   const [developmentType, setDevelopmentType] = useState("")
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [showDialog, setShowDialog] = useState(false)
+  const [reportStatus, setReportStatus] = useState<'pending' | 'in_progress' | 'completed' | null>(initialReportStatus || null)
   const { toast } = useToast()
   const { documents } = useDocuments()
+
+  // Update report status when initialReportStatus changes
+  useEffect(() => {
+    if (initialReportStatus !== undefined) {
+      setReportStatus(initialReportStatus)
+    }
+  }, [initialReportStatus])
 
   // Assume jobs always has one job (from URL context)
   const job = jobs[0]
@@ -55,6 +65,15 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
       id: doc.id,
       name: doc.uploadedFile?.originalName || doc.title
     }))
+
+  // Only show specific document types for attachment
+  const allowedDocIds = [
+    'tenSevenCertificate',
+    'certificateOfTitle',
+    'surveyPlan',
+    'architecturalPlan'
+  ];
+  const filteredAttachedDocs = attachedDocs.filter(doc => allowedDocIds.includes(doc.id));
 
   const handleSaveNotes = async () => {
     try {
@@ -86,15 +105,18 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
       const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle')
       const surveyPlan = documents.find(doc => doc.id === 'surveyPlan')
       const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate')
+      const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
 
       // Create the consultant ticket payload with the correct structure
       const consultantTicketPayload = {
         jobId: job.id,
         jobAddress: job.address,
-        category: consultant.category, // Using category instead of ticketType
+        category: consultant.category,
+        consultantId: consultant.id,
+        consultantName: consultant.name,
         status: 'pending',
         createdAt: new Date().toISOString(),
-        assessment: { // Using assessment as the key (matching your working example)
+        assessment: {
           developmentType,
           additionalInfo,
           documents: {
@@ -109,6 +131,10 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
             certificate107: {
               originalName: certificate107?.uploadedFile?.originalName,
               fileName: certificate107?.uploadedFile?.fileName
+            },
+            architecturalPlan: {
+              originalName: architecturalPlan?.uploadedFile?.originalName,
+              fileName: architecturalPlan?.uploadedFile?.fileName
             }
           }
         }
@@ -131,6 +157,11 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
         throw new Error(errorData.error || 'Failed to create consultant ticket')
       }
       console.log('Consultant ticket created successfully')
+
+      // Set report status to in_progress after successful ticket creation
+      setReportStatus('in_progress')
+      onReportStatusChange?.('in_progress')
+      setShowDialog(false)
 
       toast({
         title: "Quote Requested",
@@ -217,6 +248,15 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
             )}
           </div>
 
+          {reportStatus === 'in_progress' && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-md">
+              <h4 className="font-medium mb-2">Report In Progress</h4>
+              <p className="text-sm text-gray-600">
+                We are processing your "Quote Request" Report. You will be notified when it's ready.
+              </p>
+            </div>
+          )}
+
           <Button
             className="w-full"
             onClick={() => {
@@ -254,12 +294,12 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
                       className="mt-1"
                     />
                   </div>
-                  {attachedDocs.length > 0 && (
+                  {filteredAttachedDocs.length > 0 && (
                     <div className="space-y-2 border-t pt-4 mt-4">
                       <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
                       <p className="text-xs text-gray-500">The following documents will be included with your submission:</p>
                       <ul className="list-disc list-inside text-sm space-y-1">
-                        {attachedDocs.map(doc => (
+                        {filteredAttachedDocs.map(doc => (
                           <li key={doc.id}>{doc.name}</li>
                         ))}
                       </ul>

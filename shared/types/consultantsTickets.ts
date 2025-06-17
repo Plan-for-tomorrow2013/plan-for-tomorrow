@@ -15,4 +15,6 @@ export interface ConsultantTicket {
   }
   assessment?: Assessment
   documents?: Array<{ id: string; name: string }>
+  consultantId: string
+  consultantName: string
 }

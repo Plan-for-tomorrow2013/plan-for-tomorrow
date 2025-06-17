@@ -7,6 +7,15 @@ import { ConsultantCard } from "../../components/consultant-card"
 import { Input } from "@shared/components/ui/input"
 import { Button } from "@shared/components/ui/button"
 import { DocumentProvider } from '@shared/contexts/document-context'
+import { useQuoteRequests } from '@shared/hooks/useQuoteRequests'
+
+// Add interface for quote request state
+interface QuoteRequestState {
+  [consultantId: string]: {
+    status: 'pending' | 'in_progress' | 'completed'
+    timestamp: number
+  }
+}
 
 const categoryTitles: { [key: string]: string } = {
   "NatHERS & BASIX": "NatHERS & BASIX",
@@ -34,6 +43,7 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [job, setJob] = useState<any>(null)
+  const { quoteRequests, updateQuoteRequestStatus } = useQuoteRequests(params.jobId)
 
   useEffect(() => {
     // Fetch job details
@@ -128,6 +138,8 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
                   key={consultant.id}
                   consultant={consultant}
                   jobs={jobsData}
+                  initialReportStatus={quoteRequests[consultant.id]?.status || null}
+                  onReportStatusChange={(status) => updateQuoteRequestStatus({ consultantId: consultant.id, status })}
                 />
               ))}
             </div>

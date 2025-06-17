@@ -79,6 +79,7 @@ export interface Job {
     [key in ConsultantCategory]?: {
       name: string;
       notes: string;
+      consultantId: string;
       assessment?: Assessment;
     };
   };

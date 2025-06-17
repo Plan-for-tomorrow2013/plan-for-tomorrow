@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { DocumentWithStatus, DOCUMENT_TYPES, Document } from "../types/documents"
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from "../components/ui/use-toast"
-import { Job, Assessment } from "../types/jobs"
+import { Job, Assessment, ConsultantCategory } from "../types/jobs"
 import { documentService } from "../services/documentService"
 import { jobService } from "../services/jobService"
 import { getDocumentDisplayStatus } from "@shared/utils/report-utils"
@@ -61,6 +61,15 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             shouldDisplay = true
           }
 
+          // Check for consultant documents
+          if (job.consultants && docType.category) {
+            const consultantAssessment = job.consultants[docType.category as ConsultantCategory]?.assessment;
+            if (consultantAssessment?.completedDocument) {
+              shouldDisplay = true;
+              assessmentData = consultantAssessment;
+            }
+          }
+
           if (shouldDisplay) {
             let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload' // Default for standard
             let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
@@ -70,10 +79,33 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             // Try to get fileName from assessmentData.fileName OR assessmentData.completedDocument.fileName
             let assessmentFileName = assessmentData?.fileName;
             if (!assessmentFileName && assessmentData?.completedDocument) {
-              assessmentFileName = (assessmentData.completedDocument as any)?.fileName;
+              assessmentFileName = assessmentData.completedDocument.fileName;
             }
 
-            if (jobDocData && jobDocData.fileName) {
+            // Check for consultant completed documents
+            if (job.consultants && docType.category) {
+              const consultantAssessment = job.consultants[docType.category as ConsultantCategory]?.assessment;
+              if (consultantAssessment?.completedDocument?.returnedAt) {
+                displayStatus = 'uploaded';
+                uploadedFile = {
+                  fileName: consultantAssessment.completedDocument.fileName,
+                  originalName: consultantAssessment.completedDocument.originalName,
+                  type: consultantAssessment.completedDocument.type,
+                  uploadedAt: consultantAssessment.completedDocument.uploadedAt,
+                  size: consultantAssessment.completedDocument.size,
+                  returnedAt: consultantAssessment.completedDocument.returnedAt
+                };
+
+                // Update the quote request status in localStorage with consultant ID
+                const consultantId = job.consultants[docType.category as ConsultantCategory]?.consultantId;
+                if (consultantId) {
+                  const quoteRequestKey = `quoteRequest_${jobId}_${docType.category}_${consultantId}`;
+                  localStorage.setItem(quoteRequestKey, 'completed');
+                }
+              }
+            }
+
+            if (jobDocData && jobDocData.fileName && !uploadedFile) {
               displayStatus = 'uploaded'
               uploadedFile = {
                 fileName: jobDocData.fileName,
@@ -82,7 +114,7 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
                 uploadedAt: jobDocData.uploadedAt,
                 size: jobDocData.size
               }
-            } else if (assessmentFileName && docType.purchasable) {
+            } else if (assessmentFileName && docType.purchasable && !uploadedFile) {
               // Check assessment data for fileName if purchasable and not in job.documents
               displayStatus = 'uploaded'
               uploadedFile = {
@@ -92,7 +124,7 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
                 uploadedAt: assessmentData?.uploadedAt || new Date().toISOString(),
                 size: assessmentData?.size || 0
               }
-            } else if (docType.purchasable) {
+            } else if (docType.purchasable && !uploadedFile) {
               // Purchasable, paid/completed, but no file yet
               displayStatus = 'pending_admin_delivery'
             }

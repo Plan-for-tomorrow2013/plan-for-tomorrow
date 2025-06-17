@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const ticket = consultantTickets[ticketIndex]
-    const ticketType = ticket.ticketType
+    const ticketCategory = ticket.category
 
     // Ensure the ticket has a jobId
     if (!ticket.jobId) {
@@ -54,17 +54,17 @@ export async function POST(request: Request) {
     const jobDocumentsDir = getJobDocumentsPath(ticket.jobId)
     await ensureDirectoryExists(jobDocumentsDir)
 
-    // Define the fileName based on the ticket type
+    // Define the fileName based on the ticket category
     const fileExtension = path.extname(file.name)
-    const storedFileName = `${ticketType}${fileExtension}`
+    const storedFileName = `${ticketCategory}${fileExtension}`
     const filePath = path.join(jobDocumentsDir, storedFileName)
 
     // Save the file
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     await fs.writeFile(filePath, fileBuffer)
 
-    // Map ticketType to the expected documentId used by the client portal
-    let clientDocumentId = ticketType
+    // Map ticket category to the expected documentId used by the client portal
+    let clientDocumentId = ticketCategory
 
     // Update document metadata
     const metadataPath = getDocumentsMetadataPath()
@@ -101,7 +101,6 @@ export async function POST(request: Request) {
 
     const newTicketData = {
       ...ticket,
-      // status: 'completed', // Let's manage ticket status more granularly, e.g. 'uploaded' or rely on completedDocument presence
       completedDocument: {
         documentId: clientDocumentId,
         originalName: file.name,
@@ -115,7 +114,6 @@ export async function POST(request: Request) {
 
     console.log('[UPLOAD] Ticket object AFTER update (before save):', JSON.stringify(consultantTickets[ticketIndex], null, 2));
     console.log('[UPLOAD] Entire consultantTickets array BEFORE save (first 2 tickets):', JSON.stringify(consultantTickets.slice(0,2), null, 2));
-
 
     // Save updated tickets
     await fs.writeFile(consultantTicketsPath, JSON.stringify(consultantTickets, null, 2))

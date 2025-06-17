@@ -1,7 +1,37 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
-import { getConsultantTicketsPath } from '@shared/utils/paths';
+import { getConsultantTicketsPath, getDocumentsPath, getDocumentPath, getDocumentsMetadataPath } from '@shared/utils/paths';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
+import path from 'path';
+import { ConsultantTicket } from '@shared/types/consultantsTickets';
+import { Document, DocumentVersion } from '@shared/types/documents';
+import { getJob, saveJob } from '@shared/services/jobStorage';
+import { Job, Assessment } from '@shared/types/jobs';
+
+// Helper function to get consultant category display name
+const getConsultantCategoryDisplayName = (category: string): string => {
+  switch (category) {
+    case 'NatHERS & BASIX':
+    case 'Waste Management':
+    case 'Cost Estimate':
+    case 'Stormwater':
+    case 'Traffic':
+    case 'Surveyor':
+    case 'Bushfire':
+    case 'Flooding':
+    case 'Acoustic':
+    case 'Landscaping':
+    case 'Heritage':
+    case 'Biodiversity':
+    case 'Lawyer':
+    case 'Certifiers':
+    case 'Arborist':
+    case 'Geotechnical':
+      return category;
+    default:
+      return category;
+  }
+};
 
 export async function GET() {
   try {
@@ -126,4 +156,63 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+async function createDocumentFromConsultantTicket(
+  ticket: ConsultantTicket,
+  file: File,
+  metadata: any
+): Promise<Document> {
+  const documentId = uuidv4()
+  const version = 1
+  const extension = path.extname(file.name)
+  const filePath = getDocumentPath(documentId, version, extension)
+
+  // Save the file
+  const buffer = Buffer.from(await file.arrayBuffer())
+  await fs.writeFile(filePath, buffer)
+
+  // Create document version
+  const documentVersion: DocumentVersion = {
+    version,
+    uploadedAt: new Date().toISOString(),
+    fileName: path.basename(filePath),
+    originalName: file.name,
+    size: file.size,
+    type: file.type,
+    uploadedBy: metadata.uploadedBy || 'system'
+  }
+
+  // Create document
+  const document: Document = {
+    id: documentId,
+    title: `${getConsultantCategoryDisplayName(ticket.category)} - ${ticket.jobAddress}`,
+    path: `consultant-tickets/${ticket.id}`,
+    type: 'document',
+    category: ticket.category, // Changed from 'REPORTS' to ticket.category
+    versions: [documentVersion],
+    currentVersion: version,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    metadata: {
+      jobId: ticket.jobId,
+      ticketId: ticket.id,
+      category: ticket.category,
+      ...metadata
+    }
+  }
+
+  // Save metadata
+  const metadataPath = getDocumentsMetadataPath()
+  try {
+    const existingMetadata = await fs.readFile(metadataPath, 'utf-8')
+    const documents = JSON.parse(existingMetadata)
+    documents.push(document)
+    await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+  } catch (error) {
+    await fs.writeFile(metadataPath, JSON.stringify([document], null, 2))
+  }
+
+  return document
 }

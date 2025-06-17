@@ -34,7 +34,21 @@ interface Consultant {
 
 interface ConsultantCardProps {
   consultant: Consultant
-  jobs: Array<{ id: string; address: string; documents: Array<{ id: string; name: string }> }>
+  jobs: Array<{
+    id: string;
+    address: string;
+    documents: Array<{ id: string; name: string }>;
+    consultants?: {
+      [key: string]: {
+        consultantId: string;
+        assessment?: {
+          completedDocument?: {
+            returnedAt?: string;
+          };
+        };
+      };
+    };
+  }>
   initialReportStatus?: 'pending' | 'in_progress' | 'completed' | null
   onReportStatusChange?: (status: 'pending' | 'in_progress' | 'completed') => void
 }
@@ -55,6 +69,34 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
       setReportStatus(initialReportStatus)
     }
   }, [initialReportStatus])
+
+  // Check for completed documents
+  useEffect(() => {
+    const job = jobs[0];
+    if (!job) return;
+
+    const quoteRequestKey = `quoteRequest_${job.id}_${consultant.category}_${consultant.id}`;
+    const storedStatus = localStorage.getItem(quoteRequestKey);
+
+    // Check if this specific consultant has a completed document in the job data
+    const consultantData = job.consultants?.[consultant.category];
+    const hasCompletedDocument = consultantData?.consultantId === consultant.id &&
+                                consultantData?.assessment?.completedDocument?.returnedAt;
+
+    // Update status if either localStorage indicates completion or there's a returned document
+    if ((storedStatus === 'completed' || hasCompletedDocument) && reportStatus !== 'completed') {
+      setReportStatus('completed');
+      // Only call onReportStatusChange if the status actually changed
+      if (onReportStatusChange) {
+        onReportStatusChange('completed');
+      }
+
+      // Ensure localStorage is updated if we found a completed document
+      if (hasCompletedDocument) {
+        localStorage.setItem(quoteRequestKey, 'completed');
+      }
+    }
+  }, [jobs[0]?.id, consultant.category, consultant.id, onReportStatusChange, reportStatus, jobs]);
 
   // Assume jobs always has one job (from URL context)
   const job = jobs[0]
@@ -161,6 +203,11 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
       // Set report status to in_progress after successful ticket creation
       setReportStatus('in_progress')
       onReportStatusChange?.('in_progress')
+
+      // Store the status in localStorage with consultant ID
+      const quoteRequestKey = `quoteRequest_${job.id}_${consultant.category}_${consultant.id}`;
+      localStorage.setItem(quoteRequestKey, 'in_progress');
+
       setShowDialog(false)
 
       toast({
@@ -257,14 +304,26 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
             </div>
           )}
 
-          <Button
-            className="w-full"
-            onClick={() => {
-              setShowDialog(true);
-            }}
-          >
-            Request Quote
-          </Button>
+          {reportStatus === 'completed' && (
+            <div className="mt-4 p-4 bg-green-50 rounded-md">
+              <h4 className="font-medium mb-2">Report Complete</h4>
+              <p className="text-sm text-gray-600">
+                Your report has been completed and is available in the documents section.
+              </p>
+            </div>
+          )}
+
+          {/* Only show the Request Quote button if no quote has been sent yet */}
+          {(!reportStatus || reportStatus === null) && (
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowDialog(true);
+              }}
+            >
+              Request Quote
+            </Button>
+          )}
 
           {showDialog && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

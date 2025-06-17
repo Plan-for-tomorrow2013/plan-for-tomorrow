@@ -63,7 +63,7 @@ export default function ConsultantTicketsPage() {
       formData.append('file', file)
       formData.append('ticketId', ticketId)
 
-      const response = await fetch('/api/consultants-tickets/upload', {
+      const response = await fetch('/api/consultant-tickets/upload', {
         method: 'POST',
         body: formData,
       })
@@ -93,7 +93,7 @@ export default function ConsultantTicketsPage() {
 
   const handleReturnDocument = async (ticketId: string) => {
     try {
-      const response = await fetch('/api/consultants-tickets/return', {
+      const response = await fetch('/api/consultant-tickets/return', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

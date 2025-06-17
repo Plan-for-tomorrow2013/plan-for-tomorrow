@@ -13,7 +13,8 @@ export type ConsultantCategory =
   | "Biodiversity"
   | "Lawyer"
   | "Certifiers"
-  | "Arborist";
+  | "Arborist"
+  | "Geotechnical";
 
 export interface Assessment {
   status?: 'paid' | 'completed';

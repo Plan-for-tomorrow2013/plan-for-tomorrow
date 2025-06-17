@@ -48,7 +48,8 @@ const categories = [
   "Biodiversity",
   "Lawyer",
   "Certifiers",
-  "Arborist"
+  "Arborist",
+  "Geotechnical"
 ]
 
 export function ConsultantsManager({

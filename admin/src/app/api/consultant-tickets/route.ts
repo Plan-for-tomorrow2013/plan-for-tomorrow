@@ -59,7 +59,8 @@ export async function POST(request: Request) {
       "Biodiversity",
       "Lawyer",
       "Certifiers",
-      "Arborist"
+      "Arborist",
+      "Geotechnical"
     ];
     if (!validCategories.includes(category)) {
       console.error(`POST /api/consultant-tickets: Invalid category received: ${category}`);
@@ -92,7 +93,8 @@ export async function POST(request: Request) {
       status: 'pending',
       createdAt: new Date().toISOString(),
       assessment, // Store the assessment object directly
-      completedDocument: null
+      completedDocument: null,
+      documents: metadata.documents || []
     };
 
     console.log('POST /api/consultant-tickets: Constructed new ticket:', JSON.stringify(newTicket, null, 2));

@@ -37,12 +37,6 @@ export function ReportSummarySection({ report, jobId }: ReportSummarySectionProp
         )}
       </ul>
       <div className="text-xs mt-1">
-        {report.developmentType && (
-          <div><strong>Development Type:</strong> {report.developmentType}</div>
-        )}
-        {report.additionalInfo && (
-          <div><strong>Additional Info:</strong> {report.additionalInfo}</div>
-        )}
       </div>
     </div>
   );

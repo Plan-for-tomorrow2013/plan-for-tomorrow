@@ -19,6 +19,7 @@ import { Label } from "@shared/components/ui/label"
 import { useToast } from "@shared/components/ui/use-toast"
 import { updateConsultantNotes } from "../actions"
 import { ConsultantCategory } from "@shared/types/jobs"
+import { useDocuments } from '@shared/contexts/document-context'
 
 interface Consultant {
   id: string
@@ -43,15 +44,17 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [showDialog, setShowDialog] = useState(false)
   const { toast } = useToast()
+  const { documents } = useDocuments()
 
   // Assume jobs always has one job (from URL context)
   const job = jobs[0]
   // Remove duplicates by document id and name
-  const attachedDocs = job?.documents
-    ? job.documents.filter((doc, idx, arr) =>
-        arr.findIndex(d => d.id === doc.id || d.name === doc.name) === idx
-      )
-    : []
+  const attachedDocs = documents
+    .filter(doc => doc.uploadedFile) // Only include documents with an uploaded file
+    .map(doc => ({
+      id: doc.id,
+      name: doc.uploadedFile?.originalName || doc.title
+    }))
 
   const handleSaveNotes = async () => {
     try {
@@ -76,49 +79,44 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
       return
     }
 
-    const emailSubject = `New quote request from ${localStorage.getItem("userName")} for ${consultant.category} at ${job.address}`
-    const emailBody = `
-      Job Description: ${job.address}
-      Development Type: ${developmentType}
-      Additional Information: ${additionalInfo}
-
-      Selected Documents:
-      ${job.documents
-        .map((doc) => {
-          return doc.name
-        })
-        .join("\n")}
-    `
-
     try {
       console.log('Starting consultant ticket creation')
-      // First, create the consultant ticket
+
+      // Get the documents from the context
+      const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle')
+      const surveyPlan = documents.find(doc => doc.id === 'surveyPlan')
+      const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate')
+
+      // Create the consultant ticket payload with the correct structure
       const consultantTicketPayload = {
         jobId: job.id,
         jobAddress: job.address,
-        ticketType: 'consultantQuote',
-        consultantQuote: {
-          consultantId: consultant.id,
-          consultantName: consultant.name,
-          category: consultant.category,
-          selectedDocuments: job.documents.map(doc => ({
-            id: doc.id,
-            name: doc.name
-          })),
+        category: consultant.category, // Using category instead of ticketType
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        assessment: { // Using assessment as the key (matching your working example)
           developmentType,
-          additionalInfo
+          additionalInfo,
+          documents: {
+            certificateOfTitle: {
+              originalName: certificateOfTitle?.uploadedFile?.originalName,
+              fileName: certificateOfTitle?.uploadedFile?.fileName
+            },
+            surveyPlan: {
+              originalName: surveyPlan?.uploadedFile?.originalName,
+              fileName: surveyPlan?.uploadedFile?.fileName
+            },
+            certificate107: {
+              originalName: certificate107?.uploadedFile?.originalName,
+              fileName: certificate107?.uploadedFile?.fileName
+            }
+          }
         }
       }
       console.log('Consultant ticket payload:', consultantTicketPayload)
 
       const formData = new FormData()
-      formData.append('metadata', JSON.stringify({
-        jobId: consultantTicketPayload.jobId,
-        jobAddress: consultantTicketPayload.jobAddress,
-        ticketType: consultantTicketPayload.ticketType,
-        uploadedBy: 'professional',
-        reportData: consultantTicketPayload.consultantQuote
-      }))
+      formData.append('metadata', JSON.stringify(consultantTicketPayload))
       console.log('FormData prepared with metadata')
 
       console.log('Sending request to /api/consultant-tickets')
@@ -133,30 +131,6 @@ export function ConsultantCard({ consultant, jobs }: ConsultantCardProps) {
         throw new Error(errorData.error || 'Failed to create consultant ticket')
       }
       console.log('Consultant ticket created successfully')
-
-      // Then, send the email notification
-      console.log('Sending email notification')
-      const emailResponse = await fetch("/api/quotes/request", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          consultantId: consultant.id,
-          jobId: job.id,
-          subject: emailSubject,
-          body: emailBody,
-          documents: job.documents.map(doc => doc.id),
-          developmentType,
-          additionalInfo,
-        }),
-      })
-
-      if (!emailResponse.ok) {
-        console.error('Failed to send email notification:', await emailResponse.text())
-        throw new Error('Failed to send email notification')
-      }
-      console.log('Email notification sent successfully')
 
       toast({
         title: "Quote Requested",

@@ -141,6 +141,13 @@ const categories = [
     icon: "/placeholder.svg?height=100&width=100",
     href: "/professionals/consultants/arborist",
     description: "Tree assessment and arborist services",
+  },
+  {
+    id: "geotechnical",
+    title: "Geotechnical",
+    icon: "/placeholder.svg?height=100&width=100",
+    href: "/professionals/consultants/geotechnical",
+    description: "Geotechnical assessment consultants",
   }
 ]
 
@@ -253,8 +260,6 @@ interface ReportFormState {
 
 interface ConsultantsFormState {
   'customAssessment': ReportFormState
-  'statementOfEnvironmentalEffects': ReportFormState
-  'complyingDevelopmentCertificate': ReportFormState
 }
 
 interface CustomDocument {
@@ -277,13 +282,8 @@ interface ReportSectionProps {
   isLoading: boolean
 }
 
-function reportTypeToId(formType: keyof ConsultantsFormState): string {
-  switch (formType) {
-    case 'customAssessment': return 'custom-assessment';
-    case 'statementOfEnvironmentalEffects': return 'statement-of-environmental-effects';
-    case 'complyingDevelopmentCertificate': return 'complying-development-certificate';
-    default: return formType;
-  }
+function reportTypeToId(formType: 'customAssessment'): string {
+  return 'custom-assessment';
 }
 
 const fetchJobDetails = async (jobId: string): Promise<Job> => {
@@ -391,40 +391,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       hasUnsavedChanges: false,
       purchaseInitiated: false,
     },
-    'statementOfEnvironmentalEffects': {
-      formData: {
-        developmentType: '',
-        additionalInfo: '',
-        uploadedDocuments: {},
-        documents: {
-          certificateOfTitle: undefined,
-          surveyPlan: undefined,
-          certificate107: undefined
-        },
-        selectedTab: 'details'
-      },
-      paymentComplete: false,
-      showPaymentButton: false,
-      hasUnsavedChanges: false,
-      purchaseInitiated: false,
-    },
-    'complyingDevelopmentCertificate': {
-      formData: {
-        developmentType: '',
-        additionalInfo: '',
-        uploadedDocuments: {},
-        documents: {
-          certificateOfTitle: undefined,
-          surveyPlan: undefined,
-          certificate107: undefined
-        },
-        selectedTab: 'details'
-      },
-      paymentComplete: false,
-      showPaymentButton: false,
-      hasUnsavedChanges: false,
-      purchaseInitiated: false,
-    },
   });
 
   // New state for collapsible section
@@ -475,8 +441,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       // Reset state including purchaseInitiated
       setFormState({
         'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       });
       return;
     }
@@ -489,18 +453,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
         formData: loadFormData('customAssessment'),
         hasUnsavedChanges: false,
         purchaseInitiated: false, // Reset on load
-      },
-      'statementOfEnvironmentalEffects': {
-        ...prev['statementOfEnvironmentalEffects'],
-        formData: loadFormData('statementOfEnvironmentalEffects'),
-        hasUnsavedChanges: false,
-        purchaseInitiated: false,
-      },
-      'complyingDevelopmentCertificate': {
-        ...prev['complyingDevelopmentCertificate'],
-        formData: loadFormData('complyingDevelopmentCertificate'),
-        hasUnsavedChanges: false,
-        purchaseInitiated: false,
       },
     }));
 
@@ -545,46 +497,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
                 selectedTab: 'details'
               },
         },
-        'statementOfEnvironmentalEffects': {
-          ...prev['statementOfEnvironmentalEffects'],
-          paymentComplete: currentJob.statementOfEnvironmentalEffects?.status === 'paid',
-          showPaymentButton: currentJob.statementOfEnvironmentalEffects?.status === 'paid'
-            ? false
-            : prev['statementOfEnvironmentalEffects'].purchaseInitiated && !prev['statementOfEnvironmentalEffects'].paymentComplete,
-          formData: prev['statementOfEnvironmentalEffects'].hasUnsavedChanges
-            ? prev['statementOfEnvironmentalEffects'].formData
-            : {
-                developmentType: currentJob.statementOfEnvironmentalEffects?.developmentType || '',
-                additionalInfo: currentJob.statementOfEnvironmentalEffects?.additionalInfo || '',
-                uploadedDocuments: transformUploadedDocuments(currentJob.statementOfEnvironmentalEffects?.uploadedDocuments),
-                documents: {
-                  certificateOfTitle: currentJob.statementOfEnvironmentalEffects?.documents?.certificateOfTitle,
-                  surveyPlan: currentJob.statementOfEnvironmentalEffects?.documents?.surveyPlan,
-                  certificate107: currentJob.statementOfEnvironmentalEffects?.documents?.certificate107
-                },
-                selectedTab: 'details'
-              },
-        },
-        'complyingDevelopmentCertificate': {
-          ...prev['complyingDevelopmentCertificate'],
-          paymentComplete: currentJob.complyingDevelopmentCertificate?.status === 'paid',
-          showPaymentButton: currentJob.complyingDevelopmentCertificate?.status === 'paid'
-            ? false
-            : prev['complyingDevelopmentCertificate'].purchaseInitiated && !prev['complyingDevelopmentCertificate'].paymentComplete,
-          formData: prev['complyingDevelopmentCertificate'].hasUnsavedChanges
-            ? prev['complyingDevelopmentCertificate'].formData
-            : {
-                developmentType: currentJob.complyingDevelopmentCertificate?.developmentType || '',
-                additionalInfo: currentJob.complyingDevelopmentCertificate?.additionalInfo || '',
-                uploadedDocuments: transformUploadedDocuments(currentJob.complyingDevelopmentCertificate?.uploadedDocuments),
-                documents: {
-                  certificateOfTitle: currentJob.complyingDevelopmentCertificate?.documents?.certificateOfTitle,
-                  surveyPlan: currentJob.complyingDevelopmentCertificate?.documents?.surveyPlan,
-                  certificate107: currentJob.complyingDevelopmentCertificate?.documents?.certificate107
-                },
-                selectedTab: 'details'
-              },
-        },
       }))
 
       // Update purchased assessments state from fetched job data
@@ -610,8 +522,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       // Reset states including purchaseInitiated if no job is selected
       setFormState({
         'customAssessment': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'statementOfEnvironmentalEffects': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
-        'complyingDevelopmentCertificate': { formData: { developmentType: '', additionalInfo: '', uploadedDocuments: {}, documents: { certificateOfTitle: undefined, surveyPlan: undefined, certificate107: undefined }, selectedTab: 'details' }, paymentComplete: false, showPaymentButton: false, hasUnsavedChanges: false, purchaseInitiated: false },
       })
       setPurchasedAssessments({})
       updateSiteDetails({}) // Assuming updateSiteDetails({}) resets the site details state
@@ -625,7 +535,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   // *** Depend on jobId prop ***
   }, [currentJob, jobId, isJobError, jobError, hasUnsavedSiteDetails, updateSiteDetails])
 
-  const isAssessmentReturned = (type: 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate') => {
+  const isAssessmentReturned = (type: 'customAssessment') => {
     if (!currentJob) return false;
     const doc: DocumentWithStatus = {
       id: reportTypeToId(type),
@@ -641,7 +551,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       isActive: true,
       displayStatus: 'pending_user_upload'
     };
-    const { isCompleted } = getReportStatus(doc, currentJob || {} as Job)
+    const { isCompleted } = getReportStatus(doc, currentJob)
     return isCompleted
   }
 
@@ -663,82 +573,51 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
      }));
   };
 
-  // Handler to initiate the purchase flow for a specific report type
-  const handleInitiatePurchase = (formType: keyof ConsultantsFormState) => {
+  // Update form type references
+  type FormType = 'customAssessment';
+
+  // Update handleInitiatePurchase
+  const handleInitiatePurchase = (formType: FormType) => {
     setFormState(prev => ({
       ...prev,
       [formType]: {
         ...prev[formType],
-        purchaseInitiated: true,
-      },
+        purchaseInitiated: true
+      }
     }));
   };
 
-  // Generalized confirm details handler - Restructured for sequential validation
-  const handleConfirmDetails = (formType: keyof ConsultantsFormState) => {
-     console.log(`[handleConfirmDetails] Called for formType: ${formType}`);
-     if (!jobId) {
-        console.log('[handleConfirmDetails] No jobId, returning.');
-        return;
-     }
-     const currentFormData = formState[formType].formData;
-     console.log(`[handleConfirmDetails] Checking developmentType: "${currentFormData.developmentType}"`);
+  // Update handleConfirmDetails
+  const handleConfirmDetails = (formType: FormType) => {
+    if (!currentJob) return;
 
-     // 1. Check Development Type
-     if (currentFormData.developmentType.trim().length === 0) {
-       console.log('[handleConfirmDetails] Development type is empty. Showing toast and returning.');
-       toast({
-         title: "Missing Information",
-         description: "Please enter the development type.",
-         variant: "destructive",
-       });
-       return; // Exit if validation fails
-     }
-     console.log('[handleConfirmDetails] Development type check passed.');
+    const currentFormData = formState[formType].formData;
+    if (!currentFormData.developmentType) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a development type.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-     // 2. Check 10.7 Certificate (if required)
-     const requires107Certificate = formType === 'customAssessment' || formType === 'complyingDevelopmentCertificate';
-     console.log(`[handleConfirmDetails] Requires 10.7 Cert: ${requires107Certificate}`);
-     const certificate107Doc = documents.find(doc => doc.id === 'tenSevenCertificate');
-     const isCertMissing = !certificate107Doc || certificate107Doc.displayStatus !== 'uploaded';
-     console.log(`[handleConfirmDetails] Checking 10.7 Cert status: ${certificate107Doc?.displayStatus}`);
-     if (requires107Certificate && isCertMissing) {
-       console.log('[handleConfirmDetails] 10.7 Cert missing/not uploaded. Showing toast and returning.');
-       toast({
-         title: "Missing Document",
-         description: "Please upload the 10.7 Certificate before proceeding.",
-         variant: "destructive",
-       });
-       return; // Exit if validation fails
-     }
-     console.log('[handleConfirmDetails] 10.7 Cert check passed.');
+    const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
+    if (!certificate107?.uploadedFile) {
+      toast({
+        title: "Missing Document",
+        description: "Please upload a 10.7 Certificate.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-     // 3. Check Architectural Plan (if required)
-     const requiresArchitecturalPlan = formType === 'statementOfEnvironmentalEffects' || formType === 'complyingDevelopmentCertificate';
-     console.log(`[handleConfirmDetails] Requires Architectural Plan: ${requiresArchitecturalPlan}`);
-     const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
-     const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
-     console.log(`[handleConfirmDetails] Checking Architectural Plan status: ${architecturalPlanDoc?.displayStatus}`);
-     if (requiresArchitecturalPlan && isArchitecturalPlanMissing) {
-       console.log('[handleConfirmDetails] Architectural Plan missing/not uploaded. Showing toast and returning.');
-       toast({
-         title: "Missing Document",
-         description: "Please upload the Architectural Plan before proceeding.",
-         variant: "destructive",
-       });
-       return; // Exit if validation fails
-     }
-     console.log('[handleConfirmDetails] Architectural Plan check passed.');
-
-     // 4. All checks passed - Proceed to update state
-     console.log('[handleConfirmDetails] All checks passed. Setting showPaymentButton = true.');
-     setFormState(prev => ({
-       ...prev,
-       [formType]: {
-         ...prev[formType],
-         showPaymentButton: true, // Only set if all checks pass
-       },
-     }));
+    setFormState(prev => ({
+      ...prev,
+      [formType]: {
+        ...prev[formType],
+        showPaymentButton: true
+      }
+    }));
   };
 
   // --- Mutation for Updating Job Status (Payment) ---
@@ -810,20 +689,124 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
     },
   })
 
-  // Generalized payment handler - Refactored with useMutation
-  const handlePayment = async (formType: keyof ConsultantsFormState) => {
-    if (!jobId || !currentJob) { // Use jobId prop
+  // --- Mutation for Saving Site Details ---
+  const saveSiteDetailsMutation = useMutation<Job, Error, { jobId: string; details: SiteDetails }>({
+      mutationFn: async ({ jobId, details }) => {
+          const response = await fetch(`/api/jobs/${jobId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ siteDetails: details }),
+          });
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Failed to save site details');
+          }
+          return response.json();
+      },
+      onSuccess: (data, variables) => {
+          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
+          updateSiteDetails({});
+          toast({
+              title: "Success",
+              description: "Site details saved successfully.",
+          });
+      },
+      onError: (error) => {
+          console.error("Error saving site details:", error);
+          toast({
+              title: "Error Saving Site Details",
+              description: `${error.message}`,
+              variant: "destructive",
+          });
+      },
+  });
+
+  const handleSaveSiteDetails = () => {
+    if (!jobId) {
+      toast({ title: "Error", description: "No job selected.", variant: "destructive" })
+      return
+    }
+    console.log('Saving Site Details via mutation:', siteDetails)
+    saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails })
+  }
+
+  // --- Mutation for Uploading Document ---
+  const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
+      mutationFn: async ({ documentId, file }) => {
+          if (!jobId) throw new Error("No job selected");
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('docId', documentId);
+
+          const response = await fetch(`/api/jobs/${jobId}/documents/upload`, {
+              method: 'POST',
+              body: formData,
+          });
+          if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(errorData.error || 'Failed to upload document');
+          }
+          return response.json();
+      },
+    onSuccess: (data, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
+        queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+        toast({
+            title: "Success",
+            description: "Document uploaded successfully",
+        });
+    },
+  });
+
+  const handleUpload = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
+      return;
+    }
+    createFileInput(async (file) => {
+      await handleDocumentUpload(
+        () => uploadDocument(jobId, docId, file)
+      )
+    })
+  }
+
+  const handleDownload = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
+      return;
+    }
+    handleDocumentDownload(
+      () => {
+        return downloadDocument(jobId, docId);
+      }
+    )
+  }
+
+  const handleDelete = (docId: string) => {
+    if (!jobId) {
+      toast({ title: "Error", description: "Please select a job before deleting documents", variant: "destructive" });
+      return;
+    }
+    handleDocumentDelete(
+      () => removeDocument(jobId, docId)
+    )
+  }
+
+  const handleCustomDocumentDownload = async (document: CustomDocument) => {
+    await downloadDocumentFromApi({
+      id: document.id,
+      title: document.title
+    })
+  }
+
+  // Add handlePayment function
+  const handlePayment = async (formType: 'customAssessment') => {
+    if (!jobId || !currentJob) {
       toast({ title: "Error", description: "Job data not loaded.", variant: "destructive" });
       return;
     }
 
     const currentFormData = formState[formType].formData;
-
-    // Type guard to ensure formType is a valid report type
-    if (!['customAssessment', 'statementOfEnvironmentalEffects', 'complyingDevelopmentCertificate'].includes(formType)) {
-      toast({ title: "Error", description: "Invalid report type.", variant: "destructive" });
-      return;
-    }
 
     const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
     const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
@@ -860,7 +843,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     const jobUpdatePayload = {
       [formType]: {
-        status: 'paid',
+        status: 'paid' as const,
         type: formType,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -872,13 +855,11 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     try {
       await createWorkTicketMutation.mutateAsync(workTicketPayload);
-      await updateJobMutation.mutateAsync({ jobId: jobId, payload: jobUpdatePayload }); // Use jobId prop
+      await updateJobMutation.mutateAsync({ jobId: jobId, payload: jobUpdatePayload });
 
-      // Invalidate the job query so UI refetches latest data
       await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       await queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
 
-      // Update the form state immediately after successful payment
       setFormState(prev => ({
         ...prev,
         [formType]: {
@@ -891,143 +872,31 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
       toast({
         title: "Success",
-        description: `Your ${formType === 'customAssessment' ? 'Custom Assessment Report' : formType === 'statementOfEnvironmentalEffects' ? 'Statement of Environmental Effects' : 'Complying Development Certificate'} has been purchased successfully.`,
+        description: "Your Custom Assessment Report has been purchased successfully.",
       });
 
     } catch (error) {
       console.error(`Error processing ${formType} payment sequence:`, error);
       if (!createWorkTicketMutation.isError && !updateJobMutation.isError) {
-         toast({
-           title: "Payment Processing Error",
-           description: `An unexpected error occurred during payment for ${formType === 'customAssessment' ? 'Custom Assessment Report' : formType === 'statementOfEnvironmentalEffects' ? 'Statement of Environmental Effects' : 'Complying Development Certificate'}. Please try again.`,
-           variant: "destructive",
-         });
+        toast({
+          title: "Payment Processing Error",
+          description: "An unexpected error occurred during payment for Custom Assessment Report. Please try again.",
+          variant: "destructive",
+        });
       }
     }
   };
 
-
-  // --- Mutation for Saving Site Details ---
-  const saveSiteDetailsMutation = useMutation<Job, Error, { jobId: string; details: SiteDetails }>({
-      mutationFn: async ({ jobId, details }) => {
-          const response = await fetch(`/api/jobs/${jobId}`, { // Use jobId from arguments
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ siteDetails: details }),
-          });
-          if (!response.ok) {
-              const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.error || 'Failed to save site details');
-          }
-          return response.json();
-      },
-      onSuccess: (data, variables) => {
-          queryClient.invalidateQueries({ queryKey: ['job', variables.jobId] });
-          updateSiteDetails({});
-          toast({
-              title: "Success",
-              description: "Site details saved successfully.",
-          });
-      },
-      onError: (error) => {
-          console.error("Error saving site details:", error);
-          toast({
-              title: "Error Saving Site Details",
-              description: `${error.message}`,
-              variant: "destructive",
-          });
-      },
-  });
-
-  const handleSaveSiteDetails = () => {
-    if (!jobId) {
-      toast({ title: "Error", description: "No job selected.", variant: "destructive" })
-      return
-    }
-    console.log('Saving Site Details via mutation:', siteDetails)
-    saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails }) // Use jobId prop
-  }
-
-   // --- Mutation for Uploading Document ---
-  const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
-      mutationFn: async ({ documentId, file }) => {
-          if (!jobId) throw new Error("No job selected"); // Use jobId prop
-          const formData = new FormData();
-          formData.append('file', file);
-          // Corrected key from 'documentId' to 'docId' to match backend API expectation
-          formData.append('docId', documentId);
-
-          const response = await fetch(`/api/jobs/${jobId}/documents/upload`, { // Use jobId prop
-              method: 'POST', // Corrected method
-              body: formData,
-          });
-          if (!response.ok) {
-              const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.error || 'Failed to upload document');
-          }
-          return response.json();
-      },
-    onSuccess: (data, variables) => {
-        // Corrected: Invalidate relevant queries using jobId from component scope
-        queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] }); // Document context uses this key
-        queryClient.invalidateQueries({ queryKey: ['job', jobId] }); // Invalidate job data as well
-        toast({
-            title: "Success",
-            description: "Document uploaded successfully",
-        });
-    },
-  });
-
-  // Refactored handleFileUpload to use mutation
-  const handleUpload = (docId: string) => {
-    if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
-      return;
-    }
-    createFileInput(async (file) => {
-      await handleDocumentUpload(
-        () => uploadDocument(jobId, docId, file)
-      )
-    })
-  }
-
-  const handleDownload = (docId: string) => { // This is the existing handleDownload
-    if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
-      return;
-    }
-    handleDocumentDownload( // This is from document-utils
-      () => {
-        return downloadDocument(jobId, docId); // downloadDocument is from useDocuments context
-      }
-    )
-  }
-
-  const handleDelete = (docId: string) => {
-    if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before deleting documents", variant: "destructive" });
-      return;
-    }
-    handleDocumentDelete(
-      () => removeDocument(jobId, docId)
-    )
-  }
-
-  const handleCustomDocumentDownload = async (document: CustomDocument) => {
-    await downloadDocumentFromApi({
-      id: document.id,
-      title: document.title
-    })
-  }
-
+  // Fix type issues in renderRequiredDocuments
   const renderRequiredDocuments = () => {
-    console.log('[Consultants] Rendering required documents:', {
-        documentCount: documents.length,
-        documentTypes: documents.map(doc => doc.type)
-      });
+    if (!currentJob) return null;
 
-    // Show loading state if documents are being fetched
-    if (isDocsLoading) { // Use specific loading state
+    console.log('[Consultants] Rendering required documents:', {
+      documentCount: documents.length,
+      documentTypes: documents.map(doc => doc.type)
+    });
+
+    if (isDocsLoading) {
       return (
         <div className="flex flex-col items-center justify-center p-8">
           <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -1036,8 +905,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       );
     }
 
-    // Show error state if there's an error
-    if (docsError) { // Use specific error state
+    if (docsError) {
       return (
         <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
           <AlertCircle className="h-8 w-8 text-red-500" />
@@ -1047,8 +915,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       );
     }
 
-    // Show empty state if no documents are visible
-    if (!documents || documents.length === 0) { // Check raw documents from hook
+    if (!documents || documents.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg">
           <FileText className="h-8 w-8 text-gray-400" />
@@ -1058,20 +925,16 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       );
     }
 
-    // Show filtered documents
     const mappedDocuments = documents.map(doc => ({
       ...doc,
-      displayStatus: getDocumentDisplayStatus(doc, currentJob || {} as Job)
+      displayStatus: getDocumentDisplayStatus(doc, currentJob)
     }));
 
     const renderDocumentCard = (doc: DocumentWithStatus) => {
       const isReport = isReportType(doc.id)
-      const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
-
-      // reportStatus.isCompleted && reportStatus.hasFile
+      const reportStatus = isReport ? getReportStatus(doc, currentJob) : undefined
       const shouldBeDownloadableReport = isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
 
-      // Show completed report if available
       if (shouldBeDownloadableReport) {
         return (
           <Card key={doc.id} className="shadow-md">
@@ -1123,197 +986,14 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       )
     }
 
-    // Corrected: Wrap multiple elements in a React Fragment
     return (
       <>
-        {/* Removed wrapping div <div className="space-y-6"> */}
-        {/* Removed empty div </div> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {mappedDocuments.map(doc => renderDocumentCard(doc))}
         </div>
       </>
     )
   }
-
-  // Updated renderCustomAssessmentForm function
-  const renderCustomAssessmentForm = (formType: keyof ConsultantsFormState) => {
-    // At the start of renderCustomAssessmentForm, add a guard for currentJob
-    if (!currentJob) return null;
-    // Remove any previous or duplicate declarations of isPaid and isCompleted in this function
-    // Only use:
-    const jobSection = currentJob[formType];
-    const isPaid = jobSection?.status === 'paid';
-    const isCompleted = jobSection?.status === 'completed'; // Adjust if you have a different completion status
-    const purchaseInitiated = formState[formType].purchaseInitiated; // Get the flag
-    const isStatementOfEnvironmentalEffects = formType === 'statementOfEnvironmentalEffects';
-
-    // 1. Check if assessment is returned (completed)
-    if (isCompleted) {
-      // Show Report Complete
-      return (
-        <div className="border rounded-lg p-4 bg-green-50">
-          <div className="text-center py-4">
-            <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h4 className="font-medium mb-2">Report Complete</h4>
-            <p className="text-sm text-gray-600 mb-4">
-              Your {formType === 'statementOfEnvironmentalEffects'
-                ? 'Statement of Environmental Effects'
-                : formType === 'complyingDevelopmentCertificate'
-                ? 'Complying Development Certificate'
-                : 'Custom Assessment Report'} is available for download in the Documents section above.
-            </p>
-          </div>
-        </div>
-      );
-    } else if (isPaid) {
-      // Show Report In Progress
-      return (
-        <div className="border rounded-lg p-4 bg-yellow-50">
-          <div className="text-center py-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h4 className="font-medium mb-2">Report In Progress</h4>
-            <p className="text-sm text-gray-600">
-              We are processing your {formType === 'statementOfEnvironmentalEffects'
-                ? 'Statement of Environmental Effects'
-                : formType === 'complyingDevelopmentCertificate'
-                ? 'Complying Development Certificate'
-                : 'Custom Assessment Report'}. You will be notified when it's ready.
-            </p>
-          </div>
-        </div>
-      );
-    } else if (purchaseInitiated) {
-      // Show the form
-      const currentFormData = formState[formType].formData;
-      const showPaymentBtn = formState[formType].showPaymentButton;
-      const certificate107Doc = documents.find(doc => doc.id === 'tenSevenCertificate');
-      const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
-      const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
-      const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
-
-      // Only require 10.7 certificate for custom assessment and complying development certificate
-      const requires107Certificate = formType === 'customAssessment' || formType === 'complyingDevelopmentCertificate';
-
-      // Only require architectural plan for statement of environmental effects and complying development certificate
-      const requiresArchitecturalPlan = formType === 'statementOfEnvironmentalEffects' || formType === 'complyingDevelopmentCertificate';
-
-      // Explicitly calculate disable conditions here for clarity
-      const isDevTypeEmpty = currentFormData.developmentType.trim().length === 0;
-      const isCertPresent = !!certificate107Doc;
-      const isCertMissing = !certificate107Doc || certificate107Doc.displayStatus !== 'uploaded';
-      const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
-      const isConfirmButtonDisabled = isDevTypeEmpty || (requires107Certificate && isCertMissing) || (requiresArchitecturalPlan && isArchitecturalPlanMissing);
-
-      // In renderCustomAssessmentForm, fix uploadedDocs type:
-      const attachedDocs = [
-        certificate107Doc,
-        certificateOfTitle,
-        surveyPlan,
-        architecturalPlanDoc,
-      ].filter((doc): doc is DocumentWithStatus => !!doc);
-
-      // Add debug logging
-      console.log('[AttachedDocs] 10.7 Cert:', certificate107Doc, 'Architectural Plan:', architecturalPlanDoc, 'All docs:', documents);
-
-      console.log('DEBUG:', { formType, certificate107Doc, isCertMissing, architecturalPlanDoc, isArchitecturalPlanMissing, documents });
-
-      return (
-        <div className="space-y-6">
-          <div className="space-y-4">
-            {/* Input Fields */}
-            <div><label className="block text-sm font-medium mb-2">Development Type</label><Input placeholder="Enter the type of development" value={currentFormData.developmentType} onChange={handleFormChange(formType, 'developmentType')} /></div>
-            <div><label className="block text-sm font-medium mb-2">Additional Information</label><Textarea placeholder="Enter any additional information about your development" value={currentFormData.additionalInfo} onChange={handleFormChange(formType, 'additionalInfo')} rows={4} /></div>
-
-            {/* Attached Documents Section */}
-            {attachedDocs.length > 0 && (
-              <div className="space-y-2 border-t pt-4 mt-4">
-                <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
-                <p className="text-xs text-gray-500">The following documents will be included with your submission:</p>
-                <ul className="list-disc list-inside text-sm space-y-1">
-                  {attachedDocs.map(doc => (
-                    <li key={doc.id}>
-                      {doc.title}
-                      {doc.uploadedFile?.originalName && ` (${doc.uploadedFile.originalName})`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Document Requirements Section */}
-            <div className="space-y-3 border-t pt-4 mt-4">
-              <h4 className="font-medium text-gray-700">Document Requirements</h4>
-              <p className="text-xs text-gray-500">Please ensure the following documents are available in the document store before proceeding:</p>
-
-              {/* 10.7 Certificate Requirements */}
-              {requires107Certificate && !isCertPresent && (
-                <div className="mt-2">
-                  {certificate107Doc ? (
-                    <DocumentStatus document={certificate107Doc} />
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertDescription>Please ensure the 10.7 Certificate is available in the document store before proceeding.</AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              )}
-
-              {/* Architectural Plan Requirements */}
-              {requiresArchitecturalPlan && !architecturalPlanDoc && (
-                <div className="mt-2">
-                  {architecturalPlanDoc ? (
-                    <DocumentStatus document={architecturalPlanDoc} />
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertDescription>Please ensure the Architectural Plan is available in the document store before proceeding.</AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className="pt-4">
-              {!showPaymentBtn ? (
-                <Button
-                  className="w-full"
-                  onClick={() => handleConfirmDetails(formType)}
-                  disabled={isConfirmButtonDisabled}
-                >
-                  Confirm Details & Proceed
-                </Button>
-              ) : (
-                <Button
-                  className="w-full bg-green-600 hover:bg-green-700"
-                  onClick={() => handlePayment(formType)}
-                  disabled={createWorkTicketMutation.isPending || updateJobMutation.isPending}
-                >
-                  {createWorkTicketMutation.isPending || updateJobMutation.isPending ? 'Processing...' : 'Confirm & Pay'}
-                </Button>
-              )}
-              {(createWorkTicketMutation.isPending || updateJobMutation.isPending) && (
-                <p className="text-sm text-gray-500 text-center mt-2">Processing payment...</p>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      // Show the purchase button
-      return (
-        <div className="flex justify-center items-center p-6">
-          <Button
-            className="w-full max-w-xs" // Added max-width for better appearance
-            onClick={() => handleInitiatePurchase(formType)}
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase {getReportTitle(reportTypeToId(formType))}
-          </Button>
-        </div>
-      );
-    }
-  };
 
   // Generalized save changes handler (Site details save is now separate)
   const handleSaveChanges = () => {
@@ -1326,16 +1006,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       updatedFormState['customAssessment'] = { ...updatedFormState['customAssessment'], hasUnsavedChanges: false };
       changesSaved = true;
     }
-    if (formState['statementOfEnvironmentalEffects'].hasUnsavedChanges) {
-      localStorage.setItem(`statementOfEnvironmentalEffects-${jobId}`, JSON.stringify(formState['statementOfEnvironmentalEffects'].formData)); // *** Use jobId prop ***
-      updatedFormState['statementOfEnvironmentalEffects'] = { ...updatedFormState['statementOfEnvironmentalEffects'], hasUnsavedChanges: false };
-      changesSaved = true;
-    }
-    if (formState['complyingDevelopmentCertificate'].hasUnsavedChanges) {
-      localStorage.setItem(`complyingDevelopmentCertificate-${jobId}`, JSON.stringify(formState['complyingDevelopmentCertificate'].formData)); // *** Use jobId prop ***
-      updatedFormState['complyingDevelopmentCertificate'] = { ...updatedFormState['complyingDevelopmentCertificate'], hasUnsavedChanges: false };
-      changesSaved = true;
-    }
     if (hasUnsavedSiteDetails) {
       handleSaveSiteDetails(); // Triggers mutation (uses jobId prop internally)
       changesSaved = true;
@@ -1343,9 +1013,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     if (changesSaved) {
       setFormState(updatedFormState);
-      if (updatedFormState['customAssessment'].hasUnsavedChanges === false ||
-          updatedFormState['statementOfEnvironmentalEffects'].hasUnsavedChanges === false ||
-          updatedFormState['complyingDevelopmentCertificate'].hasUnsavedChanges === false) {
+      if (updatedFormState['customAssessment'].hasUnsavedChanges === false) {
         toast({ title: "Form Data Saved", description: "Unsaved form changes saved locally." });
       }
     } else {
@@ -1458,18 +1126,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
                 </Link>
               ))}
             </div>
-          </div>
-
-          {/* Statement of Environmental Effects Section */}
-          <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Statement of Environmental Effects</h2>
-            {renderCustomAssessmentForm('statementOfEnvironmentalEffects')}
-          </div>
-
-          {/* Complying Development Certificate Section */}
-          <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Complying Development Certificate</h2>
-            {renderCustomAssessmentForm('complyingDevelopmentCertificate')}
           </div>
 
           {/* Save Changes Button */}

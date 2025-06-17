@@ -14,4 +14,5 @@ export interface ConsultantTicket {
     returnedAt?: string
   }
   assessment?: Assessment
+  documents?: Array<{ id: string; name: string }>
 }

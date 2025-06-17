@@ -39,6 +39,8 @@ const getTicketTypeDisplayName = (type: string): string => {
       return 'Certifiers';
     case 'Arborist':
       return 'Arborist';
+    case "Geotechnical":
+      return "Geotechnical";
     default:
       return type;
   }
@@ -78,6 +80,17 @@ export function ConsultantTicketCard({
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-3">
+          {ticket.documents && ticket.documents.length > 0 && (
+            <div>
+              <h3 className="font-medium text-sm mb-1">Documents to be Attached</h3>
+              <ul className="list-disc list-inside text-xs mb-2">
+                {ticket.documents.map((doc: any) => (
+                  <li key={doc.id}>{doc.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {ticket.assessment && (
             <div className="space-y-3">
               <div>

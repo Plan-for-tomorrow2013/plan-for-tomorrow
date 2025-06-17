@@ -16,7 +16,7 @@ export default function ConsultantTicketsPage() {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const response = await fetch('/api/consultants-tickets')
+        const response = await fetch('/api/consultant-tickets')
         if (!response.ok) {
           throw new Error('Failed to fetch consultant tickets')
         }

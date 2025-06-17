@@ -501,6 +501,20 @@ export const DOCUMENT_TYPES: Document[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true
+  },
+  {
+    id: 'geotechnicalAssessment',
+    title: 'Geotechnical Assessment',
+    category: 'Geotechnical',
+    path: '/geotechnical-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
   }
 ]
 

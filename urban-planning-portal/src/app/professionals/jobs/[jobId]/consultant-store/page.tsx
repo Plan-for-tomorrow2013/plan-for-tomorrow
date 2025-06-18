@@ -99,7 +99,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     )
   }
 
-  const renderDocumentUpload = (doc: DocumentWithStatus) => {
+  const renderDocumentUpload = (doc: DocumentWithStatus, ticket?: ConsultantTicket) => {
     if (isReportType(doc.id)) {
       const reportStatus = job ? getReportStatus(doc, job) : { isPaid: false, isCompleted: false, hasFile: false }
       const reportTitle = getReportTitle(doc.id)
@@ -113,6 +113,9 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold">{reportTitle}</h3>
                   <p className="text-sm text-gray-300">{doc.category}</p>
+                  {ticket?.consultantName && (
+                    <p className="text-sm text-gray-200 font-semibold mt-1">{ticket.consultantName}</p>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -140,6 +143,9 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold">{reportTitle}</h3>
                   <p className="text-sm text-gray-300">{doc.category}</p>
+                  {ticket?.consultantName && (
+                    <p className="text-sm text-gray-200 font-semibold mt-1">{ticket.consultantName}</p>
+                  )}
                 </div>
                 <Check className="h-5 w-5 text-green-400" />
               </div>
@@ -222,10 +228,14 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     arr.findIndex(t => t.consultantId === ticket.consultantId && t.category === ticket.category) === idx
   );
   uniqueTickets.forEach(ticket => {
-    // Prefer completed document for this consultant+category
-    const doc = documents.find(doc => doc.category === ticket.category && doc.displayStatus === 'uploaded');
+    // Prefer completed document for this consultant+category by ticketId
+    const doc = documents.find(
+      doc =>
+        (((doc.metadata && (doc.metadata as any).ticketId && (doc.metadata as any).ticketId === ticket.id)) ||
+         (!(doc.metadata && (doc.metadata as any).ticketId) && doc.category === ticket.category && doc.displayStatus === 'uploaded'))
+    );
     if (doc) {
-      const rendered = renderDocumentUpload(doc);
+      const rendered = renderDocumentUpload(doc, ticket);
       if (rendered) {
         tiles.push({ key: `doc-${doc.id}-${ticket.consultantId}`, element: rendered });
         return;

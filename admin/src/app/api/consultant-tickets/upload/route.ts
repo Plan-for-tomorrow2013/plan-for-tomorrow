@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { getJobDocumentsPath, getConsultantTicketsPath, getDocumentsMetadataPath, ensureDirectoryExists } from '@shared/utils/paths'
+import { getJobDocumentsPath, getConsultantTicketsPath, getDocumentsMetadataPath, ensureDirectoryExists, getJobPath } from '@shared/utils/paths'
 
 export async function POST(request: Request) {
   try {
@@ -108,9 +108,49 @@ export async function POST(request: Request) {
         uploadedAt: new Date().toISOString(),
         size: file.size,
         type: file.type,
-      }
+      },
+      consultantId: ticket.consultantId,
+      consultantName: ticket.consultantName
     };
     consultantTickets[ticketIndex] = newTicketData;
+
+    // === BEGIN MODIFICATION: Update the Job object with completed report details ===
+    try {
+      const jobPath = getJobPath(ticket.jobId)
+      let job
+      try {
+        const jobData = await fs.readFile(jobPath, 'utf-8')
+        job = JSON.parse(jobData)
+      } catch (readError) {
+        job = null
+      }
+      if (job && ticketCategory && job.consultants && job.consultants[ticketCategory]) {
+        if (!job.consultants[ticketCategory].assessment) {
+          job.consultants[ticketCategory].assessment = {}
+        }
+        job.consultants[ticketCategory].assessment.status = 'completed'
+        job.consultants[ticketCategory].assessment.completedDocument = {
+          documentId: clientDocumentId,
+          originalName: file.name,
+          fileName: storedFileName,
+          uploadedAt: new Date().toISOString(),
+          size: file.size,
+          type: file.type,
+          returnedAt: new Date().toISOString()
+        }
+        job.consultants[ticketCategory].consultantId = ticket.consultantId
+        job.consultants[ticketCategory].consultantName = ticket.consultantName
+        delete job.consultants[ticketCategory].assessment.fileName
+        delete job.consultants[ticketCategory].assessment.originalName
+        await fs.writeFile(jobPath, JSON.stringify(job, null, 2))
+        console.log(`Job ${ticket.jobId} updated successfully with completed assessment for consultant category ${ticketCategory}.`)
+      } else {
+        console.warn(`Consultant category ${ticketCategory} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
+      }
+    } catch (err) {
+      console.error('Error updating job consultants assessment field:', err)
+    }
+    // === END MODIFICATION ===
 
     console.log('[UPLOAD] Ticket object AFTER update (before save):', JSON.stringify(consultantTickets[ticketIndex], null, 2));
     console.log('[UPLOAD] Entire consultantTickets array BEFORE save (first 2 tickets):', JSON.stringify(consultantTickets.slice(0,2), null, 2));

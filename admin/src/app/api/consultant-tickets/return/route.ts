@@ -82,6 +82,9 @@ export async function POST(request: Request) {
         type: completedDocument.type,
         returnedAt: new Date().toISOString()
       };
+      // Add consultant information to the assessment
+      job.consultants[category].consultantId = ticket.consultantId;
+      job.consultants[category].consultantName = ticket.consultantName;
       // Optionally remove old top-level file properties if they exist
       delete job.consultants[category].assessment.fileName;
       delete job.consultants[category].assessment.originalName;
@@ -123,42 +126,50 @@ export async function POST(request: Request) {
     }
 
     // Update ticket status and its completedDocument directly
-    const updatedTicket = consultantTickets[ticketIndex];
-    updatedTicket.status = 'completed';
-    if (updatedTicket.completedDocument) {
-      updatedTicket.completedDocument.returnedAt = new Date().toISOString();
-    } else {
-      // This case should ideally not happen if the checks above are passed,
-      // but as a fallback, create it.
-      console.warn(`Ticket ${ticketId} was missing completedDocument before setting returnedAt. This is unexpected.`);
-      // If ticket.completedDocument was truly null/undefined from the input file,
-      // we might need to fully populate it here from 'completedDocument' const if it was meant to be new.
-      // However, the logic implies 'ticket.completedDocument' should exist from the upload step.
-      // For now, just ensuring 'returnedAt' is set if the object exists.
-      // If 'completedDocument' itself is what's new from the 'upload' step and not on original 'ticket',
-      // then the spread `...ticket` was correct to bring it in.
-      // The current problem is likely not here but in how the consultant-tickets.json is read/parsed if it gets corrupted.
-
-      // Reverting to the spread for completedDocument as it might be new from the upload step
-      // and not on the original 'ticket' object from the file.
-      // The primary concern is the integrity of consultant-tickets.json.
-    }
-    // The previous spread was likely correct:
-     consultantTickets[ticketIndex] = {
-       ...ticket, // original ticket from file
-       status: 'completed', // new status
-       completedDocument: { // merged completed document
-         ...ticket.completedDocument, // from original ticket (should have details from upload)
-         returnedAt: new Date().toISOString() // add/update returnedAt
-       }
-     };
-
+    consultantTickets[ticketIndex] = {
+      ...ticket,
+      status: 'completed',
+      completedDocument: {
+        documentId: ticket.completedDocument.documentId,
+        originalName: ticket.completedDocument.originalName,
+        fileName: ticket.completedDocument.fileName,
+        uploadedAt: ticket.completedDocument.uploadedAt,
+        size: ticket.completedDocument.size,
+        type: ticket.completedDocument.type,
+        returnedAt: new Date().toISOString()
+      },
+      consultantId: ticket.consultantId,
+      consultantName: ticket.consultantName
+    };
 
     // Save updated tickets
     await fs.writeFile(consultantTicketsPath, JSON.stringify(consultantTickets, null, 2))
 
+    // Get the updated ticket
+    const updatedTicket = consultantTickets[ticketIndex];
+
     // Return the modified ticket object that was saved in the array
-    return NextResponse.json(consultantTickets[ticketIndex])
+    const responseTicket = {
+      id: updatedTicket.id,
+      jobId: updatedTicket.jobId,
+      jobAddress: updatedTicket.jobAddress,
+      category: updatedTicket.category,
+      status: 'completed',
+      createdAt: updatedTicket.createdAt,
+      consultantId: updatedTicket.consultantId,
+      consultantName: updatedTicket.consultantName,
+      assessment: updatedTicket.assessment,
+      completedDocument: {
+        documentId: updatedTicket.completedDocument.documentId,
+        originalName: updatedTicket.completedDocument.originalName,
+        fileName: updatedTicket.completedDocument.fileName,
+        uploadedAt: updatedTicket.completedDocument.uploadedAt,
+        size: updatedTicket.completedDocument.size,
+        type: updatedTicket.completedDocument.type,
+        returnedAt: new Date().toISOString()
+      }
+    };
+    return NextResponse.json(responseTicket)
   } catch (error) {
     console.error('Error returning consultant ticket:', error)
     return NextResponse.json(

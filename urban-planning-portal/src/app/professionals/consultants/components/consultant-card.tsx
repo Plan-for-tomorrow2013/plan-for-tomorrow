@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Mail, Phone, Edit2, Save, X, Clock } from "lucide-react"
+import { Mail, Phone, Edit2, Save, X, Clock, FileText } from "lucide-react"
 import { Button } from "@shared/components/ui/button"
 import { Textarea } from "@shared/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
@@ -20,6 +20,8 @@ import { useToast } from "@shared/components/ui/use-toast"
 import { updateConsultantNotes } from "../actions"
 import { ConsultantCategory } from "@shared/types/jobs"
 import { useDocuments } from '@shared/contexts/document-context'
+import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/report-utils'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Consultant {
   id: string
@@ -46,76 +48,55 @@ interface ConsultantCardProps {
             returnedAt?: string;
           };
         };
+        status?: string;
       };
     };
   }>
   initialReportStatus?: 'pending' | 'in_progress' | 'completed' | null
   onReportStatusChange?: (status: 'pending' | 'in_progress' | 'completed') => void
+  refetchJob?: () => Promise<any>;
 }
 
-export function ConsultantCard({ consultant, jobs, initialReportStatus, onReportStatusChange }: ConsultantCardProps) {
+export function ConsultantCard({ consultant, jobs, initialReportStatus, onReportStatusChange, refetchJob }: ConsultantCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [notes, setNotes] = useState(consultant.notes)
   const [developmentType, setDevelopmentType] = useState("")
   const [additionalInfo, setAdditionalInfo] = useState("")
   const [showDialog, setShowDialog] = useState(false)
-  const [reportStatus, setReportStatus] = useState<'pending' | 'in_progress' | 'completed' | null>(initialReportStatus || null)
   const { toast } = useToast()
   const { documents } = useDocuments()
-
-  // Update report status when initialReportStatus changes
-  useEffect(() => {
-    if (initialReportStatus !== undefined) {
-      setReportStatus(initialReportStatus)
-    }
-  }, [initialReportStatus])
-
-  // Check for completed documents
-  useEffect(() => {
-    const job = jobs[0];
-    if (!job) return;
-
-    const quoteRequestKey = `quoteRequest_${job.id}_${consultant.category}_${consultant.id}`;
-    const storedStatus = localStorage.getItem(quoteRequestKey);
-
-    // Check if this specific consultant has a completed document in the job data
-    const consultantData = job.consultants?.[consultant.category];
-    const hasCompletedDocument = consultantData?.consultantId === consultant.id &&
-                                consultantData?.assessment?.completedDocument?.returnedAt;
-
-    // Update status if either localStorage indicates completion or there's a returned document
-    if ((storedStatus === 'completed' || hasCompletedDocument) && reportStatus !== 'completed') {
-      setReportStatus('completed');
-      // Only call onReportStatusChange if the status actually changed
-      if (onReportStatusChange) {
-        onReportStatusChange('completed');
-      }
-
-      // Ensure localStorage is updated if we found a completed document
-      if (hasCompletedDocument) {
-        localStorage.setItem(quoteRequestKey, 'completed');
-      }
-    }
-  }, [jobs[0]?.id, consultant.category, consultant.id, onReportStatusChange, reportStatus, jobs]);
-
-  // Assume jobs always has one job (from URL context)
   const job = jobs[0]
-  // Remove duplicates by document id and name
-  const attachedDocs = documents
-    .filter(doc => doc.uploadedFile) // Only include documents with an uploaded file
-    .map(doc => ({
-      id: doc.id,
-      name: doc.uploadedFile?.originalName || doc.title
-    }))
+  const queryClient = useQueryClient()
 
-  // Only show specific document types for attachment
-  const allowedDocIds = [
-    'tenSevenCertificate',
-    'certificateOfTitle',
-    'surveyPlan',
-    'architecturalPlan'
-  ];
-  const filteredAttachedDocs = attachedDocs.filter(doc => allowedDocIds.includes(doc.id));
+  // Make these available to the dialog JSX as well as handleRequestQuote
+  const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
+  const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
+  const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
+  const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
+
+  // Read consultant status from job object (category array pattern)
+  const consultantArray = job?.consultants?.[consultant.category] || [];
+  const consultantObj = consultantArray.find((c: any) => c.consultantId === consultant.id);
+  const consultantStatus = consultantObj?.assessment?.status;
+
+  // Find the relevant document for this consultant/category
+  const relevantDoc = documents.find(
+    doc => doc.category === consultant.category && doc.consultantId === consultant.id
+  )
+
+  // Type guard for Job (add more fields as needed)
+  function isFullJob(obj: any): obj is import('@shared/types/jobs').Job {
+    return obj && typeof obj === 'object' && 'council' in obj && 'status' in obj && 'createdAt' in obj;
+  }
+
+  let reportStatus: any = null;
+  if (relevantDoc && job && isFullJob(job)) {
+    reportStatus = getReportStatus(relevantDoc, job);
+  }
+
+  // Fallback: check uploadedFile for completion if job is not full
+  const isCompleted = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.returnedAt;
+  const hasFile = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.fileName;
 
   const handleSaveNotes = async () => {
     try {
@@ -142,12 +123,6 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
 
     try {
       console.log('Starting consultant ticket creation')
-
-      // Get the documents from the context
-      const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle')
-      const surveyPlan = documents.find(doc => doc.id === 'surveyPlan')
-      const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate')
-      const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
 
       // Create the consultant ticket payload with the correct structure
       const consultantTicketPayload = {
@@ -198,18 +173,25 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
         console.error('Failed to create consultant ticket:', errorData)
         throw new Error(errorData.error || 'Failed to create consultant ticket')
       }
+      const createdTicket = await ticketResponse.json();
+      // Immediately PATCH the ticket to set status to 'paid'
+      if (createdTicket?.id) {
+        await fetch(`/api/consultant-tickets/${createdTicket.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'paid' })
+        });
+      }
       console.log('Consultant ticket created successfully')
 
-      // Set report status to in_progress after successful ticket creation
-      setReportStatus('in_progress')
-      onReportStatusChange?.('in_progress')
-
-      // Store the status in localStorage with consultant ID
-      const quoteRequestKey = `quoteRequest_${job.id}_${consultant.category}_${consultant.id}`;
-      localStorage.setItem(quoteRequestKey, 'in_progress');
-
       setShowDialog(false)
-
+      // Invalidate consultant-tickets query so tickets are refetched
+      if (job?.id) {
+        queryClient.invalidateQueries({ queryKey: ['consultant-tickets', job.id] });
+      }
+      if (refetchJob) {
+        await refetchJob();
+      }
       toast({
         title: "Quote Requested",
         description: "Your quote request has been sent successfully.",
@@ -223,6 +205,12 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
       })
     }
   }
+
+  console.log(
+    'ConsultantCard',
+    'consultant.id:', consultant.id,
+    'consultantStatus:', consultantStatus
+  );
 
   return (
     <Card>
@@ -295,26 +283,48 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
             )}
           </div>
 
-          {reportStatus === 'in_progress' && (
+          {/* Status display using getReportStatus or fallback */}
+          {(consultantStatus === 'pending' || consultantStatus === 'paid') ? (
             <div className="mt-4 p-4 bg-blue-50 rounded-md">
               <h4 className="font-medium mb-2">Report In Progress</h4>
               <p className="text-sm text-gray-600">
                 We are processing your "Quote Request" Report. You will be notified when it's ready.
               </p>
             </div>
-          )}
+          ) : ((reportStatus?.isPaid && !reportStatus?.isCompleted) && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-md">
+              <h4 className="font-medium mb-2">Report In Progress</h4>
+              <p className="text-sm text-gray-600">
+                We are processing your "Quote Request" Report. You will be notified when it's ready.
+              </p>
+            </div>
+          ))}
 
-          {reportStatus === 'completed' && (
+          {((reportStatus?.isCompleted && reportStatus?.hasFile) || (!reportStatus && isCompleted && hasFile)) && (
             <div className="mt-4 p-4 bg-green-50 rounded-md">
               <h4 className="font-medium mb-2">Report Complete</h4>
               <p className="text-sm text-gray-600">
                 Your report has been completed and is available in the documents section.
               </p>
+              <Button
+                className="mt-2"
+                variant="outline"
+                onClick={() => {
+                  // Download logic (reuse from document store)
+                  if (relevantDoc && hasFile) {
+                    // You may want to use a shared download utility here
+                  }
+                }}
+                disabled={!relevantDoc || !hasFile}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Download Report
+              </Button>
             </div>
           )}
 
           {/* Only show the Request Quote button if no quote has been sent yet */}
-          {(!reportStatus || reportStatus === null) && (
+          {!reportStatus && (
             <Button
               className="w-full"
               onClick={() => {
@@ -353,14 +363,23 @@ export function ConsultantCard({ consultant, jobs, initialReportStatus, onReport
                       className="mt-1"
                     />
                   </div>
-                  {filteredAttachedDocs.length > 0 && (
+                  {/* Documents to be Attached Section */}
+                  {([certificateOfTitle, surveyPlan, certificate107, architecturalPlan].filter(Boolean).length > 0) && (
                     <div className="space-y-2 border-t pt-4 mt-4">
                       <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
-                      <p className="text-xs text-gray-500">The following documents will be included with your submission:</p>
+                      <p className="text-xs text-gray-500">The following documents will be included with your quote request:</p>
                       <ul className="list-disc list-inside text-sm space-y-1">
-                        {filteredAttachedDocs.map(doc => (
-                          <li key={doc.id}>{doc.name}</li>
-                        ))}
+                        {([certificateOfTitle, surveyPlan, certificate107, architecturalPlan]
+                          .filter((doc): doc is typeof doc & { id: string } => Boolean(doc))
+                          .map(doc => {
+                            return (
+                              <li key={doc.id}>
+                                {(doc?.title || doc.id)}
+                                {doc?.uploadedFile?.originalName && ` (${doc.uploadedFile.originalName})`}
+                              </li>
+                            );
+                          })
+                        )}
                       </ul>
                     </div>
                   )}

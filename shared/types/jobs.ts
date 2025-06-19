@@ -76,12 +76,12 @@ export interface Job {
     webAddress?: string;
   };
   consultants?: {
-    [key in ConsultantCategory]?: {
+    [key in ConsultantCategory]?: Array<{
       name: string;
       notes: string;
       consultantId: string;
       assessment?: Assessment;
-    };
+    }>;
   };
   purchasedPrePreparedAssessments?: Record<string, PurchasedPrePreparedAssessments>;
   purchasedPrePreparedInitialAssessments?: Record<string, PurchasedPrePreparedAssessments>;

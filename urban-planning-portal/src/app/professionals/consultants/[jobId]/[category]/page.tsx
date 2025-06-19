@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { ArrowLeft, Search, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ConsultantCard } from "../../components/consultant-card"
@@ -8,6 +8,8 @@ import { Input } from "@shared/components/ui/input"
 import { Button } from "@shared/components/ui/button"
 import { DocumentProvider } from '@shared/contexts/document-context'
 import { useQuoteRequests } from '@shared/hooks/useQuoteRequests'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from "react"
 
 // Add interface for quote request state
 interface QuoteRequestState {
@@ -42,32 +44,40 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
   const [consultants, setConsultants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [job, setJob] = useState<any>(null)
+  const queryClient = useQueryClient();
+  const {
+    data: job,
+    isLoading: isJobLoading,
+    error: jobError,
+    refetch: refetchJob,
+  } = useQuery({
+    queryKey: ['job', params.jobId],
+    queryFn: async () => {
+      const res = await fetch(`/api/jobs/${params.jobId}`);
+      if (!res.ok) throw new Error('Failed to fetch job details');
+      return res.json();
+    },
+    enabled: !!params.jobId,
+    staleTime: 0,
+  });
   const { quoteRequests, updateQuoteRequestStatus } = useQuoteRequests(params.jobId)
+  // Fetch consultant tickets for this job
+  const { data: consultantTickets, isLoading: isTicketsLoading } = useQuery({
+    queryKey: ['consultant-tickets', params.jobId],
+    queryFn: async () => {
+      const res = await fetch('/api/consultant-tickets');
+      if (!res.ok) throw new Error('Failed to fetch consultant tickets');
+      return res.json();
+    },
+    enabled: !!params.jobId,
+    staleTime: 0,
+  });
 
-  useEffect(() => {
-    // Fetch job details
-    console.log('Fetching job:', params.jobId)
-    fetch(`/api/jobs/${params.jobId}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch job details')
-        return res.json()
-      })
-      .then(data => {
-        console.log('Job data:', data)
-        if (data.redirectUrl) {
-          // If we got a redirect URL, navigate to it
-          console.log('Redirecting to:', data.redirectUrl)
-          router.push(data.redirectUrl)
-          return
-        }
-        setJob(data)
-      })
-      .catch(err => {
-        console.error('Error with job:', err)
-        setError(err.message)
-      })
-  }, [params.jobId, router])
+  // Filter tickets for this job and category
+  const ticketsForCategory = useMemo(() => {
+    if (!consultantTickets) return [];
+    return consultantTickets.filter((t: any) => t.jobId === params.jobId && t.category === params.category);
+  }, [consultantTickets, params.jobId, params.category]);
 
   useEffect(() => {
     setLoading(true)
@@ -90,14 +100,11 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
   )
 
   // Transform job data into the format expected by ConsultantCard
-  const jobsData = job ? [{
-    id: job.id,
-    address: job.address,
-    documents: Object.entries(job.documents || {}).map(([id, doc]: [string, any]) => ({
-      id,
-      name: doc.originalName
-    }))
-  }] : []
+  const jobsData = job ? [job] : []
+
+  // Debug: Log tickets and consultants before mapping
+  console.log('ticketsForCategory', ticketsForCategory);
+  console.log('filteredConsultants', filteredConsultants.map(c => c.id));
 
   return (
     <DocumentProvider jobId={params.jobId}>
@@ -140,6 +147,7 @@ export default function QuoteCategoryPage({ params }: { params: { jobId: string;
                   jobs={jobsData}
                   initialReportStatus={quoteRequests[consultant.id]?.status || null}
                   onReportStatusChange={(status) => updateQuoteRequestStatus({ consultantId: consultant.id, status })}
+                  refetchJob={refetchJob}
                 />
               ))}
             </div>

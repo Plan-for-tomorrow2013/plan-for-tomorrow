@@ -124,28 +124,50 @@ export async function POST(request: Request) {
       } catch (readError) {
         job = null
       }
-      if (job && ticketCategory && job.consultants && job.consultants[ticketCategory]) {
-        if (!job.consultants[ticketCategory].assessment) {
-          job.consultants[ticketCategory].assessment = {}
+      if (job && ticketCategory && job.consultants) {
+        // Initialize the consultants array for this category if it doesn't exist
+        if (!job.consultants[ticketCategory]) {
+          job.consultants[ticketCategory] = [];
         }
-        job.consultants[ticketCategory].assessment.status = 'completed'
-        job.consultants[ticketCategory].assessment.completedDocument = {
-          documentId: clientDocumentId,
-          originalName: file.name,
-          fileName: storedFileName,
-          uploadedAt: new Date().toISOString(),
-          size: file.size,
-          type: file.type,
-          returnedAt: new Date().toISOString()
+
+        // Find the consultant in the array by consultantId
+        const consultantIndex = job.consultants[ticketCategory].findIndex(
+          (c: any) => c.consultantId === ticket.consultantId
+        );
+
+        const consultantData = {
+          name: ticket.consultantName,
+          notes: '',
+          consultantId: ticket.consultantId,
+          assessment: {
+            status: 'completed',
+            completedDocument: {
+              documentId: clientDocumentId,
+              originalName: file.name,
+              fileName: storedFileName,
+              uploadedAt: new Date().toISOString(),
+              size: file.size,
+              type: file.type,
+              returnedAt: new Date().toISOString()
+            }
+          }
+        };
+
+        if (consultantIndex === -1) {
+          // Add new consultant to the array
+          job.consultants[ticketCategory].push(consultantData);
+        } else {
+          // Update existing consultant
+          job.consultants[ticketCategory][consultantIndex] = {
+            ...job.consultants[ticketCategory][consultantIndex],
+            ...consultantData
+          };
         }
-        job.consultants[ticketCategory].consultantId = ticket.consultantId
-        job.consultants[ticketCategory].consultantName = ticket.consultantName
-        delete job.consultants[ticketCategory].assessment.fileName
-        delete job.consultants[ticketCategory].assessment.originalName
+
         await fs.writeFile(jobPath, JSON.stringify(job, null, 2))
         console.log(`Job ${ticket.jobId} updated successfully with completed assessment for consultant category ${ticketCategory}.`)
       } else {
-        console.warn(`Consultant category ${ticketCategory} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
+        console.warn(`Job or consultant category ${ticketCategory} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
       }
     } catch (err) {
       console.error('Error updating job consultants assessment field:', err)

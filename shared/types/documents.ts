@@ -158,6 +158,7 @@ export interface DocumentWithStatus extends Document {
   // Renamed 'status' to 'displayStatus' and added new states
   displayStatus: 'uploaded' | 'pending_user_upload' | 'pending_admin_delivery'
   originalAssessmentId?: string; // Added to store the original assessment ID for pre-prepared items
+  consultantId?: string; // Added to store the consultant ID for consultant-generated documents
   uploadedFile?: {
     fileName: string
     originalName: string

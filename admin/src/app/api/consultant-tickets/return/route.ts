@@ -68,26 +68,58 @@ export async function POST(request: Request) {
     const { completedDocument, category } = ticket
 
     // Update the consultant's assessment in the job object
-    if (category && job.consultants && job.consultants[category]) {
-      if (!job.consultants[category].assessment) {
-        job.consultants[category].assessment = {};
+    if (category && job.consultants) {
+      console.log('Job path:', jobPath)
+      console.log('Job exists:', !!job)
+      console.log('Job consultants structure:', JSON.stringify(job.consultants, null, 2))
+      console.log('Category:', category)
+      console.log('Current consultants for category:', job.consultants[category])
+      console.log('Type of consultants[category]:', typeof job.consultants[category])
+      console.log('Is array?', Array.isArray(job.consultants[category]))
+
+      // Initialize the consultants array for this category if it doesn't exist
+      if (!job.consultants[category]) {
+        job.consultants[category] = [];
+      } else if (!Array.isArray(job.consultants[category])) {
+        // If it exists but is not an array, convert it to an array
+        console.warn(`job.consultants[${category}] is not an array, converting to array`)
+        job.consultants[category] = [job.consultants[category]];
       }
-      job.consultants[category].assessment.status = 'completed';
-      job.consultants[category].assessment.completedDocument = {
-        documentId: completedDocument.documentId,
-        originalName: completedDocument.originalName,
-        fileName: completedDocument.fileName,
-        uploadedAt: completedDocument.uploadedAt || new Date().toISOString(),
-        size: completedDocument.size,
-        type: completedDocument.type,
-        returnedAt: new Date().toISOString()
+
+      // Find the consultant in the array by consultantId
+      const consultantIndex = job.consultants[category].findIndex(
+        (c: any) => c.consultantId === ticket.consultantId
+      );
+
+      const consultantData = {
+        name: ticket.consultantName,
+        notes: '',
+        consultantId: ticket.consultantId,
+        assessment: {
+          status: 'completed',
+          completedDocument: {
+            documentId: completedDocument.documentId,
+            originalName: completedDocument.originalName,
+            fileName: completedDocument.fileName,
+            uploadedAt: completedDocument.uploadedAt || new Date().toISOString(),
+            size: completedDocument.size,
+            type: completedDocument.type,
+            returnedAt: new Date().toISOString()
+          }
+        }
       };
-      // Add consultant information to the assessment
-      job.consultants[category].consultantId = ticket.consultantId;
-      job.consultants[category].consultantName = ticket.consultantName;
-      // Optionally remove old top-level file properties if they exist
-      delete job.consultants[category].assessment.fileName;
-      delete job.consultants[category].assessment.originalName;
+
+      if (consultantIndex === -1) {
+        // Add new consultant to the array
+        job.consultants[category].push(consultantData);
+      } else {
+        // Update existing consultant
+        job.consultants[category][consultantIndex] = {
+          ...job.consultants[category][consultantIndex],
+          ...consultantData
+        };
+      }
+
       // Save the updated job
       try {
         await fs.writeFile(jobPath, JSON.stringify(job, null, 2))
@@ -96,7 +128,7 @@ export async function POST(request: Request) {
         console.error(`Error writing updated job file for ${ticket.jobId}:`, writeError)
       }
     } else {
-      console.warn(`Consultant category ${category} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
+      console.warn(`Job or consultant category ${category} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
     }
     // === END MODIFICATION ===
 

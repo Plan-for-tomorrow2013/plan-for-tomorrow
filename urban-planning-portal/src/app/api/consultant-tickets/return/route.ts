@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { getConsultantTicketsPath, getJobPath, getDocumentsPath } from '@shared/utils/paths'
+import { Assessment } from '@shared/types/jobs'
 
 export async function POST(request: Request) {
   try {
@@ -117,15 +118,37 @@ export async function POST(request: Request) {
 
     // Update the consultant's assessment in the job object
     if (ticket.category && job.consultants && job.consultants[ticket.category]) {
-      if (!job.consultants[ticket.category].assessment) {
-        job.consultants[ticket.category].assessment = {};
+      // Initialize the consultants array for this category if it doesn't exist
+      if (!Array.isArray(job.consultants[ticket.category])) {
+        // If it exists but is not an array, convert it to an array
+        job.consultants[ticket.category] = [job.consultants[ticket.category] as any];
       }
-      job.consultants[ticket.category].assessment.status = 'completed';
-      job.consultants[ticket.category].assessment.returnedAt = new Date().toISOString();
-      job.consultants[ticket.category].assessment.completedDocument = fileDetails;
-      // Optionally remove old top-level file properties if they exist
-      delete job.consultants[ticket.category].assessment.fileName;
-      delete job.consultants[ticket.category].assessment.originalName;
+
+      // Ensure the array exists and find the consultant by consultantId
+      const consultantsArray = job.consultants[ticket.category] as Array<{
+        name: string;
+        notes: string;
+        consultantId: string;
+        assessment?: Assessment;
+      }>;
+
+      const consultantIndex = consultantsArray.findIndex(
+        (c) => c.consultantId === ticket.consultantId
+      );
+
+      if (consultantIndex !== -1) {
+        if (!consultantsArray[consultantIndex].assessment) {
+          consultantsArray[consultantIndex].assessment = {};
+        }
+        consultantsArray[consultantIndex].assessment.status = 'completed';
+        consultantsArray[consultantIndex].assessment.returnedAt = new Date().toISOString();
+        consultantsArray[consultantIndex].assessment.completedDocument = fileDetails;
+        // Optionally remove old top-level file properties if they exist
+        delete consultantsArray[consultantIndex].assessment.fileName;
+        delete consultantsArray[consultantIndex].assessment.originalName;
+      } else {
+        console.warn(`Consultant with ID ${ticket.consultantId} not found in category ${ticket.category} for job ${ticket.jobId}.`)
+      }
     } else {
       console.warn(`Consultant category ${ticket.category} not found in job object for job ${ticket.jobId}. Cannot update assessment details.`)
     }

@@ -1,4 +1,4 @@
-import { Job } from '@shared/types/jobs'
+import { Job, ConsultantCategory } from '@shared/types/jobs'
 import { DocumentWithStatus } from '@shared/types/documents'
 import { Assessment } from '@shared/types/jobs'
 
@@ -33,6 +33,19 @@ export const getReportStatus = (doc: DocumentWithStatus, job: Job): ReportStatus
 };
 
 export const getReportData = (doc: DocumentWithStatus, job: Job): Assessment | null => {
+  // For consultant categories, look in the consultants array
+  if (job.consultants && doc.category && doc.consultantId) {
+    const category = doc.category as ConsultantCategory;
+    if (job.consultants[category]) {
+      // Find the consultant in the array by consultantId
+      const consultant = job.consultants[category].find(
+        (c: { consultantId: string }) => c.consultantId === doc.consultantId
+      );
+      return consultant?.assessment || null;
+    }
+  }
+
+  // For other report types, use the existing logic
   const data = doc.id === 'statementOfEnvironmentalEffects' ? job.statementOfEnvironmentalEffects :
                doc.id === 'complyingDevelopmentCertificate' ? job.complyingDevelopmentCertificate :
                doc.id === 'customAssessment' ? job.customAssessment :

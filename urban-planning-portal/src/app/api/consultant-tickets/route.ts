@@ -226,14 +226,50 @@ export async function POST(request: Request) {
         const job = getJob(newTicket.jobId);
         if (job) {
           job.consultants = job.consultants ?? {};
-          job.consultants[newTicket.category] = job.consultants[newTicket.category] ?? { name: '', notes: '' };
-          (job.consultants[newTicket.category] as { assessment?: Assessment }).assessment = {
-            ...((job.consultants[newTicket.category] as { assessment?: Assessment }).assessment || {}),
-            ...newTicket.assessment,
-            status: 'paid',
-            createdAt: now,
-            updatedAt: now,
+
+          // Initialize the consultants array for this category if it doesn't exist
+          if (!job.consultants[newTicket.category]) {
+            job.consultants[newTicket.category] = [];
+          } else if (!Array.isArray(job.consultants[newTicket.category])) {
+            // If it exists but is not an array, convert it to an array
+            job.consultants[newTicket.category] = [job.consultants[newTicket.category] as any];
+          }
+
+          // Ensure the array exists and find the consultant by consultantId
+          const consultantsArray = job.consultants[newTicket.category] as Array<{
+            name: string;
+            notes: string;
+            consultantId: string;
+            assessment?: Assessment;
+          }>;
+
+          const consultantIndex = consultantsArray.findIndex(
+            (c) => c.consultantId === newTicket.consultantId
+          );
+
+          const consultantData = {
+            name: newTicket.consultantName,
+            notes: '',
+            consultantId: newTicket.consultantId,
+            assessment: {
+              ...newTicket.assessment,
+              status: 'paid' as const,
+              createdAt: now,
+              updatedAt: now,
+            }
           };
+
+          if (consultantIndex === -1) {
+            // Add new consultant to the array
+            consultantsArray.push(consultantData);
+          } else {
+            // Update existing consultant
+            consultantsArray[consultantIndex] = {
+              ...consultantsArray[consultantIndex],
+              ...consultantData
+            };
+          }
+
           await saveJob(newTicket.jobId, job);
         }
       } catch (err) {

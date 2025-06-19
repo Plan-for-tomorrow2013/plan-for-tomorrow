@@ -99,23 +99,31 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     )
   }
 
-  const renderDocumentUpload = (doc: DocumentWithStatus, ticket?: ConsultantTicket) => {
-    if (isReportType(doc.id)) {
-      const reportStatus = job ? getReportStatus(doc, job) : { isPaid: false, isCompleted: false, hasFile: false }
-      const reportTitle = getReportTitle(doc.id)
+  // Type guard for Job (add more fields as needed)
+  function isFullJob(obj: any): obj is import('@shared/types/jobs').Job {
+    return obj && typeof obj === 'object' && 'council' in obj && 'status' in obj && 'createdAt' in obj;
+  }
 
-      // Show "In Progress" if the report is paid but not completed
-      if (reportStatus.isPaid && !reportStatus.isCompleted) {
-        return (
-          <Card key={doc.id} className="shadow-md">
+  // For each ticket, find the relevant document and use getReportStatus or fallback
+  const tiles: Array<{ key: string, element: JSX.Element }> = [];
+  const uniqueTickets = consultantTickets.filter((ticket, idx, arr) =>
+    arr.findIndex(t => t.consultantId === ticket.consultantId && t.category === ticket.category) === idx
+  );
+  uniqueTickets.forEach(ticket => {
+    const doc = documents.find(
+      doc => doc.category === ticket.category && doc.consultantId === ticket.consultantId
+    );
+    if (!doc) {
+      // If no document exists for this ticket, show in-progress/fallback state
+      tiles.push({
+        key: `ticket-nodoc-${ticket.id}`,
+        element: (
+          <Card key={ticket.id} className="shadow-md">
             <CardHeader className="bg-[#323A40] text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold">{reportTitle}</h3>
-                  <p className="text-sm text-gray-300">{doc.category}</p>
-                  {ticket?.consultantName && (
-                    <p className="text-sm text-gray-200 font-semibold mt-1">{ticket.consultantName}</p>
-                  )}
+                  <h3 className="text-lg font-semibold">{ticket.consultantName}</h3>
+                  <p className="text-sm text-gray-300">{ticket.category}</p>
                 </div>
               </div>
             </CardHeader>
@@ -126,22 +134,31 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 </svg>
                 <p className="font-semibold text-lg">Report In Progress</p>
                 <p className="text-sm text-gray-600 px-4">
-                  Our team is working on your {reportTitle}. You will be notified once it's ready.
+                  We are processing your "{ticket.category}" Report for {ticket.consultantName}. You will be notified once it's ready.
                 </p>
               </div>
             </CardContent>
           </Card>
         )
-      }
+      });
+      return;
+    }
+    let reportStatus: any = null;
+    if (doc && job && isFullJob(job)) {
+      reportStatus = getReportStatus(doc, job);
+    }
+    const isCompleted = doc && doc.uploadedFile && !!doc.uploadedFile.returnedAt;
+    const hasFile = doc && doc.uploadedFile && !!doc.uploadedFile.fileName;
 
-      // Show completed report if available
-      if (reportStatus.isCompleted && reportStatus.hasFile) {
-        return (
+    if ((reportStatus && reportStatus.isCompleted && reportStatus.hasFile) || (!reportStatus && isCompleted && hasFile)) {
+      tiles.push({
+        key: `doc-${doc.id}-${ticket.consultantId}`,
+        element: (
           <Card key={doc.id} className="shadow-md">
             <CardHeader className="bg-[#323A40] text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold">{reportTitle}</h3>
+                  <h3 className="text-lg font-semibold">{getReportTitle(doc.id)}</h3>
                   <p className="text-sm text-gray-300">{doc.category}</p>
                   {ticket?.consultantName && (
                     <p className="text-sm text-gray-200 font-semibold mt-1">{ticket.consultantName}</p>
@@ -154,18 +171,16 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-[#323A40]">
                   <FileText className="h-4 w-4" />
-                  <span>{reportTitle}</span>
+                  <span>{getReportTitle(doc.id)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Uploaded: {(reportStatus as any).reportData?.completedDocument?.uploadedAt ? new Date((reportStatus as any).reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
+                  Uploaded: {doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
                 </p>
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => {
-                    handleDownload(doc.id);
-                  }}
-                  disabled={false}
+                  onClick={() => handleDownload(doc.id)}
+                  disabled={!hasFile}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Report
@@ -174,74 +189,39 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
             </CardContent>
           </Card>
         )
-      }
-
-      // Don't show anything if the report is not paid or completed
-      return null
+      });
+      return;
     }
-
-    // Standard Document Card
-    const isUploaded = doc.displayStatus === 'uploaded'
-    return (
-      <Card key={doc.id} className="relative">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div><h3 className="text-lg font-semibold">{doc.title}</h3></div>
-            {isUploaded ? (<Check className="h-5 w-5 text-green-500" />) : null}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isUploaded && doc.uploadedFile ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span className="text-sm">{doc.uploadedFile.originalName}</span>
+    if (reportStatus && reportStatus.isPaid && !reportStatus.isCompleted) {
+      tiles.push({
+        key: `ticket-inprogress-${ticket.id}`,
+        element: (
+          <Card key={ticket.id} className="shadow-md">
+            <CardHeader className="bg-[#323A40] text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{ticket.consultantName}</h3>
+                  <p className="text-sm text-gray-300">{ticket.category}</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-500">
-                Uploaded on {doc.uploadedFile.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A'}
+            </CardHeader>
+            <CardContent className="p-4 text-center">
+              <div className="flex flex-col items-center justify-center space-y-2 py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="font-semibold text-lg">Report In Progress</p>
+                <p className="text-sm text-gray-600 px-4">
+                  Our team is working on your {getReportTitle(doc.id)}. You will be notified once it's ready.
+                </p>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => handleDownload(doc.id)}>
-                  <FileText className="h-4 w-4 mr-2" />Download
-                </Button>
-                {doc.path !== '/pre-prepared-assessment' && (
-                  <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          ) : (
-            <Button variant="outline" className="w-full" onClick={() => handleUpload(doc.id)}>
-              <Upload className="h-4 w-4 mr-2" />Upload Document
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    )
-  }
-
-  // Merge logic: for each unique consultant+category, prefer completed document, otherwise show in-progress ticket
-  const tiles: Array<{ key: string, element: JSX.Element }> = [];
-  // Group tickets by consultantId+category
-  const uniqueTickets = consultantTickets.filter((ticket, idx, arr) =>
-    arr.findIndex(t => t.consultantId === ticket.consultantId && t.category === ticket.category) === idx
-  );
-  uniqueTickets.forEach(ticket => {
-    // Prefer completed document for this consultant+category by ticketId
-    const doc = documents.find(
-      doc =>
-        (((doc.metadata && (doc.metadata as any).ticketId && (doc.metadata as any).ticketId === ticket.id)) ||
-         (!(doc.metadata && (doc.metadata as any).ticketId) && doc.category === ticket.category && doc.displayStatus === 'uploaded'))
-    );
-    if (doc) {
-      const rendered = renderDocumentUpload(doc, ticket);
-      if (rendered) {
-        tiles.push({ key: `doc-${doc.id}-${ticket.consultantId}`, element: rendered });
-        return;
-      }
+            </CardContent>
+          </Card>
+        )
+      });
+      return;
     }
-    // Otherwise, show in-progress consultant ticket
+    // Otherwise, show in-progress consultant ticket (fallback)
     tiles.push({
       key: `ticket-${ticket.id}`,
       element: (

@@ -149,33 +149,55 @@ export function ConsultantTicketCard({
 
           <div className="border-t pt-2">
             <h3 className="font-medium text-sm mb-1">Completed Assessment</h3>
-            {(reportStatus?.isPaid && !reportStatus?.isCompleted) && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                <h4 className="font-medium mb-2">Report In Progress</h4>
-                <p className="text-sm text-gray-600">
-                  We are processing your "Quote Request" Report. You will be notified when it's ready.
-                </p>
+            {/* If a completed document exists, show it */}
+            {ticket.completedDocument ? (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-xs">
+                    <FileText className="h-3 w-3 mr-1" />
+                    <span className="truncate">{ticket.completedDocument.originalName}</span>
+                  </div>
+                  {!ticket.completedDocument.returnedAt && (
+                    <Button
+                      size="sm"
+                      onClick={() => onReturnDocument(ticket.id)}
+                      className="flex items-center h-6 text-xs"
+                    >
+                      <Bell className="h-3 w-3 mr-1" />
+                      Add
+                    </Button>
+                  )}
+                </div>
+                {ticket.completedDocument.returnedAt && (
+                  <div className="text-xs text-gray-500">
+                    <p>Added to stores</p>
+                    <p className="text-[10px]">
+                      {new Date(ticket.completedDocument.returnedAt).toLocaleString()}
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-            {((reportStatus?.isCompleted && reportStatus?.hasFile) || (!reportStatus && isCompleted && hasFile)) && (
-              <div className="mt-4 p-4 bg-green-50 rounded-md">
-                <h4 className="font-medium mb-2">Report Complete</h4>
-                <p className="text-sm text-gray-600">
-                  Your report has been completed and is available in the documents section.
-                </p>
-                <Button
-                  className="mt-2"
-                  variant="outline"
-                  onClick={() => {
-                    if (relevantDoc && hasFile) {
-                      // Download logic here
+            ) : (
+              // If no completed document, show upload button
+              <div>
+                <label htmlFor={`file-upload-${ticket.id}`} className="cursor-pointer">
+                  <div className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800">
+                    <Upload className="h-3 w-3" />
+                    <span>Upload Assessment</span>
+                  </div>
+                </label>
+                <input
+                  id={`file-upload-${ticket.id}`}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      onUploadDocument(ticket.id, file)
                     }
                   }}
-                  disabled={!relevantDoc || !hasFile}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Download Report
-                </Button>
+                />
               </div>
             )}
           </div>

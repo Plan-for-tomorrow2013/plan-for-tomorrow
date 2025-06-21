@@ -1,8 +1,14 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
-import { FileText, Building2, Lightbulb, Recycle } from "lucide-react"
+import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import { FileText, Building2, Lightbulb, Recycle } from 'lucide-react';
 
 const navItems = [
   {
@@ -35,7 +41,9 @@ export default function KnowledgeBasePage() {
                 <FileText className="h-6 w-6 text-blue-500" />
                 <CardTitle className="text-lg">Development Application</CardTitle>
               </div>
-              <CardDescription>Guidelines and requirements for development applications</CardDescription>
+              <CardDescription>
+                Guidelines and requirements for development applications
+              </CardDescription>
             </CardHeader>
           </Card>
         </Link>
@@ -77,5 +85,5 @@ export default function KnowledgeBasePage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

@@ -1,10 +1,16 @@
-"use client"
-import { Button } from "@shared/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
-import { Input } from "@shared/components/ui/input"
-import { Label } from "@shared/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
-import { User, CreditCard, Bell } from "lucide-react"
+'use client';
+import { Button } from '@shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
+import { User, CreditCard, Bell } from 'lucide-react';
 
 export default function AccountPage() {
   return (
@@ -98,5 +104,5 @@ export default function AccountPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

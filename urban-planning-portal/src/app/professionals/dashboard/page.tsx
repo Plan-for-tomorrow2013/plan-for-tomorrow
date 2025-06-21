@@ -1,56 +1,62 @@
-"use client"
+'use client';
 
-import { useState, useEffect, useLayoutEffect } from 'react'
-import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
-import { Input } from "@shared/components/ui/input"
-import { Button } from "@shared/components/ui/button"
-import { useToast } from "@shared/components/ui/use-toast"
+import { useState, useEffect, useLayoutEffect } from 'react';
+import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
+import { Input } from '@shared/components/ui/input';
+import { Button } from '@shared/components/ui/button';
+import { useToast } from '@shared/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { useQueryClient, useMutation } from '@tanstack/react-query'
-import { useJobs } from '@shared/hooks/useJobs'
-import { Job } from '@shared/types/jobs'
-import { UserStats } from '@shared/components/UserStats'
-import { Announcements } from '@shared/components/Announcements'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useJobs } from '@shared/hooks/useJobs';
+import { Job } from '@shared/types/jobs';
+import { UserStats } from '@shared/components/UserStats';
+import { Announcements } from '@shared/components/Announcements';
 
 interface SearchResult {
-  layer: string
-  attributes: Record<string, any>
+  layer: string;
+  attributes: Record<string, any>;
 }
 
 interface SearchResponse {
-  address: string
+  address: string;
   coordinates: {
-    longitude: number
-    latitude: number
-  }
+    longitude: number;
+    latitude: number;
+  };
   planningLayers: {
-    epiLayers: SearchResult[]
-    protectionLayers: SearchResult[]
-    localProvisionsLayers: SearchResult[]
-  }
+    epiLayers: SearchResult[];
+    protectionLayers: SearchResult[];
+    principalPlanningLayers: SearchResult[];
+  };
 }
 
 interface Announcement {
-  id: string
-  title: string
-  content: string
-  date: string
-  author: string
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
 }
 
 export default function DashboardPage() {
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-  const [address, setAddress] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState<SearchResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isCreatingJob, setIsCreatingJob] = useState(false)
-  const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const { jobs, isLoading, error: jobsError } = useJobs()
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<SearchResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreatingJob, setIsCreatingJob] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const { jobs, isLoading, error: jobsError } = useJobs();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [jobDetails, setJobDetails] = useState<Job | null>(null);
   const router = useRouter(); // Initialize the router
@@ -61,45 +67,45 @@ export default function DashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jobData),
-      })
-      if (!response.ok) throw new Error('Failed to create job')
-      return response.json()
+      });
+      if (!response.ok) throw new Error('Failed to create job');
+      return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
       router.push(data.redirectUrl); // Use router.push for client-side navigation
     },
-    onError: (error) => {
-      setError(error instanceof Error ? error.message : 'Failed to create job')
+    onError: error => {
+      setError(error instanceof Error ? error.message : 'Failed to create job');
       toast({
-        title: "Error",
-        description: "Failed to create job",
-        variant: "destructive"
-      })
-    }
-  })
+        title: 'Error',
+        description: 'Failed to create job',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Fetch announcements
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        console.log('Fetching announcements...')
+        console.log('Fetching announcements...');
         const response = await fetch('/api/announcements');
-        console.log('API Response status:', response.status)
+        console.log('API Response status:', response.status);
         if (!response.ok) throw new Error('Failed to fetch announcements');
         const data = await response.json();
-        console.log('API Response data:', data)
+        console.log('API Response data:', data);
         if (data.error) {
           throw new Error(data.error.message);
         }
-        console.log('Setting announcements:', data.data)
+        console.log('Setting announcements:', data.data);
         setAnnouncements(data.data || []);
       } catch (error) {
         console.error('Error fetching announcements:', error);
         toast({
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to load announcements",
-          variant: "destructive"
+          title: 'Error',
+          description: error instanceof Error ? error.message : 'Failed to load announcements',
+          variant: 'destructive',
         });
       }
     };
@@ -155,18 +161,18 @@ export default function DashboardPage() {
   };
 
   const handleCreateJob = async () => {
-    if (!results) return
-    setIsCreatingJob(true)
+    if (!results) return;
+    setIsCreatingJob(true);
     try {
       await createJobMutation.mutateAsync({
         address: results.address,
         coordinates: results.coordinates,
         planningLayers: results.planningLayers,
-      })
+      });
     } finally {
-      setIsCreatingJob(false)
+      setIsCreatingJob(false);
     }
-  }
+  };
 
   const renderAttributes = (attributes: Record<string, any>, layerName: string) => {
     if (!attributes) return null;
@@ -176,134 +182,142 @@ export default function DashboardPage() {
         <div className="text-[#727E86] font-medium">{label}</div>
         <div className="text-[#323A40]">{value?.toString() || 'N/A'}</div>
       </div>
-    )
+    );
 
     // Special handling for Floor Space Ratio Additional Controls
-    if (layerName === "Floor Space Ratio Additional Controls") {
+    if (layerName === 'Floor Space Ratio Additional Controls') {
       return (
         <div className="space-y-3">
-          {renderRow("Legislative Area", attributes["Legislative Area"])}
-          {renderRow("Legislative Clause", attributes["Legislative Clause"])}
+          {renderRow('Legislative Area', attributes['Legislative Area'])}
+          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Building Height Additional Controls
-    if (layerName === "Height of Building Additional Controls") {
+    if (layerName === 'Height of Building Additional Controls') {
       return (
         <div className="space-y-3">
-          {renderRow("Legislative Area", attributes["Legislative Area"])}
-          {renderRow("Legislative Clause", attributes["Legislative Clause"])}
+          {renderRow('Legislative Area', attributes['Legislative Area'])}
+          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
         </div>
-      )
+      );
     }
 
-        // Special handling for Minimum Lot Size Additional Controls
-        if (layerName === "Minimum Lot Size Additional Controls") {
-          return (
-            <div className="space-y-3">
-              {renderRow("Legislative Area", attributes["Legislative Area"])}
-              {renderRow("Legislative Clause", attributes["Legislative Clause"])}
-            </div>
-          )
-        }
+    // Special handling for Minimum Lot Size Additional Controls
+    if (layerName === 'Minimum Lot Size Additional Controls') {
+      return (
+        <div className="space-y-3">
+          {renderRow('Legislative Area', attributes['Legislative Area'])}
+          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
+        </div>
+      );
+    }
 
     // Special handling for Local Environmental Plan
-    if (layerName === "Local Environmental Plan") {
-      return renderRow("EPI Name", attributes["EPI Name"])
+    if (layerName === 'Local Environmental Plan') {
+      return renderRow('EPI Name', attributes['EPI Name']);
     }
 
     // Special handling for Land Zoning
-    if (layerName === "Land Zoning") {
+    if (layerName === 'Land Zoning') {
       return (
         <div className="space-y-3">
-          {renderRow("Land Use", attributes["Land Use"])}
-          {renderRow("Zone", attributes["Zone"])}
+          {renderRow('Land Use', attributes['Land Use'])}
+          {renderRow('Zone', attributes['Zone'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Height of Building
-    if (layerName === "Height of Building") {
+    if (layerName === 'Height of Building') {
       return (
         <div className="space-y-3">
-          {renderRow("Maximum Building Height", attributes["Maximum Building Height"])}
-          {renderRow("Units", attributes["Units"])}
+          {renderRow('Maximum Building Height', attributes['Maximum Building Height'])}
+          {renderRow('Units', attributes['Units'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Floor Space Ratio (n:1)
-    if (layerName === "Floor Space Ratio (n:1)") {
-      return (
-         <div className="space-y-3">
-            {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
-            {renderRow("Units", attributes["Units"])}
-          </div>
-        )
-      }
-
-    // Special handling for Floor Space Ratio
-    if (layerName === "Floor Space Ratio") {
+    if (layerName === 'Floor Space Ratio (n:1)') {
       return (
         <div className="space-y-3">
-          {renderRow("Floor Space Ratio", attributes["Floor Space Ratio"])}
-          {renderRow("Units", attributes["Units"])}
+          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
+          {renderRow('Units', attributes['Units'])}
         </div>
-      )
+      );
+    }
+
+    // Special handling for Floor Space Ratio
+    if (layerName === 'Floor Space Ratio') {
+      return (
+        <div className="space-y-3">
+          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
+          {renderRow('Units', attributes['Units'])}
+        </div>
+      );
     }
 
     // Special handling for Minimum Lot Size
-    if (layerName === "Minimum Lot Size") {
+    if (layerName === 'Minimum Lot Size') {
       return (
         <div className="space-y-3">
-          {renderRow("Lot Size", attributes["Lot Size"])}
-          {renderRow("Units", attributes["Units"])}
+          {renderRow('Lot Size', attributes['Lot Size'])}
+          {renderRow('Units', attributes['Units'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Minimum Dwelling Density Area
-    if (layerName === "Minimum Dwelling Density Area") {
+    if (layerName === 'Minimum Dwelling Density Area') {
       return (
         <div className="space-y-3">
-          {renderRow("Minimum Dwelling Density", attributes["Minimum Dwelling Density"])}
-          {renderRow("Code", attributes["Code"])}
+          {renderRow('Minimum Dwelling Density', attributes['Minimum Dwelling Density'])}
+          {renderRow('Code', attributes['Code'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Heritage
-    if (layerName === "Heritage") {
+    if (layerName === 'Heritage') {
       return (
         <div className="space-y-3">
-          {renderRow("Heritage Type", attributes["Heritage Type"])}
-          {renderRow("Item Number", attributes["Item Number"])}
-          {renderRow("Item Name", attributes["Item Name"])}
-          {renderRow("Significance", attributes["Significance"])}
+          {renderRow('Heritage Type', attributes['Heritage Type'])}
+          {renderRow('Item Number', attributes['Item Number'])}
+          {renderRow('Item Name', attributes['Item Name'])}
+          {renderRow('Significance', attributes['Significance'])}
         </div>
-      )
+      );
     }
 
     // Special handling for Additional Permitted Uses
-    if (layerName === "Additional Permitted Uses") {
-      return renderRow("Code", attributes["Code"])
+    if (layerName === 'Additional Permitted Uses') {
+      return renderRow('Code', attributes['Code']);
     }
 
     // Special handling for Protection Layers
     if (results?.planningLayers.protectionLayers.some(layer => layer.layer === layerName)) {
-      return renderRow("Class", attributes["Class"])
+      return renderRow('Class', attributes['Class']);
     }
 
     // Special handling for Local Provisions
-    if (results?.planningLayers.localProvisionsLayers.some(layer => layer.layer === layerName) &&
-        layerName !== "Additional Permitted Uses") {
-      return (
-        <div className="space-y-3">
-          {renderRow("Type", attributes["Type"])}
-          {renderRow("Class", attributes["Class"])}
-        </div>
-      )
+    if (results?.planningLayers.principalPlanningLayers.some(layer => layer.layer === layerName)) {
+      if (
+        layerName !== 'Additional Permitted Uses' &&
+        layerName !== 'Clause Application' &&
+        layerName !== 'Urban Release Area'
+      ) {
+        return (
+          <div className="space-y-3">
+            {results.planningLayers.principalPlanningLayers
+              .filter(layer => layer.layer === layerName)
+              .map((layer, index) => (
+                <div key={index}>{renderRow(layerName, layer.attributes[layerName] || 'N/A')}</div>
+              ))}
+          </div>
+        );
+      }
     }
 
     // Default rendering for all other layers
@@ -311,8 +325,8 @@ export default function DashboardPage() {
       <div className="space-y-3">
         {Object.entries(attributes).map(([key, value]) => renderRow(key, value))}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -336,8 +350,8 @@ export default function DashboardPage() {
                 type="text"
                 placeholder="Enter address (e.g., 9 Viola Place, Greystanes)"
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onChange={e => setAddress(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 className="flex-1"
               />
               <Button
@@ -349,9 +363,7 @@ export default function DashboardPage() {
               </Button>
             </div>
 
-            {error && (
-              <div className="mt-4 text-red-500">{error}</div>
-            )}
+            {error && <div className="mt-4 text-red-500">{error}</div>}
 
             {results && (
               <div className="mt-6 space-y-6">
@@ -390,20 +402,22 @@ export default function DashboardPage() {
                 )}
 
                 {/* Local Provisions */}
-                {results.planningLayers.localProvisionsLayers.length > 0 && (
-                  <Card className="border border-gray-200">
-                    <CardHeader className="bg-[#323A40] text-white">
-                      <h3 className="font-semibold">Local Provisions</h3>
-                    </CardHeader>
-                    <CardContent className="divide-y pt-4">
-                      {results.planningLayers.localProvisionsLayers.map((result, index) => (
-                        <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
-                          <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
+                {results.planningLayers.principalPlanningLayers.length > 0 ? (
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg">Local Provisions</h3>
+                    {results.planningLayers.principalPlanningLayers.map((result, index) => (
+                      <Card key={index}>
+                        <CardHeader>
+                          <h4 className="font-medium">{result.layer}</h4>
+                        </CardHeader>
+                        <CardContent>
                           {renderAttributes(result.attributes, result.layer)}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No local provisions data available for this address.</p>
                 )}
 
                 {/* Create Job Button */}
@@ -436,7 +450,9 @@ export default function DashboardPage() {
           <Card>
             <CardContent className="p-6 text-center">
               <p className="text-lg text-gray-600 mb-4">No jobs found</p>
-              <p className="text-sm text-gray-500">Search for a property above to create your first job</p>
+              <p className="text-sm text-gray-500">
+                Search for a property above to create your first job
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -447,7 +463,7 @@ export default function DashboardPage() {
                   <SelectValue placeholder="Select a job" />
                 </SelectTrigger>
                 <SelectContent>
-                  {jobs.map((job) => (
+                  {jobs.map(job => (
                     <SelectItem key={job.id} value={job.id}>
                       {job.address}
                     </SelectItem>
@@ -498,7 +514,7 @@ export default function DashboardPage() {
                         description: 'View completed tasks',
                         color: '#323A40',
                       },
-                    ].map((tile) => (
+                    ].map(tile => (
                       <Card
                         key={tile.id}
                         className={`shadow-md hover:shadow-lg transition-shadow cursor-pointer hover:bg-${tile.color}/5 border-l-4`}
@@ -526,10 +542,8 @@ export default function DashboardPage() {
       {/* Announcements Section */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Announcements</h2>
-        <Announcements
-          announcements={announcements}
-        />
+        <Announcements announcements={announcements} />
       </div>
     </div>
-  )
+  );
 }

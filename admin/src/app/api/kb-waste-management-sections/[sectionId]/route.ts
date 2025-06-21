@@ -29,10 +29,7 @@ const dataFilePath = path.resolve(process.cwd(), 'admin/data/kb-waste-management
 // Define the base path for the public documents in the client portal project
 const documentsBasePath = path.resolve(process.cwd(), '../urban-planning-portal/public');
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { sectionId: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { sectionId: string } }) {
   const sectionIdToDelete = params.sectionId;
 
   if (!sectionIdToDelete) {
@@ -49,7 +46,7 @@ export async function DELETE(
     }
 
     // Read and parse the JSON data
-    let sections: Section[] = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
+    const sections: Section[] = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
 
     const sectionIndex = sections.findIndex(section => section.id === sectionIdToDelete);
 
@@ -86,7 +83,7 @@ export async function DELETE(
         }
       });
     } else {
-        console.log(`No assessments with files found in section ${sectionIdToDelete}.`)
+      console.log(`No assessments with files found in section ${sectionIdToDelete}.`);
     }
 
     // Remove the section from the array
@@ -96,11 +93,16 @@ export async function DELETE(
     fs.writeFileSync(dataFilePath, JSON.stringify(sections, null, 2), 'utf-8');
     console.log(`Section ${sectionIdToDelete} removed from ${dataFilePath}`);
 
-    return NextResponse.json({ message: 'Section and associated files deleted successfully' }, { status: 200 });
-
+    return NextResponse.json(
+      { message: 'Section and associated files deleted successfully' },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error during section deletion process:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

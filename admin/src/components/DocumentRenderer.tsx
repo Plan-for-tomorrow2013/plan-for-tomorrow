@@ -1,10 +1,10 @@
-import { FileText } from 'lucide-react'
-import { Button } from "@shared/components/ui/button"
-import { DocumentWithStatus } from '@shared/types/documents'
+import { FileText } from 'lucide-react';
+import { Button } from '@shared/components/ui/button';
+import { DocumentWithStatus } from '@shared/types/documents';
 
 interface DocumentRendererProps {
-  doc: DocumentWithStatus
-  jobId: string
+  doc: DocumentWithStatus;
+  jobId: string;
 }
 
 export function DocumentRenderer({ doc, jobId }: DocumentRendererProps) {
@@ -23,7 +23,12 @@ export function DocumentRenderer({ doc, jobId }: DocumentRendererProps) {
       <Button
         variant="outline"
         className="w-full"
-        onClick={() => window.open(`/api/download-document?jobId=${jobId}&fileName=${encodeURIComponent(uploadedFile.fileName)}&originalName=${encodeURIComponent(uploadedFile.originalName)}`, '_blank')}
+        onClick={() =>
+          window.open(
+            `/api/download-document?jobId=${jobId}&fileName=${encodeURIComponent(uploadedFile.fileName)}&originalName=${encodeURIComponent(uploadedFile.originalName)}`,
+            '_blank'
+          )
+        }
       >
         <FileText className="h-4 w-4 mr-2" />
         Download Document

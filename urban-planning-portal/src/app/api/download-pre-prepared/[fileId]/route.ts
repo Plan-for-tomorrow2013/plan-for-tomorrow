@@ -5,15 +5,18 @@ import mime from 'mime-types'; // Using mime-types to determine content type
 
 // Define the base directory where admin pre-prepared documents are stored
 // IMPORTANT: Adjust this path if the actual storage location is different
-const ADMIN_DOCUMENTS_BASE_PATH = path.resolve(process.cwd(), '../../admin/admin/public/documents/pre-prepared');
+const ADMIN_DOCUMENTS_BASE_PATH = path.resolve(
+  process.cwd(),
+  '../../admin/admin/public/documents/pre-prepared'
+);
 
 // Define the path to the metadata JSON file in the admin portal
-const METADATA_PATH = path.resolve(process.cwd(), '../../admin/admin/data/pre-prepared-assessments.json');
+const METADATA_PATH = path.resolve(
+  process.cwd(),
+  '../../admin/admin/data/pre-prepared-assessments.json'
+);
 
-export async function GET(
-  request: Request,
-  { params }: { params: { fileId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { fileId: string } }) {
   const { fileId } = params;
 
   if (!fileId) {
@@ -36,7 +39,6 @@ export async function GET(
         return NextResponse.json({ error: 'File not found or metadata missing' }, { status: 404 });
       }
       console.log(`Found metadata for fileId ${fileId}:`, assessmentMetadata.file);
-
     } catch (error) {
       console.error(`Error reading or parsing metadata file ${METADATA_PATH}:`, error);
       return NextResponse.json({ error: 'Failed to read file metadata' }, { status: 500 });
@@ -79,7 +81,6 @@ export async function GET(
 
     console.log(`Sending file ${assessmentMetadata.file.originalName} to client.`);
     return response;
-
   } catch (error) {
     console.error(`Unexpected error processing download for fileId ${fileId}:`, error);
     return NextResponse.json({ error: 'Failed to process file download' }, { status: 500 });

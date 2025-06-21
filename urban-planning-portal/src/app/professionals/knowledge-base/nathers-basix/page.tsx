@@ -1,34 +1,76 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from "@shared/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@shared/components/ui/card"
-import { Plus, Upload, FileText, X, Check, ArrowLeft, ChevronDown, ChevronUp, Download, AlertCircle } from "@shared/components/ui/icons"
-import { ShoppingCart } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { useJobs } from '@shared/hooks/useJobs'
-import Link from 'next/link'
-import { Alert, AlertDescription } from "@shared/components/ui/alert"
-import { Input } from "@shared/components/ui/input"
-import { Textarea } from "@shared/components/ui/textarea"
-import { toast } from "@shared/components/ui/use-toast"
-import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs'
-import { getReportStatus, isReportType, getReportTitle, getReportData, ReportType, getDocumentDisplayStatus } from '@shared/utils/report-utils'
-import { Progress } from "@shared/components/ui/progress"
-import { Loader2 } from 'lucide-react'
-import { AlertTitle } from "@shared/components/ui/alert"
-import camelcaseKeys from 'camelcase-keys'
-import { Document, DOCUMENT_TYPES } from '@shared/types/documents'
-import { DocumentWithStatus } from '@shared/types/documents'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
-import PdfViewer from "@/components/PdfViewer"
-import { DocumentProvider, useDocuments } from '@shared/contexts/document-context'
-import { DocumentTile } from '@shared/components/DocumentTile'
-import { createFileInput, handleDocumentUpload, handleDocumentDownload, handleDocumentDelete, downloadDocumentFromApi } from '@shared/utils/document-utils'
-import { PageHeader } from '@shared/components/ui/page-header'
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Button } from '@shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@shared/components/ui/card';
+import {
+  Plus,
+  Upload,
+  FileText,
+  X,
+  Check,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  AlertCircle,
+} from '@shared/components/ui/icons';
+import { ShoppingCart } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { useJobs } from '@shared/hooks/useJobs';
+import Link from 'next/link';
+import { Alert, AlertDescription } from '@shared/components/ui/alert';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import { toast } from '@shared/components/ui/use-toast';
+import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs';
+import {
+  getReportStatus,
+  isReportType,
+  getReportTitle,
+  getReportData,
+  ReportType,
+  getDocumentDisplayStatus,
+} from '@shared/utils/report-utils';
+import { Progress } from '@shared/components/ui/progress';
+import { Loader2 } from 'lucide-react';
+import { AlertTitle } from '@shared/components/ui/alert';
+import camelcaseKeys from 'camelcase-keys';
+import { Document, DOCUMENT_TYPES } from '@shared/types/documents';
+import { DocumentWithStatus } from '@shared/types/documents';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@shared/components/ui/dialog';
+import PdfViewer from '@/components/PdfViewer';
+import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
+import { DocumentTile } from '@shared/components/DocumentTile';
+import {
+  createFileInput,
+  handleDocumentUpload,
+  handleDocumentDownload,
+  handleDocumentDelete,
+  downloadDocumentFromApi,
+} from '@shared/utils/document-utils';
+import { PageHeader } from '@shared/components/ui/page-header';
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -41,15 +83,15 @@ interface CustomAssessmentForm {
 }
 
 interface ReportFormState {
-  formData: CustomAssessmentForm
-  paymentComplete: boolean
-  showPaymentButton: boolean
-  hasUnsavedChanges: boolean
-  purchaseInitiated: boolean
+  formData: CustomAssessmentForm;
+  paymentComplete: boolean;
+  showPaymentButton: boolean;
+  hasUnsavedChanges: boolean;
+  purchaseInitiated: boolean;
 }
 
 interface NathersFormState {
-  'nathersAssessment': ReportFormState
+  nathersAssessment: ReportFormState;
 }
 
 interface PrePreparedAssessmentSection {
@@ -85,12 +127,12 @@ interface PrePreparedAssessment {
 }
 
 interface ReportSectionProps {
-  doc: DocumentWithStatus
-  job: Job
-  onUpload: (file: File) => void
-  onDownload: () => void
-  onDelete: () => void
-  isLoading: boolean
+  doc: DocumentWithStatus;
+  job: Job;
+  onUpload: (file: File) => void;
+  onDownload: () => void;
+  onDelete: () => void;
+  isLoading: boolean;
 }
 
 interface PurchasedPrePreparedAssessment {
@@ -108,7 +150,7 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
   const response = await fetch(`/api/jobs/${jobId}`);
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error("Failed to fetch job details:", response.status, errorBody);
+    console.error('Failed to fetch job details:', response.status, errorBody);
     throw new Error(`Failed to fetch job details for ID ${jobId}. Status: ${response.status}`);
   }
   const data = await response.json();
@@ -117,18 +159,18 @@ const fetchJobDetails = async (jobId: string): Promise<Job> => {
 
 // Define fetch function for pre-prepared assessments
 const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSection[]> => {
-    const response = await fetch('/api/kb-nathers-assessments');
-    if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("Failed to fetch kb nathers assessments:", response.status, errorBody);
-        throw new Error(`Failed to fetch kb nathers assessments. Status: ${response.status}`);
-    }
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-        console.error("Invalid kb nathers assessments data received:", data);
-        throw new Error('Invalid kb nathers assessments data received');
-    }
-    return camelcaseKeys(data, { deep: true });
+  const response = await fetch('/api/kb-nathers-assessments');
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Failed to fetch kb nathers assessments:', response.status, errorBody);
+    throw new Error(`Failed to fetch kb nathers assessments. Status: ${response.status}`);
+  }
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    console.error('Invalid kb nathers assessments data received:', data);
+    throw new Error('Invalid kb nathers assessments data received');
+  }
+  return camelcaseKeys(data, { deep: true });
 };
 
 const formatDate = (dateString: string) => {
@@ -145,7 +187,7 @@ function JobInitialAssessment({
   isLoadingJobs,
   jobsError,
   selectedJobId,
-  setSelectedJobId
+  setSelectedJobId,
 }: {
   jobId: string;
   jobs?: Job[];
@@ -154,14 +196,21 @@ function JobInitialAssessment({
   selectedJobId: string | undefined;
   setSelectedJobId: (id: string) => void;
 }): JSX.Element {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const { documents, isLoading: isDocsLoading, error: docsError, uploadDocument, removeDocument, downloadDocument } = useDocuments()
-  const [documentError, setDocumentError] = useState<string | null>(null)
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const {
+    documents,
+    isLoading: isDocsLoading,
+    error: docsError,
+    uploadDocument,
+    removeDocument,
+    downloadDocument,
+  } = useDocuments();
+  const [documentError, setDocumentError] = useState<string | null>(null);
 
   // Combined state for both report forms
   const [formState, setFormState] = useState<NathersFormState>({
-    'nathersAssessment': {
+    nathersAssessment: {
       formData: {
         developmentType: '',
         additionalInfo: '',
@@ -169,7 +218,7 @@ function JobInitialAssessment({
         documents: {
           architecturalPlan: undefined,
         },
-        selectedTab: 'details'
+        selectedTab: 'details',
       },
       paymentComplete: false,
       showPaymentButton: false,
@@ -190,33 +239,36 @@ function JobInitialAssessment({
   const getOverlayStateForJob = (jobId: string) => {
     if (!jobId) return true; // default to visible
     const stored = localStorage.getItem(`soeOverlayVisible_${jobId}`);
-    return stored === null ? true : stored === "true";
+    return stored === null ? true : stored === 'true';
   };
 
   const setOverlayStateForJob = (jobId: string, visible: boolean) => {
     if (!jobId) return;
-    localStorage.setItem(`soeOverlayVisible_${jobId}`, visible ? "true" : "false");
+    localStorage.setItem(`soeOverlayVisible_${jobId}`, visible ? 'true' : 'false');
   };
 
   // Helper to get/set assessment overlay state per job in localStorage
   const getAssessmentOverlayStateForJob = (jobId: string) => {
     if (!jobId) return true; // default to visible
     const stored = localStorage.getItem(`assessmentOverlayVisible_${jobId}`);
-    return stored === null ? true : stored === "true";
+    return stored === null ? true : stored === 'true';
   };
 
   const setAssessmentOverlayStateForJob = (jobId: string, visible: boolean) => {
     if (!jobId) return;
-    localStorage.setItem(`assessmentOverlayVisible_${jobId}`, visible ? "true" : "false");
+    localStorage.setItem(`assessmentOverlayVisible_${jobId}`, visible ? 'true' : 'false');
   };
 
   // Add transformUploadedDocuments function inside component
   const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
     if (!documents) return {};
-    return Object.keys(documents).reduce((acc, key) => {
-      acc[key] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+    return Object.keys(documents).reduce(
+      (acc, key) => {
+        acc[key] = true;
+        return acc;
+      },
+      {} as Record<string, boolean>
+    );
   };
 
   // Sync overlay state with jobId and localStorage
@@ -238,7 +290,7 @@ function JobInitialAssessment({
           documents: {
             architecturalPlan: parsedData.documents?.architecturalPlan,
           },
-          selectedTab: parsedData.selectedTab || 'details'
+          selectedTab: parsedData.selectedTab || 'details',
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
@@ -251,7 +303,7 @@ function JobInitialAssessment({
       documents: {
         architecturalPlan: undefined,
       },
-      selectedTab: 'details'
+      selectedTab: 'details',
     };
   };
 
@@ -259,7 +311,7 @@ function JobInitialAssessment({
   useEffect(() => {
     if (!jobId) {
       setFormState({
-        'nathersAssessment': {
+        nathersAssessment: {
           formData: {
             developmentType: '',
             additionalInfo: '',
@@ -267,12 +319,12 @@ function JobInitialAssessment({
             documents: {
               architecturalPlan: undefined,
             },
-            selectedTab: 'details'
+            selectedTab: 'details',
           },
           paymentComplete: false,
           showPaymentButton: false,
           hasUnsavedChanges: false,
-          purchaseInitiated: false
+          purchaseInitiated: false,
         },
       });
       return;
@@ -280,14 +332,13 @@ function JobInitialAssessment({
 
     setFormState(prev => ({
       ...prev,
-      'nathersAssessment': {
+      nathersAssessment: {
         ...prev['nathersAssessment'],
         formData: loadFormData('nathersAssessment'),
         hasUnsavedChanges: false,
         purchaseInitiated: false,
       },
     }));
-
   }, [jobId]);
 
   // --- React Query for fetching selected job details ---
@@ -306,14 +357,14 @@ function JobInitialAssessment({
 
   // --- React Query for fetching pre-prepared assessments ---
   const {
-      data: prePreparedAssessmentsData = [],
-      isLoading: isPrePreparedLoading,
-      error: prePreparedError,
-      isError: isPrePreparedError,
+    data: prePreparedAssessmentsData = [],
+    isLoading: isPrePreparedLoading,
+    error: prePreparedError,
+    isError: isPrePreparedError,
   } = useQuery<PrePreparedAssessmentSection[], Error>({
-      queryKey: ['prePreparedAssessments', 'nathers'],
-      queryFn: fetchPrePreparedAssessments,
-      staleTime: 1000 * 60 * 10,
+    queryKey: ['prePreparedAssessments', 'nathers'],
+    queryFn: fetchPrePreparedAssessments,
+    staleTime: 1000 * 60 * 10,
   });
 
   const filteredAssessments = prePreparedAssessmentsData || [];
@@ -322,28 +373,32 @@ function JobInitialAssessment({
   useEffect(() => {
     if (currentJob) {
       setFormState(prev => ({
-        'nathersAssessment': {
+        nathersAssessment: {
           ...prev['nathersAssessment'],
           paymentComplete: currentJob.nathersAssessment?.status === 'paid',
-          showPaymentButton: currentJob.nathersAssessment?.status === 'paid'
-            ? false
-            : prev['nathersAssessment'].purchaseInitiated && !prev['nathersAssessment'].paymentComplete,
+          showPaymentButton:
+            currentJob.nathersAssessment?.status === 'paid'
+              ? false
+              : prev['nathersAssessment'].purchaseInitiated &&
+                !prev['nathersAssessment'].paymentComplete,
           formData: prev['nathersAssessment'].hasUnsavedChanges
             ? prev['nathersAssessment'].formData
             : {
                 developmentType: currentJob.nathersAssessment?.developmentType || '',
                 additionalInfo: currentJob.nathersAssessment?.additionalInfo || '',
-                uploadedDocuments: transformUploadedDocuments(currentJob.nathersAssessment?.uploadedDocuments),
+                uploadedDocuments: transformUploadedDocuments(
+                  currentJob.nathersAssessment?.uploadedDocuments
+                ),
                 documents: {
                   architecturalPlan: currentJob.nathersAssessment?.documents?.architecturalPlan,
                 },
-                selectedTab: 'details'
+                selectedTab: 'details',
               },
         },
-      }))
+      }));
     } else if (!jobId) {
       setFormState({
-        'nathersAssessment': {
+        nathersAssessment: {
           formData: {
             developmentType: '',
             additionalInfo: '',
@@ -351,34 +406,34 @@ function JobInitialAssessment({
             documents: {
               architecturalPlan: undefined,
             },
-            selectedTab: 'details'
+            selectedTab: 'details',
           },
           paymentComplete: false,
           showPaymentButton: false,
           hasUnsavedChanges: false,
-          purchaseInitiated: false
+          purchaseInitiated: false,
         },
-      })
+      });
     }
-  }, [currentJob, jobId, isJobError, jobError])
+  }, [currentJob, jobId, isJobError, jobError]);
 
   // Generalized form change handler
-  const handleFormChange = (formType: keyof NathersFormState, field: keyof CustomAssessmentForm) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-     if (!jobId) return;
-     setFormState(prev => ({
-       ...prev,
-       [formType]: {
-         ...prev[formType],
-         formData: {
-           ...prev[formType].formData,
-           [field]: e.target.value,
-         },
-         hasUnsavedChanges: true,
-       },
-     }));
-  };
+  const handleFormChange =
+    (formType: keyof NathersFormState, field: keyof CustomAssessmentForm) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!jobId) return;
+      setFormState(prev => ({
+        ...prev,
+        [formType]: {
+          ...prev[formType],
+          formData: {
+            ...prev[formType].formData,
+            [field]: e.target.value,
+          },
+          hasUnsavedChanges: true,
+        },
+      }));
+    };
 
   // Handler to initiate the purchase flow for a specific report type
   const handleInitiatePurchase = (formType: keyof NathersFormState) => {
@@ -393,32 +448,34 @@ function JobInitialAssessment({
 
   // Generalized confirm details handler
   const handleConfirmDetails = (formType: keyof NathersFormState) => {
-     console.log(`[handleConfirmDetails] Called for formType: ${formType}`);
-     if (!jobId) {
-        console.log('[handleConfirmDetails] No jobId, returning.');
-        return;
-     }
-     const currentFormData = formState[formType].formData;
-     console.log(`[handleConfirmDetails] Checking developmentType: "${currentFormData.developmentType}"`);
+    console.log(`[handleConfirmDetails] Called for formType: ${formType}`);
+    if (!jobId) {
+      console.log('[handleConfirmDetails] No jobId, returning.');
+      return;
+    }
+    const currentFormData = formState[formType].formData;
+    console.log(
+      `[handleConfirmDetails] Checking developmentType: "${currentFormData.developmentType}"`
+    );
 
-     if (currentFormData.developmentType.trim().length === 0) {
-       console.log('[handleConfirmDetails] Development type is empty. Showing toast and returning.');
-       toast({
-         title: "Missing Information",
-         description: "Please enter the development type.",
-         variant: "destructive",
-       });
-       return;
-     }
-     console.log('[handleConfirmDetails] Development type check passed.');
+    if (currentFormData.developmentType.trim().length === 0) {
+      console.log('[handleConfirmDetails] Development type is empty. Showing toast and returning.');
+      toast({
+        title: 'Missing Information',
+        description: 'Please enter the development type.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    console.log('[handleConfirmDetails] Development type check passed.');
 
-     setFormState(prev => ({
-       ...prev,
-       [formType]: {
-         ...prev[formType],
-         showPaymentButton: true,
-       },
-     }));
+    setFormState(prev => ({
+      ...prev,
+      [formType]: {
+        ...prev[formType],
+        showPaymentButton: true,
+      },
+    }));
   };
 
   // --- Mutation for Updating Job Status (Payment) ---
@@ -436,63 +493,69 @@ function JobInitialAssessment({
       return response.json();
     },
     onSuccess: (data, variables) => {
-      console.log('[updateJobMutation onSuccess] Received data from PATCH. Setting queryClient cache:', data);
+      console.log(
+        '[updateJobMutation onSuccess] Received data from PATCH. Setting queryClient cache:',
+        data
+      );
       queryClient.setQueryData(['job', variables.jobId], data);
     },
-    onError: (error) => {
-      console.error("Error updating job status:", error);
+    onError: error => {
+      console.error('Error updating job status:', error);
       toast({
-        title: "Error Updating Job",
+        title: 'Error Updating Job',
         description: `${error.message}`,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
 
   // --- Mutation for Creating Work Ticket ---
   const createWorkTicketMutation = useMutation<any, Error, any>({
-    mutationFn: async (payload) => {
+    mutationFn: async payload => {
       const formData = new FormData();
-      formData.append('metadata', JSON.stringify({
-        jobId: payload.jobId,
-        jobAddress: payload.jobAddress,
-        ticketType: payload.ticketType,
-        uploadedBy: 'professional',
-        reportData: payload[payload.ticketType]
-      }));
+      formData.append(
+        'metadata',
+        JSON.stringify({
+          jobId: payload.jobId,
+          jobAddress: payload.jobAddress,
+          ticketType: payload.ticketType,
+          uploadedBy: 'professional',
+          reportData: payload[payload.ticketType],
+        })
+      );
 
       const response = await fetch('/api/work-tickets', {
         method: 'POST',
         body: formData,
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to create work ticket')
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create work ticket');
       }
-      return response.json()
+      return response.json();
     },
-    onError: (error) => {
-      console.error("Error creating work ticket:", error)
+    onError: error => {
+      console.error('Error creating work ticket:', error);
       toast({
-        title: "Error Creating Work Ticket",
+        title: 'Error Creating Work Ticket',
         description: `${error.message}`,
-        variant: "destructive",
-      })
+        variant: 'destructive',
+      });
     },
-  })
+  });
 
   // Generalized payment handler
   const handlePayment = async (formType: keyof NathersFormState) => {
     if (!jobId || !currentJob) {
-      toast({ title: "Error", description: "Job data not loaded.", variant: "destructive" });
+      toast({ title: 'Error', description: 'Job data not loaded.', variant: 'destructive' });
       return;
     }
 
     const currentFormData = formState[formType].formData;
 
     if (!['nathersAssessment'].includes(formType)) {
-      toast({ title: "Error", description: "Invalid report type.", variant: "destructive" });
+      toast({ title: 'Error', description: 'Invalid report type.', variant: 'destructive' });
       return;
     }
 
@@ -508,10 +571,10 @@ function JobInitialAssessment({
         documents: {
           architecturalPlan: {
             originalName: architecturalPlan?.uploadedFile?.originalName,
-            fileName: architecturalPlan?.uploadedFile?.fileName
-          }
-        }
-      }
+            fileName: architecturalPlan?.uploadedFile?.fileName,
+          },
+        },
+      },
     };
 
     const jobUpdatePayload = {
@@ -525,10 +588,10 @@ function JobInitialAssessment({
         documents: {
           architecturalPlan: {
             originalName: architecturalPlan?.uploadedFile?.originalName,
-            fileName: architecturalPlan?.uploadedFile?.fileName
-          }
-        }
-      }
+            fileName: architecturalPlan?.uploadedFile?.fileName,
+          },
+        },
+      },
     };
 
     try {
@@ -538,29 +601,28 @@ function JobInitialAssessment({
       await queryClient.invalidateQueries({ queryKey: ['job', jobId] });
       await queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
 
-
       setFormState(prev => ({
         ...prev,
         [formType]: {
           ...prev[formType],
           paymentComplete: true,
           showPaymentButton: false,
-          purchaseInitiated: false
-        }
+          purchaseInitiated: false,
+        },
       }));
 
       toast({
-        title: "Success",
+        title: 'Success',
         description: `Your Nathers Report has been purchased successfully.`,
       });
     } catch (error) {
       console.error(`Error processing ${formType} payment sequence:`, error);
       if (!createWorkTicketMutation.isError && !updateJobMutation.isError) {
-         toast({
-           title: "Payment Processing Error",
-           description: `An unexpected error occurred during payment for Nathers Report. Please try again.`,
-           variant: "destructive",
-         });
+        toast({
+          title: 'Payment Processing Error',
+          description: `An unexpected error occurred during payment for Nathers Report. Please try again.`,
+          variant: 'destructive',
+        });
       }
     }
   };
@@ -584,73 +646,79 @@ function JobInitialAssessment({
 
   // --- Mutation for Uploading Document ---
   const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
-      mutationFn: async ({ documentId, file }) => {
-          if (!jobId) throw new Error("No job selected");
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('docId', documentId);
+    mutationFn: async ({ documentId, file }) => {
+      if (!jobId) throw new Error('No job selected');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('docId', documentId);
 
-          const response = await fetch(`/api/jobs/${jobId}/documents/upload`, {
-              method: 'POST',
-              body: formData,
-          });
-          if (!response.ok) {
-              const errorData = await response.json().catch(() => ({}));
-              throw new Error(errorData.error || 'Failed to upload document');
-          }
-          return response.json();
-      },
+      const response = await fetch(`/api/jobs/${jobId}/documents/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to upload document');
+      }
+      return response.json();
+    },
     onSuccess: (data, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
-        queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-        toast({
-            title: "Success",
-            description: "Document uploaded successfully",
-        });
+      queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
+      queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+      toast({
+        title: 'Success',
+        description: 'Document uploaded successfully',
+      });
     },
   });
 
   // Refactored handleFileUpload to use mutation
   const handleUpload = (docId: string) => {
     if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before uploading documents", variant: "destructive" });
+      toast({
+        title: 'Error',
+        description: 'Please select a job before uploading documents',
+        variant: 'destructive',
+      });
       return;
     }
-    createFileInput(async (file) => {
-      await handleDocumentUpload(
-        () => uploadDocument(jobId, docId, file)
-      )
-    })
-  }
+    createFileInput(async file => {
+      await handleDocumentUpload(() => uploadDocument(jobId, docId, file));
+    });
+  };
 
   const handleDownload = (docId: string) => {
     if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before downloading documents", variant: "destructive" });
+      toast({
+        title: 'Error',
+        description: 'Please select a job before downloading documents',
+        variant: 'destructive',
+      });
       return;
     }
-    handleDocumentDownload(
-      () => {
-        return downloadDocument(jobId, docId);
-      }
-    )
-  }
+    handleDocumentDownload(() => {
+      return downloadDocument(jobId, docId);
+    });
+  };
 
   const handleDelete = (docId: string) => {
     if (!jobId) {
-      toast({ title: "Error", description: "Please select a job before deleting documents", variant: "destructive" });
+      toast({
+        title: 'Error',
+        description: 'Please select a job before deleting documents',
+        variant: 'destructive',
+      });
       return;
     }
-    handleDocumentDelete(
-      () => removeDocument(jobId, docId)
-    )
-  }
+    handleDocumentDelete(() => removeDocument(jobId, docId));
+  };
 
   const handleCustomDocumentDownload = async (document: CustomDocument) => {
     await downloadDocumentFromApi({
       id: document.id,
-      title: document.title
-    })
-  }
+      title: document.title,
+    });
+  };
 
   const renderRequiredDocuments = () => {
     if (isDocsLoading) {
@@ -667,7 +735,9 @@ function JobInitialAssessment({
         <div className="flex flex-col items-center justify-center p-8 bg-red-50 rounded-lg">
           <AlertCircle className="h-8 w-8 text-red-500" />
           <p className="mt-4 text-red-600">Error loading documents: {docsError}</p>
-          <p className="text-sm text-gray-600 mt-2">Please check the console for details or try again.</p>
+          <p className="text-sm text-gray-600 mt-2">
+            Please check the console for details or try again.
+          </p>
         </div>
       );
     }
@@ -684,14 +754,15 @@ function JobInitialAssessment({
 
     const mappedDocuments = documents.map(doc => ({
       ...doc,
-      displayStatus: getDocumentDisplayStatus(doc, currentJob || {} as Job)
+      displayStatus: getDocumentDisplayStatus(doc, currentJob || ({} as Job)),
     }));
 
     const renderDocumentCard = (doc: DocumentWithStatus) => {
-      const isReport = isReportType(doc.id)
-      const reportStatus = isReport ? getReportStatus(doc, currentJob || {} as Job) : undefined
+      const isReport = isReportType(doc.id);
+      const reportStatus = isReport ? getReportStatus(doc, currentJob || ({} as Job)) : undefined;
 
-      const shouldBeDownloadableReport = isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
+      const shouldBeDownloadableReport =
+        isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
 
       if (shouldBeDownloadableReport) {
         return (
@@ -712,7 +783,14 @@ function JobInitialAssessment({
                   <span>{getReportTitle(doc.id)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Uploaded: {reportStatus?.reportData?.completedDocument?.uploadedAt ? new Date(reportStatus.reportData.completedDocument.uploadedAt).toLocaleDateString() : (doc.uploadedFile?.uploadedAt ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString() : 'N/A')}
+                  Uploaded:{' '}
+                  {reportStatus?.reportData?.completedDocument?.uploadedAt
+                    ? new Date(
+                        reportStatus.reportData.completedDocument.uploadedAt
+                      ).toLocaleDateString()
+                    : doc.uploadedFile?.uploadedAt
+                      ? new Date(doc.uploadedFile.uploadedAt).toLocaleDateString()
+                      : 'N/A'}
                 </p>
                 <Button
                   variant="outline"
@@ -728,7 +806,7 @@ function JobInitialAssessment({
               </div>
             </CardContent>
           </Card>
-        )
+        );
       }
 
       return (
@@ -741,8 +819,8 @@ function JobInitialAssessment({
           onDownload={() => handleDownload(doc.id)}
           onDelete={() => handleDelete(doc.id)}
         />
-      )
-    }
+      );
+    };
 
     return (
       <>
@@ -750,8 +828,8 @@ function JobInitialAssessment({
           {mappedDocuments.map(doc => renderDocumentCard(doc))}
         </div>
       </>
-    )
-  }
+    );
+  };
 
   // Updated renderCustomAssessmentForm function
   const renderCustomAssessmentForm = (formType: keyof NathersFormState) => {
@@ -777,8 +855,19 @@ function JobInitialAssessment({
       return (
         <div className="border rounded-lg p-4 bg-yellow-50">
           <div className="text-center py-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8 text-yellow-500 mx-auto mb-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <h4 className="font-medium mb-2">Report In Progress</h4>
             <p className="text-sm text-gray-600">
@@ -792,12 +881,12 @@ function JobInitialAssessment({
       const showPaymentBtn = formState[formType].showPaymentButton;
       const architecturalPlanDoc = documents.find(doc => doc.id === 'architecturalPlan');
 
-      const attachedDocs = [
-        architecturalPlanDoc,
-      ].filter((doc): doc is DocumentWithStatus => !!doc);
+      const attachedDocs = [architecturalPlanDoc].filter((doc): doc is DocumentWithStatus => !!doc);
 
-      const isArchitecturalPlanMissing = !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
-      const isConfirmButtonDisabled = currentFormData.developmentType.trim().length === 0 || isArchitecturalPlanMissing;
+      const isArchitecturalPlanMissing =
+        !architecturalPlanDoc || architecturalPlanDoc.displayStatus !== 'uploaded';
+      const isConfirmButtonDisabled =
+        currentFormData.developmentType.trim().length === 0 || isArchitecturalPlanMissing;
 
       return (
         <div className="space-y-6">
@@ -823,7 +912,9 @@ function JobInitialAssessment({
             {/* Attached Documents Section */}
             <div className="space-y-2 border-t pt-4 mt-4">
               <h4 className="font-medium text-gray-700">Documents to be Attached</h4>
-              <p className="text-xs text-gray-500">The following documents will be included with your submission:</p>
+              <p className="text-xs text-gray-500">
+                The following documents will be included with your submission:
+              </p>
               <ul className="list-disc list-inside text-sm space-y-1">
                 {attachedDocs.map(doc => (
                   <li key={doc.id} className="flex items-center justify-between">
@@ -831,11 +922,13 @@ function JobInitialAssessment({
                       {doc.title}
                       {doc.uploadedFile?.originalName && ` (${doc.uploadedFile.originalName})`}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      doc.displayStatus === 'uploaded'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        doc.displayStatus === 'uploaded'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
                       {doc.displayStatus === 'uploaded' ? 'Uploaded' : 'Required'}
                     </span>
                   </li>
@@ -846,7 +939,10 @@ function JobInitialAssessment({
             {/* Document Requirements Section */}
             <div className="space-y-3 border-t pt-4 mt-4">
               <h4 className="font-medium text-gray-700">Document Requirements</h4>
-              <p className="text-xs text-gray-500">Please ensure the following document is available in the document store before proceeding.</p>
+              <p className="text-xs text-gray-500">
+                Please ensure the following document is available in the document store before
+                proceeding.
+              </p>
               {architecturalPlanDoc && (
                 <DocumentTile
                   document={architecturalPlanDoc}
@@ -862,7 +958,7 @@ function JobInitialAssessment({
             {isArchitecturalPlanMissing && (
               <Alert variant="destructive">
                 <AlertDescription>
-                Please attach the Architectural Plans to proceed.
+                  Please attach the Architectural Plans to proceed.
                 </AlertDescription>
               </Alert>
             )}
@@ -882,7 +978,9 @@ function JobInitialAssessment({
                   onClick={() => handlePayment(formType)}
                   disabled={createWorkTicketMutation.isPending || updateJobMutation.isPending}
                 >
-                  {createWorkTicketMutation.isPending || updateJobMutation.isPending ? 'Processing...' : 'Confirm & Pay'}
+                  {createWorkTicketMutation.isPending || updateJobMutation.isPending
+                    ? 'Processing...'
+                    : 'Confirm & Pay'}
                 </Button>
               )}
               {(createWorkTicketMutation.isPending || updateJobMutation.isPending) && (
@@ -895,10 +993,7 @@ function JobInitialAssessment({
     } else {
       return (
         <div className="flex justify-center items-center p-6">
-          <Button
-            className="w-full max-w-xs"
-            onClick={() => handleInitiatePurchase(formType)}
-          >
+          <Button className="w-full max-w-xs" onClick={() => handleInitiatePurchase(formType)}>
             <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Nathers Report
           </Button>
         </div>
@@ -913,18 +1008,24 @@ function JobInitialAssessment({
     const updatedFormState = { ...formState };
 
     if (formState['nathersAssessment'].hasUnsavedChanges) {
-      localStorage.setItem(`nathersAssessment-${jobId}`, JSON.stringify(formState['nathersAssessment'].formData));
-      updatedFormState['nathersAssessment'] = { ...updatedFormState['nathersAssessment'], hasUnsavedChanges: false };
+      localStorage.setItem(
+        `nathersAssessment-${jobId}`,
+        JSON.stringify(formState['nathersAssessment'].formData)
+      );
+      updatedFormState['nathersAssessment'] = {
+        ...updatedFormState['nathersAssessment'],
+        hasUnsavedChanges: false,
+      };
       changesSaved = true;
     }
 
     if (changesSaved) {
       setFormState(updatedFormState);
       if (updatedFormState['nathersAssessment'].hasUnsavedChanges === false) {
-        toast({ title: "Form Data Saved", description: "Unsaved form changes saved locally." });
+        toast({ title: 'Form Data Saved', description: 'Unsaved form changes saved locally.' });
       }
     } else {
-      toast({ title: "No Changes", description: "No unsaved changes to save." });
+      toast({ title: 'No Changes', description: 'No unsaved changes to save.' });
     }
   };
 
@@ -932,8 +1033,15 @@ function JobInitialAssessment({
   const isLoading = isJobLoading;
 
   if (isLoading) return <div>Loading job details...</div>;
-  if (isJobError) return <Alert variant="destructive"><AlertTitle>Error Loading Job</AlertTitle><AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription></Alert>;
-  if (!currentJob && !isJobLoading) return <div>Job data not available. Select a job or check for errors.</div>;
+  if (isJobError)
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Error Loading Job</AlertTitle>
+        <AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription>
+      </Alert>
+    );
+  if (!currentJob && !isJobLoading)
+    return <div>Job data not available. Select a job or check for errors.</div>;
   if (!currentJob) return <div>Loading...</div>;
 
   // Only render the assessment/report section
@@ -945,13 +1053,13 @@ function JobInitialAssessment({
         <Button
           variant="outline"
           onClick={() => {
-            setSelectedJobId("");
+            setSelectedJobId('');
           }}
         >
           Back to Resources
         </Button>
       </div>
-      {(Object.values(formState).some(s => s.hasUnsavedChanges)) && (
+      {Object.values(formState).some(s => s.hasUnsavedChanges) && (
         <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
           Save Changes
         </Button>
@@ -978,7 +1086,9 @@ export default function NathersPage() {
   // Update URL when job selection changes
   useEffect(() => {
     if (selectedJobId) {
-      router.push(`/professionals/knowledge-base/nathers-basix?job=${selectedJobId}`, { scroll: false });
+      router.push(`/professionals/knowledge-base/nathers-basix?job=${selectedJobId}`, {
+        scroll: false,
+      });
     }
   }, [selectedJobId, router]);
 
@@ -1029,10 +1139,7 @@ export default function NathersPage() {
   return (
     <DocumentProvider jobId={selectedJobId || ''}>
       <div className="space-y-6">
-        <PageHeader
-          title="Nathers"
-          backHref="/professionals/knowledge-base"
-        />
+        <PageHeader title="Nathers" backHref="/professionals/knowledge-base" />
 
         {/* Nathers Resources Section (always visible) */}
         <div className="border rounded-lg p-4">
@@ -1040,11 +1147,13 @@ export default function NathersPage() {
           {isPrePreparedLoading ? (
             <div>Loading Resources...</div>
           ) : (
-            filteredAssessments.map((section) => (
+            filteredAssessments.map(section => (
               <div key={section.title} className="space-y-4 mb-6">
                 <h3 className="text-lg font-medium">{section.title}</h3>
                 <div>
-                  {section.assessments.map((assessment) => renderPrePreparedAssessmentCard(assessment))}
+                  {section.assessments.map(assessment =>
+                    renderPrePreparedAssessmentCard(assessment)
+                  )}
                 </div>
               </div>
             ))
@@ -1071,11 +1180,13 @@ export default function NathersPage() {
                 {isLoadingJobs ? (
                   <div>Loading jobs...</div>
                 ) : jobsError ? (
-                  <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
+                  <Alert variant="destructive">
+                    <AlertDescription>Failed to load jobs.</AlertDescription>
+                  </Alert>
                 ) : (
                   <Select
                     value={selectedJobId}
-                    onValueChange={(value) => {
+                    onValueChange={value => {
                       setSelectedJobId(value);
                     }}
                   >
@@ -1083,7 +1194,7 @@ export default function NathersPage() {
                       <SelectValue placeholder="Select a job" />
                     </SelectTrigger>
                     <SelectContent>
-                      {jobs?.map((job) => (
+                      {jobs?.map(job => (
                         <SelectItem key={job.id} value={job.id}>
                           {job.address}
                         </SelectItem>
@@ -1102,7 +1213,8 @@ export default function NathersPage() {
             <DialogHeader>
               <DialogTitle>{selectedAssessment?.title}</DialogTitle>
               <DialogDescription>
-                {selectedAssessment?.section} • Posted by {selectedAssessment?.author} on {selectedAssessment?.date && new Date(selectedAssessment.date).toLocaleDateString()}
+                {selectedAssessment?.section} • Posted by {selectedAssessment?.author} on{' '}
+                {selectedAssessment?.date && new Date(selectedAssessment.date).toLocaleDateString()}
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 space-y-4">

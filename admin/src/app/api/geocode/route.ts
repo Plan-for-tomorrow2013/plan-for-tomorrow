@@ -1,98 +1,112 @@
-import { NextResponse } from 'next/server'
-import { geocodeAddress } from '@shared/services/geocodingService'
+import { NextRequest, NextResponse } from 'next/server';
+import { geocodeAddress } from '@shared/services/geocodingService';
 
 interface LayerResult {
-  layerId: number
-  name: string
+  layerId: number;
+  name: string;
   features: Array<{
-    attributes: Record<string, any>
-  }>
+    attributes: Record<string, unknown>;
+  }>;
+}
+
+interface EpiResult {
+  layerName: string;
+  attributes: Record<string, unknown>;
 }
 
 interface ProtectionResult {
-  layerName: string
-  attributes: Record<string, any>
+  layerName: string;
+  attributes: Record<string, unknown>;
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const address = searchParams.get('address')
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const address = searchParams.get('address');
 
   if (!address) {
-    return NextResponse.json({ error: 'Address is required' }, { status: 400 })
+    return NextResponse.json({ error: 'Address is required' }, { status: 400 });
   }
 
   try {
     // Step 1: Get coordinates using our geocoding service
-    const { longitude, latitude } = await geocodeAddress(address)
+    const { longitude, latitude } = await geocodeAddress(address);
 
     if (!longitude || !latitude) {
-      return NextResponse.json({ error: 'Address not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
     // Step 2: Query all layers in parallel
     const [epiResponse, protectionResponse, localProvisionsResponse] = await Promise.all([
       // EPI Primary Planning Layers
-      fetch(`${process.env.ARCGIS_EPI_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`),
+      fetch(
+        `${process.env.ARCGIS_EPI_URL}/identify?${new URLSearchParams({
+          geometry: `${longitude},${latitude}`,
+          geometryType: 'esriGeometryPoint',
+          layers: 'all',
+          tolerance: '1',
+          mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+          imageDisplay: '400,400,96',
+          returnGeometry: 'false',
+          f: 'json',
+        })}`
+      ),
 
       // Protection Layers
-      fetch(`${process.env.ARCGIS_PROTECTION_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`),
+      fetch(
+        `${process.env.ARCGIS_PROTECTION_URL}/identify?${new URLSearchParams({
+          geometry: `${longitude},${latitude}`,
+          geometryType: 'esriGeometryPoint',
+          layers: 'all',
+          tolerance: '1',
+          mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+          imageDisplay: '400,400,96',
+          returnGeometry: 'false',
+          f: 'json',
+        })}`
+      ),
 
       // Local Provisions Layers
-      fetch(`${process.env.ARCGIS_LOCAL_PROVISIONS_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`)
-    ])
+      fetch(
+        `${process.env.ARCGIS_LOCAL_PROVISIONS_URL}/identify?${new URLSearchParams({
+          geometry: `${longitude},${latitude}`,
+          geometryType: 'esriGeometryPoint',
+          layers: 'all',
+          tolerance: '1',
+          mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+          imageDisplay: '400,400,96',
+          returnGeometry: 'false',
+          f: 'json',
+        })}`
+      ),
+    ]);
 
     // Process responses in parallel
     const [epiData, protectionData, localProvisionsData] = await Promise.all([
       epiResponse.json(),
       protectionResponse.json(),
-      localProvisionsResponse.json()
-    ])
+      localProvisionsResponse.json(),
+    ]);
 
     // Process EPI results
-    const processedResults = epiData.results?.map((result: any) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    const processedResults =
+      epiData.results?.map((result: EpiResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
     // Process Protection results
-    const processedProtectionResults = protectionData.results?.map((result: ProtectionResult) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    const processedProtectionResults =
+      protectionData.results?.map((result: ProtectionResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
     // Process Local Provisions results
-    const processedLocalProvisionsResults = localProvisionsData.results?.map((result: ProtectionResult) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    const processedLocalProvisionsResults =
+      localProvisionsData.results?.map((result: ProtectionResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
     return NextResponse.json({
       address,
@@ -100,15 +114,10 @@ export async function GET(request: Request) {
       planningLayers: {
         epiLayers: processedResults,
         protectionLayers: processedProtectionResults,
-        localProvisionsLayers: processedLocalProvisionsResults
-      }
-    })
-
+        localProvisionsLayers: processedLocalProvisionsResults,
+      },
+    });
   } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch property information' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch property information' }, { status: 500 });
   }
 }

@@ -1,7 +1,13 @@
-import { Button } from "@shared/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
-import { Input } from "@shared/components/ui/input"
-import { HelpCircle, Search, Book, MessageCircle, Phone } from "lucide-react"
+import { Button } from '@shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import { Input } from '@shared/components/ui/input';
+import { HelpCircle, Search, Book, MessageCircle, Phone } from 'lucide-react';
 
 export default function HelpPage() {
   return (
@@ -20,7 +26,10 @@ export default function HelpPage() {
             placeholder="Search for help..."
             className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <button type="button" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+          >
             <Search className="h-4 w-4" />
           </button>
         </div>
@@ -41,7 +50,9 @@ export default function HelpPage() {
               <li>• Report Writing Tips</li>
               <li>• Design Check Guide</li>
             </ul>
-            <Button variant="outline" className="w-full mt-4">View All</Button>
+            <Button variant="outline" className="w-full mt-4">
+              View All
+            </Button>
           </div>
         </div>
 
@@ -74,7 +85,9 @@ export default function HelpPage() {
               <p className="text-sm">Phone: 1300 XXX XXX</p>
               <p className="text-sm">Email: support@planfortomorrow.com</p>
             </div>
-            <Button variant="outline" className="w-full">Send Email</Button>
+            <Button variant="outline" className="w-full">
+              Send Email
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -91,8 +104,8 @@ export default function HelpPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                To start a new assessment, navigate to the Initial Assessment page and click the "Create New" button.
-                Follow the guided process to complete your assessment.
+                To start a new assessment, navigate to the Initial Assessment page and click the
+                "Create New" button. Follow the guided process to complete your assessment.
               </p>
             </CardContent>
           </Card>
@@ -106,8 +119,8 @@ export default function HelpPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                For a complete report, you'll need site plans, development drawings, and any relevant council documentation.
-                Check our documentation guide for a full list.
+                For a complete report, you'll need site plans, development drawings, and any
+                relevant council documentation. Check our documentation guide for a full list.
               </p>
             </CardContent>
           </Card>
@@ -127,11 +140,12 @@ export default function HelpPage() {
         <section>
           <h2 className="text-2xl font-bold mb-4">How to Use the Platform</h2>
           <p className="mb-4">
-            To start a new assessment, navigate to the Design Check page and follow the guided process.
-            Our platform will help you ensure your design complies with local regulations and requirements.
+            To start a new assessment, navigate to the Design Check page and follow the guided
+            process. Our platform will help you ensure your design complies with local regulations
+            and requirements.
           </p>
         </section>
       </div>
     </div>
-  )
+  );
 }

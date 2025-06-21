@@ -1,8 +1,4 @@
-"use client"
-
-import { Button } from "@shared/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
-import Link from "next/link"
+'use client';
 
 export default function DashboardPage() {
   return (
@@ -16,5 +12,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

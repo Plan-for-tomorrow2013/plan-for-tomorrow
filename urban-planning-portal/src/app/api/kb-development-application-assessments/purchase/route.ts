@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Path to the kb development application data file
-const kbDevelopmentApplicationPath = '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application-assessments.json';
+const kbDevelopmentApplicationPath =
+  '/home/tania/urban-planning-professionals-portal/admin/admin/data/kb-development-application-assessments.json';
 
 // POST /api/kb-development-application-assessments/purchase
 export async function POST(request: Request) {
@@ -11,10 +12,7 @@ export async function POST(request: Request) {
     const { assessment } = await request.json();
 
     if (!assessment) {
-      return NextResponse.json(
-        { error: 'Missing assessment data' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing assessment data' }, { status: 400 });
     }
 
     // Read the assessments data to verify the assessment exists
@@ -27,10 +25,7 @@ export async function POST(request: Request) {
     );
 
     if (!assessmentExists) {
-      return NextResponse.json(
-        { error: 'Assessment not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Assessment not found' }, { status: 404 });
     }
 
     // Return success response with the assessment data
@@ -40,14 +35,11 @@ export async function POST(request: Request) {
       assessment: {
         ...assessment,
         purchaseDate: new Date().toISOString(),
-        status: 'paid'
-      }
+        status: 'paid',
+      },
     });
   } catch (error) {
     console.error('Error purchasing assessment:', error);
-    return NextResponse.json(
-      { error: 'Failed to purchase assessment' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to purchase assessment' }, { status: 500 });
   }
 }

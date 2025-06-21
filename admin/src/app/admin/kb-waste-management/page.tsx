@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function KBWasteManagementPage() {
   return (
@@ -12,5 +12,5 @@ export default function KBWasteManagementPage() {
       sectionEndpoint="/api/kb-waste-management-sections"
       assessmentType="waste-management"
     />
-  )
+  );
 }

@@ -1,12 +1,18 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@shared/components/ui/dialog"
-import Link from 'next/link'
-import camelcaseKeys from 'camelcase-keys'
-import { PageHeader } from '@shared/components/ui/page-header'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@shared/components/ui/dialog';
+import Link from 'next/link';
+import camelcaseKeys from 'camelcase-keys';
+import { PageHeader } from '@shared/components/ui/page-header';
 
 interface PrePreparedAssessmentSection {
   title: string;
@@ -31,18 +37,18 @@ interface PrePreparedAssessment {
 
 // Define fetch function for pre-prepared assessments
 const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSection[]> => {
-    const response = await fetch('/api/kb-development-application-assessments');
-    if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("Failed to fetch kb development applications:", response.status, errorBody);
-        throw new Error(`Failed to fetch kb development applications. Status: ${response.status}`);
-    }
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-        console.error("Invalid kb development applications data received:", data);
-        throw new Error('Invalid kb development applications data received');
-    }
-    return camelcaseKeys(data, { deep: true });
+  const response = await fetch('/api/kb-development-application-assessments');
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Failed to fetch kb development applications:', response.status, errorBody);
+    throw new Error(`Failed to fetch kb development applications. Status: ${response.status}`);
+  }
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    console.error('Invalid kb development applications data received:', data);
+    throw new Error('Invalid kb development applications data received');
+  }
+  return camelcaseKeys(data, { deep: true });
 };
 
 export default function DevelopmentApplicationPage() {
@@ -79,10 +85,7 @@ export default function DevelopmentApplicationPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Development Application"
-        backHref="/professionals/knowledge-base"
-      />
+      <PageHeader title="Development Application" backHref="/professionals/knowledge-base" />
 
       {/* Development Application Resources Section */}
       <div className="border rounded-lg p-4">
@@ -90,11 +93,11 @@ export default function DevelopmentApplicationPage() {
         {isPrePreparedLoading ? (
           <div>Loading Resources...</div>
         ) : (
-          prePreparedAssessmentsData.map((section) => (
+          prePreparedAssessmentsData.map(section => (
             <div key={section.title} className="space-y-4 mb-6">
               <h3 className="text-lg font-medium">{section.title}</h3>
               <div>
-                {section.assessments.map((assessment) => renderPrePreparedAssessmentCard(assessment))}
+                {section.assessments.map(assessment => renderPrePreparedAssessmentCard(assessment))}
               </div>
             </div>
           ))
@@ -107,7 +110,8 @@ export default function DevelopmentApplicationPage() {
           <DialogHeader>
             <DialogTitle>{selectedAssessment?.title}</DialogTitle>
             <DialogDescription>
-              {selectedAssessment?.section} • Posted by {selectedAssessment?.author} on {selectedAssessment?.date && new Date(selectedAssessment.date).toLocaleDateString()}
+              {selectedAssessment?.section} • Posted by {selectedAssessment?.author} on{' '}
+              {selectedAssessment?.date && new Date(selectedAssessment.date).toLocaleDateString()}
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 space-y-4">

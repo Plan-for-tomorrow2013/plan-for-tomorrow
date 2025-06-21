@@ -1,5 +1,6 @@
-import { Assessment, ConsultantCategory } from './jobs'
+import { Assessment, ConsultantCategory } from '@shared/types/jobs'
 
+export type { ConsultantCategory }
 export interface ConsultantTicket {
   id: string
   jobId: string

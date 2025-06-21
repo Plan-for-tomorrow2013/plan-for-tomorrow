@@ -7,7 +7,7 @@ import { Plus } from "lucide-react"
 import { useToast } from "@shared/components/ui/use-toast"
 import { Announcement } from "@shared/types/announcements"
 import dynamic from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
+// import 'react-quill/dist/quill.snow.css' // Temporarily commented out due to missing CSS files
 import sanitizeHtml from 'sanitize-html'
 import { stripHtml } from 'string-strip-html'
 

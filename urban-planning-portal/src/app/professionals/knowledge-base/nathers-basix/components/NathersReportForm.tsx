@@ -1,16 +1,22 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
-import { Button } from "@shared/components/ui/button"
-import { Input } from "@shared/components/ui/input"
-import { Textarea } from "@shared/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { Alert, AlertDescription } from "@shared/components/ui/alert"
-import { toast } from "@shared/components/ui/use-toast"
-import { Job } from '@shared/types/jobs'
-import { Loader2, Upload, X } from 'lucide-react'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Alert, AlertDescription } from '@shared/components/ui/alert';
+import { toast } from '@shared/components/ui/use-toast';
+import { Job } from '@shared/types/jobs';
+import { Loader2, Upload, X } from 'lucide-react';
 
 interface NathersReportForm {
   jobId: string;
@@ -31,7 +37,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
     jobId: '',
     developmentType: '',
     additionalInfo: '',
-    documents: []
+    documents: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,7 +48,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
       formData.append('jobId', data.jobId);
       formData.append('developmentType', data.developmentType);
       formData.append('additionalInfo', data.additionalInfo);
-      data.documents.forEach((file) => {
+      data.documents.forEach(file => {
         formData.append('documents', file);
       });
 
@@ -59,16 +65,16 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Nathers report request submitted successfully.",
+        title: 'Success',
+        description: 'Nathers report request submitted successfully.',
       });
       router.refresh();
     },
-    onError: (error) => {
+    onError: error => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to submit nathers report request.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to submit nathers report request.',
+        variant: 'destructive',
       });
     },
   });
@@ -103,17 +109,17 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
 
       if (!isValidType) {
         toast({
-          title: "Invalid file type",
-          description: "Please upload PDF, JPEG, or PNG files only.",
-          variant: "destructive",
+          title: 'Invalid file type',
+          description: 'Please upload PDF, JPEG, or PNG files only.',
+          variant: 'destructive',
         });
       }
 
       if (!isValidSize) {
         toast({
-          title: "File too large",
-          description: "Please upload files smaller than 10MB.",
-          variant: "destructive",
+          title: 'File too large',
+          description: 'Please upload files smaller than 10MB.',
+          variant: 'destructive',
         });
       }
 
@@ -122,14 +128,14 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
 
     setFormData(prev => ({
       ...prev,
-      documents: [...prev.documents, ...validFiles]
+      documents: [...prev.documents, ...validFiles],
     }));
   };
 
   const handleRemoveFile = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      documents: prev.documents.filter((_, i) => i !== index)
+      documents: prev.documents.filter((_, i) => i !== index),
     }));
   };
 
@@ -149,7 +155,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
         jobId: '',
         developmentType: '',
         additionalInfo: '',
-        documents: []
+        documents: [],
       });
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -173,14 +179,14 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
         <label className="text-sm font-medium">Select Job</label>
         <Select
           value={formData.jobId}
-          onValueChange={(value) => setFormData(prev => ({ ...prev, jobId: value }))}
+          onValueChange={value => setFormData(prev => ({ ...prev, jobId: value }))}
           disabled={isLoadingJobs || isSubmitting}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a job" />
           </SelectTrigger>
           <SelectContent>
-            {jobs.map((job) => (
+            {jobs.map(job => (
               <SelectItem key={job.id} value={job.id}>
                 {job.title}
               </SelectItem>
@@ -194,7 +200,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
         <label className="text-sm font-medium">Development Type</label>
         <Input
           value={formData.developmentType}
-          onChange={(e) => setFormData(prev => ({ ...prev, developmentType: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, developmentType: e.target.value }))}
           placeholder="Enter development type"
           disabled={isSubmitting}
         />
@@ -205,7 +211,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
         <label className="text-sm font-medium">Additional Information</label>
         <Textarea
           value={formData.additionalInfo}
-          onChange={(e) => setFormData(prev => ({ ...prev, additionalInfo: e.target.value }))}
+          onChange={e => setFormData(prev => ({ ...prev, additionalInfo: e.target.value }))}
           placeholder="Enter any additional information"
           disabled={isSubmitting}
         />
@@ -229,12 +235,8 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
             className="flex flex-col items-center justify-center cursor-pointer"
           >
             <Upload className="h-8 w-8 text-gray-400" />
-            <span className="mt-2 text-sm text-gray-600">
-              Click to upload or drag and drop
-            </span>
-            <span className="text-xs text-gray-500">
-              PDF, JPEG, or PNG up to 10MB
-            </span>
+            <span className="mt-2 text-sm text-gray-600">Click to upload or drag and drop</span>
+            <span className="text-xs text-gray-500">PDF, JPEG, or PNG up to 10MB</span>
           </label>
         </div>
 
@@ -242,10 +244,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
         {formData.documents.length > 0 && (
           <div className="mt-4 space-y-2">
             {formData.documents.map((file, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-2 bg-gray-50 rounded"
-              >
+              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm truncate">{file.name}</span>
                 <Button
                   type="button"
@@ -263,11 +262,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
       </div>
 
       {/* Submit Button */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isSubmitting || !formData.jobId}
-      >
+      <Button type="submit" className="w-full" disabled={isSubmitting || !formData.jobId}>
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

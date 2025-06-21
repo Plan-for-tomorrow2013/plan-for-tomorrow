@@ -1,39 +1,36 @@
-import { NextResponse } from 'next/server'
-import { readFile, writeFile, unlink } from 'fs/promises'
-import path from 'path'
-import { Document } from '@shared/types/documents'
+import { NextResponse } from 'next/server';
+import { readFile, writeFile, unlink } from 'fs/promises';
+import path from 'path';
+import { Document } from '@shared/types/documents';
 
-const DOCUMENTS_DIR = path.join(process.cwd(), 'data', 'documents')
+const DOCUMENTS_DIR = path.join(process.cwd(), 'data', 'documents');
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { documentId: string } }
-) {
+export async function PUT(request: Request, { params }: { params: { documentId: string } }) {
   try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
-    const metadata = JSON.parse(formData.get('metadata') as string)
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const metadata = JSON.parse(formData.get('metadata') as string);
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json')
-    const documents = JSON.parse(await readFile(metadataPath, 'utf-8'))
-    const documentIndex = documents.findIndex((doc: Document) => doc.id === params.documentId)
+    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json');
+    const documents = JSON.parse(await readFile(metadataPath, 'utf-8'));
+    const documentIndex = documents.findIndex((doc: Document) => doc.id === params.documentId);
 
     if (documentIndex === -1) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    const document = documents[documentIndex]
-    const newVersion = document.currentVersion + 1
-    const fileName = `${document.id}-v${newVersion}${path.extname(file.name)}`
-    const filePath = path.join(DOCUMENTS_DIR, fileName)
+    const document = documents[documentIndex];
+    const newVersion = document.currentVersion + 1;
+    const fileName = `${document.id}-v${newVersion}${path.extname(file.name)}`;
+    const filePath = path.join(DOCUMENTS_DIR, fileName);
 
     // Save the new version
-    const buffer = Buffer.from(await file.arrayBuffer())
-    await writeFile(filePath, buffer)
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(filePath, buffer);
 
     // Create new version
     const documentVersion = {
@@ -43,57 +40,54 @@ export async function PUT(
       originalName: file.name,
       size: file.size,
       uploadedBy: metadata.uploadedBy || 'system',
-      type: file.type
-    }
+      type: file.type,
+    };
 
     // Update document metadata
-    document.versions.push(documentVersion)
-    document.currentVersion = newVersion
-    document.updatedAt = new Date().toISOString()
+    document.versions.push(documentVersion);
+    document.currentVersion = newVersion;
+    document.updatedAt = new Date().toISOString();
 
     // Save updated metadata
-    await writeFile(metadataPath, JSON.stringify(documents, null, 2))
+    await writeFile(metadataPath, JSON.stringify(documents, null, 2));
 
-    return NextResponse.json(document)
+    return NextResponse.json(document);
   } catch (error) {
-    console.error('Error updating document:', error)
-    return NextResponse.json({ error: 'Failed to update document' }, { status: 500 })
+    console.error('Error updating document:', error);
+    return NextResponse.json({ error: 'Failed to update document' }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { documentId: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: { documentId: string } }) {
   try {
-    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json')
-    const documents = JSON.parse(await readFile(metadataPath, 'utf-8'))
+    const metadataPath = path.join(DOCUMENTS_DIR, 'metadata.json');
+    const documents = JSON.parse(await readFile(metadataPath, 'utf-8'));
 
     // Find the document
-    const documentIndex = documents.findIndex((doc: Document) => doc.id === params.documentId)
+    const documentIndex = documents.findIndex((doc: Document) => doc.id === params.documentId);
     if (documentIndex === -1) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    const document = documents[documentIndex]
+    const document = documents[documentIndex];
 
     // Delete all version files
     for (const version of document.versions) {
       try {
-        await unlink(path.join(DOCUMENTS_DIR, version.fileName))
+        await unlink(path.join(DOCUMENTS_DIR, version.fileName));
       } catch (error) {
-        console.error(`Error deleting file ${version.fileName}:`, error)
+        console.error(`Error deleting file ${version.fileName}:`, error);
         // Continue even if a file deletion fails
       }
     }
 
     // Remove document from metadata
-    documents.splice(documentIndex, 1)
-    await writeFile(metadataPath, JSON.stringify(documents, null, 2))
+    documents.splice(documentIndex, 1);
+    await writeFile(metadataPath, JSON.stringify(documents, null, 2));
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting document:', error)
-    return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 })
+    console.error('Error deleting document:', error);
+    return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
   }
 }

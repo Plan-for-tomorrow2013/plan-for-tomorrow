@@ -25,14 +25,14 @@ interface Section {
 }
 
 // Define the absolute path to the JSON data file
-const dataFilePath = path.resolve(process.cwd(), 'admin/data/kb-complying-development-assessments.json');
+const dataFilePath = path.resolve(
+  process.cwd(),
+  'admin/data/kb-complying-development-assessments.json'
+);
 // Define the absolute base path for the public documents in the other project
 const documentsBasePath = path.resolve(process.cwd(), '../urban-planning-portal/public');
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { assessmentId: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { assessmentId: string } }) {
   const fileId = params.assessmentId;
 
   if (!fileId) {
@@ -95,10 +95,12 @@ export async function GET(
     );
 
     return response;
-
   } catch (error) {
     console.error('Error fetching or processing file:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

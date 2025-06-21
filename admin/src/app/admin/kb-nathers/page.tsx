@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function KBNathersPage() {
   return (
@@ -12,5 +12,5 @@ export default function KBNathersPage() {
       sectionEndpoint="/api/kb-nathers-sections"
       assessmentType="nathers"
     />
-  )
+  );
 }

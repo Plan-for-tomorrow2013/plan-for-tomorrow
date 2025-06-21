@@ -1,15 +1,21 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { Button } from "@shared/components/ui/button"
-import { Card, CardContent } from "@shared/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
-import { Input } from "@shared/components/ui/input"
-import { Alert, AlertDescription } from "@shared/components/ui/alert"
-import { useJobs } from '@shared/hooks/useJobs'
-import { Job } from '@shared/types/jobs'
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@shared/components/ui/button';
+import { Card, CardContent } from '@shared/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Input } from '@shared/components/ui/input';
+import { Alert, AlertDescription } from '@shared/components/ui/alert';
+import { useJobs } from '@shared/hooks/useJobs';
+import { Job } from '@shared/types/jobs';
 
 // Function to fetch job details
 async function fetchJobDetails(jobId: string): Promise<Job> {
@@ -69,8 +75,8 @@ function CertifyingAuthorityContent({ jobId }: { jobId: string }): JSX.Element {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           certifyingAuthority: {
-            webAddress: webAddress
-          }
+            webAddress: webAddress,
+          },
         }),
       });
 
@@ -83,7 +89,12 @@ function CertifyingAuthorityContent({ jobId }: { jobId: string }): JSX.Element {
   };
 
   if (isJobLoading) return <div>Loading...</div>;
-  if (jobError) return <Alert variant="destructive"><AlertDescription>{jobError.message}</AlertDescription></Alert>;
+  if (jobError)
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{jobError.message}</AlertDescription>
+      </Alert>
+    );
 
   return (
     <div className="space-y-6">
@@ -104,14 +115,13 @@ function CertifyingAuthorityContent({ jobId }: { jobId: string }): JSX.Element {
                   Save
                 </Button>
               </div>
-              {!isValidUrl && (
-                <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>
-              )}
+              {!isValidUrl && <p className="text-sm text-red-500 mt-1">Please enter a valid URL</p>}
               {isValidUrl && webAddress && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-700">
-                    <strong>Note:</strong> Some websites may not display in the preview above due to their security settings.
-                    If you can't see the website content, please use the "Open in New Tab" button below to view it directly.
+                    <strong>Note:</strong> Some websites may not display in the preview above due to
+                    their security settings. If you can't see the website content, please use the
+                    "Open in New Tab" button below to view it directly.
                   </p>
                 </div>
               )}
@@ -174,14 +184,16 @@ export default function CertifyingAuthorityPage() {
         {isLoadingJobs ? (
           <div>Loading jobs...</div>
         ) : jobsError ? (
-          <Alert variant="destructive"><AlertDescription>Failed to load jobs.</AlertDescription></Alert>
+          <Alert variant="destructive">
+            <AlertDescription>Failed to load jobs.</AlertDescription>
+          </Alert>
         ) : (
           <Select value={selectedJobId} onValueChange={setSelectedJobId}>
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Select a job" />
             </SelectTrigger>
             <SelectContent>
-              {jobs?.map((job) => (
+              {jobs?.map(job => (
                 <SelectItem key={job.id} value={job.id}>
                   {job.address}
                 </SelectItem>

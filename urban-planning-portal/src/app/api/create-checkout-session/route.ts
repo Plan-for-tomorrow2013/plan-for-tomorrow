@@ -5,10 +5,7 @@ export async function POST(request: Request) {
     const { jobId, assessmentId, type } = await request.json();
 
     if (!jobId || !assessmentId || type !== 'pre-prepared-assessment') {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Simulate payment processing delay
@@ -16,13 +13,10 @@ export async function POST(request: Request) {
 
     // Return success response with redirect URL
     return NextResponse.json({
-      url: `/professionals/report-writer?job=${jobId}&payment_success=true&assessment_id=${assessmentId}`
+      url: `/professionals/report-writer?job=${jobId}&payment_success=true&assessment_id=${assessmentId}`,
     });
   } catch (error) {
     console.error('Error processing payment:', error);
-    return NextResponse.json(
-      { error: 'Failed to process payment' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process payment' }, { status: 500 });
   }
 }

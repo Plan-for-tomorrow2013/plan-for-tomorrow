@@ -11,32 +11,28 @@ export async function GET(request: Request) {
   const fileName = searchParams.get('fileName'); // This is the stored filename, potentially with a unique prefix/timestamp
   const originalName = searchParams.get('originalName') || fileName; // Fallback to fileName if originalName is not provided
 
-  console.log(`[API /api/download-document] Received request: jobId=${jobId}, fileName=${fileName}, originalName=${originalName}`);
-
   if (!jobId || !fileName) {
-    console.log('[API /api/download-document] Missing jobId or fileName.');
-    return NextResponse.json({ error: 'Missing jobId or fileName query parameters' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing jobId or fileName query parameters' },
+      { status: 400 }
+    );
   }
 
   try {
     // Hardcoded base path to the jobs data directory
     const documentsBasePath = '/home/tania/urban-planning-professionals-portal/data/jobs';
-    console.log(`[API /api/download-document] Hardcoded documentsBasePath: ${documentsBasePath}`);
 
-    const filePath = path.join(documentsBasePath, jobId!, 'documents', fileName!); // Added non-null assertions for type safety if strict null checks are on
-    console.log(`[API /api/download-document] Constructed filePath (jobId: ${jobId}, fileName: ${fileName}): ${filePath}`);
+    const filePath = path.join(documentsBasePath, jobId, 'documents', fileName);
 
     // Check if file exists before attempting to read
     try {
       await stat(filePath);
-      console.log(`[API /api/download-document] File confirmed to exist at: ${filePath}`);
-    } catch (e: any) {
-      if (e.code === 'ENOENT') {
-        console.error(`[API /api/download-document] File not found (ENOENT) at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`);
+    } catch (e: unknown) {
+      const error = e as { code?: string };
+      if (error.code === 'ENOENT') {
         return NextResponse.json({ error: 'File not found on server.' }, { status: 404 });
       }
       // Other errors (e.g., permissions)
-      console.error(`[API /api/download-document] Error accessing file with stat at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`, e);
       return NextResponse.json({ error: 'Error accessing file.' }, { status: 500 });
     }
 
@@ -56,12 +52,13 @@ export async function GET(request: Request) {
     const response = new NextResponse(fileBuffer);
     response.headers.set('Content-Type', contentType);
     // Use the originalName for the download attribute if available
-    response.headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName || fileName)}"`);
+    response.headers.set(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(originalName || fileName)}"`
+    );
 
     return response;
   } catch (error) {
-    console.error('Error serving file download:', error);
     return NextResponse.json({ error: 'Failed to download file' }, { status: 500 });
   }
-
 }

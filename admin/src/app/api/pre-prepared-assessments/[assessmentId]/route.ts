@@ -24,7 +24,13 @@ interface Section {
 }
 
 // Define the path to the JSON data file - correcting the path relative to the likely CWD
-const dataFilePath = path.resolve(process.cwd(), 'admin', 'admin', 'data', 'pre-prepared-assessments.json');
+const dataFilePath = path.resolve(
+  process.cwd(),
+  'admin',
+  'admin',
+  'data',
+  'pre-prepared-assessments.json'
+);
 // Define the base path for the public documents in the client portal project
 const documentsBasePath = path.resolve(process.cwd(), '../urban-planning-portal/public');
 
@@ -104,14 +110,16 @@ export async function DELETE(
         // For now, we'll log it but still return success for the data deletion
       }
     } else {
-        console.log(`No associated file path found for assessment ${assessmentIdToDelete}.`)
+      console.log(`No associated file path found for assessment ${assessmentIdToDelete}.`);
     }
 
     return NextResponse.json({ message: 'Assessment deleted successfully' }, { status: 200 });
-
   } catch (error) {
     console.error('Error during assessment deletion process:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

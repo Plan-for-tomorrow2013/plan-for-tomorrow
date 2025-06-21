@@ -1,73 +1,82 @@
-import { NextResponse } from 'next/server'
-import { geocodeAddress } from '@shared/services/geocodingService'
-
-interface LayerResult {
-  layerId: number
-  name: string
-  features: Array<{
-    attributes: Record<string, any>
-  }>
-}
+import { NextResponse } from 'next/server';
+import { geocodeAddress } from '@shared/services/geocodingService';
 
 interface ProtectionResult {
-  layerName: string
-  attributes: Record<string, any>
+  layerName: string;
+  attributes: Record<string, unknown>;
+}
+
+interface ArcGISResult {
+  layerName: string;
+  attributes: Record<string, unknown>;
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const address = searchParams.get('address')
+  const { searchParams } = new URL(request.url);
+  const address = searchParams.get('address');
 
   if (!address) {
-    return NextResponse.json({ error: 'Address is required' }, { status: 400 })
+    return NextResponse.json({ error: 'Address is required' }, { status: 400 });
   }
 
   try {
     // Step 1: Get coordinates using our geocoding service
-    const { longitude, latitude } = await geocodeAddress(address)
+    const { longitude, latitude } = await geocodeAddress(address);
 
     if (!longitude || !latitude) {
-      return NextResponse.json({ error: 'Address not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
-    // Step 2: Query all layers in parallel
+    // Step 2: Query all layers in parallel using the actual ArcGIS URLs
     const [epiResponse, protectionResponse, localProvisionsResponse] = await Promise.all([
       // EPI Primary Planning Layers
-      fetch(`${process.env.NEXT_PUBLIC_ARCGIS_EPI_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`),
+      fetch(
+        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/identify?${new URLSearchParams(
+          {
+            geometry: `${longitude},${latitude}`,
+            geometryType: 'esriGeometryPoint',
+            layers: 'all',
+            tolerance: '1',
+            mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+            imageDisplay: '400,400,96',
+            returnGeometry: 'false',
+            f: 'json',
+          }
+        )}`
+      ),
 
       // Protection Layers
-      fetch(`${process.env.NEXT_PUBLIC_ARCGIS_PROTECTION_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`),
+      fetch(
+        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer/identify?${new URLSearchParams(
+          {
+            geometry: `${longitude},${latitude}`,
+            geometryType: 'esriGeometryPoint',
+            layers: 'all',
+            tolerance: '1',
+            mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+            imageDisplay: '400,400,96',
+            returnGeometry: 'false',
+            f: 'json',
+          }
+        )}`
+      ),
 
-      // Local Provisions Layers
-      fetch(`${process.env.NEXT_PUBLIC_ARCGIS_LOCAL_PROVISIONS_URL}/identify?${new URLSearchParams({
-        geometry: `${longitude},${latitude}`,
-        geometryType: "esriGeometryPoint",
-        layers: "all",
-        tolerance: "1",
-        mapExtent: `${longitude-0.005},${latitude-0.005},${longitude+0.005},${latitude+0.005}`,
-        imageDisplay: "400,400,96",
-        returnGeometry: "false",
-        f: "json"
-      })}`)
-    ])
+      // Principal Planning Layers
+      fetch(
+        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer/identify?${new URLSearchParams(
+          {
+            geometry: `${longitude},${latitude}`,
+            geometryType: 'esriGeometryPoint',
+            layers: 'all',
+            tolerance: '1',
+            mapExtent: `${longitude - 0.005},${latitude - 0.005},${longitude + 0.005},${latitude + 0.005}`,
+            imageDisplay: '400,400,96',
+            returnGeometry: 'false',
+            f: 'json',
+          }
+        )}`
+      ),
+    ]);
 
     if (!epiResponse.ok) {
       const errorText = await epiResponse.text();
@@ -79,33 +88,38 @@ export async function GET(request: Request) {
     }
     if (!localProvisionsResponse.ok) {
       const errorText = await localProvisionsResponse.text();
-      throw new Error(`Local Provisions Service Error: ${localProvisionsResponse.status} - ${errorText}`);
+      throw new Error(
+        `Local Provisions Service Error: ${localProvisionsResponse.status} - ${errorText}`
+      );
     }
 
     // Process responses in parallel
-    const [epiData, protectionData, localProvisionsData] = await Promise.all([
+    const [epiData, protectionData, principalPlanningData] = await Promise.all([
       epiResponse.json(),
       protectionResponse.json(),
-      localProvisionsResponse.json()
-    ])
+      localProvisionsResponse.json(),
+    ]);
 
     // Process EPI results
-    const processedResults = epiData.results?.map((result: any) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    const processedResults =
+      epiData.results?.map((result: ArcGISResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
     // Process Protection results
-    const processedProtectionResults = protectionData.results?.map((result: ProtectionResult) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    const processedProtectionResults =
+      protectionData.results?.map((result: ProtectionResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
-    // Process Local Provisions results
-    const processedLocalProvisionsResults = localProvisionsData.results?.map((result: ProtectionResult) => ({
-      layer: result.layerName,
-      attributes: result.attributes || {}
-    })) || []
+    // Process Principal Planning results
+    const processedPrincipalPlanningResults =
+      principalPlanningData.results?.map((result: ProtectionResult) => ({
+        layer: result.layerName,
+        attributes: result.attributes || {},
+      })) || [];
 
     return NextResponse.json({
       address,
@@ -113,15 +127,10 @@ export async function GET(request: Request) {
       planningLayers: {
         epiLayers: processedResults,
         protectionLayers: processedProtectionResults,
-        localProvisionsLayers: processedLocalProvisionsResults
-      }
-    })
-
+        principalPlanningLayers: processedPrincipalPlanningResults,
+      },
+    });
   } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch property information' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch property information' }, { status: 500 });
   }
 }

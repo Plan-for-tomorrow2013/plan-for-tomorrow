@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
+import { Button } from '@shared/components/ui/button'
+// import 'react-quill/dist/quill.snow.css' // Temporarily commented out due to missing CSS files
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), {

@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function PrePreparedAssessmentsPage() {
   return (
@@ -12,5 +12,5 @@ export default function PrePreparedAssessmentsPage() {
       sectionEndpoint="/api/pre-prepared-sections"
       assessmentType="regular"
     />
-  )
+  );
 }

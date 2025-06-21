@@ -1,11 +1,12 @@
-import { Card, CardContent, CardHeader } from "@shared/components/ui/card"
-import { Button } from "@shared/components/ui/button"
-import { FileText, Clock, Upload, Bell } from 'lucide-react'
-import { cn } from '@shared/lib/utils'
-import { ConsultantTicket } from '@shared/types/consultantsTickets'
-import { DocumentRenderer } from '@/components/DocumentRenderer'
-import { ReportSummarySection } from '@/components/ReportSummarySection'
-import { getReportStatus, getReportTitle } from '@shared/utils/report-utils'
+import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
+import { Button } from '@shared/components/ui/button';
+import { FileText, Clock, Upload, Bell } from 'lucide-react';
+import { cn } from '@shared/lib/utils';
+import { ConsultantTicket } from '@shared/types/consultantsTickets';
+import { DocumentRenderer } from '@/components/DocumentRenderer';
+import { ReportSummarySection } from '@/components/ReportSummarySection';
+import { getReportStatus } from '@shared/utils/report-utils';
+import { Job } from '@shared/types/jobs';
 
 // Helper function to get display name for ticket type
 const getTicketTypeDisplayName = (type: string): string => {
@@ -40,20 +41,20 @@ const getTicketTypeDisplayName = (type: string): string => {
       return 'Certifiers';
     case 'Arborist':
       return 'Arborist';
-    case "Geotechnical":
-      return "Geotechnical";
+    case 'Geotechnical':
+      return 'Geotechnical';
     default:
       return type;
   }
-}
+};
 
 interface ConsultantTicketCardProps {
-  ticket: ConsultantTicket
-  onUploadDocument: (ticketId: string, file: File) => Promise<void>
-  onReturnDocument: (ticketId: string) => Promise<void>
-  getStatusColor: (status: string) => string
-  documents?: import('@shared/types/documents').DocumentWithStatus[]
-  job?: any
+  ticket: ConsultantTicket;
+  onUploadDocument: (ticketId: string, file: File) => Promise<void>;
+  onReturnDocument: (ticketId: string) => Promise<void>;
+  getStatusColor: (status: string) => string;
+  documents?: import('@shared/types/documents').DocumentWithStatus[];
+  job?: Job;
 }
 
 export function ConsultantTicketCard({
@@ -62,21 +63,14 @@ export function ConsultantTicketCard({
   onReturnDocument,
   getStatusColor,
   documents = [],
-  job
+  job,
 }: ConsultantTicketCardProps) {
-  // Type guard for Job
-  function isFullJob(obj: any): obj is import('@shared/types/jobs').Job {
-    return obj && typeof obj === 'object' && 'council' in obj && 'status' in obj && 'createdAt' in obj;
-  }
   const relevantDoc = documents.find(
     doc => doc.category === ticket.category && doc.consultantId === ticket.consultantId
   );
-  let reportStatus: any = null;
-  if (relevantDoc && job && isFullJob(job)) {
-    reportStatus = getReportStatus(relevantDoc, job);
+  if (relevantDoc && job) {
+    getReportStatus(relevantDoc, job);
   }
-  const isCompleted = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.returnedAt;
-  const hasFile = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.fileName;
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -84,15 +78,20 @@ export function ConsultantTicketCard({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-medium">
-              {ticket.consultantName ? `${ticket.consultantName} — ` : ''}{getTicketTypeDisplayName(ticket.category)}
+              {ticket.consultantName ? `${ticket.consultantName} — ` : ''}
+              {getTicketTypeDisplayName(ticket.category)}
             </h2>
             <p className="text-xs text-gray-500 truncate">{ticket.jobAddress}</p>
-            <ReportSummarySection
-              report={ticket.assessment}
-              jobId={ticket.jobId}
-            />
+            {ticket.assessment && (
+              <ReportSummarySection report={ticket.assessment} jobId={ticket.jobId} />
+            )}
           </div>
-          <div className={cn("rounded-md px-2 py-1 text-xs font-semibold", getStatusColor(ticket.status))}>
+          <div
+            className={cn(
+              'rounded-md px-2 py-1 text-xs font-semibold',
+              getStatusColor(ticket.status)
+            )}
+          >
             {ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
           </div>
         </div>
@@ -103,7 +102,7 @@ export function ConsultantTicketCard({
             <div>
               <h3 className="font-medium text-sm mb-1">Documents to be Attached</h3>
               <ul className="list-disc list-inside text-xs mb-2">
-                {ticket.documents.map((doc: any) => (
+                {ticket.documents.map((doc: { id: string; name: string }) => (
                   <li key={doc.id}>{doc.name}</li>
                 ))}
               </ul>
@@ -139,8 +138,8 @@ export function ConsultantTicketCard({
                     originalName: ticket.assessment.originalName || '',
                     type: 'application/pdf',
                     uploadedAt: ticket.assessment.uploadedAt || new Date().toISOString(),
-                    size: ticket.assessment.size || 0
-                  }
+                    size: ticket.assessment.size || 0,
+                  },
                 }}
                 jobId={ticket.jobId}
               />
@@ -191,10 +190,10 @@ export function ConsultantTicketCard({
                   type="file"
                   className="hidden"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
+                  onChange={e => {
+                    const file = e.target.files?.[0];
                     if (file) {
-                      onUploadDocument(ticket.id, file)
+                      onUploadDocument(ticket.id, file);
                     }
                   }}
                 />
@@ -208,5 +207,5 @@ export function ConsultantTicketCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -53,14 +53,14 @@ const WollongongFSR: React.FC = () => {
     }
 
     // Calculate mixed use FSR
-    return (NRFSR * nonResidentialPercentage / 100) + (RFSR * residentialPercentage / 100);
+    return (NRFSR * nonResidentialPercentage) / 100 + (RFSR * residentialPercentage) / 100;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setInputs(prev => ({
       ...prev,
-      [name]: name === 'zone' ? value : Number(value)
+      [name]: name === 'zone' ? value : Number(value),
     }));
   };
 
@@ -110,7 +110,9 @@ const WollongongFSR: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Residential Percentage (%)</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Residential Percentage (%)
+          </label>
           <input
             type="number"
             name="residentialPercentage"

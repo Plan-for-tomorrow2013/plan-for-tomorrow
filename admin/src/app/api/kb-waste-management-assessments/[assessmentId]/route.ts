@@ -104,14 +104,16 @@ export async function DELETE(
         // For now, we'll log it but still return success for the data deletion
       }
     } else {
-        console.log(`No associated file path found for assessment ${assessmentIdToDelete}.`)
+      console.log(`No associated file path found for assessment ${assessmentIdToDelete}.`);
     }
 
     return NextResponse.json({ message: 'Assessment deleted successfully' }, { status: 200 });
-
   } catch (error) {
     console.error('Error during assessment deletion process:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

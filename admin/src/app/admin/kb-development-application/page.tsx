@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function KBDevelopmentApplicationPage() {
   return (
@@ -12,5 +12,5 @@ export default function KBDevelopmentApplicationPage() {
       sectionEndpoint="/api/kb-development-application-sections"
       assessmentType="development-application"
     />
-  )
+  );
 }

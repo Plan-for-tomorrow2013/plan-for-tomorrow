@@ -1,19 +1,13 @@
-import { NextResponse } from 'next/server'
-import { getJob, saveJob } from '@shared/services/jobStorage'
+import { NextResponse } from 'next/server';
+import { getJob, saveJob } from '@shared/services/jobStorage';
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { jobId: string } }
-) {
+export async function PUT(request: Request, { params }: { params: { jobId: string } }) {
   try {
-    const manualSubmission = await request.json()
-    const job = await getJob(params.jobId)
+    const manualSubmission = await request.json();
+    const job = await getJob(params.jobId);
 
     if (!job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     }
 
     // Update the job with manual submission data
@@ -21,48 +15,36 @@ export async function PUT(
       ...job,
       manualSubmission: {
         ...manualSubmission,
-        updatedAt: new Date().toISOString()
-      }
-    }
+        updatedAt: new Date().toISOString(),
+      },
+    };
 
-    await saveJob(params.jobId, updatedJob)
+    await saveJob(params.jobId, updatedJob);
 
     return NextResponse.json({
       success: true,
-      manualSubmission: updatedJob.manualSubmission
-    })
+      manualSubmission: updatedJob.manualSubmission,
+    });
   } catch (error) {
-    console.error('Error saving manual submission:', error)
-    return NextResponse.json(
-      { error: 'Failed to save manual submission' },
-      { status: 500 }
-    )
+    console.error('Error saving manual submission:', error);
+    return NextResponse.json({ error: 'Failed to save manual submission' }, { status: 500 });
   }
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: { jobId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { jobId: string } }) {
   try {
-    const job = await getJob(params.jobId)
+    const job = await getJob(params.jobId);
 
     if (!job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
-      manualSubmission: job.manualSubmission || null
-    })
+      manualSubmission: job.manualSubmission || null,
+    });
   } catch (error) {
-    console.error('Error fetching manual submission:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch manual submission' },
-      { status: 500 }
-    )
+    console.error('Error fetching manual submission:', error);
+    return NextResponse.json({ error: 'Failed to fetch manual submission' }, { status: 500 });
   }
 }

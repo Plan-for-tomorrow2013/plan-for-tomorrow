@@ -1,57 +1,59 @@
-'use client'
+'use client';
 
-import { useState } from "react"
-import { Document, Page, pdfjs } from "react-pdf"
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react"
-import "react-pdf/dist/esm/Page/AnnotationLayer.css"
-import "react-pdf/dist/esm/Page/TextLayer.css"
+import { useState } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // Set up the worker for PDF.js
-pdfjs.GlobalWorkerOptions.workerSrc = "/pdf-worker.min.mjs"
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.min.mjs';
 
 interface PdfViewerProps {
-  pdfPath: string
+  pdfPath: string;
 }
 
 export default function PdfViewer({ pdfPath }: PdfViewerProps) {
-  const [numPages, setNumPages] = useState<number | null>(null)
-  const [pageNumber, setPageNumber] = useState<number>(1)
-  const [scale, setScale] = useState<number>(1.0)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1.0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
-    setNumPages(numPages)
-    setLoading(false)
+    setNumPages(numPages);
+    setLoading(false);
   }
 
   function onDocumentLoadError(error: Error) {
-    setError("Failed to load PDF document")
-    setLoading(false)
-    console.error("PDF load error:", error)
+    setError('Failed to load PDF document');
+    setLoading(false);
+    console.error('PDF load error:', error);
   }
 
   function changePage(offset: number) {
-    setPageNumber((prevPageNumber) => {
-      const newPageNumber = prevPageNumber + offset
-      return newPageNumber >= 1 && newPageNumber <= (numPages || 1) ? newPageNumber : prevPageNumber
-    })
+    setPageNumber(prevPageNumber => {
+      const newPageNumber = prevPageNumber + offset;
+      return newPageNumber >= 1 && newPageNumber <= (numPages || 1)
+        ? newPageNumber
+        : prevPageNumber;
+    });
   }
 
   function previousPage() {
-    changePage(-1)
+    changePage(-1);
   }
 
   function nextPage() {
-    changePage(1)
+    changePage(1);
   }
 
   function zoomIn() {
-    setScale((prevScale) => Math.min(prevScale + 0.2, 2.5))
+    setScale(prevScale => Math.min(prevScale + 0.2, 2.5));
   }
 
   function zoomOut() {
-    setScale((prevScale) => Math.max(prevScale - 0.2, 0.5))
+    setScale(prevScale => Math.max(prevScale - 0.2, 0.5));
   }
 
   return (
@@ -78,7 +80,7 @@ export default function PdfViewer({ pdfPath }: PdfViewerProps) {
             <ChevronLeft className="h-5 w-5" />
           </button>
           <span>
-            Page {pageNumber} of {numPages || "--"}
+            Page {pageNumber} of {numPages || '--'}
           </span>
           <button
             onClick={nextPage}
@@ -121,5 +123,5 @@ export default function PdfViewer({ pdfPath }: PdfViewerProps) {
         This document is for viewing only and cannot be downloaded.
       </div>
     </div>
-  )
+  );
 }

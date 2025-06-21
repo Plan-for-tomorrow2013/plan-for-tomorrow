@@ -1,41 +1,35 @@
-import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { getWorkTicketsPath, getJobPath, getDocumentsPath } from '@shared/utils/paths'
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { getWorkTicketsPath, getJobPath, getDocumentsPath } from '@shared/utils/paths';
 
 export async function POST(request: Request) {
   try {
-    const { ticketId } = await request.json()
+    const { ticketId } = await request.json();
 
     if (!ticketId) {
-      return NextResponse.json(
-        { error: 'Ticket ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Ticket ID is required' }, { status: 400 });
     }
 
     // Read the work tickets file
-    const workTicketsPath = getWorkTicketsPath()
-    const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8')
-    const workTickets = JSON.parse(workTicketsData)
+    const workTicketsPath = getWorkTicketsPath();
+    const workTicketsData = await fs.readFile(workTicketsPath, 'utf-8');
+    const workTickets = JSON.parse(workTicketsData);
 
     // Find the ticket to update
-    const ticketIndex = workTickets.findIndex((ticket: any) => ticket.id === ticketId)
+    const ticketIndex = workTickets.findIndex((ticket: any) => ticket.id === ticketId);
     if (ticketIndex === -1) {
-      return NextResponse.json(
-        { error: 'Ticket not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
 
-    const ticket = workTickets[ticketIndex]
+    const ticket = workTickets[ticketIndex];
 
     // Check if the ticket has a completed document
     if (!ticket.completedDocument) {
       return NextResponse.json(
         { error: 'No completed document found for this ticket' },
         { status: 400 }
-      )
+      );
     }
 
     // Define the path to the completed document based on ticket type
@@ -54,52 +48,43 @@ export async function POST(request: Request) {
 
     // Check if the completed document exists
     try {
-      await fs.access(completedDocPath)
+      await fs.access(completedDocPath);
     } catch (error) {
-      console.error('Completed document not found:', error)
-      return NextResponse.json(
-        { error: 'Completed document file not found' },
-        { status: 404 }
-      )
+      console.error('Completed document not found:', error);
+      return NextResponse.json({ error: 'Completed document file not found' }, { status: 404 });
     }
 
     // Read the job file
-    const jobPath = getJobPath(ticket.jobId)
-    let job
+    const jobPath = getJobPath(ticket.jobId);
+    let job;
     try {
-      const jobData = await fs.readFile(jobPath, 'utf-8')
-      job = JSON.parse(jobData)
+      const jobData = await fs.readFile(jobPath, 'utf-8');
+      job = JSON.parse(jobData);
     } catch (error) {
-      console.error('Error reading job file:', error)
-      return NextResponse.json(
-        { error: 'Associated job not found' },
-        { status: 404 }
-      )
+      console.error('Error reading job file:', error);
+      return NextResponse.json({ error: 'Associated job not found' }, { status: 404 });
     }
 
     // Create job documents directory if it doesn't exist
-    const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents')
-    await fs.mkdir(jobDocDir, { recursive: true })
+    const jobDocDir = path.join(process.cwd(), 'data', 'jobs', ticket.jobId, 'documents');
+    await fs.mkdir(jobDocDir, { recursive: true });
 
     // Generate a unique fileName for the document
-    const timestamp = Date.now()
-    const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`
-    const jobDocPath = path.join(jobDocDir, newFileName)
+    const timestamp = Date.now();
+    const newFileName = `${ticket.ticketType.replace(/-/g, '_')}_${timestamp}_${ticket.completedDocument.fileName}`;
+    const jobDocPath = path.join(jobDocDir, newFileName);
 
     // Copy the document to the job's document store
     try {
-      await fs.copyFile(completedDocPath, jobDocPath)
+      await fs.copyFile(completedDocPath, jobDocPath);
     } catch (error) {
-      console.error('Error copying document:', error)
-      return NextResponse.json(
-        { error: 'Failed to copy document to job store' },
-        { status: 500 }
-      )
+      console.error('Error copying document:', error);
+      return NextResponse.json({ error: 'Failed to copy document to job store' }, { status: 500 });
     }
 
     // Initialize documents object if it doesn't exist
     if (!job.documents) {
-      job.documents = {}
+      job.documents = {};
     }
 
     // The ticket.ticketType (e.g., 'customAssessment') is already the correct ID
@@ -112,7 +97,7 @@ export async function POST(request: Request) {
       originalName: ticket.completedDocument.fileName,
       type: ticket.completedDocument.type || 'application/pdf', // Use the actual type from the completed document
       uploadedAt: new Date().toISOString(),
-      size: (await fs.stat(completedDocPath)).size
+      size: (await fs.stat(completedDocPath)).size,
     };
 
     // Prepare file details for assessment
@@ -121,8 +106,8 @@ export async function POST(request: Request) {
       originalName: ticket.completedDocument.fileName,
       type: 'application/pdf',
       uploadedAt: new Date().toISOString(),
-      size: (await fs.stat(completedDocPath)).size
-    }
+      size: (await fs.stat(completedDocPath)).size,
+    };
 
     // Update the job's assessment status and file details based on ticket type
     if (ticket.ticketType === 'customAssessment') {
@@ -185,13 +170,10 @@ export async function POST(request: Request) {
 
     // Save the updated job data
     try {
-      await fs.writeFile(jobPath, JSON.stringify(job, null, 2))
+      await fs.writeFile(jobPath, JSON.stringify(job, null, 2));
     } catch (error) {
-      console.error('Error saving job data:', error)
-      return NextResponse.json(
-        { error: 'Failed to update job data' },
-        { status: 500 }
-      )
+      console.error('Error saving job data:', error);
+      return NextResponse.json({ error: 'Failed to update job data' }, { status: 500 });
     }
 
     // Update the ticket with the return timestamp
@@ -200,32 +182,29 @@ export async function POST(request: Request) {
       status: 'completed',
       completedDocument: {
         ...ticket.completedDocument,
-        returnedAt: new Date().toISOString()
-      }
-    }
+        returnedAt: new Date().toISOString(),
+      },
+    };
 
     // Save the updated tickets
     try {
-      await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2))
+      await fs.writeFile(workTicketsPath, JSON.stringify(workTickets, null, 2));
     } catch (error) {
-      console.error('Error saving work tickets:', error)
-      return NextResponse.json(
-        { error: 'Failed to update work ticket' },
-        { status: 500 }
-      )
+      console.error('Error saving work tickets:', error);
+      return NextResponse.json({ error: 'Failed to update work ticket' }, { status: 500 });
     }
 
     // Return success response
-    return NextResponse.json({
-      success: true,
-      message: 'Document returned successfully',
-      ticket: workTickets[ticketIndex]
-    }, { status: 200 })
-  } catch (error) {
-    console.error('Error returning document:', error)
     return NextResponse.json(
-      { error: 'Failed to process document return' },
-      { status: 500 }
-    )
+      {
+        success: true,
+        message: 'Document returned successfully',
+        ticket: workTickets[ticketIndex],
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error returning document:', error);
+    return NextResponse.json({ error: 'Failed to process document return' }, { status: 500 });
   }
 }

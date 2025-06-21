@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function PrePreparedInitialAssessmentsPage() {
   return (
@@ -12,5 +12,5 @@ export default function PrePreparedInitialAssessmentsPage() {
       sectionEndpoint="/api/pre-prepared-initial-assessments/sections"
       assessmentType="initial"
     />
-  )
+  );
 }

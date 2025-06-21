@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useRef } from "react"
-import { Button } from "@shared/components/ui/button"
-import { Input } from "@shared/components/ui/input"
-import { Label } from "@shared/components/ui/label"
-import { Textarea } from "@shared/components/ui/textarea"
+import { useState, useRef } from 'react';
+import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -15,97 +15,97 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@shared/components/ui/dialog"
-import { useToast } from "@shared/components/ui/use-toast"
+} from '@shared/components/ui/dialog';
+import { useToast } from '@shared/components/ui/use-toast';
 
 interface ConsultantFormProps {
-  category: string
+  category: string;
 }
 
 export function ConsultantForm({ category }: ConsultantFormProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    company: "",
-    notes: "",
-  })
-  const [logoFile, setLogoFile] = useState<File | null>(null)
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const { toast } = useToast()
-  const [isOpen, setIsOpen] = useState(false)
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    notes: '',
+  });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    setLogoFile(file)
+    const file = e.target.files?.[0] || null;
+    setLogoFile(file);
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (ev) => setLogoPreview(ev.target?.result as string)
-      reader.readAsDataURL(file)
+      const reader = new FileReader();
+      reader.onload = ev => setLogoPreview(ev.target?.result as string);
+      reader.readAsDataURL(file);
     } else {
-      setLogoPreview(null)
+      setLogoPreview(null);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      let response
+      let response;
       if (logoFile) {
-        const formDataToSend = new FormData()
-        Object.entries(formData).forEach(([key, value]) => formDataToSend.append(key, value))
-        formDataToSend.append('logo', logoFile)
-        formDataToSend.append('category', category)
-        response = await fetch("/api/consultants", {
-          method: "POST",
+        const formDataToSend = new FormData();
+        Object.entries(formData).forEach(([key, value]) => formDataToSend.append(key, value));
+        formDataToSend.append('logo', logoFile);
+        formDataToSend.append('category', category);
+        response = await fetch('/api/consultants', {
+          method: 'POST',
           body: formDataToSend,
-        })
+        });
       } else {
-        response = await fetch("/api/consultants", {
-          method: "POST",
+        response = await fetch('/api/consultants', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             ...formData,
             category,
           }),
-        })
+        });
       }
 
-      if (!response.ok) throw new Error("Failed to add consultant")
+      if (!response.ok) throw new Error('Failed to add consultant');
 
-      const consultant = await response.json()
+      const consultant = await response.json();
 
       // Close the dialog after successful submission
-      setIsOpen(false)
+      setIsOpen(false);
 
       toast({
-        title: "Consultant Added",
-        description: "The consultant has been added successfully.",
-      })
+        title: 'Consultant Added',
+        description: 'The consultant has been added successfully.',
+      });
 
       // Reset form
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        notes: "",
-      })
-      setLogoFile(null)
-      setLogoPreview(null)
-      if (fileInputRef.current) fileInputRef.current.value = ""
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        notes: '',
+      });
+      setLogoFile(null);
+      setLogoPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to add consultant. Please try again.",
-        variant: "destructive",
-      })
+        title: 'Error',
+        description: 'Failed to add consultant. Please try again.',
+        variant: 'destructive',
+      });
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -125,7 +125,7 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
               id="name"
               required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
 
@@ -136,7 +136,7 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={e => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -147,7 +147,7 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
               type="tel"
               required
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={e => setFormData({ ...formData, phone: e.target.value })}
             />
           </div>
 
@@ -157,7 +157,7 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
               id="company"
               required
               value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              onChange={e => setFormData({ ...formData, company: e.target.value })}
             />
           </div>
 
@@ -172,7 +172,11 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
               className="w-full"
             />
             {logoPreview && (
-              <img src={logoPreview} alt="Logo preview" className="h-12 w-12 rounded-full mt-2 object-cover border" />
+              <img
+                src={logoPreview}
+                alt="Logo preview"
+                className="h-12 w-12 rounded-full mt-2 object-cover border"
+              />
             )}
           </div>
 
@@ -181,7 +185,7 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
             <Textarea
               id="notes"
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={e => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Add any additional notes..."
             />
           </div>
@@ -192,5 +196,5 @@ export function ConsultantForm({ category }: ConsultantFormProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

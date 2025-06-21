@@ -1,4 +1,4 @@
-'use server'
+'use server';
 
 export async function updateConsultantNotes(id: string, notes: string) {
   try {
@@ -8,15 +8,15 @@ export async function updateConsultantNotes(id: string, notes: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ notes }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error('Failed to update notes')
+      throw new Error('Failed to update notes');
     }
 
-    return await response.json()
+    return await response.json();
   } catch (error) {
-    console.error('Error updating notes:', error)
-    throw error
+    console.error('Error updating notes:', error);
+    throw error;
   }
 }

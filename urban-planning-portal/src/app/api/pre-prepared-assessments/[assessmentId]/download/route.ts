@@ -1,15 +1,18 @@
-import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Define paths
-const prePreparedAssessmentsPath = path.join(process.cwd(), '..', 'admin', 'data', 'pre-prepared-assessments.json');
+const prePreparedAssessmentsPath = path.join(
+  process.cwd(),
+  '..',
+  'admin',
+  'data',
+  'pre-prepared-assessments.json'
+);
 const documentsBasePath = path.join(process.cwd(), 'public', 'documents', 'pre-prepared');
 
-export async function GET(
-  request: Request,
-  { params }: { params: { assessmentId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { assessmentId: string } }) {
   try {
     // Read the assessments data
     const data = await fs.readFile(prePreparedAssessmentsPath, 'utf8');
@@ -26,10 +29,7 @@ export async function GET(
     }
 
     if (!assessment || !assessment.file) {
-      return NextResponse.json(
-        { error: 'Assessment or file not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Assessment or file not found' }, { status: 404 });
     }
 
     // Construct the file path
@@ -39,10 +39,7 @@ export async function GET(
     try {
       await fs.access(filePath);
     } catch (error) {
-      return NextResponse.json(
-        { error: 'File not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
     // Read the file
@@ -55,14 +52,10 @@ export async function GET(
 
     return new NextResponse(fileBuffer, {
       status: 200,
-      headers
+      headers,
     });
-
   } catch (error) {
     console.error('Error downloading assessment:', error);
-    return NextResponse.json(
-      { error: 'Failed to download assessment' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to download assessment' }, { status: 500 });
   }
 }

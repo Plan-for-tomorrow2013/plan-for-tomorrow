@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { PrePreparedAssessmentsManager } from "@/lib/PrePreparedAssessmentsManager"
+import { PrePreparedAssessmentsManager } from '@/lib/PrePreparedAssessmentsManager';
 
 export default function KBComplyingDevelopmentPage() {
   return (
@@ -12,5 +12,5 @@ export default function KBComplyingDevelopmentPage() {
       sectionEndpoint="/api/kb-complying-development-sections"
       assessmentType="complying-development"
     />
-  )
+  );
 }

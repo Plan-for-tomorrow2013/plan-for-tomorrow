@@ -1,43 +1,35 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { stat } from 'fs/promises'; // For checking file existence
+import { getDataPath } from '@shared/utils/paths';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const jobId = searchParams.get('jobId');
   const fileName = searchParams.get('fileName'); // This is the stored filename, potentially with a unique prefix/timestamp
   const originalName = searchParams.get('originalName') || fileName; // Fallback to fileName if originalName is not provided
 
-  console.log(`[API ADMIN /api/download-document] Received request: jobId=${jobId}, fileName=${fileName}, originalName=${originalName}`);
-
   if (!jobId || !fileName) {
-    console.log('[API ADMIN /api/download-document] Missing jobId or fileName.');
-    return NextResponse.json({ error: 'Missing jobId or fileName query parameters' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing jobId or fileName query parameters' },
+      { status: 400 }
+    );
   }
 
   try {
-    // Hardcoded base path to the jobs data directory, relative to the monorepo root.
-    // Assumes the admin app's process.cwd() might be admin/ but files are at monorepo_root/data/jobs
-    // To ensure robustness, we construct path from a known root or adjust based on actual process.cwd() for admin app.
-    // For WSL, the direct Linux path is most reliable if the server runs in WSL.
-    const documentsBasePath = '/home/tania/urban-planning-professionals-portal/data/jobs';
-    console.log(`[API ADMIN /api/download-document] Hardcoded documentsBasePath: ${documentsBasePath}`);
+    const documentsBasePath = path.join(getDataPath(), 'jobs');
 
     const filePath = path.join(documentsBasePath, jobId!, 'documents', fileName!);
-    console.log(`[API ADMIN /api/download-document] Constructed filePath (jobId: ${jobId}, fileName: ${fileName}): ${filePath}`);
 
     // Check if file exists before attempting to read
     try {
       await stat(filePath);
-      console.log(`[API ADMIN /api/download-document] File confirmed to exist at: ${filePath}`);
-    } catch (e: any) {
-      if (e.code === 'ENOENT') {
-        console.error(`[API ADMIN /api/download-document] File not found (ENOENT) at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`);
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
         return NextResponse.json({ error: 'File not found on server.' }, { status: 404 });
       }
       // Other errors (e.g., permissions)
-      console.error(`[API ADMIN /api/download-document] Error accessing file with stat at path: ${filePath}. Base path was: ${documentsBasePath}. JobId: ${jobId}. FileName: ${fileName}.`, e);
       return NextResponse.json({ error: 'Error accessing file.' }, { status: 500 });
     }
 
@@ -56,11 +48,13 @@ export async function GET(request: Request) {
 
     const response = new NextResponse(fileBuffer);
     response.headers.set('Content-Type', contentType);
-    response.headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName || fileName)}"`);
+    response.headers.set(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(originalName || fileName)}"`
+    );
 
     return response;
   } catch (error) {
-    console.error('Error serving file download:', error);
     return NextResponse.json({ error: 'Failed to download file' }, { status: 500 });
   }
 }

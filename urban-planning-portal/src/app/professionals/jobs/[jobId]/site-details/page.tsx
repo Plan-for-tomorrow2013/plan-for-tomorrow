@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { ArrowLeft, Check, Loader2 } from 'lucide-react'
-import { Button } from "@shared/components/ui/button"
-import { useRouter } from 'next/navigation'
-import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
-import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails'
-import { toast } from "@shared/components/ui/use-toast"; // Import toast
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Check, Loader2 } from 'lucide-react';
+import { Button } from '@shared/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
+import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails';
+import { toast } from '@shared/components/ui/use-toast'; // Import toast
 
 // Add normalization helper
 function normalizeSiteDetails(data: any): SiteDetails {
@@ -31,12 +31,12 @@ function normalizeSiteDetails(data: any): SiteDetails {
 }
 
 export default function SiteDetailsPage({ params }: { params: { jobId: string } }) {
-  const router = useRouter()
+  const router = useRouter();
   const [siteDetailsData, setSiteDetailsData] = useState<SiteDetails | null>(null); // State to hold the form data
   const [isLoading, setIsLoading] = useState(true); // Loading state for initial fetch
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
-  const [error, setError] = useState<string | null>(null)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Fetch initial data
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
 
   // Save handler using the correct API endpoint and method
   const handleSave = async () => {
-     if (!siteDetailsData) return; // Don't save if data is null
+    if (!siteDetailsData) return; // Don't save if data is null
 
     setSaveStatus('saving');
     setError(null);
@@ -98,21 +98,19 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
 
       setSaveStatus('success');
       setHasUnsavedChanges(false); // Mark changes as saved
-      toast({ title: "Success", description: "Site details saved successfully." });
-
+      toast({ title: 'Success', description: 'Site details saved successfully.' });
 
       // Optionally reset success status after a delay
       setTimeout(() => {
         // Check if still success before resetting, in case another save started
-        setSaveStatus(currentStatus => currentStatus === 'success' ? 'idle' : currentStatus);
+        setSaveStatus(currentStatus => (currentStatus === 'success' ? 'idle' : currentStatus));
       }, 3000);
-
     } catch (error) {
       console.error('Error saving site details:', error);
       setSaveStatus('error');
       const errorMessage = error instanceof Error ? error.message : 'Failed to save site details';
       setError(errorMessage);
-      toast({ title: "Error", description: errorMessage, variant: "destructive" });
+      toast({ title: 'Error', description: errorMessage, variant: 'destructive' });
     }
   };
 
@@ -127,7 +125,9 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
             className="p-2"
             onClick={() => {
               if (hasUnsavedChanges) {
-                const shouldLeave = window.confirm('You have unsaved changes. Do you want to leave without saving?');
+                const shouldLeave = window.confirm(
+                  'You have unsaved changes. Do you want to leave without saving?'
+                );
                 if (!shouldLeave) return;
               }
               router.back();
@@ -152,12 +152,13 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
         )}
       </div>
 
-      {error && saveStatus === 'error' && ( // Show error only when saveStatus is error
-        <Alert variant="destructive" className="mb-6">
-          <AlertTitle>Error Saving</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error &&
+        saveStatus === 'error' && ( // Show error only when saveStatus is error
+          <Alert variant="destructive" className="mb-6">
+            <AlertTitle>Error Saving</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
       {saveStatus === 'success' && ( // Show success message
         <Alert className="mb-6 bg-green-50 border-green-200">
@@ -171,20 +172,20 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
 
       {/* Render the DetailedSiteDetails component */}
       {isLoading ? (
-         <div className="flex justify-center items-center p-10">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-         </div>
+        <div className="flex justify-center items-center p-10">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
       ) : siteDetailsData ? (
         <DetailedSiteDetails
           siteDetails={siteDetailsData as SiteDetails}
           onSiteDetailsChange={handleDataChange}
         />
       ) : (
-         // Show error if loading finished but data is still null (and no specific load error was set)
-         <Alert variant="destructive" className="mb-6">
-             <AlertTitle>Error Loading</AlertTitle>
-             <AlertDescription>{error || 'Could not load site details.'}</AlertDescription>
-         </Alert>
+        // Show error if loading finished but data is still null (and no specific load error was set)
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Error Loading</AlertTitle>
+          <AlertDescription>{error || 'Could not load site details.'}</AlertDescription>
+        </Alert>
       )}
     </div>
   );

@@ -1,54 +1,62 @@
-import { NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import { WorkTicket } from '@shared/types/workTickets'
-import { getWorkTicketsPath, getDocumentsPath, getDocumentPath, getDocumentsMetadataPath } from '@shared/utils/paths'
-import { Document, DocumentVersion } from '@shared/types/documents'
-import { getJob, saveJob } from '@shared/services/jobStorage'
-import { Job, Assessment } from '@shared/types/jobs'
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { WorkTicket } from '@shared/types/workTickets';
+import {
+  getWorkTicketsPath,
+  getDocumentsPath,
+  getDocumentPath,
+  getDocumentsMetadataPath,
+} from '@shared/utils/paths';
+import { Document, DocumentVersion } from '@shared/types/documents';
+import { getJob, saveJob } from '@shared/services/jobStorage';
+import { Job, Assessment } from '@shared/types/jobs';
 
 // Helper function to get display name for ticket type
 const getTicketTypeDisplayName = (type: string): string => {
   switch (type) {
     case 'custom-assessment':
-      return 'Custom Assessment'
+      return 'Custom Assessment';
     case 'statement-of-environmental-effects':
-      return 'Statement of Environmental Effects'
+      return 'Statement of Environmental Effects';
     case 'complying-development-certificate':
-      return 'Complying Development Certificate'
+      return 'Complying Development Certificate';
     case 'waste-management-assessment':
-      return 'Waste Management Assessment'
+      return 'Waste Management Assessment';
     case 'nathers-assessment':
-      return 'Nathers Assessment'
+      return 'Nathers Assessment';
     default:
-      return type
+      return type;
   }
-}
+};
 
 // Helper function to read work tickets
 async function readWorkTickets(): Promise<WorkTicket[]> {
   try {
-    const filePath = getWorkTicketsPath()
-    const fileExists = await fs.access(filePath).then(() => true).catch(() => false)
+    const filePath = getWorkTicketsPath();
+    const fileExists = await fs
+      .access(filePath)
+      .then(() => true)
+      .catch(() => false);
 
     if (!fileExists) {
-      await fs.writeFile(filePath, '[]')
-      return []
+      await fs.writeFile(filePath, '[]');
+      return [];
     }
 
-    const data = await fs.readFile(filePath, 'utf8')
-    return JSON.parse(data)
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data);
   } catch (error) {
-    console.error('Error reading work tickets:', error)
-    return []
+    console.error('Error reading work tickets:', error);
+    return [];
   }
 }
 
 // Helper function to write work tickets
 async function writeWorkTickets(tickets: WorkTicket[]) {
-  const filePath = getWorkTicketsPath()
-  await fs.writeFile(filePath, JSON.stringify(tickets, null, 2))
+  const filePath = getWorkTicketsPath();
+  await fs.writeFile(filePath, JSON.stringify(tickets, null, 2));
 }
 
 // Helper function to create document from work ticket
@@ -57,14 +65,14 @@ async function createDocumentFromWorkTicket(
   file: File,
   metadata: any
 ): Promise<Document> {
-  const documentId = uuidv4()
-  const version = 1
-  const extension = path.extname(file.name)
-  const filePath = getDocumentPath(documentId, version, extension)
+  const documentId = uuidv4();
+  const version = 1;
+  const extension = path.extname(file.name);
+  const filePath = getDocumentPath(documentId, version, extension);
 
   // Save the file
-  const buffer = Buffer.from(await file.arrayBuffer())
-  await fs.writeFile(filePath, buffer)
+  const buffer = Buffer.from(await file.arrayBuffer());
+  await fs.writeFile(filePath, buffer);
 
   // Create document version
   const documentVersion: DocumentVersion = {
@@ -74,8 +82,8 @@ async function createDocumentFromWorkTicket(
     originalName: file.name,
     size: file.size,
     type: file.type,
-    uploadedBy: metadata.uploadedBy || 'system'
-  }
+    uploadedBy: metadata.uploadedBy || 'system',
+  };
 
   // Create document
   const document: Document = {
@@ -93,22 +101,22 @@ async function createDocumentFromWorkTicket(
       jobId: ticket.jobId,
       ticketId: ticket.id,
       ticketType: ticket.ticketType,
-      ...metadata
-    }
-  }
+      ...metadata,
+    },
+  };
 
   // Save metadata
-  const metadataPath = getDocumentsMetadataPath()
+  const metadataPath = getDocumentsMetadataPath();
   try {
-    const existingMetadata = await fs.readFile(metadataPath, 'utf-8')
-    const documents = JSON.parse(existingMetadata)
-    documents.push(document)
-    await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2))
+    const existingMetadata = await fs.readFile(metadataPath, 'utf-8');
+    const documents = JSON.parse(existingMetadata);
+    documents.push(document);
+    await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2));
   } catch (error) {
-    await fs.writeFile(metadataPath, JSON.stringify([document], null, 2))
+    await fs.writeFile(metadataPath, JSON.stringify([document], null, 2));
   }
 
-  return document
+  return document;
 }
 
 export async function POST(request: Request) {
@@ -132,7 +140,7 @@ export async function POST(request: Request) {
       status: 'pending',
       createdAt: new Date().toISOString(),
       // Initialize with empty completedDocument
-      completedDocument: undefined
+      completedDocument: undefined,
     };
 
     // Add report-specific data based on ticket type
@@ -174,7 +182,7 @@ export async function POST(request: Request) {
         newTicket.completedDocument = {
           fileName: createdDocument.versions[0].fileName,
           originalName: createdDocument.versions[0].originalName,
-          uploadedAt: createdDocument.versions[0].uploadedAt
+          uploadedAt: createdDocument.versions[0].uploadedAt,
         };
       } catch (docError) {
         console.error('Error creating document from work ticket file:', docError);
@@ -202,9 +210,9 @@ export async function POST(request: Request) {
           ticketId: newTicket.id,
           ticketType: newTicket.ticketType,
           attachedDocuments,
-          ...metadata
+          ...metadata,
         },
-        displayStatus: 'pending_admin_delivery'
+        displayStatus: 'pending_admin_delivery',
       };
       // Save to metadata.json
       const metadataPath = getDocumentsMetadataPath();
@@ -233,7 +241,16 @@ export async function POST(request: Request) {
       const job = getJob(newTicket.jobId);
       if (job) {
         // Determine which assessment field to update
-        let assessmentKey: keyof Pick<Job, 'customAssessment' | 'statementOfEnvironmentalEffects' | 'complyingDevelopmentCertificate' | 'wasteManagementAssessment' | 'nathersAssessment'> | null = null;
+        let assessmentKey:
+          | keyof Pick<
+              Job,
+              | 'customAssessment'
+              | 'statementOfEnvironmentalEffects'
+              | 'complyingDevelopmentCertificate'
+              | 'wasteManagementAssessment'
+              | 'nathersAssessment'
+            >
+          | null = null;
         let documentKey: string | null = null;
         let reportTitle: string | null = null;
         switch (newTicket.ticketType) {
@@ -281,7 +298,7 @@ export async function POST(request: Request) {
             originalName: reportTitle,
             type: 'report',
             uploadedAt: new Date().toISOString(),
-            size: 0
+            size: 0,
           };
           await saveJob(newTicket.jobId, job);
         }
@@ -293,10 +310,7 @@ export async function POST(request: Request) {
     return NextResponse.json(newTicket);
   } catch (error) {
     console.error('Error creating work ticket:', error);
-    return NextResponse.json(
-      { error: 'Failed to create work ticket' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create work ticket' }, { status: 500 });
   }
 }
 
@@ -309,7 +323,7 @@ export async function GET() {
       'statementOfEnvironmentalEffects',
       'complyingDevelopmentCertificate',
       'wasteManagementAssessment',
-      'nathersAssessment'
+      'nathersAssessment',
     ];
     const enrichedTickets = tickets.map(ticket => {
       let completedSet = false;
@@ -335,7 +349,7 @@ export async function GET() {
                 fileName,
                 originalName,
                 uploadedAt: report.uploadedAt || '',
-                returnedAt: report.returnedAt
+                returnedAt: report.returnedAt,
               };
               completedSet = true;
             }
@@ -347,9 +361,6 @@ export async function GET() {
     return NextResponse.json(enrichedTickets);
   } catch (error) {
     console.error('Error fetching work tickets:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch work tickets' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch work tickets' }, { status: 500 });
   }
 }

@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { useSearchParams, useRouter } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-import PdfViewer from "@/components/PdfViewer"
+import { useSearchParams, useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import PdfViewer from '@/components/PdfViewer';
 
 export default function DocumentPage() {
-  const searchParams = useSearchParams()
-  const pdfPath = searchParams.get("path")
-  const title = searchParams.get("title") || "Assessment PDF"
-  const router = useRouter()
+  const searchParams = useSearchParams();
+  const pdfPath = searchParams.get('path');
+  const title = searchParams.get('title') || 'Assessment PDF';
+  const router = useRouter();
 
   if (!pdfPath) {
     return (
@@ -20,14 +20,17 @@ export default function DocumentPage() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="mb-6 flex items-center">
-          <button onClick={() => router.back()} className="text-[#5a3d1c] hover:underline flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="text-[#5a3d1c] hover:underline flex items-center"
+          >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Complying Development
           </button>
@@ -40,5 +43,5 @@ export default function DocumentPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

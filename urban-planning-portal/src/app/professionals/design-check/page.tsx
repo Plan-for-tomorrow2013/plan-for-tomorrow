@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
-import { PageHeader } from "@shared/components/ui/page-header"
-import { Clock } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { PageHeader } from '@shared/components/ui/page-header';
+import { Clock } from 'lucide-react';
 
 export default function DesignCheckPage() {
   return (
@@ -24,5 +24,5 @@ export default function DesignCheckPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

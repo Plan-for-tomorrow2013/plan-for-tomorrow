@@ -1,6 +1,20 @@
+interface ReportDocument {
+  fileName?: string;
+  originalName?: string;
+}
+
+interface Report {
+  documents?: {
+    certificate107?: ReportDocument;
+    certificateOfTitle?: ReportDocument;
+    surveyPlan?: ReportDocument;
+    architecturalPlan?: ReportDocument;
+  };
+}
+
 interface ReportSummarySectionProps {
-  report: any
-  jobId: string
+  report: Report;
+  jobId: string;
 }
 
 export function ReportSummarySection({ report, jobId }: ReportSummarySectionProps) {
@@ -36,8 +50,7 @@ export function ReportSummarySection({ report, jobId }: ReportSummarySectionProp
           ) : null
         )}
       </ul>
-      <div className="text-xs mt-1">
-      </div>
+      <div className="text-xs mt-1"></div>
     </div>
   );
 }

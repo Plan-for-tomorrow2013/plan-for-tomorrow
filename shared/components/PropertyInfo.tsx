@@ -66,6 +66,16 @@ export function PropertyInfo({ address, propertyData, className = "" }: Property
       )
     }
 
+        // Special handling for Lot Size
+        if (layerName === "Lot Size") {
+          return (
+            <div className="space-y-1">
+              {renderRow("Lot Size", attributes["Lot Size"])}
+              {renderRow("Units", attributes["Units"])}
+            </div>
+          )
+        }
+
     // Special handling for Floor Space Ratio (n:1)
     if (layerName === "Floor Space Ratio (n:1)") {
       return (

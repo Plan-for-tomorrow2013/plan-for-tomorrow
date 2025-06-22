@@ -97,7 +97,16 @@ export async function POST(request: NextRequest) {
         return layer;
       }),
       protectionLayers: data.planningLayers.protectionLayers || [],
-      localProvisionsLayers: data.planningLayers.localProvisionsLayers || [],
+      localProvisionsLayers:
+        data.planningLayers.localProvisionsLayers?.map(layer => {
+          return {
+            layer: layer.layer,
+            attributes: {
+              Type: layer.attributes['Type'],
+              Class: layer.attributes['Class'],
+            },
+          };
+        }) || [],
     };
 
     // Create a new job with the property search data

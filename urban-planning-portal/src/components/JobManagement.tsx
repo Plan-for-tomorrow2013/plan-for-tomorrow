@@ -28,6 +28,11 @@ interface GeocodingResult {
   latitude: number | null;
 }
 
+interface LayerQuery {
+  id: number;
+  name: string;
+}
+
 // Function to format attribute names for display
 function formatAttributeName(name: string): string {
   return name
@@ -47,6 +52,63 @@ export function JobManagement() {
   const [coordinates, setCoordinates] = useState<GeocodingResult | null>(null);
   const [layersInfo, setLayersInfo] = useState<LayerInfo[]>([]);
   const [protectionLayersInfo, setProtectionLayersInfo] = useState<LayerInfo[]>([]);
+  const [localProvisionsInfo, setLocalProvisionsInfo] = useState<LayerInfo[]>([]);
+
+  const handleCreateJob = async () => {
+    if (!coordinates) {
+      setError('Cannot create a job without coordinates.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const jobData = {
+      address: address,
+      council: 'Test Council', // Placeholder, you might want to get this from somewhere
+      coordinates: coordinates,
+      planningLayers: {
+        epiLayers: layersInfo.map(l => ({
+          layer: l.layerName,
+          attributes: l.attributes,
+        })),
+        protectionLayers: protectionLayersInfo.map(l => ({
+          layer: l.layerName,
+          attributes: l.attributes,
+        })),
+        localProvisionsLayers: localProvisionsInfo.map(l => ({
+          layer: l.layerName,
+          attributes: l.attributes,
+        })),
+      },
+    };
+
+    try {
+      const response = await fetch('/api/jobs/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jobData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create job');
+      }
+
+      const result = await response.json();
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        throw new Error('Did not receive a redirect URL.');
+      }
+    } catch (error) {
+      console.error('Error creating job:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async () => {
     if (!address.trim()) {
@@ -59,6 +121,7 @@ export function JobManagement() {
     setCoordinates(null);
     setLayersInfo([]);
     setProtectionLayersInfo([]);
+    setLocalProvisionsInfo([]);
 
     try {
       // Step 1: Geocode the address
@@ -89,7 +152,7 @@ export function JobManagement() {
       if (coords.longitude && coords.latitude) {
         // Step 2: Get Principal Planning Layers information
         const principalUrl =
-          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer';
+          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer';
         const principalResults = await fetchLayerInfo(
           coords,
           principalUrl,
@@ -102,6 +165,16 @@ export function JobManagement() {
           'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer';
         const protectionResults = await fetchLayerInfo(coords, protectionUrl, 'Protection', true);
         setProtectionLayersInfo(protectionResults);
+
+        // Step 4: Get Local Provisions information
+        const localProvisionsUrl =
+          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Development_Control/MapServer';
+        const localProvisionsResults = await fetchLayerInfo(
+          coords,
+          localProvisionsUrl,
+          'Local Provisions'
+        );
+        setLocalProvisionsInfo(localProvisionsResults);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -165,14 +238,25 @@ export function JobManagement() {
       return [];
     }
 
-    // Handle Principal Planning Layers
-    const layersToQuery = [
-      { id: 14, name: 'Heritage' },
-      { id: 13, name: 'Height of Building' },
-      { id: 11, name: 'Land Zoning' },
-      { id: 12, name: 'Minimum Lot Size' },
-      { id: 15, name: 'Local Environmental Plan' },
-    ];
+    // Define layers based on the source
+    let layersToQuery: LayerQuery[] = [];
+    if (source === 'Principal Planning Layers') {
+      layersToQuery = [
+        { id: 14, name: 'Heritage' },
+        { id: 13, name: 'Height of Building' },
+        { id: 11, name: 'Land Zoning' },
+        { id: 12, name: 'Minimum Lot Size' },
+        { id: 15, name: 'Local Environmental Plan' },
+      ];
+    } else if (source === 'Local Provisions') {
+      layersToQuery = [
+        { id: 3, name: 'Local Provisions' },
+        { id: 4, name: 'Active Street Frontages' },
+        { id: 5, name: 'Additional Permitted Uses' },
+        { id: 6, name: 'Key Sites' },
+        { id: 7, name: 'Urban Release Area' },
+      ];
+    }
 
     const results: LayerInfo[] = [];
 
@@ -307,108 +391,73 @@ export function JobManagement() {
             </div>
           )}
 
-          {/* Principal Planning Layers Section */}
+          {/* Layers Information */}
           {layersInfo.length > 0 && (
-            <div className="mt-6 space-y-8">
-              <h3 className="text-lg font-medium">Principal Planning Layers</h3>
-              {layersInfo.map((layerInfo, index) => (
-                <div
-                  key={`${layerInfo.source}-${layerInfo.layerId}-${index}`}
-                  className="space-y-2"
-                >
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-md font-medium">{layerInfo.layerName}</h4>
-                    <span className="text-xs text-muted-foreground">{layerInfo.source}</span>
-                  </div>
-                  <Separator />
-                  {Object.keys(layerInfo.attributes).length > 0 ? (
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Property</TableHead>
-                            <TableHead>Value</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(layerInfo.attributes).map(([key, value]) => (
-                            <TableRow key={key}>
-                              <TableCell className="font-medium">
-                                {formatAttributeName(key)}
-                              </TableCell>
-                              <TableCell>{value !== null ? String(value) : 'N/A'}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No information available for this layer at this location.
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
+            <LayersTable title="Principal Planning Layers" layers={layersInfo} />
           )}
 
-          {/* Protection Layers Section */}
-          {protectionLayersInfo.length > 0 ? (
-            <div className="mt-6 space-y-8">
-              <h3 className="text-lg font-medium">Protection Layers</h3>
-              {protectionLayersInfo.map((layerInfo, index) => (
-                <div
-                  key={`${layerInfo.source}-${layerInfo.layerId}-${index}`}
-                  className="space-y-2"
-                >
-                  <div className="flex justify-between items-center">
-                    <h4 className="text-md font-medium">{layerInfo.layerName}</h4>
-                    <span className="text-xs text-muted-foreground">{layerInfo.source}</span>
-                  </div>
-                  <Separator />
-                  {Object.keys(layerInfo.attributes).length > 0 ? (
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Property</TableHead>
-                            <TableHead>Value</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(layerInfo.attributes).map(([key, value]) => (
-                            <TableRow key={key}>
-                              <TableCell className="font-medium">
-                                {formatAttributeName(key)}
-                              </TableCell>
-                              <TableCell>{value !== null ? String(value) : 'N/A'}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No information available for this layer at this location.
-                    </p>
-                  )}
-                </div>
-              ))}
+          {/* Protection Layers Information */}
+          {protectionLayersInfo.length > 0 && (
+            <LayersTable title="Protection Layers" layers={protectionLayersInfo} />
+          )}
+
+          {/* Local Provisions Information */}
+          {localProvisionsInfo.length > 0 && (
+            <LayersTable title="Local Provisions" layers={localProvisionsInfo} />
+          )}
+
+          {/* Create Job Button */}
+          {layersInfo.length > 0 && (
+            <div className="flex justify-end mt-6">
+              <Button onClick={handleCreateJob} disabled={loading}>
+                Create Job
+              </Button>
             </div>
-          ) : coordinates && !loading ? (
-            <div className="mt-6">
-              <h3 className="text-lg font-medium">Protection Layers</h3>
-              <Alert className="mt-2">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>No Protection Data</AlertTitle>
-                <AlertDescription>
-                  No protection information found for this address.
-                </AlertDescription>
-              </Alert>
-            </div>
-          ) : null}
+          )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// Reusable component to render a table of layers
+function LayersTable({ title, layers }: { title: string; layers: LayerInfo[] }) {
+  return (
+    <div className="mt-6 space-y-8">
+      <h3 className="text-lg font-medium">{title}</h3>
+      {layers.map((layerInfo, index) => (
+        <div key={`${layerInfo.source}-${layerInfo.layerId}-${index}`} className="space-y-2">
+          <div className="flex justify-between items-center">
+            <h4 className="text-md font-medium">{layerInfo.layerName}</h4>
+            <span className="text-xs text-muted-foreground">{layerInfo.source}</span>
+          </div>
+          <Separator />
+          {Object.keys(layerInfo.attributes).length > 0 ? (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Property</TableHead>
+                    <TableHead>Value</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Object.entries(layerInfo.attributes).map(([key, value]) => (
+                    <TableRow key={key}>
+                      <TableCell className="font-medium">{formatAttributeName(key)}</TableCell>
+                      <TableCell>{value !== null ? String(value) : 'N/A'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No information available for this layer at this location.
+            </p>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

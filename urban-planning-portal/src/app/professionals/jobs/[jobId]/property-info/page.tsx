@@ -27,7 +27,7 @@ interface JobData {
         layer: string;
         attributes: Record<string, any>;
       }>;
-      principalPlanningLayers: Array<{
+      localProvisionsLayers: Array<{
         layer: string;
         attributes: Record<string, any>;
       }>;
@@ -105,7 +105,15 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
         </div>
       );
     }
-
+    // Special handling for Lot Size
+    if (layerName === "Lot Size") {
+      return (
+        <div className="space-y-3">
+          {renderRow("Lot Size", attributes["Lot Size"])}
+          {renderRow("Units", attributes["Units"])}
+        </div>
+      );
+    }
     // Special handling for Floor Space Ratio (n:1)
     if (layerName === 'Floor Space Ratio (n:1)') {
       return (
@@ -164,22 +172,19 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
 
     // Special handling for Local Provisions
     if (
-      job?.propertyData.planningLayers.principalPlanningLayers.some(
+      job?.propertyData.planningLayers.localProvisionsLayers?.some(
         layer => layer.layer === layerName
       )
     ) {
       if (
         layerName !== 'Additional Permitted Uses' &&
-        layerName !== 'Clause Application' &&
+        layerName !== 'Clause Application Map' &&
         layerName !== 'Urban Release Area'
       ) {
         return (
           <div className="space-y-2">
-            {job.propertyData.planningLayers.principalPlanningLayers
-              .filter(layer => layer.layer === layerName)
-              .map((layer, index) => (
-                <div key={index}>{renderRow(layerName, layer.attributes[layerName] || 'N/A')}</div>
-              ))}
+            {renderRow('Type', attributes['Type'])}
+            {renderRow('Class', attributes['Class'])}
           </div>
         );
       }
@@ -228,7 +233,7 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
             <h2 className="text-lg font-semibold">Principal Planning Layers</h2>
           </CardHeader>
           <CardContent className="p-4 space-y-6">
-            {job.propertyData.planningLayers.epiLayers.map((layer, index) => (
+            {job.propertyData?.planningLayers?.epiLayers?.map((layer, index) => (
               <div key={index} className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-[#532200] mb-3">{layer.layer}</h3>
                 {renderAttributes(layer.attributes, layer.layer)}
@@ -243,7 +248,7 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
             <h2 className="text-lg font-semibold">Protection Layers</h2>
           </CardHeader>
           <CardContent className="p-4 space-y-6">
-            {job.propertyData.planningLayers.protectionLayers.map((layer, index) => (
+            {job.propertyData?.planningLayers?.protectionLayers?.map((layer, index) => (
               <div key={index} className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-medium text-[#532200] mb-3">{layer.layer}</h3>
                 {renderAttributes(layer.attributes, layer.layer)}
@@ -253,26 +258,17 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
         </Card>
 
         {/* Local Provisions */}
-        <Card className="shadow-md lg:col-span-2">
+        <Card className="shadow-md">
           <CardHeader className="bg-[#323A40] text-white">
             <h2 className="text-lg font-semibold">Local Provisions</h2>
           </CardHeader>
           <CardContent className="p-4 space-y-6">
-            {job.propertyData.planningLayers.principalPlanningLayers.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg text-gray-800">Local Provisions</h3>
-                {job.propertyData.planningLayers.principalPlanningLayers.map((result, index) => (
-                  <Card key={index} className="bg-white shadow-sm">
-                    <CardHeader>
-                      <h4 className="font-medium text-gray-700">{result.layer}</h4>
-                    </CardHeader>
-                    <CardContent>{renderAttributes(result.attributes, result.layer)}</CardContent>
-                  </Card>
-                ))}
+            {job.propertyData?.planningLayers?.localProvisionsLayers?.map((layer, index) => (
+              <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium text-[#532200] mb-3">{layer.layer}</h3>
+                {renderAttributes(layer.attributes, layer.layer)}
               </div>
-            ) : (
-              <p>No local provisions data available for this address.</p>
-            )}
+            ))}
           </CardContent>
         </Card>
       </div>

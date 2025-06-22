@@ -35,7 +35,7 @@ interface SearchResponse {
   planningLayers: {
     epiLayers: SearchResult[];
     protectionLayers: SearchResult[];
-    principalPlanningLayers: SearchResult[];
+    localProvisionsLayers: SearchResult[];
   };
 }
 
@@ -268,27 +268,18 @@ export default function DashboardPage() {
         </div>
       );
     }
-
+        // Special handling for Lot Size
+        if (layerName === "Lot Size") {
+          return (
+            <div className="space-y-3">
+              {renderRow("Lot Size", attributes["Lot Size"])}
+              {renderRow("Units", attributes["Units"])}
+            </div>
+          )
+        }
     // Special handling for Minimum Dwelling Density Area
     if (layerName === 'Minimum Dwelling Density Area') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Minimum Dwelling Density', attributes['Minimum Dwelling Density'])}
-          {renderRow('Code', attributes['Code'])}
-        </div>
-      );
-    }
-
-    // Special handling for Heritage
-    if (layerName === 'Heritage') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Heritage Type', attributes['Heritage Type'])}
-          {renderRow('Item Number', attributes['Item Number'])}
-          {renderRow('Item Name', attributes['Item Name'])}
-          {renderRow('Significance', attributes['Significance'])}
-        </div>
-      );
+      return renderRow('Type', attributes['Type']);
     }
 
     // Special handling for Additional Permitted Uses
@@ -302,19 +293,16 @@ export default function DashboardPage() {
     }
 
     // Special handling for Local Provisions
-    if (results?.planningLayers.principalPlanningLayers.some(layer => layer.layer === layerName)) {
+    if (results?.planningLayers.localProvisionsLayers.some(layer => layer.layer === layerName)) {
       if (
         layerName !== 'Additional Permitted Uses' &&
-        layerName !== 'Clause Application' &&
+        layerName !== 'Clause Application Map' &&
         layerName !== 'Urban Release Area'
       ) {
         return (
           <div className="space-y-3">
-            {results.planningLayers.principalPlanningLayers
-              .filter(layer => layer.layer === layerName)
-              .map((layer, index) => (
-                <div key={index}>{renderRow(layerName, layer.attributes[layerName] || 'N/A')}</div>
-              ))}
+            {renderRow('Type', attributes['Type'])}
+            {renderRow('Class', attributes['Class'])}
           </div>
         );
       }
@@ -402,10 +390,10 @@ export default function DashboardPage() {
                 )}
 
                 {/* Local Provisions */}
-                {results.planningLayers.principalPlanningLayers.length > 0 ? (
+                {results.planningLayers.localProvisionsLayers.length > 0 ? (
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg">Local Provisions</h3>
-                    {results.planningLayers.principalPlanningLayers.map((result, index) => (
+                    {results.planningLayers.localProvisionsLayers.map((result, index) => (
                       <Card key={index}>
                         <CardHeader>
                           <h4 className="font-medium">{result.layer}</h4>

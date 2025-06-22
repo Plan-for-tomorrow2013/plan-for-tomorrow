@@ -35,7 +35,11 @@ export async function POST(request: Request) {
       updatedAt: new Date().toISOString(),
       propertyData: {
         coordinates: data.coordinates,
-        planningLayers: data.planningLayers,
+        planningLayers: {
+          epiLayers: data.planningLayers?.epiLayers || [],
+          protectionLayers: data.planningLayers?.protectionLayers || [],
+          localProvisionsLayers: data.planningLayers?.localProvisionsLayers || [],
+        },
       },
       // Initialize empty documents object - documents will be added when uploaded
       documents: {},

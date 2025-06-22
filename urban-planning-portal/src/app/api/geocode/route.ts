@@ -29,9 +29,9 @@ export async function GET(request: Request) {
 
     // Step 2: Query all layers in parallel using the actual ArcGIS URLs
     const [epiResponse, protectionResponse, localProvisionsResponse] = await Promise.all([
-      // EPI Primary Planning Layers
+      // Principal Planning Layers
       fetch(
-        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/identify?${new URLSearchParams(
+        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer/identify?${new URLSearchParams(
           {
             geometry: `${longitude},${latitude}`,
             geometryType: 'esriGeometryPoint',
@@ -41,8 +41,8 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          }
-        )}`
+          },
+        )}`,
       ),
 
       // Protection Layers
@@ -57,13 +57,13 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          }
-        )}`
+          },
+        )}`,
       ),
 
-      // Principal Planning Layers
+      // Local Provisions Layers
       fetch(
-        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer/identify?${new URLSearchParams(
+        `https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Development_Control/MapServer/identify?${new URLSearchParams(
           {
             geometry: `${longitude},${latitude}`,
             geometryType: 'esriGeometryPoint',
@@ -73,11 +73,11 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          }
-        )}`
+          },
+        )}`,
       ),
     ]);
-
+    
     if (!epiResponse.ok) {
       const errorText = await epiResponse.text();
       throw new Error(`EPI Service Error: ${epiResponse.status} - ${errorText}`);
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
     }
 
     // Process responses in parallel
-    const [epiData, protectionData, principalPlanningData] = await Promise.all([
+    const [epiData, protectionData, localProvisionsData] = await Promise.all([
       epiResponse.json(),
       protectionResponse.json(),
       localProvisionsResponse.json(),
@@ -114,9 +114,9 @@ export async function GET(request: Request) {
         attributes: result.attributes || {},
       })) || [];
 
-    // Process Principal Planning results
-    const processedPrincipalPlanningResults =
-      principalPlanningData.results?.map((result: ProtectionResult) => ({
+    // Process Local Provisions results
+    const processedLocalProvisionsResults =
+      localProvisionsData.results?.map((result: ProtectionResult) => ({
         layer: result.layerName,
         attributes: result.attributes || {},
       })) || [];
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
       planningLayers: {
         epiLayers: processedResults,
         protectionLayers: processedProtectionResults,
-        principalPlanningLayers: processedPrincipalPlanningResults,
+        localProvisionsLayers: processedLocalProvisionsResults,
       },
     });
   } catch (error) {

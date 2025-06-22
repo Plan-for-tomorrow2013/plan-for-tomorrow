@@ -37,14 +37,14 @@ import {
 import { useJobs } from '@shared/hooks/useJobs';
 import Link from 'next/link';
 import { Alert, AlertDescription } from '@shared/components/ui/alert';
-import { Document, DOCUMENT_TYPES } from '@shared/types/documents';
-import { DocumentWithStatus } from '@shared/types/documents';
+import { Document, DOCUMENT_TYPES } from '@shared/types/consultants';
+import { DocumentWithStatus } from '@shared/types/consultants';
 import { Input } from '@shared/components/ui/input';
 import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from '@shared/components/ui/use-toast';
 import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo';
 import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails';
-import { DocumentStatus } from '@shared/components/DocumentStatus';
+import { ConsultantStatus } from '@shared/components/ConsultantStatus';
 import { Job } from '@shared/types/jobs';
 import {
   getReportStatus,
@@ -52,15 +52,14 @@ import {
   getReportTitle,
   getReportData,
   ReportType,
-} from '@shared/utils/report-utils';
-import { getDocumentDisplayStatus } from '@shared/utils/report-utils';
+} from '@shared/utils/consultant-report-utils';
+import { getDocumentDisplayStatus } from '@shared/utils/consultant-report-utils';
 import { Loader2 } from 'lucide-react';
-import { DocumentUpload } from '@shared/components/DocumentUpload';
-import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
+import { ConsultantProvider, useConsultants } from '@shared/contexts/consultant-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
 import { AlertTitle } from '@shared/components/ui/alert';
 import camelcaseKeys from 'camelcase-keys';
-import { DocumentTile } from '@shared/components/DocumentTile';
+import { ConsultantTile } from '@shared/components/ConsultantTile';
 import {
   createFileInput,
   handleDocumentUpload,
@@ -235,45 +234,45 @@ export default function ConsultantsPage() {
   }, [selectedJobId, router]);
 
   return (
-    <div className="space-y-6">
-      {/* Job Selection */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Consultants</h1>
-        {isLoadingJobs ? (
-          <div>Loading jobs...</div>
-        ) : jobsError ? (
-          <Alert variant="destructive">
-            <AlertDescription>Failed to load jobs.</AlertDescription>
-          </Alert>
-        ) : (
-          <Select value={selectedJobId} onValueChange={setSelectedJobId}>
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder="Select a job" />
-            </SelectTrigger>
-            <SelectContent>
-              {jobs?.map(job => (
-                <SelectItem key={job.id} value={job.id}>
-                  {job.address}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+    <ConsultantProvider jobId={selectedJobId || ''}>
+      <div className="space-y-6">
+        {/* Job Selection */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">Consultants</h1>
+          {isLoadingJobs ? (
+            <div>Loading jobs...</div>
+          ) : jobsError ? (
+            <Alert variant="destructive">
+              <AlertDescription>Failed to load jobs.</AlertDescription>
+            </Alert>
+          ) : (
+            <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select a job" />
+              </SelectTrigger>
+              <SelectContent>
+                {jobs?.map(job => (
+                  <SelectItem key={job.id} value={job.id}>
+                    {job.address}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
 
-      {/* Job-specific content */}
-      {selectedJobId ? (
-        <DocumentProvider jobId={selectedJobId}>
+        {/* Job-specific content */}
+        {selectedJobId ? (
           <SiteDetailsProvider jobId={selectedJobId}>
             <JobConsultants jobId={selectedJobId} />
           </SiteDetailsProvider>
-        </DocumentProvider>
-      ) : (
-        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to access Consultants.</p>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
+            <p>Please select a job from the dropdown above to access Consultants.</p>
+          </div>
+        )}
+      </div>
+    </ConsultantProvider>
   );
 }
 
@@ -369,13 +368,11 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter();
   const queryClient = useQueryClient();
   const {
-    documents,
+    consultantDocuments: documents,
     isLoading: isDocsLoading,
     error: docsError,
-    uploadDocument,
-    removeDocument,
     downloadDocument,
-  } = useDocuments();
+  } = useConsultants();
   const {
     siteDetails,
     updateSiteDetails,
@@ -692,7 +689,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       return;
     }
 
-    const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
+    const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
     if (!certificate107?.uploadedFile) {
       toast({
         title: 'Missing Document',
@@ -829,72 +826,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   };
 
   // --- Mutation for Uploading Document ---
-  const uploadDocumentMutation = useMutation<any, Error, { documentId: string; file: File }>({
-    mutationFn: async ({ documentId, file }) => {
-      if (!jobId) throw new Error('No job selected');
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('docId', documentId);
-
-      const response = await fetch(`/api/jobs/${jobId}/documents/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to upload document');
-      }
-      return response.json();
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['jobDocuments', jobId] });
-      queryClient.invalidateQueries({ queryKey: ['job', jobId] });
-      toast({
-        title: 'Success',
-        description: 'Document uploaded successfully',
-      });
-    },
-  });
-
-  const handleUpload = (docId: string) => {
-    if (!jobId) {
-      toast({
-        title: 'Error',
-        description: 'Please select a job before uploading documents',
-        variant: 'destructive',
-      });
-      return;
-    }
-    createFileInput(async file => {
-      await handleDocumentUpload(() => uploadDocument(jobId, docId, file));
-    });
-  };
-
-  const handleDownload = (docId: string) => {
-    if (!jobId) {
-      toast({
-        title: 'Error',
-        description: 'Please select a job before downloading documents',
-        variant: 'destructive',
-      });
-      return;
-    }
-    handleDocumentDownload(() => {
-      return downloadDocument(jobId, docId);
-    });
-  };
-
-  const handleDelete = (docId: string) => {
-    if (!jobId) {
-      toast({
-        title: 'Error',
-        description: 'Please select a job before deleting documents',
-        variant: 'destructive',
-      });
-      return;
-    }
-    handleDocumentDelete(() => removeDocument(jobId, docId));
-  };
+  // All uploadDocument and removeDocument logic removed for consultant documents.
 
   const handleCustomDocumentDownload = async (document: CustomDocument) => {
     await downloadDocumentFromApi({
@@ -912,10 +844,10 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     const currentFormData = formState[formType].formData;
 
-    const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
-    const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
-    const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
-    const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
+    const certificateOfTitle = documents.find((doc: DocumentWithStatus) => doc.id === 'certificateOfTitle');
+    const surveyPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'surveyPlan');
+    const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
+    const architecturalPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'architecturalPlan');
 
     const workTicketPayload = {
       jobId: jobId,
@@ -997,7 +929,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     console.log('[Consultants] Rendering required documents:', {
       documentCount: documents.length,
-      documentTypes: documents.map(doc => doc.type),
+      documentTypes: documents.map((doc: DocumentWithStatus) => doc.type),
     });
 
     if (isDocsLoading) {
@@ -1031,7 +963,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       );
     }
 
-    const mappedDocuments = documents.map(doc => ({
+    const mappedDocuments = documents.map((doc: DocumentWithStatus) => ({
       ...doc,
       displayStatus: getDocumentDisplayStatus(doc, currentJob),
     }));
@@ -1088,14 +1020,10 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       }
 
       return (
-        <DocumentTile
+        <ConsultantTile
           key={doc.id}
           document={doc}
-          isReport={isReport}
-          reportStatus={reportStatus}
-          onUpload={() => handleUpload(doc.id)}
           onDownload={() => handleDownload(doc.id)}
-          onDelete={() => handleDelete(doc.id)}
         />
       );
     };
@@ -1103,7 +1031,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
     return (
       <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {mappedDocuments.map(doc => renderDocumentCard(doc))}
+          {mappedDocuments.map((doc: DocumentWithStatus) => renderDocumentCard(doc))}
         </div>
       </>
     );
@@ -1173,6 +1101,19 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   if (!currentJob) return <div>Loading...</div>; // Fallback if somehow still null
 
   console.log('DEBUG propertyData:', currentJob.propertyData);
+
+  // Add back handleDownload for document download
+  const handleDownload = (docId: string) => {
+    if (!jobId) {
+      toast({
+        title: 'Error',
+        description: 'Please select a job before downloading documents',
+        variant: 'destructive',
+      });
+      return;
+    }
+    downloadDocument(jobId, docId);
+  };
 
   return (
     <div className="space-y-6">
@@ -1253,16 +1194,18 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
         {/* Category Tiles Section */}
         <div className="max-w-6xl mx-auto my-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/*
+              If you see a linter error on the Link component below, it is likely due to a mismatch between your Next.js, React, and @types/react versions. 
+              Ensure you are using compatible versions. The code below is correct for Next.js 13+ app directory.
+            */}
             {jobCategories.map(category => (
-              <Link key={category.id} href={category.href} passHref legacyBehavior>
-                <a style={{ textDecoration: 'none' }}>
-                  <CategoryCard
-                    title={category.title}
-                    icon={category.icon}
-                    href={category.href}
-                    description={category.description}
-                  />
-                </a>
+              <Link key={category.id} href={category.href}>
+                <CategoryCard
+                  title={category.title}
+                  icon={category.icon}
+                  href={category.href}
+                  description={category.description}
+                />
               </Link>
             ))}
           </div>

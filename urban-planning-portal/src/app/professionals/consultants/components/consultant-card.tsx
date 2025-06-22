@@ -19,9 +19,10 @@ import { Label } from '@shared/components/ui/label';
 import { useToast } from '@shared/components/ui/use-toast';
 import { updateConsultantNotes } from '../actions';
 import { ConsultantCategory } from '@shared/types/jobs';
-import { useDocuments } from '@shared/contexts/document-context';
-import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/report-utils';
+import { useConsultants } from '@shared/contexts/consultant-context';
+import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/consultant-report-utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { DocumentWithStatus } from '@shared/types/consultants';
 
 interface Consultant {
   id: string;
@@ -70,15 +71,15 @@ export function ConsultantCard({
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [showDialog, setShowDialog] = useState(false);
   const { toast } = useToast();
-  const { documents } = useDocuments();
+  const { consultantDocuments: documents } = useConsultants();
   const job = jobs[0];
   const queryClient = useQueryClient();
 
   // Make these available to the dialog JSX as well as handleRequestQuote
-  const certificateOfTitle = documents.find(doc => doc.id === 'certificateOfTitle');
-  const surveyPlan = documents.find(doc => doc.id === 'surveyPlan');
-  const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
-  const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
+  const certificateOfTitle = documents.find((doc: DocumentWithStatus) => doc.id === 'certificateOfTitle');
+  const surveyPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'surveyPlan');
+  const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
+  const architecturalPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'architecturalPlan');
 
   // Read consultant status from job object
   const consultantObj = job?.consultants?.[consultant.category];
@@ -86,7 +87,7 @@ export function ConsultantCard({
 
   // Find the relevant document for this consultant/category
   const relevantDoc = documents.find(
-    doc => doc.category === consultant.category && doc.consultantId === consultant.id
+    (doc: DocumentWithStatus) => doc.category === consultant.category && doc.consultantId === consultant.id
   );
 
   // Type guard for Job (add more fields as needed)

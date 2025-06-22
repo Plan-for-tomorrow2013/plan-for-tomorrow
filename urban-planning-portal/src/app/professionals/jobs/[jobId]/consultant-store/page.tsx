@@ -6,7 +6,7 @@ import { ArrowLeft, Upload, FileText, X, Check } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
-import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/documents';
+import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/consultants';
 import { toast } from '@shared/components/ui/use-toast';
 import { useJobs } from '@shared/hooks/useJobs';
 import type { Job } from '@shared/types/jobs';
@@ -15,8 +15,8 @@ import {
   isReportType,
   getReportTitle,
   getDocumentDisplayStatus,
-} from '@shared/utils/report-utils';
-import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
+} from '@shared/utils/consultant-report-utils';
+import { ConsultantProvider, useConsultants } from '@shared/contexts/consultant-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -50,13 +50,11 @@ const CONSULTANT_CATEGORIES = [
 function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   const router = useRouter();
   const {
-    documents,
+    consultantDocuments: documents,
     isLoading: isDocsLoading,
     error: docsError,
-    uploadDocument,
-    removeDocument,
     downloadDocument,
-  } = useDocuments();
+  } = useConsultants();
   const [consultantTickets, setConsultantTickets] = useState<ConsultantTicket[]>([]);
   const [isTicketsLoading, setIsTicketsLoading] = useState(true);
   const [ticketsError, setTicketsError] = useState<string | null>(null);
@@ -78,7 +76,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   }, [params.jobId]);
 
   // Filter documents to only show consultant-generated assessment documents
-  const filteredDocuments = documents.filter(doc => CONSULTANT_CATEGORIES.includes(doc.category));
+  const filteredDocuments = documents.filter((doc: DocumentWithStatus) => CONSULTANT_CATEGORIES.includes(doc.category));
 
   // Fetch job data for report status
   const {
@@ -98,9 +96,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   const error = docsError || jobError?.message || ticketsError;
 
   const handleUpload = (docId: string) => {
-    createFileInput(async file => {
-      await handleDocumentUpload(() => uploadDocument(params.jobId, docId, file));
-    });
+    // Consultant documents are read-only, no upload functionality needed
+    console.log('Upload not available for consultant documents');
   };
 
   const handleDownload = (docId: string) => {
@@ -112,7 +109,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   };
 
   const handleDelete = (docId: string) => {
-    handleDocumentDelete(() => removeDocument(params.jobId, docId));
+    // Consultant documents are read-only, no delete functionality needed
+    console.log('Delete not available for consultant documents');
   };
 
   // Type guard for Job (add more fields as needed)
@@ -132,7 +130,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   );
   uniqueTickets.forEach(ticket => {
     const doc = documents.find(
-      doc => doc.category === ticket.category && doc.consultantId === ticket.consultantId
+      (doc: DocumentWithStatus) => doc.category === ticket.category && doc.consultantId === ticket.consultantId
     );
     if (!doc) {
       // If no document exists for this ticket, show in-progress/fallback state
@@ -345,8 +343,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
 
 export default function ConsultantStorePage({ params }: { params: { jobId: string } }) {
   return (
-    <DocumentProvider jobId={params.jobId}>
+    <ConsultantProvider jobId={params.jobId}>
       <ConsultantStoreContent params={params} />
-    </DocumentProvider>
+    </ConsultantProvider>
   );
 }

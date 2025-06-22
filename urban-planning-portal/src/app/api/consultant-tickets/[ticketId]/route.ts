@@ -52,13 +52,13 @@ export async function PATCH(request: NextRequest, { params }: { params: { ticket
         job.consultants = job.consultants ?? {};
         let consultantsArray = job.consultants[ticket.category];
         if (!consultantsArray) {
-            consultantsArray = [];
-            job.consultants[ticket.category] = consultantsArray;
+          consultantsArray = [];
+          job.consultants[ticket.category] = consultantsArray;
         } else if (!Array.isArray(consultantsArray)) {
-            consultantsArray = [consultantsArray as any];
-            job.consultants[ticket.category] = consultantsArray;
+          consultantsArray = [consultantsArray as any];
+          job.consultants[ticket.category] = consultantsArray;
         }
-        
+
         const consultantIndex = consultantsArray.findIndex(
           c => c.consultantId === ticket.consultantId
         );

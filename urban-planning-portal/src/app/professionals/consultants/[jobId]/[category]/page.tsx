@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ConsultantCard } from '../../components/consultant-card';
 import { Input } from '@shared/components/ui/input';
 import { Button } from '@shared/components/ui/button';
-import { DocumentProvider } from '@shared/contexts/document-context';
+import { ConsultantProvider } from '@shared/contexts/consultant-context';
 import { useQuoteRequests } from '@shared/hooks/useQuoteRequests';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -116,7 +116,7 @@ export default function QuoteCategoryPage({
   );
 
   return (
-    <DocumentProvider jobId={params.jobId}>
+    <ConsultantProvider jobId={params.jobId}>
       <div className="container mx-auto p-6">
         <div className="flex items-center gap-4 mb-6">
           <Button variant="outline" onClick={() => router.back()}>
@@ -157,7 +157,7 @@ export default function QuoteCategoryPage({
                   consultant={consultant}
                   jobs={jobsData}
                   initialReportStatus={quoteRequests[consultant.id]?.status || null}
-                  onReportStatusChange={status =>
+                  onReportStatusChange={(status: 'pending' | 'in_progress' | 'completed') =>
                     updateQuoteRequestStatus({ consultantId: consultant.id, status })
                   }
                   refetchJob={refetchJob}
@@ -177,6 +177,6 @@ export default function QuoteCategoryPage({
           </>
         )}
       </div>
-    </DocumentProvider>
+    </ConsultantProvider>
   );
 }

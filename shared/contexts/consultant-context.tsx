@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from "../components/ui/use-toast"
 import { Job, Assessment, ConsultantCategory } from "../types/jobs"
 import { jobService } from "../services/jobService"
-import { getDocumentDisplayStatus } from "@shared/utils/report-utils"
+import { getDocumentDisplayStatus } from "@shared/utils/consultant-report-utils"
 import { consultantService } from "../services/consultantService"
 
 interface ConsultantContextType {

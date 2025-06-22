@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { DocumentWithStatus, DOCUMENT_TYPES, Document } from "../types/documents"
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from "../components/ui/use-toast"
-import { Job, Assessment, ConsultantCategory } from "../types/jobs"
+import { Job, Assessment } from "../types/jobs"
 import { documentService } from "../services/documentService"
 import { jobService } from "../services/jobService"
 import { getDocumentDisplayStatus } from "@shared/utils/report-utils"
@@ -41,7 +41,7 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
           return [] // Return empty array if job doesn't exist
         }
 
-        // --- New Logic: Filter and Process Documents ---
+        // --- Document Store Logic: Filter and Process Documents ---
         const displayableDocuments: DocumentWithStatus[] = []
 
         DOCUMENT_TYPES.forEach(docType => {
@@ -61,15 +61,6 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             shouldDisplay = true
           }
 
-          // Check for consultant documents
-          if (job.consultants && docType.category) {
-            const consultantAssessment = job.consultants[docType.category as ConsultantCategory]?.assessment;
-            if (consultantAssessment?.completedDocument) {
-              shouldDisplay = true;
-              assessmentData = consultantAssessment;
-            }
-          }
-
           if (shouldDisplay) {
             let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload' // Default for standard
             let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
@@ -80,29 +71,6 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
             let assessmentFileName = assessmentData?.fileName;
             if (!assessmentFileName && assessmentData?.completedDocument) {
               assessmentFileName = assessmentData.completedDocument.fileName;
-            }
-
-            // Check for consultant completed documents
-            if (job.consultants && docType.category) {
-              const consultantAssessment = job.consultants[docType.category as ConsultantCategory]?.assessment;
-              if (consultantAssessment?.completedDocument?.returnedAt) {
-                displayStatus = 'uploaded';
-                uploadedFile = {
-                  fileName: consultantAssessment.completedDocument.fileName,
-                  originalName: consultantAssessment.completedDocument.originalName,
-                  type: consultantAssessment.completedDocument.type,
-                  uploadedAt: consultantAssessment.completedDocument.uploadedAt,
-                  size: consultantAssessment.completedDocument.size,
-                  returnedAt: consultantAssessment.completedDocument.returnedAt
-                };
-
-                // Update the quote request status in localStorage with consultant ID
-                const consultantId = job.consultants[docType.category as ConsultantCategory]?.consultantId;
-                if (consultantId) {
-                  const quoteRequestKey = `quoteRequest_${jobId}_${docType.category}_${consultantId}`;
-                  localStorage.setItem(quoteRequestKey, 'completed');
-                }
-              }
             }
 
             if (jobDocData && jobDocData.fileName && !uploadedFile) {
@@ -258,8 +226,8 @@ export function DocumentProvider({ children, jobId }: DocumentProviderProps) {
         throw new Error(`Failed to process job documents: ${error instanceof Error ? error.message : String(error)}`)
       }
     },
-    refetchInterval: 5000, // Poll every 5 seconds
-    refetchIntervalInBackground: true, // Continue polling even when tab is not active
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   })
 
   // Upload document mutation

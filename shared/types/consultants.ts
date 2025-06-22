@@ -1,4 +1,16 @@
 import { ReactNode } from "react"
+import { ConsultantCategory } from "./jobs"
+
+export interface Consultant {
+  id: string;
+  name: string;
+  company: string;
+  category: ConsultantCategory;
+  notes?: string;
+  email?: string;
+  phone?: string;
+  logo?: string;
+}
 
 export interface DocumentVersion {
   version: number
@@ -61,6 +73,7 @@ export interface Assessment {
   additionalInfo?: string;
   createdAt?: string;
   updatedAt?: string;
+  category?: ConsultantCategory;
   documents?: {
     certificateOfTitle?: { originalName?: string; fileName?: string };
     surveyPlan?: { originalName?: string; fileName?: string };
@@ -71,48 +84,6 @@ export interface Assessment {
     id: string;
     documentId: string;
     version: number;
-  };
-}
-
-export interface CustomAssessment extends Assessment {
-  jobId: string;
-  uploadedDocuments: Record<string, boolean>;
-  selectedTab: string;
-}
-
-export interface StatementOfEnvironmentalEffects extends Assessment {
-  jobId: string;
-  uploadedDocuments: Record<string, boolean>;
-  selectedTab: string;
-}
-
-export interface ComplyingDevelopmentCertificate extends Assessment {
-  jobId: string;
-  uploadedDocuments: Record<string, boolean>;
-  selectedTab: string;
-}
-
-export interface NathersAssessment extends Assessment {
-  jobId: string;
-  uploadedDocuments: Record<string, boolean>;
-  selectedTab: string;
-}
-
-export interface WasteManagementAssessment extends Assessment {
-  jobId: string;
-  uploadedDocuments: Record<string, boolean>;
-  selectedTab: string;
-}
-
-export interface PrePreparedAssessment {
-  id: string;
-  section: string;
-  title: string;
-  content: string;
-  author: string;
-  file?: {
-    originalName: string;
-    id: string;
   };
 }
 
@@ -173,62 +144,10 @@ export interface DocumentMetadata {
 
 export const DOCUMENT_TYPES: Document[] = [
   {
-    id: 'certificateOfTitle',
-    title: 'Certificate of Title',
-    category: 'LEGAL',
-    path: '/certificate-of-title',
-    type: 'document',
-    versions: [],
-    currentVersion: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    purchasable: false
-  },
-  {
-    id: 'tenSevenCertificate',
-    title: '10.7 Certificate',
-    category: 'PLANNING',
-    path: '/10-7-certificate',
-    type: 'document',
-    versions: [],
-    currentVersion: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    purchasable: false
-  },
-  {
-    id: 'surveyPlan',
-    title: 'Survey Plan',
-    category: 'TECHNICAL',
-    path: '/survey-plan',
-    type: 'document',
-    versions: [],
-    currentVersion: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    purchasable: false
-  },
-  {
-    id: 'architecturalPlan',
-    title: 'Architectural Plan',
-    category: 'PLANNING',
-    path: '/architectural-plan',
-    type: 'document',
-    versions: [],
-    currentVersion: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    isActive: true,
-    purchasable: false
-  },
-  {
-    id: 'customAssessment',
-    title: 'Custom Assessment Report',
-    category: 'REPORTS',
-    path: '/custom-assessment',
+    id: 'nathersBasixAssessment',
+    title: 'NatHERS & BASIX Assessment',
+    category: 'NatHERS & BASIX',
+    path: '/nathers-basix-assessment',
     adminOnly: true,
     purchasable: true,
     type: 'document',
@@ -239,10 +158,10 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'statementOfEnvironmentalEffects',
-    title: 'Statement of Environmental Effects',
-    category: 'REPORTS',
-    path: '/statement-of-environmental-effects',
+    id: 'costEstimateAssessment',
+    title: 'Cost Estimate Assessment',
+    category: 'Cost Estimate',
+    path: '/cost-estimate-assessment',
     adminOnly: true,
     purchasable: true,
     type: 'document',
@@ -253,10 +172,10 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'complyingDevelopmentCertificate',
-    title: 'Complying Development Certificate',
-    category: 'REPORTS',
-    path: '/complying-development-certificate',
+    id: 'stormwaterAssessment',
+    title: 'Stormwater Assessment',
+    category: 'Stormwater',
+    path: '/stormwater-assessment',
     adminOnly: true,
     purchasable: true,
     type: 'document',
@@ -267,10 +186,10 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'wasteManagementAssessment',
-    title: 'Waste Management Assessment',
-    category: 'REPORTS',
-    path: '/waste-management-assessment',
+    id: 'trafficAssessment',
+    title: 'Traffic Assessment',
+    category: 'Traffic',
+    path: '/traffic-assessment',
     adminOnly: true,
     purchasable: true,
     type: 'document',
@@ -281,10 +200,150 @@ export const DOCUMENT_TYPES: Document[] = [
     isActive: true
   },
   {
-    id: 'nathersAssessment',
-    title: 'Nathers Assessment',
-    category: 'REPORTS',
-    path: '/nathers-assessment',
+    id: 'surveyorAssessment',
+    title: 'Surveyor Assessment',
+    category: 'Surveyor',
+    path: '/surveyor-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'bushfireAssessment',
+    title: 'Bushfire Assessment',
+    category: 'Bushfire',
+    path: '/bushfire-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'floodingAssessment',
+    title: 'Flooding Assessment',
+    category: 'Flooding',
+    path: '/flooding-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'acousticAssessment',
+    title: 'Acoustic Assessment',
+    category: 'Acoustic',
+    path: '/acoustic-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'landscapingAssessment',
+    title: 'Landscaping Assessment',
+    category: 'Landscaping',
+    path: '/landscaping-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'heritageAssessment',
+    title: 'Heritage Assessment',
+    category: 'Heritage',
+    path: '/heritage-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'biodiversityAssessment',
+    title: 'Biodiversity Assessment',
+    category: 'Biodiversity',
+    path: '/biodiversity-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'lawyerAssessment',
+    title: 'Legal Assessment',
+    category: 'Lawyer',
+    path: '/lawyer-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'certifiersAssessment',
+    title: 'Certifiers Assessment',
+    category: 'Certifiers',
+    path: '/certifiers-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'arboristAssessment',
+    title: 'Arborist Assessment',
+    category: 'Arborist',
+    path: '/arborist-assessment',
+    adminOnly: true,
+    purchasable: true,
+    type: 'document',
+    versions: [],
+    currentVersion: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true
+  },
+  {
+    id: 'geotechnicalAssessment',
+    title: 'Geotechnical Assessment',
+    category: 'Geotechnical',
+    path: '/geotechnical-assessment',
     adminOnly: true,
     purchasable: true,
     type: 'document',

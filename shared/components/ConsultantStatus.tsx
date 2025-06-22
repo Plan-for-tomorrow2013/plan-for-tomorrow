@@ -2,13 +2,13 @@
 
 import React from 'react'
 import { Check } from 'lucide-react'
-import { DocumentWithStatus } from '../types/documents'
+import { DocumentWithStatus } from '../types/consultants'
 
-interface DocumentStatusProps {
+interface ConsultantStatusProps {
   document: DocumentWithStatus
 }
 
-export function DocumentStatus({ document }: DocumentStatusProps) {
+export function ConsultantStatus({ document }: ConsultantStatusProps) {
   const documentName = document.uploadedFile?.originalName || document.title
 
   return (
@@ -23,4 +23,4 @@ export function DocumentStatus({ document }: DocumentStatusProps) {
       </span>
     </div>
   )
-}
+} 

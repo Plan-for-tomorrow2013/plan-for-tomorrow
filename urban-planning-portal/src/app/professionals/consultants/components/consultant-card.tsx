@@ -80,10 +80,9 @@ export function ConsultantCard({
   const certificate107 = documents.find(doc => doc.id === 'tenSevenCertificate');
   const architecturalPlan = documents.find(doc => doc.id === 'architecturalPlan');
 
-  // Read consultant status from job object (category array pattern)
-  const consultantArray = job?.consultants?.[consultant.category] || [];
-  const consultantObj = consultantArray.find((c: any) => c.consultantId === consultant.id);
-  const consultantStatus = consultantObj?.assessment?.status;
+  // Read consultant status from job object
+  const consultantObj = job?.consultants?.[consultant.category];
+  const consultantStatus = consultantObj?.status;
 
   // Find the relevant document for this consultant/category
   const relevantDoc = documents.find(

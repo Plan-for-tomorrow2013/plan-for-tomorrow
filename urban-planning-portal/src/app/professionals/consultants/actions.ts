@@ -3,7 +3,7 @@
 export async function updateConsultantNotes(id: string, notes: string) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/consultants/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },

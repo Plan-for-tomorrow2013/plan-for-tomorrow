@@ -10,6 +10,7 @@ import { ConsultantProvider } from '@shared/contexts/consultant-context';
 import { useQuoteRequests } from '@shared/hooks/useQuoteRequests';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
 
 // Add interface for quote request state
 interface QuoteRequestState {
@@ -117,66 +118,101 @@ export default function QuoteCategoryPage({
 
   return (
     <ConsultantProvider jobId={params.jobId}>
-      <div className="container mx-auto p-6">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-2xl font-bold">
-            {categoryTitles[params.category] || params.category}
-          </h1>
-        </div>
-
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search consultants..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin mb-4" />
-            <p>Loading consultants...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-12 text-red-500">
-            <h3 className="text-lg font-medium mb-2">Error loading consultants</h3>
-            <p>{error}</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredConsultants.map(consultant => (
-                <ConsultantCard
-                  key={consultant.id}
-                  consultant={consultant}
-                  jobs={jobsData}
-                  initialReportStatus={quoteRequests[consultant.id]?.status || null}
-                  onReportStatusChange={(status: 'pending' | 'in_progress' | 'completed') =>
-                    updateQuoteRequestStatus({ consultantId: consultant.id, status })
-                  }
-                  refetchJob={refetchJob}
-                />
-              ))}
-            </div>
-            {filteredConsultants.length === 0 && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No consultants found</h3>
-                <p className="text-gray-500">
-                  {searchQuery
-                    ? 'Try adjusting your search terms.'
-                    : 'No consultants available for this category yet.'}
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <DocumentProvider jobId={params.jobId}>
+        <ConsultantDocumentsContent
+          params={params}
+          job={job}
+          quoteRequests={quoteRequests}
+          updateQuoteRequestStatus={updateQuoteRequestStatus}
+          refetchJob={refetchJob}
+          loading={loading}
+          error={error}
+          filteredConsultants={filteredConsultants}
+          router={router}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+      </DocumentProvider>
     </ConsultantProvider>
+  );
+}
+
+function ConsultantDocumentsContent({
+  params,
+  job,
+  quoteRequests,
+  updateQuoteRequestStatus,
+  refetchJob,
+  loading,
+  error,
+  filteredConsultants,
+  router,
+  searchQuery,
+  setSearchQuery,
+}: any) {
+  const { documents } = useDocuments();
+  const jobsData = job ? [job] : [];
+  return (
+    <div className="container mx-auto p-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="outline" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">
+          {categoryTitles[params.category] || params.category}
+        </h1>
+      </div>
+
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search consultants..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin mb-4" />
+          <p>Loading consultants...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500">
+          <h3 className="text-lg font-medium mb-2">Error loading consultants</h3>
+          <p>{error}</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredConsultants.map((consultant: any) => (
+              <ConsultantCard
+                key={consultant.id}
+                consultant={consultant}
+                jobs={jobsData}
+                initialReportStatus={quoteRequests[consultant.id]?.status || null}
+                onReportStatusChange={(status: 'pending' | 'in_progress' | 'completed') =>
+                  updateQuoteRequestStatus({ consultantId: consultant.id, status })
+                }
+                refetchJob={refetchJob}
+                documents={documents}
+              />
+            ))}
+          </div>
+          {filteredConsultants.length === 0 && (
+            <div className="text-center py-12">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No consultants found</h3>
+              <p className="text-gray-500">
+                {searchQuery
+                  ? 'Try adjusting your search terms.'
+                  : 'No consultants available for this category yet.'}
+              </p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }

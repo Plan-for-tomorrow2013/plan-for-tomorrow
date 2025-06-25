@@ -94,3 +94,29 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Failed to delete consultant' }, { status: 500 });
   }
 }
+
+// PATCH /api/consultants/[id]
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const updates = await request.json();
+    const data = await fs.readFile(consultantsPath, 'utf8');
+    const consultants: Consultant[] = JSON.parse(data);
+    const index = consultants.findIndex((c: Consultant) => c.id === params.id);
+
+    if (index === -1) {
+      return NextResponse.json({ error: 'Consultant not found' }, { status: 404 });
+    }
+
+    // Only update the provided fields (e.g., notes)
+    consultants[index] = {
+      ...consultants[index],
+      ...updates,
+      id: params.id, // Ensure ID doesn't change
+    };
+
+    await fs.writeFile(consultantsPath, JSON.stringify(consultants, null, 2));
+    return NextResponse.json(consultants[index]);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to patch consultant' }, { status: 500 });
+  }
+}

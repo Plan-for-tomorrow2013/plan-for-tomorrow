@@ -19,7 +19,6 @@ import { Label } from '@shared/components/ui/label';
 import { useToast } from '@shared/components/ui/use-toast';
 import { updateConsultantNotes } from '../actions';
 import { ConsultantCategory } from '@shared/types/jobs';
-import { useConsultants } from '@shared/contexts/consultant-context';
 import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/consultant-report-utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { DocumentWithStatus } from '@shared/types/consultants';
@@ -56,6 +55,7 @@ interface ConsultantCardProps {
   initialReportStatus?: 'pending' | 'in_progress' | 'completed' | null;
   onReportStatusChange?: (status: 'pending' | 'in_progress' | 'completed') => void;
   refetchJob?: () => Promise<any>;
+  documents: DocumentWithStatus[];
 }
 
 export function ConsultantCard({
@@ -64,6 +64,7 @@ export function ConsultantCard({
   initialReportStatus,
   onReportStatusChange,
   refetchJob,
+  documents,
 }: ConsultantCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(consultant.notes);
@@ -71,8 +72,6 @@ export function ConsultantCard({
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [showDialog, setShowDialog] = useState(false);
   const { toast } = useToast();
-  const { consultantDocuments: documents } = useConsultants();
-  const job = jobs[0];
   const queryClient = useQueryClient();
 
   // Make these available to the dialog JSX as well as handleRequestQuote
@@ -82,8 +81,19 @@ export function ConsultantCard({
   const architecturalPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'architecturalPlan');
 
   // Read consultant status from job object
-  const consultantObj = job?.consultants?.[consultant.category];
-  const consultantStatus = consultantObj?.status;
+  const job = jobs[0];
+  let consultantList: any[] = [];
+  const rawConsultants = job?.consultants?.[consultant.category];
+  if (Array.isArray(rawConsultants)) {
+    consultantList = rawConsultants;
+  } else if (rawConsultants) {
+    consultantList = [rawConsultants];
+  }
+
+  const consultantObj = consultantList.find(
+    (c: any) => c.consultantId === consultant.id
+  );
+  const consultantStatus = consultantObj?.assessment?.status;
 
   // Find the relevant document for this consultant/category
   const relevantDoc = documents.find(
@@ -106,6 +116,9 @@ export function ConsultantCard({
   const isCompleted =
     relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.returnedAt;
   const hasFile = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.fileName;
+
+  const completedDocument = consultantObj?.assessment?.completedDocument;
+  const isCompletedFromAssessment = consultantObj?.assessment?.status === 'completed' && !!completedDocument?.fileName && !!completedDocument?.returnedAt;
 
   const handleSaveNotes = async () => {
     try {
@@ -221,6 +234,11 @@ export function ConsultantCard({
     }
   };
 
+  console.log('consultant:', consultant);
+  console.log('documents:', documents);
+  console.log('relevantDoc:', relevantDoc);
+  console.log('reportStatus:', reportStatus);
+
   console.log(
     'ConsultantCard',
     'consultant.id:',
@@ -325,32 +343,17 @@ export function ConsultantCard({
             )
           )}
 
-          {((reportStatus?.isCompleted && reportStatus?.hasFile) ||
-            (!reportStatus && isCompleted && hasFile)) && (
+          {isCompletedFromAssessment && (
             <div className="mt-4 p-4 bg-green-50 rounded-md">
               <h4 className="font-medium mb-2">Report Complete</h4>
               <p className="text-sm text-gray-600">
                 Your report has been completed and is available in the documents section.
               </p>
-              <Button
-                className="mt-2"
-                variant="outline"
-                onClick={() => {
-                  // Download logic (reuse from document store)
-                  if (relevantDoc && hasFile) {
-                    // You may want to use a shared download utility here
-                  }
-                }}
-                disabled={!relevantDoc || !hasFile}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Download Report
-              </Button>
             </div>
           )}
 
-          {/* Only show the Request Quote button if no quote has been sent yet */}
-          {!reportStatus && (
+          {/* Only show the Request Quote button if no quote has been sent yet, not in progress, and not completed */}
+          {!(consultantStatus === 'pending' || consultantStatus === 'paid' || isCompletedFromAssessment) && !reportStatus && (
             <Button
               className="w-full"
               onClick={() => {

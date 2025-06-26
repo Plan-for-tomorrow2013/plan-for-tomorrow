@@ -44,62 +44,129 @@ export function ConsultantProvider({ children, jobId }: ConsultantProviderProps)
           let shouldDisplay = false
           let assessmentData: Assessment | undefined | null = null
 
-          // Check for consultant documents
+          // Check for consultant documents - handle multiple consultants per category
           if (job.consultants && docType.category) {
-            const consultantInfo = job.consultants[docType.category as ConsultantCategory]?.[0];
-            if (consultantInfo?.assessment?.completedDocument) {
-              shouldDisplay = true;
-              assessmentData = consultantInfo.assessment;
-            }
-          }
+            const category = docType.category as ConsultantCategory;
+            const consultantsArray = job.consultants[category];
+            
+            if (Array.isArray(consultantsArray)) {
+              // Process each consultant in the array
+              consultantsArray.forEach(consultantInfo => {
+                if (consultantInfo?.assessment?.completedDocument) {
+                  shouldDisplay = true;
+                  assessmentData = consultantInfo.assessment;
+                  
+                  // Create a document for this specific consultant
+                  let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload'
+                  let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
 
-          if (shouldDisplay) {
-            let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload'
-            let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
+                  // Check for consultant completed documents
+                  if (consultantInfo?.assessment?.completedDocument?.returnedAt) {
+                    displayStatus = 'uploaded';
+                    
+                    // Get the correct fileName from the job's documents
+                    const jobDocument = job.documents?.[category];
+                    const fileName = jobDocument?.fileName || consultantInfo.assessment.completedDocument.fileName;
+                    
+                    uploadedFile = {
+                      fileName: fileName,
+                      originalName: consultantInfo.assessment.completedDocument.originalName,
+                      type: consultantInfo.assessment.completedDocument.type,
+                      uploadedAt: consultantInfo.assessment.completedDocument.uploadedAt,
+                      size: consultantInfo.assessment.completedDocument.size,
+                      returnedAt: consultantInfo.assessment.completedDocument.returnedAt
+                    };
 
-            // Check for consultant completed documents
-            if (job.consultants && docType.category) {
-              const consultantInfo = job.consultants[docType.category as ConsultantCategory]?.[0];
-              if (consultantInfo?.assessment?.completedDocument?.returnedAt) {
-                displayStatus = 'uploaded';
-                uploadedFile = {
-                  fileName: consultantInfo.assessment.completedDocument.fileName,
-                  originalName: consultantInfo.assessment.completedDocument.originalName,
-                  type: consultantInfo.assessment.completedDocument.type,
-                  uploadedAt: consultantInfo.assessment.completedDocument.uploadedAt,
-                  size: consultantInfo.assessment.completedDocument.size,
-                  returnedAt: consultantInfo.assessment.completedDocument.returnedAt
+                    // Update the quote request status in localStorage with consultant ID
+                    const consultantId = consultantInfo.consultantId;
+                    if (consultantId) {
+                      const quoteRequestKey = `quoteRequest_${jobId}_${docType.category}_${consultantId}`;
+                      localStorage.setItem(quoteRequestKey, 'completed');
+                    }
+                  }
+
+                  // Construct the document object with the specific consultantId
+                  const currentProcessedDoc: DocumentWithStatus = {
+                    ...docType,
+                    uploadedFile: uploadedFile,
+                    displayStatus: displayStatus,
+                    description: docType.description || '',
+                    versions: docType.versions || [],
+                    currentVersion: docType.currentVersion || 1,
+                    createdAt: docType.createdAt || new Date().toISOString(),
+                    updatedAt: docType.updatedAt || new Date().toISOString(),
+                    isActive: docType.isActive !== undefined ? docType.isActive : true,
+                    consultantId: consultantInfo.consultantId, // Set the specific consultantId
+                  };
+
+                  // Get the final display status
+                  const finalDisplayStatus = getDocumentDisplayStatus(currentProcessedDoc, job);
+
+                  displayableConsultantDocuments.push({
+                    ...currentProcessedDoc,
+                    displayStatus: finalDisplayStatus,
+                  });
+                }
+              });
+            } else if (consultantsArray) {
+              // Fallback for non-array structure
+              const consultantInfo = consultantsArray as any;
+              if (consultantInfo?.assessment?.completedDocument) {
+                shouldDisplay = true;
+                assessmentData = consultantInfo.assessment;
+                
+                // Create a document for this consultant
+                let displayStatus: DocumentWithStatus['displayStatus'] = 'pending_user_upload'
+                let uploadedFile: DocumentWithStatus['uploadedFile'] = undefined
+
+                // Check for consultant completed documents
+                if (consultantInfo?.assessment?.completedDocument?.returnedAt) {
+                  displayStatus = 'uploaded';
+                  
+                  // Get the correct fileName from the job's documents
+                  const jobDocument = job.documents?.[category];
+                  const fileName = jobDocument?.fileName || consultantInfo.assessment.completedDocument.fileName;
+                  
+                  uploadedFile = {
+                    fileName: fileName,
+                    originalName: consultantInfo.assessment.completedDocument.originalName,
+                    type: consultantInfo.assessment.completedDocument.type,
+                    uploadedAt: consultantInfo.assessment.completedDocument.uploadedAt,
+                    size: consultantInfo.assessment.completedDocument.size,
+                    returnedAt: consultantInfo.assessment.completedDocument.returnedAt
+                  };
+
+                  // Update the quote request status in localStorage with consultant ID
+                  const consultantId = consultantInfo.consultantId;
+                  if (consultantId) {
+                    const quoteRequestKey = `quoteRequest_${jobId}_${docType.category}_${consultantId}`;
+                    localStorage.setItem(quoteRequestKey, 'completed');
+                  }
+                }
+
+                // Construct the document object with the specific consultantId
+                const currentProcessedDoc: DocumentWithStatus = {
+                  ...docType,
+                  uploadedFile: uploadedFile,
+                  displayStatus: displayStatus,
+                  description: docType.description || '',
+                  versions: docType.versions || [],
+                  currentVersion: docType.currentVersion || 1,
+                  createdAt: docType.createdAt || new Date().toISOString(),
+                  updatedAt: docType.updatedAt || new Date().toISOString(),
+                  isActive: docType.isActive !== undefined ? docType.isActive : true,
+                  consultantId: consultantInfo.consultantId, // Set the specific consultantId
                 };
 
-                // Update the quote request status in localStorage with consultant ID
-                const consultantId = consultantInfo.consultantId;
-                if (consultantId) {
-                  const quoteRequestKey = `quoteRequest_${jobId}_${docType.category}_${consultantId}`;
-                  localStorage.setItem(quoteRequestKey, 'completed');
-                }
+                // Get the final display status
+                const finalDisplayStatus = getDocumentDisplayStatus(currentProcessedDoc, job);
+
+                displayableConsultantDocuments.push({
+                  ...currentProcessedDoc,
+                  displayStatus: finalDisplayStatus,
+                });
               }
             }
-
-            // Construct the document object
-            const currentProcessedDoc: DocumentWithStatus = {
-              ...docType,
-              uploadedFile: uploadedFile,
-              displayStatus: displayStatus,
-              description: docType.description || '',
-              versions: docType.versions || [],
-              currentVersion: docType.currentVersion || 1,
-              createdAt: docType.createdAt || new Date().toISOString(),
-              updatedAt: docType.updatedAt || new Date().toISOString(),
-              isActive: docType.isActive !== undefined ? docType.isActive : true,
-            };
-
-            // Get the final display status
-            const finalDisplayStatus = getDocumentDisplayStatus(currentProcessedDoc, job);
-
-            displayableConsultantDocuments.push({
-              ...currentProcessedDoc,
-              displayStatus: finalDisplayStatus,
-            });
           }
         })
 
@@ -119,10 +186,15 @@ export function ConsultantProvider({ children, jobId }: ConsultantProviderProps)
   const downloadMutation = useMutation({
     mutationFn: async ({ jobId, docId }: { jobId: string; docId: string }) => {
       const docToDownload = consultantDocuments.find(doc => doc.id === docId && doc.displayStatus === 'uploaded');
-      const fileName = docToDownload?.uploadedFile?.originalName || docToDownload?.uploadedFile?.fileName || docId;
-
+      
       if (!docToDownload) {
         throw new Error("Document not found or not available for download.");
+      }
+
+      // Use the fileName from the uploadedFile for the download
+      const fileName = docToDownload.uploadedFile?.fileName;
+      if (!fileName) {
+        throw new Error("Document file not found.");
       }
 
       return consultantService.downloadDocument(docId, jobId, fileName);

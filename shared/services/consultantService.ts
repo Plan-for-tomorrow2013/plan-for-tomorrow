@@ -17,8 +17,8 @@ class ConsultantService {
   // Downloads a document provided by a consultant.
   async downloadDocument(documentId: string, jobId: string, fileName: string): Promise<Blob> {
     try {
-      // This endpoint is generic for now and can fetch any document by its ID within a job.
-      const response = await fetch(`/api/jobs/${jobId}/documents/${documentId}/download`)
+      // Use the generic download endpoint for consultant documents
+      const response = await fetch(`/api/download-document?jobId=${jobId}&fileName=${fileName}`)
       if (!response.ok) {
         let errorMessage = `Failed to download document (status: ${response.status})`
         try {

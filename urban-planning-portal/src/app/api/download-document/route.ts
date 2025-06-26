@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { stat } from 'fs/promises'; // For checking file existence
+import { getJobsPath } from '@shared/utils/paths';
 
 export async function GET(request: Request) {
   // Original code below, temporarily commented out for testing
@@ -19,8 +20,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Hardcoded base path to the jobs data directory
-    const documentsBasePath = '/home/tania/urban-planning-professionals-portal/data/jobs';
+    // Use the correct path from the paths utility
+    const documentsBasePath = getJobsPath();
 
     const filePath = path.join(documentsBasePath, jobId, 'documents', fileName);
 

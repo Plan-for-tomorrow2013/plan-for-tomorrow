@@ -39,10 +39,16 @@ export const getReportData = (doc: DocumentWithStatus, job: Job): Assessment | n
   if (job.consultants && doc.category) {
     const category = doc.category as ConsultantCategory;
     if (job.consultants[category]) {
-      // Since the context already gets the first consultant, we'll assume that for now.
-      // A more robust solution might pass the specific consultantId.
-      const consultant = job.consultants[category][0];
-      return consultant?.assessment || null;
+      // Find the specific consultant by consultantId instead of just taking the first one
+      const consultantsArray = job.consultants[category];
+      if (Array.isArray(consultantsArray)) {
+        const consultant = consultantsArray.find(c => c.consultantId === doc.consultantId);
+        return consultant?.assessment || null;
+      } else {
+        // Fallback for non-array structure
+        const consultant = consultantsArray as any;
+        return consultant?.assessment || null;
+      }
     }
   }
   return null;

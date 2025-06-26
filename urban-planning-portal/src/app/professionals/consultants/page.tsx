@@ -381,6 +381,53 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   } = useSiteDetails();
   const [documentError, setDocumentError] = useState<string | null>(null);
 
+  // Fetch consultant tickets for this job
+  const { data: consultantTickets = [] } = useQuery({
+    queryKey: ['consultant-tickets', jobId],
+    queryFn: async () => {
+      const response = await fetch('/api/consultant-tickets');
+      if (!response.ok) {
+        throw new Error('Failed to fetch consultant tickets');
+      }
+      const allTickets = await response.json();
+      // Filter tickets for this specific job
+      return allTickets.filter((ticket: any) => ticket.jobId === jobId);
+    },
+    staleTime: 30000, // 30 seconds
+  });
+
+  // Function to check if any consultant in a category has a quote request
+  const hasQuoteRequestForCategory = (categoryId: string): boolean => {
+    // Map category IDs to category names used in tickets
+    const categoryIdToName: { [key: string]: string } = {
+      'nathers-basix': 'NatHERS & BASIX',
+      'waste-management': 'Waste Management',
+      'cost-estimate': 'Cost Estimate',
+      'stormwater': 'Stormwater',
+      'traffic': 'Traffic',
+      'surveyor': 'Surveyor',
+      'bushfire': 'Bushfire',
+      'flooding': 'Flooding',
+      'acoustic': 'Acoustic',
+      'landscaping': 'Landscaping',
+      'heritage': 'Heritage',
+      'biodiversity': 'Biodiversity',
+      'lawyer': 'Lawyer',
+      'certifiers': 'Certifiers',
+      'arborist': 'Arborist',
+      'geotechnical': 'Geotechnical',
+    };
+
+    const categoryName = categoryIdToName[categoryId];
+    if (!categoryName) return false;
+
+    // Check if there are any tickets for this category with status 'pending', 'in-progress', 'paid', or 'completed'
+    return consultantTickets.some((ticket: any) => 
+      ticket.category === categoryName && 
+      ['pending', 'in-progress', 'paid', 'completed'].includes(ticket.status)
+    );
+  };
+
   // Category Tiles logic (must be at the top, before any early returns)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -1205,6 +1252,7 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
                   icon={category.icon}
                   href={category.href}
                   description={category.description}
+                  quoteRequested={hasQuoteRequestForCategory(category.id)}
                 />
               </Link>
             ))}

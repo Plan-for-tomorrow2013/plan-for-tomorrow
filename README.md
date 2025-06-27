@@ -1,255 +1,364 @@
 # Urban Planning Professionals Portal
 
-## Environment Setup
+## 🏗️ Project Overview
 
-This project consists of two applications: an admin portal and a user-facing portal. Each application requires its own environment configuration.
+A comprehensive digital workflow system for urban planning professionals that automates and streamlines development project lifecycles. The platform combines spatial data, compliance checking, document management, and real-time collaboration to create a fully automated, scalable service.
 
-### Prerequisites
+## 🚀 Current Status
 
-- Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
-- npm or yarn
+### ✅ **Implemented Features**
+- **Dual Portal Architecture**: Admin portal (port 3001) and Professional portal (port 3000)
+- **Document Management**: Upload, store, and manage project documents
+- **Job Management**: Create and manage urban planning projects
+- **Consultant Integration**: Quote request system with visual indicators
+- **Assessment Tools**: Pre-prepared assessments for various planning categories
+- **Real-time Updates**: Live status tracking for consultant tickets
+- **Shared Component Library**: Reusable UI components and utilities
+- **TypeScript Support**: Full type safety across the application
 
-### Environment Files Structure
+### 🔄 **In Progress**
+- **Authentication System**: Supabase-based user authentication
+- **Database Migration**: Moving from localStorage to Supabase
+- **State Management Optimization**: React Query + Zustand implementation
 
-```
+### �� **Planned Features**
+- **Spatial Planning Intelligence**: GIS integration and zoning analysis
+- **AI Assistant**: Document analysis and compliance recommendations
+- **Real-time Collaboration**: Multi-user workflows and live editing
+- **Mobile Application**: Cross-platform mobile support
+
+## ��️ Architecture
+
+### **Monorepo Structure**
+
 urban-planning-professionals-portal/
-├── .env                    # Root environment variables (database)
-├── .env.local             # Root local environment variables
-├── admin/
-│   ├── .env.local         # Admin application environment variables
-│   ├── .env.development.local  # Development-specific variables
-│   └── .env.example       # Admin environment template
-└── urban-planning-portal/
-    ├── .env.local         # Portal application environment variables
-    ├── .env.development.local  # Development-specific variables
-    └── .env.example       # Portal environment template
+├── admin/ # Admin portal (Next.js)
+│ ├── src/app/ # Admin pages and API routes
+│ ├── src/lib/ # Admin utilities and components
+│ └── data/ # Admin data storage
+├── urban-planning-portal/ # Professional portal (Next.js)
+│ ├── src/app/ # Portal pages and API routes
+│ ├── src/components/ # Portal-specific components
+│ └── public/ # Static assets
+├── shared/ # Shared components and utilities
+│ ├── components/ # Reusable UI components
+│ ├── contexts/ # React contexts
+│ ├── hooks/ # Custom React hooks
+│ ├── services/ # API services
+│ ├── types/ # TypeScript type definitions
+│ └── utils/ # Utility functions
+├── docs/ # Project documentation
+├── prisma/ # Database schema and migrations
+└── TODO.md # Development roadmap
+
+### **Technology Stack**
+- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
+- **State Management**: React Query (@tanstack/react-query), Zustand
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **File Storage**: Supabase Storage
+- **Real-time**: Supabase Realtime
+- **Development**: ESLint, Prettier, Husky, Jest
+
+## ��️ Development Setup
+
+### **Prerequisites**
+- Node.js (v18 or higher)
+- npm or yarn
+- Git
+
+### **Quick Start**
+
+1. **Clone and Install**
+   ```bash
+   git clone <repository-url>
+   cd urban-planning-professionals-portal
+   npm install
+   ```
+
+2. **Environment Setup**
+   ```bash
+   # Copy environment templates
+   cp .env.example .env.local
+   cp admin/.env.example admin/.env.local
+   cp urban-planning-portal/.env.example urban-planning-portal/.env.local
+   ```
+
+3. **Supabase Setup** (Coming Soon)
+   ```bash
+   # Install Supabase CLI
+   npm install -g supabase
+   
+   # Initialize Supabase project
+   supabase init
+   supabase start
+   ```
+
+4. **Start Development Servers**
+   ```bash
+   # Start both applications
+   npm run dev
+   
+   # Or start individually
+   npm run dev:admin      # Admin portal (http://localhost:3001)
+   npm run dev:portal     # Professional portal (http://localhost:3000)
+   ```
+
+## 🔧 Environment Configuration
+
+### **Root Environment Variables**
+```env
+# Supabase Configuration (Coming Soon)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Storage Configuration
+STORAGE_TYPE=supabase
 ```
 
-### Setting Up Environment Variables
+### **Admin Portal Environment**
+```env
+# Server Configuration
+PORT=3001
+NODE_ENV=development
 
-1. **Root Environment Variables**
-   - Copy `.env.example` to `.env`
-   - Update the database connection string:
-     ```
-     DATABASE_URL="postgres://user:password@localhost:5432/database?schema=public"
-     ```
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 
-2. **Admin Application**
-   - Navigate to the `admin` directory
-   - Copy `.env.example` to `.env.local`
-   - Update the following required variables:
-     ```
-     PORT=3001
-     DATABASE_URL="postgres://user:password@localhost:5432/database?schema=public"
-     JWT_SECRET=your_jwt_secret_here
-     ```
+# File Upload
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=10485760
 
-3. **Urban Planning Portal**
-   - Navigate to the `urban-planning-portal` directory
-   - Copy `.env.example` to `.env.local`
-   - Update the following required variables:
-     ```
-     NEXT_PUBLIC_API_URL=http://localhost:3001
-     NEXT_PUBLIC_APP_URL=http://localhost:3000
-     ```
+# Logging
+LOG_LEVEL=debug
+```
 
-### Key Environment Variables
+### **Professional Portal Environment**
+```env
+# Application Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 
-#### Admin Application
-- `PORT`: Server port (default: 3001)
-- `DATABASE_URL`: PostgreSQL connection string
-- `JWT_SECRET`: Secret key for JWT token generation
-- `UPLOAD_DIR`: Directory for file uploads
-- `ALLOWED_ORIGINS`: CORS allowed origins
-- `SMTP_*`: Email configuration for notifications
-- `LOG_LEVEL`: Logging level (debug, info, warn, error)
-- `RATE_LIMIT_*`: API rate limiting configuration
+# Feature Flags
+NEXT_PUBLIC_ENABLE_DEBUG_TOOLS=true
+NEXT_PUBLIC_ENABLE_MOCK_DATA=false
 
-#### Urban Planning Portal
-- `NEXT_PUBLIC_API_URL`: Admin API endpoint
-- `NEXT_PUBLIC_APP_URL`: Portal frontend URL
-- `NEXT_PUBLIC_JWT_COOKIE_NAME`: JWT cookie name
-- `NEXT_PUBLIC_ARCGIS_*`: ArcGIS map service URLs
-- `NEXT_PUBLIC_ENABLE_*`: Feature flags
-- `NEXT_PUBLIC_THEME`: UI theme setting
-- `NEXT_PUBLIC_DEFAULT_LOCALE`: Default language
+# External Services
+NEXT_PUBLIC_ARCGIS_API_KEY=your_arcgis_key
+```
 
-### Development Setup
+## 📁 Key Directories
 
-1. Install dependencies:
+### **Shared Components** (`shared/`)
+- **`components/ui/`**: Reusable UI components (buttons, forms, modals)
+- **`contexts/`**: React contexts for state management
+- **`hooks/`**: Custom React hooks
+- **`services/`**: API service functions
+- **`types/`**: TypeScript type definitions
+- **`utils/`**: Utility functions and helpers
+
+### **Admin Portal** (`admin/`)
+- **`src/app/api/`**: Admin API routes
+- **`src/app/admin/`**: Admin dashboard pages
+- **`src/lib/`**: Admin-specific utilities
+- **`data/`**: JSON data storage
+
+### **Professional Portal** (`urban-planning-portal/`)
+- **`src/app/professionals/`**: Professional user pages
+- **`src/app/api/`**: Portal API routes
+- **`public/documents/`**: Document templates and assets
+
+## 🚀 Available Scripts
+
+### **Development**
+```bash
+npm run dev              # Start both applications
+npm run dev:admin        # Start admin portal only
+npm run dev:portal       # Start professional portal only
+```
+
+### **Building**
+```bash
+npm run build            # Build both applications
+npm run build:admin      # Build admin portal
+npm run build:portal     # Build professional portal
+```
+
+### **Testing**
+```bash
+npm run test             # Run all tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Generate coverage report
+```
+
+### **Code Quality**
+```bash
+npm run lint             # Run ESLint
+npm run format           # Format code with Prettier
+npm run type-check       # TypeScript type checking
+```
+
+### **Database** (Coming Soon)
+```bash
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:migrate   # Run database migrations
+npm run prisma:studio    # Open Prisma Studio
+```
+
+## 🔐 Authentication & Security
+
+### **Current State**
+- Basic session management with localStorage
+- Role-based access control (Admin/Professional)
+- File upload security
+
+### **Planned Implementation** (Supabase)
+- **User Authentication**: Email/password, social login
+- **Row Level Security**: Database-level access control
+- **JWT Tokens**: Secure session management
+- **Multi-factor Authentication**: Enhanced security
+- **Audit Logging**: Track user actions
+
+## 📊 Data Management
+
+### **Current Storage**
+- **File System**: Document storage in local directories
+- **JSON Files**: Configuration and metadata storage
+- **localStorage**: User preferences and session data
+
+### **Planned Migration** (Supabase)
+- **PostgreSQL Database**: Structured data storage
+- **Supabase Storage**: File and document storage
+- **Real-time Subscriptions**: Live data updates
+- **Backup & Recovery**: Automated data protection
+
+## �� Core Features
+
+### **Job Management**
+- Create and manage urban planning projects
+- Track project status and progress
+- Document organization and version control
+- Client collaboration tools
+
+### **Consultant Integration**
+- Quote request system with visual indicators
+- Consultant ticket management
+- Document sharing and review
+- Status tracking and notifications
+
+### **Assessment Tools**
+- Pre-prepared assessment templates
+- Dynamic report generation
+- Compliance checking
+- Export and sharing capabilities
+
+### **Document Management**
+- File upload and storage
+- Version control and history
+- Category-based organization
+- Search and filtering
+
+## 🔄 Development Workflow
+
+### **Code Organization**
+1. **Shared Components**: Place reusable code in `shared/`
+2. **Portal-Specific**: Keep portal-specific code in respective directories
+3. **Type Safety**: Use TypeScript interfaces from `shared/types/`
+4. **API Routes**: Follow RESTful conventions
+
+### **State Management**
+- **Server State**: React Query for API data
+- **Client State**: Zustand for UI state
+- **Form State**: React Hook Form for forms
+- **Global State**: React Context for shared state
+
+### **Testing Strategy**
+- **Unit Tests**: Jest for utility functions
+- **Component Tests**: React Testing Library
+- **Integration Tests**: API route testing
+- **E2E Tests**: Playwright (planned)
+
+## 🚧 Troubleshooting
+
+### **Common Issues**
+
+1. **Port Conflicts**
    ```bash
-   # Root directory
-   npm install
-
-   # Admin application
-   cd admin
-   npm install
-
-   # Portal application
-   cd ../urban-planning-portal
-   npm install
-   ```
-
-2. Set up the database:
-   ```bash
-   # From the root directory
-   npx prisma generate
-   npx prisma db push
-   ```
-
-3. Start the applications:
-   ```bash
-   # Admin application (port 3001)
-   cd admin
-   npm run dev
-
-   # Portal application (port 3000)
-   cd ../urban-planning-portal
-   npm run dev
-   ```
-
-### Environment Variables Security
-
-- Never commit `.env.local` files to version control
-- Keep sensitive information secure
-- Use different environment variables for development, staging, and production
-- Regularly rotate secrets and API keys
-- Use strong, unique values for secrets
-
-### Troubleshooting
-
-Common issues and solutions:
-
-1. **Database Connection Issues**
-   - Verify PostgreSQL is running
-   - Check database credentials in `.env`
-   - Ensure database exists and is accessible
-
-2. **Port Conflicts**
-   - Admin runs on port 3001
-   - Portal runs on port 3000
-   - Change ports in respective `.env.local` files if needed
-
-3. **CORS Issues**
-   - Verify `ALLOWED_ORIGINS` in admin `.env.local`
-   - Check `NEXT_PUBLIC_API_URL` in portal `.env.local`
-
-4. **File Upload Issues**
-   - Ensure `UPLOAD_DIR` exists and is writable
-   - Check `MAX_FILE_SIZE` limits
-
-### Additional Resources
-
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Next.js Environment Variables](https://nextjs.org/docs/basic-features/environment-variables)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-
-### Development Environment Setup
-
-1. **Development Database**
-   - Create a development database:
-     ```bash
-     createdb urbanplanning_dev
-     ```
-   - Update DATABASE_URL in `.env.development.local` to point to the development database
-
-2. **Development Scripts**
-   - Admin application:
-     ```bash
-     # Regular development
-     npm run dev
-     
-     # Debug mode with verbose logging
-     npm run dev:debug
-     ```
-   - Portal application:
-     ```bash
-     # Regular development
-     npm run dev
-     
-     # Debug mode with verbose logging
-     npm run dev:debug
-     ```
-
-3. **Development Features**
-   - Debug tools enabled
-   - Verbose logging
-   - Mock data available
-   - Development-specific UI elements
-   - Relaxed security settings
-   - Performance monitoring
-
-4. **Development Ports**
-   - Admin: http://localhost:3001
-   - Portal: http://localhost:3000
-
-### Development-Specific Variables
-
-#### Admin Development Variables
-- `DEBUG_MODE`: Enable debug mode
-- `DEBUG_LEVEL`: Set logging level
-- `ENABLE_API_LOGS`: Enable API request logging
-- `LOG_SQL_QUERIES`: Log database queries
-- `SHOW_DETAILED_ERRORS`: Show full error details
-- `RATE_LIMIT_MAX_REQUESTS`: Higher limit for development
-
-#### Portal Development Variables
-- `NEXT_PUBLIC_ENABLE_DEBUG_TOOLS`: Enable development tools
-- `NEXT_PUBLIC_SHOW_GRID_OVERLAY`: Show layout grid
-- `NEXT_PUBLIC_ENABLE_MOCK_DATA`: Enable mock data
-- `NEXT_PUBLIC_ENABLE_MAP_DEBUG`: Enable map debugging
-- `NEXT_PUBLIC_SHOW_DEVELOPMENT_BANNER`: Show development mode banner
-
-### Development Tools
-
-1. **Database Management**
-   ```bash
-   # View database with Prisma Studio
-   npm run db:studio
+   # Check if ports are in use
+   lsof -i :3000
+   lsof -i :3001
    
-   # Push schema changes
-   npm run db:push
+   # Kill processes if needed
+   kill -9 <PID>
    ```
 
-2. **Testing**
+2. **File Permission Issues**
    ```bash
-   # Run tests
-   npm run test
-   
-   # Watch mode
-   npm run test:watch
-   
-   # Coverage report
-   npm run test:coverage
+   # Ensure upload directories exist
+   mkdir -p admin/uploads
+   mkdir -p urban-planning-portal/public/documents
    ```
 
-3. **Performance Analysis**
+3. **TypeScript Errors**
    ```bash
-   # Analyze bundle size
-   npm run analyze
+   # Regenerate shared types
+   npm run type-check
    ```
 
-### Development Best Practices
+4. **Database Issues** (Coming Soon)
+   ```bash
+   # Reset Supabase local development
+   supabase stop
+   supabase start
+   ```
 
-1. **Code Quality**
-   - Run linter before committing: `npm run lint`
-   - Maintain test coverage
-   - Use TypeScript strictly
+### **Development Tips**
+- Use `npm run dev` to start both applications simultaneously
+- Check browser console and terminal for error messages
+- Use React DevTools for component debugging
+- Monitor network requests in browser DevTools
 
-2. **Database**
-   - Use development database
-   - Reset data when needed
-   - Use migrations for schema changes
+## 📚 Documentation
 
-3. **Debugging**
-   - Use Chrome DevTools
-   - Enable React DevTools
-   - Check network requests
-   - Monitor console logs
+- **`docs/PROJECT.md`**: Project vision and roadmap
+- **`docs/system-architecture.md`**: Technical architecture
+- **`TODO.md`**: Development roadmap and tasks
+- **`shared/README.md`**: Shared components documentation
 
-4. **Performance**
-   - Monitor bundle size
-   - Check render performance
-   - Profile API calls
-   - Use React DevTools profiler 
+## 🤝 Contributing
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**: Follow the coding standards
+4. **Test your changes**: Run tests and verify functionality
+5. **Commit your changes**: Use conventional commit messages
+6. **Push to the branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request**: Provide clear description and screenshots
+
+### **Coding Standards**
+- Use TypeScript for all new code
+- Follow ESLint and Prettier configurations
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+## 🆘 Support
+
+For technical support or questions:
+- Check the documentation in the `docs/` directory
+- Review the `TODO.md` for current development status
+- Open an issue for bugs or feature requests
+- Contact the development team for urgent matters
+
+---
+
+**Last Updated**: December 2024  
+**Version**: 0.1.0  
+**Status**: Active Development

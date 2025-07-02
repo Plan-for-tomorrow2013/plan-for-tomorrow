@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/app/professionals/SoEE/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/professionals/SoEE/components/ui/card"
 import { ArrowLeft, Download, FileText, Pencil, Save } from "lucide-react"
@@ -17,6 +17,8 @@ import { useToast } from "@/app/professionals/SoEE/hooks/use-toast"
 
 export default function PreviewPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get("job")
   const { formData, saveDraft } = useFormData()
   const { toast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
@@ -84,7 +86,7 @@ export default function PreviewPage() {
       description: "Your progress has been saved. You can continue later.",
     })
 
-    router.push("/")
+    router.push(`/professionals/report-writer?job=${jobId}`)
   }
 
   return (
@@ -116,7 +118,7 @@ export default function PreviewPage() {
                       <div>
                         <CardTitle className="text-lg">Project Details</CardTitle>
                       </div>
-                      <Link href="/professionals/SoEE/form/project-setup">
+                      <Link href={`/professionals/SoEE/form/project-setup?job=${jobId}`}>
                         <Button variant="ghost" size="sm" className="gap-1">
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
@@ -150,7 +152,7 @@ export default function PreviewPage() {
                       <div>
                         <CardTitle className="text-lg">Property Details</CardTitle>
                       </div>
-                      <Link href="/professionals/SoEE/form/property-details">
+                      <Link href={`/professionals/SoEE/form/property-details?job=${jobId}`}>
                         <Button variant="ghost" size="sm" className="gap-1">
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
@@ -204,7 +206,7 @@ export default function PreviewPage() {
                       <div>
                         <CardTitle className="text-lg">Development Details</CardTitle>
                       </div>
-                      <Link href="/professionals/SoEE/form/development-details">
+                      <Link href={`/professionals/SoEE/form/development-details?job=${jobId}`}>
                         <Button variant="ghost" size="sm" className="gap-1">
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
@@ -271,7 +273,7 @@ export default function PreviewPage() {
                       <div>
                         <CardTitle className="text-lg">Planning Controls</CardTitle>
                       </div>
-                      <Link href="/professionals/SoEE/form/planning">
+                      <Link href={`/professionals/SoEE/form/planning?job=${jobId}`}>
                         <Button variant="ghost" size="sm" className="gap-1">
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
@@ -345,7 +347,7 @@ export default function PreviewPage() {
                       <div>
                         <CardTitle className="text-lg">Environmental Factors</CardTitle>
                       </div>
-                      <Link href="/professionals/SoEE/form/environmental-factors">
+                      <Link href={`/professionals/SoEE/form/environmental-factors?job=${jobId}`}>
                         <Button variant="ghost" size="sm" className="gap-1">
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
@@ -1229,7 +1231,7 @@ export default function PreviewPage() {
             </div>
 
             <div className="flex justify-between pt-8">
-              <Link href="/professionals/SoEE/form/planning">
+              <Link href={`/professionals/SoEE/form/planning?job=${jobId}`}>
                 <Button variant="outline" type="button" className="gap-2">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>

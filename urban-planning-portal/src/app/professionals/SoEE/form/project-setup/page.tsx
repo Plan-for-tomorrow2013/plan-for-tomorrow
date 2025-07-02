@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -33,6 +33,8 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function ProjectSetupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get("job")
   const { formData, updateFormData, saveDraft } = useFormData()
   const { toast } = useToast()
   const [showCustomType, setShowCustomType] = useState(false)
@@ -62,7 +64,7 @@ export default function ProjectSetupPage() {
     updateFormData("project", data)
 
     // Navigate to the next step
-    router.push("/professionals/SoEE/form/property-details")
+    router.push(`/professionals/SoEE/form/property-details?job=${jobId}`)
   }
 
   // Handle development type change to show/hide custom type field

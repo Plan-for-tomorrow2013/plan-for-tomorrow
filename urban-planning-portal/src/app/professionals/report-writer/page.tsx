@@ -73,6 +73,7 @@ import {
   InitialAssessment,
 } from '@shared/components/DetailedInitialAssessment';
 import { LEPFilter } from '@shared/components/LEPFilter';
+import SoEELanding from "../SoEE/components/SoEELanding";
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -2056,42 +2057,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
 
         {/* Statement of Environmental Effects Generator Section */}
         <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
-          {/* The actual content that will be revealed */}
-          <div
-            className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}
-          >
-            <div className="space-y-4">
-              <p>This is the actual content that will be revealed!</p>
-              {/* Add your form elements, inputs, etc. here */}
-
-              {/* Show Overlay Again Button */}
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsOverlayVisible(true);
-                  setOverlayStateForJob(jobId, true);
-                }}
-              >
-                Show Overlay Again
-              </Button>
-            </div>
-          </div>
-
-          {/* The overlay that covers the content */}
-          <div
-            className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
-                ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            onClick={() => {
-              setIsOverlayVisible(false);
-              setOverlayStateForJob(jobId, false);
-            }}
-          >
-            <div className="flex flex-col items-center justify-center w-full p-8">
-              <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
-              <p>Statement of Environmental Effects Generator</p>
-              <p className="text-[#532200] text-sm mt-2">Click to preview</p>
-            </div>
-          </div>
+          <SoEELanding jobId={jobId} />
         </div>
 
         {/* LEP Filter Section */}

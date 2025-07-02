@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -63,6 +63,8 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function PropertyDetailsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get("job")
   const [siteArea, setSiteArea] = useState("500.00")
 
   // Initialize form with default values
@@ -117,7 +119,7 @@ export default function PropertyDetailsPage() {
     console.log(data)
     // Save form data to state/localStorage/backend
     // Then navigate to the next step
-    router.push("/professionals/SoEE/form/development-details")
+    router.push(`/professionals/SoEE/form/development-details?job=${jobId}`)
   }
 
   // Handle save draft functionality

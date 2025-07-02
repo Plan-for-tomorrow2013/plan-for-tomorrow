@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -76,6 +76,8 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function DevelopmentDetailsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get("job")
 
   // Initialize form with default values
   const form = useForm<FormValues>({
@@ -173,7 +175,7 @@ export default function DevelopmentDetailsPage() {
     console.log(data)
     // Save form data to state/localStorage/backend
     // Then navigate to the next step
-    router.push("/professionals/SoEE/form/planning")
+    router.push(`/professionals/SoEE/form/planning?job=${jobId}`)
   }
 
   // Handle save draft functionality
@@ -753,7 +755,7 @@ export default function DevelopmentDetailsPage() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <Link href="/professionals/SoEE/form/property-details">
+                <Link href="/professionals/SoEE/form/property-details?job=${jobId}">
                   <Button variant="outline" type="button" className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> Back
                   </Button>

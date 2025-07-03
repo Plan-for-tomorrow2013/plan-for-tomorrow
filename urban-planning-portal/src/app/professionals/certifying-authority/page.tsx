@@ -16,6 +16,7 @@ import { Input } from '@shared/components/ui/input';
 import { Alert, AlertDescription } from '@shared/components/ui/alert';
 import { useJobs } from '@shared/hooks/useJobs';
 import { Job } from '@shared/types/jobs';
+import { JobProvider, useJob } from '@shared/contexts/job-context';
 
 // Function to fetch job details
 async function fetchJobDetails(jobId: string): Promise<Job> {
@@ -156,26 +157,29 @@ function CertifyingAuthorityContent({ jobId }: { jobId: string }): JSX.Element {
   );
 }
 
-export default function CertifyingAuthorityPage() {
+function CertifyingAuthorityPageContent(): JSX.Element {
   const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs();
-  const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined);
+  const { currentJob, setCurrentJob } = useJob();
   const router = useRouter();
 
-  // Effect to set initial job ID from URL query param
+  // Effect to set initial job from URL query param
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const jobId = params.get('job');
     if (jobId && jobs?.find(j => j.id === jobId)) {
-      setSelectedJobId(jobId);
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        setCurrentJob(job);
+      }
     }
-  }, [jobs]);
+  }, [jobs, setCurrentJob]);
 
   // Update URL when job selection changes
   useEffect(() => {
-    if (selectedJobId) {
-      router.push(`/professionals/certifying-authority?job=${selectedJobId}`, { scroll: false });
+    if (currentJob) {
+      router.push(`/professionals/certifying-authority?job=${currentJob.id}`, { scroll: false });
     }
-  }, [selectedJobId, router]);
+  }, [currentJob, router]);
 
   return (
     <div className="space-y-6">
@@ -188,7 +192,12 @@ export default function CertifyingAuthorityPage() {
             <AlertDescription>Failed to load jobs.</AlertDescription>
           </Alert>
         ) : (
-          <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+          <Select value={currentJob?.id} onValueChange={(jobId) => {
+            const job = jobs?.find(j => j.id === jobId);
+            if (job) {
+              setCurrentJob(job);
+            }
+          }}>
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Select a job" />
             </SelectTrigger>
@@ -203,13 +212,21 @@ export default function CertifyingAuthorityPage() {
         )}
       </div>
 
-      {selectedJobId ? (
-        <CertifyingAuthorityContent jobId={selectedJobId} />
+      {currentJob ? (
+        <CertifyingAuthorityContent jobId={currentJob.id} />
       ) : (
         <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
           <p>Please select a job from the dropdown above to access Certifying Authority.</p>
         </div>
       )}
     </div>
+  );
+}
+
+export default function CertifyingAuthorityPage() {
+  return (
+    <JobProvider storageKey="urban-planning-jobs">
+      <CertifyingAuthorityPageContent />
+    </JobProvider>
   );
 }

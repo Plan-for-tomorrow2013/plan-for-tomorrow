@@ -13,8 +13,9 @@ import {
   TableRow,
 } from '@shared/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Building, Loader2 } from 'lucide-react';
 import { Separator } from '@shared/components/ui/separator';
+import { renderLayerAttributes } from '@shared/utils/layerAttributeRenderer';
 
 interface LayerInfo {
   layerId: number;
@@ -124,58 +125,43 @@ export function JobManagement() {
     setLocalProvisionsInfo([]);
 
     try {
-      // Step 1: Geocode the address
-      const geocodeUrl =
-        'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates';
-      const params = new URLSearchParams({
-        SingleLine: address,
-        f: 'json',
-        outFields: 'Match_addr,Addr_type',
-      });
+      // Use the same API endpoint as the dashboard
+      const response = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`);
 
-      const response = await fetch(`${geocodeUrl}?${params}`);
       if (!response.ok) {
-        throw new Error(`Geocoding API error: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      if (!data.candidates || data.candidates.length === 0) {
-        throw new Error(`No location found for the address: ${address}`);
-      }
+      setCoordinates(data.coordinates);
 
-      // Take the first match
-      const candidate = data.candidates[0];
-      const location = candidate.location;
-      const coords = { longitude: location.x, latitude: location.y };
-      setCoordinates(coords);
+      // Transform the data to match JobManagement's expected format
+      const transformedEpiLayers = data.planningLayers.epiLayers.map((layer: any) => ({
+        layerId: 0, // We don't have layer IDs from identify endpoint
+        layerName: layer.layer,
+        source: 'Principal Planning Layers',
+        attributes: layer.attributes,
+      }));
 
-      if (coords.longitude && coords.latitude) {
-        // Step 2: Get Principal Planning Layers information
-        const principalUrl =
-          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Principal_Planning_Layers/MapServer';
-        const principalResults = await fetchLayerInfo(
-          coords,
-          principalUrl,
-          'Principal Planning Layers'
-        );
-        setLayersInfo(principalResults);
+      const transformedProtectionLayers = data.planningLayers.protectionLayers.map((layer: any) => ({
+        layerId: 0,
+        layerName: layer.layer,
+        source: 'Protection',
+        attributes: layer.attributes,
+      }));
 
-        // Step 3: Get Protection Layers information
-        const protectionUrl =
-          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Protection/MapServer';
-        const protectionResults = await fetchLayerInfo(coords, protectionUrl, 'Protection', true);
-        setProtectionLayersInfo(protectionResults);
+      const transformedLocalProvisionsLayers = data.planningLayers.localProvisionsLayers.map((layer: any) => ({
+        layerId: 0,
+        layerName: layer.layer,
+        source: 'Local Provisions',
+        attributes: layer.attributes,
+      }));
 
-        // Step 4: Get Local Provisions information
-        const localProvisionsUrl =
-          'https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Development_Control/MapServer';
-        const localProvisionsResults = await fetchLayerInfo(
-          coords,
-          localProvisionsUrl,
-          'Local Provisions'
-        );
-        setLocalProvisionsInfo(localProvisionsResults);
-      }
+      setLayersInfo(transformedEpiLayers);
+      setProtectionLayersInfo(transformedProtectionLayers);
+      setLocalProvisionsInfo(transformedLocalProvisionsLayers);
+
     } catch (error) {
       console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch property information');
@@ -190,66 +176,50 @@ export function JobManagement() {
     source: string,
     isProtection = false
   ) => {
-    if (isProtection) {
-      // Handle Protection layer differently
-      const queryUrl = `${mapServerUrl}/2/query`;
-      const params = new URLSearchParams({
-        where: '',
-        text: '',
-        objectIds: '',
-        time: '',
-        timeRelation: 'esriTimeRelationOverlaps',
-        geometry: `${coords.longitude},${coords.latitude}`,
-        geometryType: 'esriGeometryPoint',
-        outFields: '*',
-        inSR: '4326',
-        spatialRel: 'esriSpatialRelIntersects',
-        distance: '',
-        units: 'esriSRUnit_Meter',
-        f: 'json',
-      });
-
-      try {
-        const response = await fetch(`${queryUrl}?${params}`);
-        if (!response.ok) {
-          console.error(`Error querying Protection layer: ${response.status}`);
-          return [];
-        }
-
-        const data = await response.json();
-        if (data.features && data.features.length > 0) {
-          const layClass = data.features[0].attributes?.LAY_CLASS;
-          if (layClass) {
-            return [
-              {
-                layerId: 2,
-                layerName: 'Protection Layer',
-                source: source,
-                attributes: {
-                  LAY_CLASS: layClass,
-                },
-              },
-            ];
-          }
-        }
-      } catch (error) {
-        console.error('Error querying Protection layer:', error);
-      }
-      return [];
-    }
 
     // Define layers based on the source
     let layersToQuery: LayerQuery[] = [];
     if (source === 'Principal Planning Layers') {
       layersToQuery = [
-        { id: 14, name: 'Heritage' },
-        { id: 13, name: 'Height of Building' },
+        { id: 1, name: 'Local Environmental Plan' },
+        { id: 2, name: 'Floor Space Ratio and Additional Controls' },
+        { id: 3, name: 'Floor Space Ratio Additional Controls' },
+        { id: 4, name: 'Floor Space Ratio (n:1)' },
+        { id: 5, name: 'Height of Building and Additional Controls' },
+        { id: 6, name: 'Height of Building Additional Controls' },
+        { id: 7, name: 'Height of Building' },
+        { id: 8, name: 'Heritage' },
+        { id: 9, name: 'Land Zoning and Additional Controls' },
+        { id: 10, name: 'Land Zoning Additional Controls' },
         { id: 11, name: 'Land Zoning' },
-        { id: 12, name: 'Minimum Lot Size' },
-        { id: 15, name: 'Local Environmental Plan' },
+        { id: 12, name: 'Minimum Lot Size and Additional Controls' },
+        { id: 13, name: 'Minimum Lot Size Additional Controls' },
+        { id: 14, name: 'Minimum Lot Size' },
+        { id: 15, name: 'Land Reclassification' },
+        { id: 16, name: 'Land Reservation Acquisition' },
+        { id: 17, name: 'Minimum Dwelling Density Area' },
+        { id: 18, name: 'Foreshore Building Line' },
       ];
+
+    } else if (source === 'Protection') {
+      layersToQuery = [
+        { id: 1, name: 'Acid Sulfate Soils' },
+        { id: 2, name: 'Airport Noise' },
+        { id: 3, name: 'Drinking Water Catchment' },
+        { id: 4, name: 'Groundwater Vulnerability' },
+        { id: 5, name: 'Mineral and Resource Land' },
+        { id: 6, name: 'Obstacle Limitation Surface' },
+        { id: 7, name: 'Riparian Lands and Watercourses' },
+        { id: 8, name: 'Salinity' },
+        { id: 9, name: 'Scenic Protection Land' },
+        { id: 10, name: 'Terrestrial Biodiversity' },
+        { id: 11, name: 'Wetlands' },
+        { id: 12, name: 'Environmentally Sensitive Land' },
+      ];
+
     } else if (source === 'Local Provisions') {
       layersToQuery = [
+        { id: 2, name: 'Greenfield Housing Code Area' },
         { id: 3, name: 'Local Provisions' },
         { id: 4, name: 'Active Street Frontages' },
         { id: 5, name: 'Additional Permitted Uses' },
@@ -299,28 +269,52 @@ export function JobManagement() {
                 };
               }
               break;
+            case 'Floor Space Ratio and Additional Controls':
+              if (attributes.FSR || attributes.UNITS) {
+                filteredAttributes = {
+                  FSR: attributes.FSR || 'N/A',
+                  UNITS: attributes.UNITS || 'N/A',
+                };
+              }
+              break;
+            case 'Floor Space Ratio Additional Controls':
+              if (attributes.LEGISLATIVE_AREA || attributes.LEGISLATIVE_CLAUSE) {
+                filteredAttributes = {
+                  LEGISLATIVE_AREA: attributes.LEGISLATIVE_AREA || 'N/A',
+                  LEGISLATIVE_CLAUSE: attributes.LEGISLATIVE_CLAUSE || 'N/A',
+                };
+              }
+              break;
+            case 'Floor Space Ratio (n:1)':
+              if (attributes.FSR || attributes.UNITS) {
+                filteredAttributes = {
+                  FSR: attributes.FSR || 'N/A',
+                  UNITS: attributes.UNITS || 'N/A',
+                };
+              }
+              break;
+            case 'Height of Building and Additional Controls':
+              if (attributes.MAX_B_H || attributes.UNITS) {
+                filteredAttributes = {
+                  MAX_B_H: attributes.MAX_B_H || 'N/A',
+                  UNITS: attributes.UNITS || 'N/A',
+                };
+              }
+              break;
+            case 'Height of Building Additional Controls':
+              if (attributes.LEGISLATIVE_AREA || attributes.LEGISLATIVE_CLAUSE) {
+                filteredAttributes = {
+                  LEGISLATIVE_AREA: attributes.LEGISLATIVE_AREA || 'N/A',
+                  LEGISLATIVE_CLAUSE: attributes.LEGISLATIVE_CLAUSE || 'N/A',
+                };
+              }
+              break;
             case 'Height of Building':
               if (attributes.MAX_B_H) {
                 filteredAttributes = {
                   LAY_NAME: 'Maximum Building Height (m)',
                   MAX_B_H: attributes.MAX_B_H || 'N/A',
                   UNITS: attributes.UNITS || 'm',
-                };
-              }
-              break;
-            case 'Land Zoning':
-              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
-                filteredAttributes = {
-                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
-                  SYM_CODE: attributes.SYM_CODE || 'N/A',
-                };
-              }
-              break;
-            case 'Minimum Lot Size':
-              if (attributes.LOT_SIZE) {
-                filteredAttributes = {
-                  LOT_SIZE: attributes.LOT_SIZE || 'N/A',
-                  UNITS: attributes.UNITS || 'm²',
                 };
               }
               break;
@@ -334,6 +328,130 @@ export function JobManagement() {
                 };
               }
               break;
+            case 'Land Zoning and Additional Controls':
+              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
+                filteredAttributes = {
+                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
+                  SYM_CODE: attributes.SYM_CODE || 'N/A',
+                };
+              }
+              break;
+            case 'Land Zoning Additional Controls':
+              if (attributes.LEGISLATIVE_AREA || attributes.LEGISLATIVE_CLAUSE) {
+                filteredAttributes = {
+                  LEGISLATIVE_AREA: attributes.LEGISLATIVE_AREA || 'N/A',
+                  LEGISLATIVE_CLAUSE: attributes.LEGISLATIVE_CLAUSE || 'N/A',
+                };
+              }
+              break;
+            case 'Land Zoning':
+              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
+                filteredAttributes = {
+                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
+                  SYM_CODE: attributes.SYM_CODE || 'N/A',
+                };
+              }
+              break;
+            case 'Minimum Lot Size and Additional Controls':
+              if (attributes.LOT_SIZE || attributes.UNITS) {
+                filteredAttributes = {
+                  LOT_SIZE: attributes.LOT_SIZE || 'N/A',
+                  UNITS: attributes.UNITS || 'm²',
+                };
+              }
+              break;
+            case 'Minimum Lot Size Additional Controls':
+              if (attributes.LEGISLATIVE_AREA || attributes.LEGISLATIVE_CLAUSE) {
+                filteredAttributes = {
+                  LEGISLATIVE_AREA: attributes.LEGISLATIVE_AREA || 'N/A',
+                  LEGISLATIVE_CLAUSE: attributes.LEGISLATIVE_CLAUSE || 'N/A',
+                };
+              }
+              break;
+            case 'Minimum Lot Size':
+              if (attributes.LOT_SIZE) {
+                filteredAttributes = {
+                  LOT_SIZE: attributes.LOT_SIZE || 'N/A',
+                  UNITS: attributes.UNITS || 'm²',
+                };
+              }
+              break;
+            case 'Land Reclassification':
+              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
+                filteredAttributes = {
+                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
+                  SYM_CODE: attributes.SYM_CODE || 'N/A',
+                };
+              }
+              break;
+            case 'Land Reservation Acquisition':
+              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
+                filteredAttributes = {
+                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
+                  SYM_CODE: attributes.SYM_CODE || 'N/A',
+                };
+              }
+              break;
+            case 'Minimum Dwelling Density Area':
+              if (attributes.TYPE) {
+                filteredAttributes = {
+                  TYPE: attributes.TYPE || 'N/A',
+                };
+              }
+              break;
+            case 'Foreshore Building Line':
+              if (attributes.LAY_CLASS || attributes.SYM_CODE) {
+                filteredAttributes = {
+                  LAY_CLASS: attributes.LAY_CLASS || 'N/A',
+                  SYM_CODE: attributes.SYM_CODE || 'N/A',
+                };
+              }
+              break;
+            // Protection Layers
+            case 'Acid Sulfate Soils':
+            case 'Airport Noise':
+            case 'Drinking Water Catchment':
+            case 'Groundwater Vulnerability':
+            case 'Mineral and Resource Land':
+            case 'Obstacle Limitation Surface':
+            case 'Riparian Lands and Watercourses':
+            case 'Salinity':
+            case 'Scenic Protection Land':
+            case 'Terrestrial Biodiversity':
+            case 'Wetlands':
+            case 'Environmentally Sensitive Land':
+              if (attributes.LAY_CLASS || attributes.CLASS) {
+                filteredAttributes = {
+                  CLASS: attributes.LAY_CLASS || attributes.CLASS || 'N/A',
+                };
+              }
+              break;
+            // Local Provisions Layers
+            case 'Greenfield Housing Code Area':
+            case 'Local Provisions':
+            case 'Active Street Frontages':
+            case 'Key Sites':
+            case 'Urban Release Area':
+              if (attributes.TYPE || attributes.CLASS) {
+                filteredAttributes = {
+                  TYPE: attributes.TYPE || 'N/A',
+                  CLASS: attributes.CLASS || 'N/A',
+                };
+              }
+              break;
+            case 'Additional Permitted Uses':
+              if (attributes.CODE) {
+                filteredAttributes = {
+                  CODE: attributes.CODE || 'N/A',
+                };
+              }
+              break;
+            default:
+              // For any layer not specifically handled, show all available attributes
+              if (attributes && Object.keys(attributes).length > 0) {
+                filteredAttributes = attributes;
+              }
+              break;
           }
 
           if (Object.keys(filteredAttributes).length > 0) {
@@ -342,6 +460,14 @@ export function JobManagement() {
               layerName: layer.name,
               source: source,
               attributes: filteredAttributes,
+            });
+          } else {
+            // Add layer with no data for transparency
+            results.push({
+              layerId: layer.id,
+              layerName: layer.name,
+              source: source,
+              attributes: {},
             });
           }
         }
@@ -407,7 +533,7 @@ export function JobManagement() {
           )}
 
           {/* Create Job Button */}
-          {layersInfo.length > 0 && (
+          {(layersInfo.length > 0 || protectionLayersInfo.length > 0 || localProvisionsInfo.length > 0) && (
             <div className="flex justify-end mt-6">
               <Button onClick={handleCreateJob} disabled={loading}>
                 Create Job
@@ -422,6 +548,13 @@ export function JobManagement() {
 
 // Reusable component to render a table of layers
 function LayersTable({ title, layers }: { title: string; layers: LayerInfo[] }) {
+  const renderRow = (label: string, value: any) => (
+    <TableRow key={label}>
+      <TableCell className="font-medium">{label}</TableCell>
+      <TableCell>{value !== null ? String(value) : 'N/A'}</TableCell>
+    </TableRow>
+  );
+
   return (
     <div className="mt-6 space-y-8">
       <h3 className="text-lg font-medium">{title}</h3>
@@ -442,12 +575,12 @@ function LayersTable({ title, layers }: { title: string; layers: LayerInfo[] }) 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {Object.entries(layerInfo.attributes).map(([key, value]) => (
-                    <TableRow key={key}>
-                      <TableCell className="font-medium">{formatAttributeName(key)}</TableCell>
-                      <TableCell>{value !== null ? String(value) : 'N/A'}</TableCell>
-                    </TableRow>
-                  ))}
+                  {renderLayerAttributes({
+                    attributes: layerInfo.attributes,
+                    layerName: layerInfo.layerName,
+                    renderRow,
+                    className: ""
+                  })}
                 </TableBody>
               </Table>
             </div>

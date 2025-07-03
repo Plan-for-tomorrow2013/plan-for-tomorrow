@@ -6,6 +6,7 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
 import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { renderLayerAttributes } from '@shared/utils/layerAttributeRenderer';
 
 interface JobData {
   jobId: string;
@@ -71,131 +72,12 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
       </div>
     );
 
-    // Special handling for Local Environmental Plan
-    if (layerName === 'Local Environmental Plan') {
-      return renderRow('EPI Name', attributes['EPI Name']);
-    }
-
-    // Special handling for Land Zoning
-    if (layerName === 'Land Zoning') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Land Use', attributes['Land Use'])}
-          {renderRow('Zone', attributes['Zone'])}
-        </div>
-      );
-    }
-
-    // Special handling for Height of Building
-    if (layerName === 'Height of Building') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Maximum Building Height', attributes['Maximum Building Height'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-
-    // Special handling for Minimum Lot Size
-    if (layerName === 'Minimum Lot Size') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Lot Size', attributes['Lot Size'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-    // Special handling for Lot Size
-    if (layerName === "Lot Size") {
-      return (
-        <div className="space-y-3">
-          {renderRow("Lot Size", attributes["Lot Size"])}
-          {renderRow("Units", attributes["Units"])}
-        </div>
-      );
-    }
-    // Special handling for Floor Space Ratio (n:1)
-    if (layerName === 'Floor Space Ratio (n:1)') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-    // Special handling for Floor Space Ratio
-    if (layerName === 'Floor Space Ratio') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-    // Special handling for Floor Space Ratio Additional Controls
-    if (layerName === 'Floor Space Ratio Additional Controls') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Legislative Area', attributes['Legislative Area'])}
-          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
-        </div>
-      );
-    }
-    // Special handling for Heritage
-    if (layerName === 'Heritage') {
-      return (
-        <div className="space-y-2">
-          {renderRow('Heritage Type', attributes['Heritage Type'])}
-          {renderRow('Item Number', attributes['Item Number'])}
-          {renderRow('Item Name', attributes['Item Name'])}
-          {renderRow('Significance', attributes['Significance'])}
-        </div>
-      );
-    }
-
-    // Special handling for Minimum Dwelling Density Area
-    if (layerName === 'Minimum Dwelling Density Area') {
-      return renderRow('Type', attributes['Type']);
-    }
-
-    // Special handling for Additional Permitted Uses
-    if (layerName === 'Additional Permitted Uses') {
-      return renderRow('Code', attributes['Code']);
-    }
-
-    // Special handling for Protection Layers
-    if (
-      job?.propertyData.planningLayers.protectionLayers.some(layer => layer.layer === layerName)
-    ) {
-      return renderRow('Class', attributes['Class']);
-    }
-
-    // Special handling for Local Provisions
-    if (
-      job?.propertyData.planningLayers.localProvisionsLayers?.some(
-        layer => layer.layer === layerName
-      )
-    ) {
-      if (
-        layerName !== 'Additional Permitted Uses' &&
-        layerName !== 'Clause Application Map' &&
-        layerName !== 'Urban Release Area'
-      ) {
-        return (
-          <div className="space-y-2">
-            {renderRow('Type', attributes['Type'])}
-            {renderRow('Class', attributes['Class'])}
-          </div>
-        );
-      }
-    }
-
-    // Default rendering for all other layers
-    return (
-      <div className="space-y-2">
-        {Object.entries(attributes).map(([key, value]) => renderRow(key, value))}
-      </div>
-    );
+    return renderLayerAttributes({
+      attributes,
+      layerName,
+      renderRow,
+      className: "space-y-2"
+    });
   };
 
   if (loading) {

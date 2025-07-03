@@ -20,6 +20,7 @@ import { useJobs } from '@shared/hooks/useJobs';
 import { Job } from '@shared/types/jobs';
 import { UserStats } from '@shared/components/UserStats';
 import { Announcements } from '@shared/components/Announcements';
+import { renderLayerAttributes } from '@shared/utils/layerAttributeRenderer';
 
 interface SearchResult {
   layer: string;
@@ -60,6 +61,61 @@ export default function DashboardPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [jobDetails, setJobDetails] = useState<Job | null>(null);
   const router = useRouter(); // Initialize the router
+
+  // Tiles that can be ticked
+  const tickableTileIds = [
+    'initial-assessment',
+    'design-check',
+    'report-writer',
+    'consultants',
+    'certifying-authority',
+    'complete',
+  ];
+
+  // Helper to get ticked state for a job/tile from localStorage
+  function getTickedTiles(jobId: string): { [tileId: string]: boolean } {
+    if (typeof window === 'undefined') return {};
+    const key = `tickedTiles-${jobId}`;
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : {};
+  }
+
+  // Calculate UserStats counts from ticked tiles for all jobs
+  const [userStats, setUserStats] = useState({
+    initialAssessments: 0,
+    designChecks: 0,
+    reportsWritten: 0,
+    consultantsSent: 0,
+    completedJobs: 0,
+    certifyingAuthority: 0,
+  });
+
+  useEffect(() => {
+    if (!jobs || jobs.length === 0 || typeof window === 'undefined') return;
+    let initialAssessments = 0;
+    let designChecks = 0;
+    let reportsWritten = 0;
+    let consultantsSent = 0;
+    let completedJobs = 0;
+    let certifyingAuthority = 0;
+    jobs.forEach(job => {
+      const ticked = getTickedTiles(job.id);
+      if (ticked['initial-assessment']) initialAssessments++;
+      if (ticked['design-check']) designChecks++;
+      if (ticked['report-writer']) reportsWritten++;
+      if (ticked['consultants']) consultantsSent++;
+      if (ticked['complete']) completedJobs++;
+      if (ticked['certifying-authority']) certifyingAuthority++;
+    });
+    setUserStats({
+      initialAssessments,
+      designChecks,
+      reportsWritten,
+      consultantsSent,
+      completedJobs,
+      certifyingAuthority,
+    });
+  }, [jobs]);
 
   const createJobMutation = useMutation({
     mutationFn: async (jobData: any) => {
@@ -184,136 +240,12 @@ export default function DashboardPage() {
       </div>
     );
 
-    // Special handling for Floor Space Ratio Additional Controls
-    if (layerName === 'Floor Space Ratio Additional Controls') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Legislative Area', attributes['Legislative Area'])}
-          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
-        </div>
-      );
-    }
-
-    // Special handling for Building Height Additional Controls
-    if (layerName === 'Height of Building Additional Controls') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Legislative Area', attributes['Legislative Area'])}
-          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
-        </div>
-      );
-    }
-
-    // Special handling for Minimum Lot Size Additional Controls
-    if (layerName === 'Minimum Lot Size Additional Controls') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Legislative Area', attributes['Legislative Area'])}
-          {renderRow('Legislative Clause', attributes['Legislative Clause'])}
-        </div>
-      );
-    }
-
-    // Special handling for Local Environmental Plan
-    if (layerName === 'Local Environmental Plan') {
-      return renderRow('EPI Name', attributes['EPI Name']);
-    }
-
-    // Special handling for Land Zoning
-    if (layerName === 'Land Zoning') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Land Use', attributes['Land Use'])}
-          {renderRow('Zone', attributes['Zone'])}
-        </div>
-      );
-    }
-
-    // Special handling for Height of Building
-    if (layerName === 'Height of Building') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Maximum Building Height', attributes['Maximum Building Height'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-
-    // Special handling for Floor Space Ratio (n:1)
-    if (layerName === 'Floor Space Ratio (n:1)') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-
-    // Special handling for Floor Space Ratio
-    if (layerName === 'Floor Space Ratio') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Floor Space Ratio', attributes['Floor Space Ratio'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-
-    // Special handling for Minimum Lot Size
-    if (layerName === 'Minimum Lot Size') {
-      return (
-        <div className="space-y-3">
-          {renderRow('Lot Size', attributes['Lot Size'])}
-          {renderRow('Units', attributes['Units'])}
-        </div>
-      );
-    }
-        // Special handling for Lot Size
-        if (layerName === "Lot Size") {
-          return (
-            <div className="space-y-3">
-              {renderRow("Lot Size", attributes["Lot Size"])}
-              {renderRow("Units", attributes["Units"])}
-            </div>
-          )
-        }
-    // Special handling for Minimum Dwelling Density Area
-    if (layerName === 'Minimum Dwelling Density Area') {
-      return renderRow('Type', attributes['Type']);
-    }
-
-    // Special handling for Additional Permitted Uses
-    if (layerName === 'Additional Permitted Uses') {
-      return renderRow('Code', attributes['Code']);
-    }
-
-    // Special handling for Protection Layers
-    if (results?.planningLayers.protectionLayers.some(layer => layer.layer === layerName)) {
-      return renderRow('Class', attributes['Class']);
-    }
-
-    // Special handling for Local Provisions
-    if (results?.planningLayers.localProvisionsLayers.some(layer => layer.layer === layerName)) {
-      if (
-        layerName !== 'Additional Permitted Uses' &&
-        layerName !== 'Clause Application Map' &&
-        layerName !== 'Urban Release Area'
-      ) {
-        return (
-          <div className="space-y-3">
-            {renderRow('Type', attributes['Type'])}
-            {renderRow('Class', attributes['Class'])}
-          </div>
-        );
-      }
-    }
-
-    // Default rendering for all other layers
-    return (
-      <div className="space-y-3">
-        {Object.entries(attributes).map(([key, value]) => renderRow(key, value))}
-      </div>
-    );
+    return renderLayerAttributes({
+      attributes,
+      layerName,
+      renderRow,
+      className: "space-y-3"
+    });
   };
 
   return (
@@ -321,11 +253,18 @@ export default function DashboardPage() {
       <UserStats
         username="Matt"
         role="professional"
-        designChecks={8}
-        reportsWritten={6}
-        completedJobs={4}
-        designChecksDiff={3}
-        reportsWrittenDiff={-1}
+        initialAssessments={userStats.initialAssessments}
+        designChecks={userStats.designChecks}
+        reportsWritten={userStats.reportsWritten}
+        consultantsSent={userStats.consultantsSent}
+        completedJobs={userStats.completedJobs}
+        underAssessment={userStats.certifyingAuthority}
+        designChecksDiff={0}
+        reportsWrittenDiff={0}
+        initialAssessmentsDiff={0}
+        consultantsSentDiff={0}
+        completedJobsDiff={0}
+        underAssessmentDiff={0}
       />
 
       {/* Property Search Section */}
@@ -390,22 +329,20 @@ export default function DashboardPage() {
                 )}
 
                 {/* Local Provisions */}
-                {results.planningLayers.localProvisionsLayers.length > 0 ? (
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Local Provisions</h3>
-                    {results.planningLayers.localProvisionsLayers.map((result, index) => (
-                      <Card key={index}>
-                        <CardHeader>
-                          <h4 className="font-medium">{result.layer}</h4>
-                        </CardHeader>
-                        <CardContent>
+                {results.planningLayers.localProvisionsLayers.length > 0 && (
+                  <Card className="border border-gray-200">
+                    <CardHeader className="bg-[#323A40] text-white">
+                      <h3 className="font-semibold">Local Provisions</h3>
+                    </CardHeader>
+                    <CardContent className="divide-y pt-4">
+                      {results.planningLayers.localProvisionsLayers.map((result, index) => (
+                        <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
+                          <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
                           {renderAttributes(result.attributes, result.layer)}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No local provisions data available for this address.</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
                 )}
 
                 {/* Create Job Button */}
@@ -502,23 +439,29 @@ export default function DashboardPage() {
                         description: 'View completed tasks',
                         color: '#323A40',
                       },
-                    ].map(tile => (
-                      <Card
-                        key={tile.id}
-                        className={`shadow-md hover:shadow-lg transition-shadow cursor-pointer hover:bg-${tile.color}/5 border-l-4`}
-                        style={{ borderLeftColor: tile.color }}
-                        onClick={() => {
-                          // Handle navigation or display logic here
-                          console.log(`Navigating to ${tile.id}`);
-                          // Example: router.push(`/jobs/${jobDetails.id}/${tile.id}`);
-                        }}
-                      >
-                        <CardHeader>
-                          <h3 className="font-semibold">{tile.name}</h3>
-                          <p className="text-sm text-gray-500">{tile.description}</p>
-                        </CardHeader>
-                      </Card>
-                    ))}
+                    ].map(tile => {
+                      // Get ticked state for this job/tile
+                      const tickedTiles = getTickedTiles(jobDetails.id);
+                      const isTickable = tickableTileIds.includes(tile.id);
+                      const isTicked = isTickable ? tickedTiles[tile.id] : false;
+                      return (
+                        <Card
+                          key={tile.id}
+                          className={`shadow-md hover:shadow-lg transition-shadow cursor-pointer border-l-4 ${isTickable && isTicked ? 'bg-green-100 border-green-500' : ''}`}
+                          style={{ borderLeftColor: tile.color }}
+                          onClick={() => {
+                            // Handle navigation or display logic here
+                            console.log(`Navigating to ${tile.id}`);
+                            // Example: router.push(`/jobs/${jobDetails.id}/${tile.id}`);
+                          }}
+                        >
+                          <CardHeader>
+                            <h3 className="font-semibold">{tile.name}</h3>
+                            <p className="text-sm text-gray-500">{tile.description}</p>
+                          </CardHeader>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

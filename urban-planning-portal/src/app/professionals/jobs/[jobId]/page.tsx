@@ -14,6 +14,7 @@ import {
   FileCheck,
   Building2,
   FolderOpen,
+  Undo2,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
 import { Button } from '@shared/components/ui/button';
@@ -46,6 +47,39 @@ export default function JobPage({ params }: Props) {
     queryKey: ['job', params.jobId],
     queryFn: () => getJob(params.jobId),
   });
+
+  // Only these tiles should have tick/untick feature
+  const tickableTileIds = [
+    'initial-assessment',
+    'design-check',
+    'report-writer',
+    'consultant-store',
+    'certifying-authority',
+    'complete',
+  ];
+
+  // Persistent tick state for all tickable tiles per job
+  const tickedTilesKey = `tickedTiles-${params.jobId}`;
+  const [tickedTiles, setTickedTiles] = useState<{ [tileId: string]: boolean }>({});
+
+  useEffect(() => {
+    const stored = localStorage.getItem(tickedTilesKey);
+    setTickedTiles(stored ? JSON.parse(stored) : {});
+  }, [tickedTilesKey]);
+
+  const handleTickTile = (tileId: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const updated = { ...tickedTiles, [tileId]: true };
+    setTickedTiles(updated);
+    localStorage.setItem(tickedTilesKey, JSON.stringify(updated));
+  };
+
+  const handleUntickTile = (tileId: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const updated = { ...tickedTiles, [tileId]: false };
+    setTickedTiles(updated);
+    localStorage.setItem(tickedTilesKey, JSON.stringify(updated));
+  };
 
   if (isLoading) {
     return (
@@ -166,26 +200,52 @@ export default function JobPage({ params }: Props) {
       </Alert>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tiles.map(tile => (
-          <div key={tile.id}>
-            <a href={tile.href}>
-              <Card
-                className="hover:bg-gray-50 transition-colors cursor-pointer border-l-4"
-                style={{ borderLeftColor: tile.color }}
-              >
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <tile.icon className="h-6 w-6" style={{ color: tile.color }} />
-                    <div>
-                      <h3 className="font-semibold">{tile.name}</h3>
-                      <p className="text-sm text-gray-500">{tile.description}</p>
+        {tiles.map(tile => {
+          const isTickable = tickableTileIds.includes(tile.id);
+          const isTicked = isTickable ? tickedTiles[tile.id] : false;
+          return (
+            <div key={tile.id} className="relative">
+              <a href={tile.href}>
+                <Card
+                  className={`hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${isTickable && isTicked ? 'bg-green-100 border-green-500' : ''}`}
+                  style={{ borderLeftColor: tile.color }}
+                >
+                  {/* Tick/Undo icon in top right for tickable tiles only */}
+                  {isTickable && (
+                    <div className="absolute top-2 right-2 z-10">
+                      {isTicked ? (
+                        <button
+                          onClick={handleUntickTile(tile.id)}
+                          className="bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                          title="Undo tick"
+                        >
+                          <Undo2 className="h-5 w-5 text-green-600" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleTickTile(tile.id)}
+                          className="bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                          title="Mark as complete"
+                        >
+                          <Check className="h-5 w-5 text-green-600" />
+                        </button>
+                      )}
                     </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            </a>
-          </div>
-        ))}
+                  )}
+                  <CardHeader>
+                    <div className="flex items-center space-x-2">
+                      <tile.icon className="h-6 w-6" style={{ color: tile.color }} />
+                      <div>
+                        <h3 className="font-semibold">{tile.name}</h3>
+                        <p className="text-sm text-gray-500">{tile.description}</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

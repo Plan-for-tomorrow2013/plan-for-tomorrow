@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { FormProvider } from "@/app/professionals/SoEE/lib/form-context"
-import { Toaster } from "@/app/professionals/SoEE/components/ui/toaster"
+import { Toaster } from "@shared/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 

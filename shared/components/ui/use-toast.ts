@@ -1,17 +1,24 @@
-// Adapted from https://ui.shadcn.com/docs/components/toast
-import * as React from "react"
+"use client"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+// Inspired by react-hot-toast library
+import type * as React from "react"
+import { useState, useCallback } from "react"
 
-type ToasterToast = {
+export type UseToastProps = {
   id: string
   title?: string
   description?: string
   action?: React.ReactNode
   variant?: "default" | "destructive"
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+}
+
+const TOAST_LIMIT = 1
+const TOAST_REMOVE_DELAY = 1000000
+
+type ToasterToast = UseToastProps & {
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: React.ReactNode
 }
 
 const actionTypes = {
@@ -24,7 +31,7 @@ const actionTypes = {
 let count = 0
 
 function genId() {
-  count = (count + 1) % Number.MAX_VALUE
+  count = (count + 1) % Number.MAX_SAFE_INTEGER
   return count.toString()
 }
 
@@ -38,7 +45,6 @@ type Action =
   | {
       type: ActionType["UPDATE_TOAST"]
       toast: Partial<ToasterToast>
-      id: string
     }
   | {
       type: ActionType["DISMISS_TOAST"]
@@ -50,7 +56,7 @@ type Action =
     }
 
 interface State {
-  toasts: ToasterToast[]
+  toasts: UseToastProps[]
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
@@ -82,9 +88,7 @@ export const reducer = (state: State, action: Action): State => {
     case "UPDATE_TOAST":
       return {
         ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.id ? { ...t, ...action.toast } : t
-        ),
+        toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
       }
 
     case "DISMISS_TOAST": {
@@ -106,9 +110,9 @@ export const reducer = (state: State, action: Action): State => {
           t.id === toastId || toastId === undefined
             ? {
                 ...t,
-                open: false,
+                //open: false, // Removed open property
               }
-            : t
+            : t,
         ),
       }
     }
@@ -142,11 +146,10 @@ type Toast = Omit<ToasterToast, "id">
 function toast({ ...props }: Toast) {
   const id = genId()
 
-  const update = (props: ToasterToast) =>
+  const update = (props: UseToastProps) =>
     dispatch({
       type: "UPDATE_TOAST",
-      id,
-      toast: { ...props },
+      toast: { ...props, id },
     })
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
 
@@ -155,10 +158,10 @@ function toast({ ...props }: Toast) {
     toast: {
       ...props,
       id,
-      open: true,
-      onOpenChange: (open: boolean) => {
+      //open: true, // Removed open property
+      /*onOpenChange: (open) => { // Removed onOpenChange
         if (!open) dismiss()
-      },
+      },*/
     },
   })
 
@@ -170,23 +173,19 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
+  const [toasts, setToasts] = useState<UseToastProps[]>([])
 
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    }
-  }, [state])
+  const toast = useCallback(({ title, description, variant }: Omit<UseToastProps, "id">) => {
+    const id = Math.random().toString(36).substring(2, 9)
+    setToasts((prev) => [...prev, { id, title, description, variant }])
+    return id
+  }, [])
 
-  return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  }
+  const dismiss = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }, [])
+
+  return { toast, dismiss, toasts }
 }
 
 export { useToast, toast }

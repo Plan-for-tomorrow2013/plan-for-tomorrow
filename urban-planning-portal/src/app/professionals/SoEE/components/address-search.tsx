@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Search, Loader2, AlertCircle } from "lucide-react"
-import { Input } from "@/app/professionals/SoEE/components/ui/input"
-import { Button } from "@/app/professionals/SoEE/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/app/professionals/SoEE/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/app/professionals/SoEE/components/ui/popover"
-import { Alert, AlertDescription } from "@/app/professionals/SoEE/components/ui/alert"
+import { Input } from "@shared/components/ui/input"
+import { Button } from "@shared/components/ui/button"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@shared/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@shared/components/ui/popover"
+import { Alert, AlertDescription } from "@shared/components/ui/alert"
 
 interface AddressSuggestion {
   address: string

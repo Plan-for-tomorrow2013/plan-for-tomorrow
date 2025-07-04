@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/app/professionals/SoEE/components/ui/button"
-import { Input } from "@/app/professionals/SoEE/components/ui/input"
-import { Label } from "@/app/professionals/SoEE/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/app/professionals/SoEE/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/app/professionals/SoEE/components/ui/accordion"
-import { Alert, AlertDescription } from "@/app/professionals/SoEE/components/ui/alert"
+import { Button } from "@shared/components/ui/button"
+import { Input } from "@shared/components/ui/input"
+import { Label } from "@shared/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@shared/components/ui/accordion"
+import { Alert, AlertDescription } from "@shared/components/ui/alert"
 import { Info } from "lucide-react"
 
 interface DCPStandardsValues {

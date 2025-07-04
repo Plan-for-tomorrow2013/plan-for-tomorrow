@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "@shared/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card";
 import { ArrowRight, FileText, ClipboardList } from "lucide-react";
 
 interface SoEELandingProps {

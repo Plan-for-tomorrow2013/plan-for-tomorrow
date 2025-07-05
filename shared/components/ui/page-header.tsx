@@ -8,9 +8,10 @@ interface PageHeaderProps {
   title: string
   description?: string
   backHref?: string
+  icon?: React.ReactNode
 }
 
-export function PageHeader({ title, description, backHref }: PageHeaderProps) {
+export function PageHeader({ title, description, backHref, icon }: PageHeaderProps) {
   return (
     <div className="flex items-center gap-4 mb-8">
       {backHref && (
@@ -20,9 +21,12 @@ export function PageHeader({ title, description, backHref }: PageHeaderProps) {
           </Link>
         </Button>
       )}
-      <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
-        {description && <p className="text-gray-500 mt-2">{description}</p>}
+      <div className="flex items-center gap-3">
+        {icon && <div className="text-gray-600">{icon}</div>}
+        <div>
+          <h1 className="text-3xl font-bold">{title}</h1>
+          {description && <p className="text-gray-500 mt-2">{description}</p>}
+        </div>
       </div>
     </div>
   )

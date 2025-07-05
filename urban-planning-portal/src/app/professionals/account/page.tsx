@@ -44,15 +44,15 @@ export default function AccountPage() {
     <div className="p-6">
       <PageHeader title="Account Settings" description="Manage your account preferences and settings" />
 
-      <div className="max-w-4xl mx-auto">
-        <Tabs defaultValue="personal" className="space-y-6">
-          <TabsList className="grid grid-cols-3 lg:grid-cols-6 gap-4">
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="company">Company</TabsTrigger>
-            <TabsTrigger value="billing">Billing</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="social">Social</TabsTrigger>
+      <div className="w-full">
+        <Tabs defaultValue="personal" className="space-y-6 w-full">
+          <TabsList className="flex w-full border-b bg-grey-100 p-0">
+            <TabsTrigger value="personal" className="flex-1">Personal</TabsTrigger>
+            <TabsTrigger value="company" className="flex-1">Company</TabsTrigger>
+            <TabsTrigger value="billing" className="flex-1">Billing</TabsTrigger>
+            <TabsTrigger value="notifications" className="flex-1">Notifications</TabsTrigger>
+            <TabsTrigger value="security" className="flex-1">Security</TabsTrigger>
+            <TabsTrigger value="social" className="flex-1">Social</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal">

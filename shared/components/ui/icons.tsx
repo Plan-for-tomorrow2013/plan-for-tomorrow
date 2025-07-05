@@ -85,7 +85,7 @@ export {
   FileSpreadsheet,
   BarChart3,
   AlertCircle,
-  XIcon
+  XIcon,
 }
 
 // You can also create custom icon components here if needed

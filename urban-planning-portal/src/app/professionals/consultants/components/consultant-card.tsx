@@ -325,19 +325,18 @@ export function ConsultantCard({
           {/* Status display using getReportStatus or fallback */}
           {consultantStatus === 'pending' || consultantStatus === 'paid' ? (
             <div className="mt-4 p-4 bg-blue-50 rounded-md">
-              <h4 className="font-medium mb-2">Report In Progress</h4>
+              <h4 className="font-medium mb-2">Quote In Progress</h4>
               <p className="text-sm text-gray-600">
-                We are processing your "Quote Request" Report. You will be notified when it's ready.
+                We are processing your Quote Request. You will be notified when it's ready.
               </p>
             </div>
           ) : (
             reportStatus?.isPaid &&
             !reportStatus?.isCompleted && (
               <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                <h4 className="font-medium mb-2">Report In Progress</h4>
+                <h4 className="font-medium mb-2">Quote In Progress</h4>
                 <p className="text-sm text-gray-600">
-                  We are processing your "Quote Request" Report. You will be notified when it's
-                  ready.
+                  We are processing your Quote Request. You will be notified when it's ready.
                 </p>
               </div>
             )
@@ -345,9 +344,9 @@ export function ConsultantCard({
 
           {isCompletedFromAssessment && (
             <div className="mt-4 p-4 bg-green-50 rounded-md">
-              <h4 className="font-medium mb-2">Report Complete</h4>
+              <h4 className="font-medium mb-2">Quote Returned</h4>
               <p className="text-sm text-gray-600">
-                Your report has been completed and is available in the documents section.
+                Your Quote has been returned and is available in the documents section.
               </p>
             </div>
           )}

@@ -390,10 +390,12 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
         throw new Error('Failed to fetch consultant tickets');
       }
       const allTickets = await response.json();
-      // Filter tickets for this specific job
       return allTickets.filter((ticket: any) => ticket.jobId === jobId);
     },
-    staleTime: 30000, // 30 seconds
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 
   // Function to check if any consultant in a category has a quote request

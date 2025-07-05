@@ -25,8 +25,7 @@ export function CategoryCard({ title, icon, href, description, quoteRequested = 
           <p className="text-sm text-gray-600 text-center mb-4">{description}</p>
         )}
         {quoteRequested && (
-          <div className="mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-            Quote Requested
+          <div className="mt-2 px-3 py-1 bg-blue-100 rounded-full">
           </div>
         )}
       </div>

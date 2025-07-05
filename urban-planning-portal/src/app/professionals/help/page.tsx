@@ -1,151 +1,177 @@
-import { Button } from '@shared/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@shared/components/ui/card';
-import { Input } from '@shared/components/ui/input';
-import { HelpCircle, Search, Book, MessageCircle, Phone } from 'lucide-react';
+"use client"
+
+import { useState } from "react"
+import { HelpCircle, Search, Mail, ArrowRight } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Input } from "@shared/components/ui/input"
+import { Button } from "@shared/components/ui/button"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@shared/components/ui/accordion"
+import { PageHeader } from "@shared/components/ui/page-header"
+
+const HELP_SECTIONS = [
+  {
+    title: "Getting Started",
+    items: [
+      {
+        question: "How do I create a new job?",
+        answer:
+          "To create a new job, go to the Dashboard and use the 'New Job' form. Enter the address and select the job stage. You can also upload relevant documents at this stage.",
+      },
+      {
+        question: "What documents do I need?",
+        answer:
+          "Required documents vary by job type. Generally, you'll need architectural plans, a site survey, and property information. The system will guide you through required documents for your specific case.",
+      },
+    ],
+  },
+  {
+    title: "Initial Assessment",
+    items: [
+      {
+        question: "How does the Initial Assessment work?",
+        answer:
+          "The Initial Assessment uses AI to analyze your project against council requirements. You can also chat with our system to get instant answers about planning rules and requirements.",
+      },
+      {
+        question: "Can I purchase pre-configured assessments?",
+        answer:
+          "Yes, you can purchase pre-configured assessments for various development types including alterations, single dwellings, dual occupancy, and more.",
+      },
+    ],
+  },
+  {
+    title: "Design Check",
+    items: [
+      {
+        question: "What does the Design Check analyze?",
+        answer:
+          "The Design Check analyzes your architectural plans against council-specific development controls, including building height, setbacks, FSR, and more.",
+      },
+      {
+        question: "How accurate is the Design Check?",
+        answer:
+          "Our Design Check uses advanced AI to provide highly accurate results. However, we recommend reviewing the results with your architect or planner.",
+      },
+    ],
+  },
+  {
+    title: "Report Writer",
+    items: [
+      {
+        question: "What types of reports can I generate?",
+        answer:
+          "You can generate Complying Development Certificates (CDC) and Statements of Environmental Effects (SoEE) for various development types.",
+      },
+      {
+        question: "How long does report review take?",
+        answer:
+          "Reports are typically reviewed within 1-2 business days. You'll receive an email notification when your report is ready.",
+      },
+    ],
+  },
+]
 
 export default function HelpPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredSections, setFilteredSections] = useState(HELP_SECTIONS)
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setFilteredSections(HELP_SECTIONS)
+      return
+    }
+
+    const filtered = HELP_SECTIONS.map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) =>
+          item.question.toLowerCase().includes(query.toLowerCase()) ||
+          item.answer.toLowerCase().includes(query.toLowerCase()),
+      ),
+    })).filter((section) => section.items.length > 0)
+
+    setFilteredSections(filtered)
+  }
+
+  const handleContactSupport = () => {
+    window.location.href = "mailto:support@example.com?subject=Portal Support Request"
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Help Center</h1>
-          <p className="text-gray-500 mt-2">Find answers and support</p>
-        </div>
-      </div>
+    <div className="p-6">
+      <PageHeader title="Help Center" icon={<HelpCircle className="h-6 w-6" />} />
 
-      <div className="max-w-2xl mb-8">
-        <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search for help..."
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-          >
-            <Search className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center gap-2">
-              <Book className="h-6 w-6 text-blue-500" />
-              <h3 className="text-2xl font-semibold leading-none tracking-tight">Documentation</h3>
+      <div className="max-w-full mx-auto space-y-6">
+        <Card className="bg-primary text-primary-foreground">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-bold">Need help with the portal?</h2>
+              <p>Search our help articles or contact us directly</p>
+              <div className="max-w-xl mx-auto flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary" />
+                  <Input
+                    placeholder="Search help articles..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="pl-8 bg-white text-primary border-0"
+                  />
+                </div>
+                <Button variant="outline" className="bg-white hover:bg-white/90" onClick={handleContactSupport}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Contact Support
+                </Button>
+              </div>
             </div>
-            <CardDescription>Browse our guides and tutorials</CardDescription>
-          </div>
-          <div className="p-6 pt-0">
-            <ul className="space-y-2">
-              <li>• Getting Started Guide</li>
-              <li>• Initial Assessment Guide</li>
-              <li>• Report Writing Tips</li>
-              <li>• Design Check Guide</li>
-            </ul>
-            <Button variant="outline" className="w-full mt-4">
-              View All
-            </Button>
-          </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6">
+          {filteredSections.map((section) => (
+            <Card key={section.title}>
+              <CardHeader>
+                <CardTitle>{section.title}</CardTitle>
+                <CardDescription>Everything you need to know about {section.title.toLowerCase()}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Accordion type="single" collapsible className="w-full">
+                  {section.items.map((item, index) => (
+                    <AccordionItem key={index} value={`item-${index}`}>
+                      <AccordionTrigger>{item.question}</AccordionTrigger>
+                      <AccordionContent>{item.answer}</AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-6 w-6 text-green-500" />
-              <CardTitle>Live Chat</CardTitle>
-            </div>
-            <CardDescription>Chat with our support team</CardDescription>
+            <CardTitle>Quick Links</CardTitle>
+            <CardDescription>Frequently accessed features and guides</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-500 mb-4">
-              Our team is available Monday to Friday, 9am - 5pm AEST.
-            </p>
-            <Button className="w-full">Start Chat</Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { title: "Video Tutorials", href: "/help/tutorials" },
+                { title: "User Guide PDF", href: "/help/guide.pdf" },
+                { title: "FAQ", href: "/help/faq" },
+                { title: "Support Portal", href: "/help/support" },
+              ].map((link) => (
+                <Button key={link.title} variant="outline" className="justify-between" asChild>
+                  <a href={link.href}>
+                    {link.title}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </Button>
+              ))}
+            </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Phone className="h-6 w-6 text-purple-500" />
-              <CardTitle>Contact Us</CardTitle>
-            </div>
-            <CardDescription>Get in touch via phone or email</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 mb-4">
-              <p className="text-sm">Phone: 1300 XXX XXX</p>
-              <p className="text-sm">Email: support@planfortomorrow.com</p>
-            </div>
-            <Button variant="outline" className="w-full">
-              Send Email
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Frequently Asked Questions</h2>
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-gray-500" />
-                <CardTitle className="text-base">How do I start a new assessment?</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                To start a new assessment, navigate to the Initial Assessment page and click the
-                "Create New" button. Follow the guided process to complete your assessment.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-gray-500" />
-                <CardTitle className="text-base">What documents do I need for a report?</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                For a complete report, you'll need site plans, development drawings, and any
-                relevant council documentation. Check our documentation guide for a full list.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Getting Started</h2>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>• Design Check Guide</li>
-            <li>• Report Writer Guide</li>
-            <li>• Consultants Guide</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold mb-4">How to Use the Platform</h2>
-          <p className="mb-4">
-            To start a new assessment, navigate to the Design Check page and follow the guided
-            process. Our platform will help you ensure your design complies with local regulations
-            and requirements.
-          </p>
-        </section>
       </div>
     </div>
-  );
+  )
 }

@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@shared/components/ui/use-toast';
 import { ConsultantTicket } from '@shared/types/consultantsTickets';
 import { PageHeader } from '@shared/components/ui/page-header';
-import { ConsultantTicketCard } from './components/ConsultantTicketCard';
+import { ConsultantTicketCard } from '../../../components/ConsultantTicketCard';
 
 export default function ConsultantTicketsPage() {
   const [tickets, setTickets] = useState<ConsultantTicket[]>([]);

@@ -130,15 +130,28 @@ export default function AdminPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-2">Consultant Tickets</h2>
+            <h2 className="text-lg font-semibold mb-2">Consultant Quotes</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Review and manage the consultant tickets.
+              Review and manage the consultant quotes.
             </p>
             <a
               href="/admin/consultants-tickets"
               className="text-sm text-blue-500 hover:text-blue-700"
             >
-              Go to Consultant Tickets →
+              Go to Consultant Quotes →
+            </a>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold mb-2">Consultant Work Orders</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Review and manage the consultant work orders.
+            </p>
+            <a
+              href="/admin/consultants-work-orders"
+              className="text-sm text-blue-500 hover:text-blue-700"
+            >
+              Go to Consultant Work Orders →
             </a>
           </div>
         </div>

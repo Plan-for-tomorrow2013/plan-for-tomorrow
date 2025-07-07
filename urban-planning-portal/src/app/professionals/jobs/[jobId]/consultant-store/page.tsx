@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
 import { ArrowLeft, Upload, FileText, X, Check, Loader2, DollarSign } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
@@ -10,7 +10,7 @@ import { Document, DOCUMENT_TYPES, DocumentWithStatus } from '@shared/types/cons
 import { Job } from '@shared/types/jobs';
 import { getReportStatus, getReportTitle } from '@shared/utils/report-utils';
 import { ConsultantProvider, useConsultants } from '@shared/contexts/consultant-context';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { handleDocumentDownload } from '@shared/utils/document-utils';
 import { ConsultantTicket } from '@shared/types/consultantsTickets';
 import { ConsultantWorkOrder } from '@shared/types/consultantsWorkOrder';
@@ -38,14 +38,13 @@ const CONSULTANT_CATEGORIES = [
 
 function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const {
     consultantDocuments: documents,
     isLoading: isDocsLoading,
     error: docsError,
     downloadDocument,
   } = useConsultants();
-  const [consultantTickets, setConsultantTickets] = useState<ConsultantTicket[]>([]);
-  const [workOrders, setWorkOrders] = useState<ConsultantWorkOrder[]>([]);
   const [isAcceptingQuote, setIsAcceptingQuote] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -63,40 +62,140 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     },
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [params.jobId]);
+  // Fetch consultant tickets using React Query
+  const {
+    data: consultantTickets = [],
+    isLoading: isTicketsLoading,
+    error: ticketsError,
+  } = useQuery<ConsultantTicket[]>({
+    queryKey: ['consultant-tickets', params.jobId],
+    queryFn: async () => {
+      const response = await fetch('/api/consultant-tickets');
+      if (!response.ok) throw new Error('Failed to fetch consultant tickets');
+      const ticketsData = await response.json();
+      // Filter tickets for this job
+      return ticketsData.filter((ticket: ConsultantTicket) => ticket.jobId === params.jobId);
+    },
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true,
+  });
 
-  const fetchData = async () => {
-    try {
-      const [ticketsRes, workOrdersRes] = await Promise.all([
-        fetch('/api/consultant-tickets'),
-        fetch('/api/consultant-work-orders'),
-      ]);
+  // Fetch work orders using React Query
+  const {
+    data: workOrders = [],
+    isLoading: isWorkOrdersLoading,
+    error: workOrdersError,
+  } = useQuery<ConsultantWorkOrder[]>({
+    queryKey: ['consultant-work-orders', params.jobId],
+    queryFn: async () => {
+      const response = await fetch('/api/consultant-work-orders');
+      if (!response.ok) throw new Error('Failed to fetch work orders');
+      const workOrdersData = await response.json();
+      // Filter work orders for this job
+      return workOrdersData.filter((order: ConsultantWorkOrder) => order.jobId === params.jobId);
+    },
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true,
+  });
 
-      if (ticketsRes.ok) {
-        const ticketsData = await ticketsRes.json();
-        // Filter tickets for this job
-        const jobTickets = ticketsData.filter((ticket: ConsultantTicket) => ticket.jobId === params.jobId);
-        setConsultantTickets(jobTickets);
+  // Accept quote mutation
+  const acceptQuoteMutation = useMutation({
+    mutationFn: async (quoteTicketId: string) => {
+      const ticket = consultantTickets.find(t => t.id === quoteTicketId);
+      if (!ticket) {
+        throw new Error('Consultant ticket not found');
       }
 
-      if (workOrdersRes.ok) {
-        const workOrdersData = await workOrdersRes.json();
-        // Filter work orders for this job
-        const jobWorkOrders = workOrdersData.filter((order: ConsultantWorkOrder) => order.jobId === params.jobId);
-        setWorkOrders(jobWorkOrders);
+      const response = await fetch('/api/consultant-work-orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          quoteTicketId: ticket.id,
+          jobId: ticket.jobId,
+          category: ticket.category,
+          consultantId: ticket.consultantId,
+          consultantName: ticket.consultantName,
+          jobAddress: ticket.jobAddress,
+          assessment: ticket.assessment,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to accept quote');
       }
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    }
-  };
+
+      return response.json();
+    },
+    // Optimistic update for instant UI feedback
+    onMutate: async (quoteTicketId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['consultant-tickets', params.jobId] });
+      await queryClient.cancelQueries({ queryKey: ['consultant-work-orders', params.jobId] });
+      const previousTickets = queryClient.getQueryData<ConsultantTicket[]>(['consultant-tickets', params.jobId]);
+      const previousWorkOrders = queryClient.getQueryData<ConsultantWorkOrder[]>(['consultant-work-orders', params.jobId]);
+      // Optimistically remove the ticket and add a placeholder work order
+      if (previousTickets && previousWorkOrders) {
+        const ticket = previousTickets.find(t => t.id === quoteTicketId);
+        if (ticket) {
+          queryClient.setQueryData(
+            ['consultant-tickets', params.jobId],
+            previousTickets.filter(t => t.id !== quoteTicketId)
+          );
+          queryClient.setQueryData(
+            ['consultant-work-orders', params.jobId],
+            [
+              ...previousWorkOrders,
+              {
+                id: 'optimistic-' + quoteTicketId,
+                jobId: ticket.jobId,
+                jobAddress: ticket.jobAddress,
+                category: ticket.category,
+                status: 'in-progress',
+                createdAt: new Date().toISOString(),
+                consultantId: ticket.consultantId,
+                consultantName: ticket.consultantName,
+                assessment: ticket.assessment,
+                documents: ticket.documents,
+              },
+            ]
+          );
+        }
+      }
+      return { previousTickets, previousWorkOrders };
+    },
+    onSuccess: (newWorkOrder) => {
+      // Invalidate and refetch the relevant queries
+      queryClient.invalidateQueries({ queryKey: ['consultant-tickets', params.jobId] });
+      queryClient.invalidateQueries({ queryKey: ['consultant-work-orders', params.jobId] });
+      queryClient.invalidateQueries({ queryKey: ['job', params.jobId] });
+      toast({
+        title: 'Quote Accepted',
+        description: 'Your quote has been accepted and work has begun.',
+      });
+    },
+    onError: (error, _quoteTicketId, context) => {
+      // Rollback optimistic update
+      if (context?.previousTickets) {
+        queryClient.setQueryData(['consultant-tickets', params.jobId], context.previousTickets);
+      }
+      if (context?.previousWorkOrders) {
+        queryClient.setQueryData(['consultant-work-orders', params.jobId], context.previousWorkOrders);
+      }
+      console.error('Error accepting quote:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to accept quote. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Filter documents to only show consultant-generated assessment documents
   const filteredDocuments = documents.filter((doc: DocumentWithStatus) => CONSULTANT_CATEGORIES.includes(doc.category));
 
-  const isLoading = isDocsLoading || isJobLoading;
-  const error = docsError || jobError?.message;
+  const isLoading = isDocsLoading || isJobLoading || isTicketsLoading || isWorkOrdersLoading;
+  const error = docsError || jobError?.message || ticketsError?.message || workOrdersError?.message;
 
   const handleUpload = (docId: string) => {
     // Consultant documents are read-only, no upload functionality needed
@@ -119,51 +218,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   const handleAcceptQuote = async (quoteTicketId: string) => {
     setIsAcceptingQuote(quoteTicketId);
     try {
-      // Find the ticket by ID
-      const ticket = consultantTickets.find(t => t.id === quoteTicketId);
-      if (!ticket) {
-        throw new Error('Consultant ticket not found');
-      }
-      const response = await fetch('/api/consultant-work-orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          quoteTicketId: ticket.id,
-          jobId: ticket.jobId,
-          category: ticket.category,
-          consultantId: ticket.consultantId,
-          consultantName: ticket.consultantName,
-          jobAddress: ticket.jobAddress,
-          assessment: ticket.assessment,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to accept quote');
-      }
-
-      const newWorkOrder = await response.json();
-      setWorkOrders(prev => [...prev, newWorkOrder]);
-      
-      // Remove the quote ticket from the list
-      setConsultantTickets(prev => prev.filter(ticket => ticket.id !== quoteTicketId));
-
-      toast({
-        title: 'Quote Accepted',
-        description: 'Your quote has been accepted and work has begun.',
-      });
-
-      // Refresh data to update the display
-      fetchData();
-    } catch (error) {
-      console.error('Error accepting quote:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to accept quote. Please try again.',
-        variant: 'destructive',
-      });
+      await acceptQuoteMutation.mutateAsync(quoteTicketId);
     } finally {
       setIsAcceptingQuote(null);
     }
@@ -171,29 +226,35 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
 
   const handleDownloadWorkOrderDocument = async (orderId: string, documentType: 'report' | 'invoice') => {
     try {
-      const response = await fetch('/api/consultant-work-orders/download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderId,
-          documentType,
-        }),
-      });
-
+      // Find the work order
+      const workOrder = workOrders.find((wo) => wo.id === orderId);
+      if (!workOrder) throw new Error('Work order not found');
+      // Get the correct fileName
+      let fileName = '';
+      let originalName = '';
+      if (documentType === 'report' && workOrder.completedDocument) {
+        fileName = workOrder.completedDocument.fileName;
+        originalName = workOrder.completedDocument.originalName || fileName;
+      } else if (documentType === 'invoice' && workOrder.invoice) {
+        fileName = workOrder.invoice.fileName;
+        originalName = workOrder.invoice.originalName || fileName;
+      } else {
+        throw new Error('Requested document not found');
+      }
+      // Use the download-document endpoint (GET)
+      const url = `/api/download-document?jobId=${encodeURIComponent(workOrder.jobId)}&fileName=${encodeURIComponent(fileName)}&originalName=${encodeURIComponent(originalName)}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to download document');
       }
-
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = documentType === 'report' ? 'final-report.pdf' : 'invoice.pdf';
+      a.href = downloadUrl;
+      a.download = originalName;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading document:', error);
@@ -386,8 +447,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 <p className="font-semibold text-lg">Report In Progress</p>
                 <p className="text-sm text-gray-600 px-4">
                   {hasWorkOrder 
-                    ? `Thank you for accepting your quote for "${ticket.category}" Report for ${ticket.consultantName}. You will be notified once it's ready.`
-                    : `We are processing your "${ticket.category}" Report for ${ticket.consultantName}. You will be notified once it's ready.`
+                    ? `Thank you for accepting your quote for a "${ticket.category}" Report from ${ticket.consultantName}. We are requesting your report. You will be notified once it's ready.`
+                    : `We are requesting a quote for your "${ticket.category}" Report for ${ticket.consultantName}. You will be notified once it's ready.`
                   }
                 </p>
               </div>
@@ -447,9 +508,9 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 <Button
                   className="w-full bg-green-600 hover:bg-green-700"
                   onClick={() => handleAcceptQuote(ticket.id)}
-                  disabled={isAcceptingQuote === ticket.id}
+                  disabled={isAcceptingQuote === ticket.id || acceptQuoteMutation.isPending}
                 >
-                  {isAcceptingQuote === ticket.id ? (
+                  {isAcceptingQuote === ticket.id || acceptQuoteMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Accepting Quote...

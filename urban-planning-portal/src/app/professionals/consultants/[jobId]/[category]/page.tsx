@@ -1,5 +1,8 @@
 'use client';
 
+// Force logs to always run on every render
+console.log('--- PAGE RENDER ---');
+
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Search, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -11,11 +14,13 @@ import { useQuoteRequests } from '@shared/hooks/useQuoteRequests';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
+import { ConsultantTicket } from '@shared/types/consultantsTickets';
+import { ConsultantWorkOrder } from '@shared/types/consultantsWorkOrder';
 
 // Add interface for quote request state
 interface QuoteRequestState {
   [consultantId: string]: {
-    status: 'pending' | 'in_progress' | 'completed';
+    status: 'pending' | 'in_progress' | 'paid' | 'completed';
     timestamp: number;
   };
 }
@@ -38,6 +43,11 @@ const categoryTitles: { [key: string]: string } = {
   Arborist: 'Arborist',
   Geotechnical: 'Geotechnical',
 };
+
+// Utility to normalize category strings (kebab-case or title case to lowercase with spaces)
+function normalizeCategory(category: string) {
+  return category.replace(/-/g, ' ').toLowerCase().trim();
+}
 
 export default function QuoteCategoryPage({
   params,
@@ -66,25 +76,63 @@ export default function QuoteCategoryPage({
     staleTime: 0,
   });
   const { quoteRequests, updateQuoteRequestStatus } = useQuoteRequests(params.jobId);
-  // Fetch consultant tickets for this job
-  const { data: consultantTickets, isLoading: isTicketsLoading } = useQuery({
+  
+  // Fetch consultant tickets using React Query
+  const {
+    data: consultantTickets = [],
+    isLoading: isTicketsLoading,
+    error: ticketsError,
+  } = useQuery<ConsultantTicket[]>({
     queryKey: ['consultant-tickets', params.jobId],
     queryFn: async () => {
-      const res = await fetch('/api/consultant-tickets');
-      if (!res.ok) throw new Error('Failed to fetch consultant tickets');
-      return res.json();
+      const response = await fetch('/api/consultant-tickets');
+      if (!response.ok) throw new Error('Failed to fetch consultant tickets');
+      const ticketsData = await response.json();
+      // Filter tickets for this job
+      return ticketsData.filter((ticket: ConsultantTicket) => ticket.jobId === params.jobId);
     },
-    enabled: !!params.jobId,
-    staleTime: 0,
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true,
+  });
+
+  // Fetch work orders using React Query
+  const {
+    data: workOrders = [],
+    isLoading: isWorkOrdersLoading,
+    error: workOrdersError,
+  } = useQuery<ConsultantWorkOrder[]>({
+    queryKey: ['consultant-work-orders', params.jobId],
+    queryFn: async () => {
+      const response = await fetch('/api/consultant-work-orders');
+      if (!response.ok) throw new Error('Failed to fetch work orders');
+      const workOrdersData = await response.json();
+      // Filter work orders for this job
+      return workOrdersData.filter((order: ConsultantWorkOrder) => order.jobId === params.jobId);
+    },
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchIntervalInBackground: true,
   });
 
   // Filter tickets for this job and category
   const ticketsForCategory = useMemo(() => {
     if (!consultantTickets) return [];
     return consultantTickets.filter(
-      (t: any) => t.jobId === params.jobId && t.category === params.category
+      (t: any) =>
+        t.jobId === params.jobId &&
+        normalizeCategory(t.category) === normalizeCategory(params.category)
     );
   }, [consultantTickets, params.jobId, params.category]);
+
+  // Filter work orders for this job and category - include status check for work orders
+  const workOrdersForCategory = useMemo(() => {
+    if (!workOrders) return [];
+    return workOrders.filter(
+      (order: ConsultantWorkOrder) =>
+        order.jobId === params.jobId &&
+        normalizeCategory(order.category) === normalizeCategory(params.category) &&
+        (order.status === 'in-progress' || order.status === 'completed' || order.status === 'pending')
+    );
+  }, [workOrders, params.jobId, params.category]);
 
   useEffect(() => {
     setLoading(true);
@@ -109,13 +157,6 @@ export default function QuoteCategoryPage({
   // Transform job data into the format expected by ConsultantCard
   const jobsData = job ? [job] : [];
 
-  // Debug: Log tickets and consultants before mapping
-  console.log('ticketsForCategory', ticketsForCategory);
-  console.log(
-    'filteredConsultants',
-    filteredConsultants.map(c => c.id)
-  );
-
   return (
     <ConsultantProvider jobId={params.jobId}>
       <DocumentProvider jobId={params.jobId}>
@@ -131,6 +172,9 @@ export default function QuoteCategoryPage({
           router={router}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          ticketsForCategory={ticketsForCategory}
+          workOrdersForCategory={workOrdersForCategory}
+          isTicketsLoading={isTicketsLoading}
         />
       </DocumentProvider>
     </ConsultantProvider>
@@ -149,6 +193,9 @@ function ConsultantDocumentsContent({
   router,
   searchQuery,
   setSearchQuery,
+  ticketsForCategory,
+  workOrdersForCategory,
+  isTicketsLoading,
 }: any) {
   const { documents } = useDocuments();
   const jobsData = job ? [job] : [];
@@ -186,20 +233,36 @@ function ConsultantDocumentsContent({
         </div>
       ) : (
         <>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredConsultants.map((consultant: any) => (
-              <ConsultantCard
-                key={consultant.id}
-                consultant={consultant}
-                jobs={jobsData}
-                initialReportStatus={quoteRequests[consultant.id]?.status || null}
-                onReportStatusChange={(status: 'pending' | 'in_progress' | 'completed') =>
-                  updateQuoteRequestStatus({ consultantId: consultant.id, status })
-                }
-                refetchJob={refetchJob}
-                documents={documents}
-              />
-            ))}
+            {filteredConsultants.map((consultant: any) => {
+              // Find ticket for this consultant (match by consultantId as string, trimmed)
+              const ticket = ticketsForCategory.find(
+                (t: ConsultantTicket) => String(t.consultantId).trim() === String(consultant.id).trim()
+              );
+              
+              // Find work order for this consultant (match by consultantId as string, trimmed)
+              const workOrder = workOrdersForCategory.find(
+                (wo: ConsultantWorkOrder) => String(wo.consultantId).trim() === String(consultant.id).trim()
+              );
+
+              return (
+                <ConsultantCard
+                  key={consultant.id}
+                  consultant={consultant}
+                  jobs={jobsData}
+                  initialReportStatus={quoteRequests[consultant.id]?.status || null}
+                  onReportStatusChange={(status: 'pending' | 'in_progress' | 'completed') =>
+                    updateQuoteRequestStatus({ consultantId: consultant.id, status })
+                  }
+                  refetchJob={refetchJob}
+                  documents={documents}
+                  ticket={ticket}
+                  workOrder={workOrder}
+                  isTicketsLoading={isTicketsLoading}
+                />
+              );
+            })}
           </div>
           {filteredConsultants.length === 0 && (
             <div className="text-center py-12">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Phone, Edit2, Save, X, Clock, FileText } from 'lucide-react';
+import { Mail, Phone, Edit2, Save, X, Clock, FileText, Check, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Textarea } from '@shared/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -22,6 +22,8 @@ import { ConsultantCategory } from '@shared/types/jobs';
 import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/consultant-report-utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { DocumentWithStatus } from '@shared/types/consultants';
+import { ConsultantTicket } from '@shared/types/consultantsTickets';
+import { ConsultantWorkOrder } from '@shared/types/consultantsWorkOrder';
 
 interface Consultant {
   id: string;
@@ -56,6 +58,9 @@ interface ConsultantCardProps {
   onReportStatusChange?: (status: 'pending' | 'in_progress' | 'completed') => void;
   refetchJob?: () => Promise<any>;
   documents: DocumentWithStatus[];
+  ticket?: ConsultantTicket;
+  workOrder?: ConsultantWorkOrder;
+  isTicketsLoading?: boolean;
 }
 
 export function ConsultantCard({
@@ -65,6 +70,9 @@ export function ConsultantCard({
   onReportStatusChange,
   refetchJob,
   documents,
+  ticket,
+  workOrder,
+  isTicketsLoading,
 }: ConsultantCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(consultant.notes);
@@ -119,6 +127,21 @@ export function ConsultantCard({
 
   const completedDocument = consultantObj?.assessment?.completedDocument;
   const isCompletedFromAssessment = consultantObj?.assessment?.status === 'completed' && !!completedDocument?.fileName && !!completedDocument?.returnedAt;
+
+  // Determine the current status based on ticket and work order
+  const hasTicket = !!ticket;
+  const hasWorkOrder = !!workOrder;
+  // Treat 'pending' as in-progress for work orders for backward compatibility
+  const isWorkOrderCompleted = workOrder?.status === 'completed';
+  const isWorkOrderInProgress = workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
+  // Only check for valid ConsultantTicket.status values to avoid TypeScript error
+  const hasActiveTicket = ticket && (
+    ticket.status === 'pending' ||
+    ticket.status === 'in-progress' ||
+    ticket.status === 'paid'
+  );
+  // If 'paid' is needed, update the ConsultantTicket.status type in shared/types/consultantsTickets.ts
+  const hasActiveWorkOrder = workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
 
   const handleSaveNotes = async () => {
     try {
@@ -234,19 +257,6 @@ export function ConsultantCard({
     }
   };
 
-  console.log('consultant:', consultant);
-  console.log('documents:', documents);
-  console.log('relevantDoc:', relevantDoc);
-  console.log('reportStatus:', reportStatus);
-
-  console.log(
-    'ConsultantCard',
-    'consultant.id:',
-    consultant.id,
-    'consultantStatus:',
-    consultantStatus
-  );
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-3">
@@ -322,37 +332,48 @@ export function ConsultantCard({
             )}
           </div>
 
-          {/* Status display using getReportStatus or fallback */}
-          {consultantStatus === 'pending' || consultantStatus === 'paid' ? (
-            <div className="mt-4 p-4 bg-blue-50 rounded-md">
-              <h4 className="font-medium mb-2">Quote In Progress</h4>
-              <p className="text-sm text-gray-600">
-                We are processing your Quote Request. You will be notified when it's ready.
+          {/* Status display based on work order and ticket status, in strict priority order */}
+          {isWorkOrderCompleted ? (
+            <div className="mt-4 p-4 bg-green-50 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <Check className="h-4 w-4 text-green-600" />
+                <h4 className="font-medium text-green-800">Work Completed</h4>
+              </div>
+              <p className="text-sm text-green-700">
+                Your work order has been completed. Check the consultant store for final reports and invoices.
               </p>
             </div>
-          ) : (
-            reportStatus?.isPaid &&
-            !reportStatus?.isCompleted && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                <h4 className="font-medium mb-2">Quote In Progress</h4>
-                <p className="text-sm text-gray-600">
-                  We are processing your Quote Request. You will be notified when it's ready.
-                </p>
+          ) : isWorkOrderInProgress ? (
+            <div className="mt-4 p-4 bg-blue-50 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+                <h4 className="font-medium text-blue-800">Work In Progress</h4>
               </div>
-            )
-          )}
-
-          {isCompletedFromAssessment && (
+              <p className="text-sm text-blue-700">
+                Thank you for accepting your quote for a "{consultant.category}" Report from "{consultant.name}". We are requesting your report. You will be notified once it's ready.
+              </p>
+            </div>
+          ) : hasActiveTicket ? (
+            <div className="mt-4 p-4 bg-yellow-50 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-yellow-600" />
+                <h4 className="font-medium text-yellow-800">Quote Requested</h4>
+              </div>
+              <p className="text-sm text-yellow-700">
+                Quote request has been sent. You will be notified when the quote is ready.
+              </p>
+            </div>
+          ) : (ticket && ticket.status === 'completed') ? (
             <div className="mt-4 p-4 bg-green-50 rounded-md">
               <h4 className="font-medium mb-2">Quote Returned</h4>
               <p className="text-sm text-gray-600">
                 Your Quote has been returned and is available in the documents section.
               </p>
             </div>
-          )}
+          ) : null}
 
-          {/* Only show the Request Quote button if no quote has been sent yet, not in progress, and not completed */}
-          {!(consultantStatus === 'pending' || consultantStatus === 'paid' || isCompletedFromAssessment) && !reportStatus && (
+          {/* Only show the Request Quote button if no ticket or work order exists and tickets are not loading */}
+          {!hasTicket && !hasWorkOrder && !isTicketsLoading && (
             <Button
               className="w-full"
               onClick={() => {

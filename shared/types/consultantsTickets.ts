@@ -6,7 +6,7 @@ export interface ConsultantTicket {
   jobId: string
   jobAddress: string
   category: ConsultantCategory
-  status: 'pending' | 'in-progress' | 'completed'
+  status: 'pending' | 'in-progress' | 'paid' | 'completed'
   createdAt: string
   completedDocument?: {
     fileName: string

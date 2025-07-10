@@ -7,22 +7,36 @@ import { toast } from "../components/ui/use-toast"
 
 // Create an empty site details object with default values
 const emptySiteDetails: SiteDetails = {
+  // Site Characteristics
+  lotType: '',
   siteArea: '',
-  frontage: '',
-  depth: '',
-  slope: '',
-  orientation: '',
-  soilType: '',
-  vegetation: '',
+  primaryStreetWidth: '',
+  siteDepth: '',
+  secondaryStreetWidth: '',
+  gradient: '',
+  highestRL: '',
+  lowestRL: '',
+  fallAmount: '',
+
+  // Existing Development
+  currentLandUse: '',
+  existingDevelopmentDetails: '',
+
+  // Surrounding Development
+  northDevelopment: '',
+  southDevelopment: '',
+  eastDevelopment: '',
+  westDevelopment: '',
+
+  // Site Constraints
+  bushfireProne: false,
+  floodProne: false,
+  acidSulfateSoils: false,
+  biodiversity: false,
+  salinity: false,
+  landslip: false,
   heritage: '',
-  floodProne: '',
-  bushfireProne: '',
-  contamination: '',
   otherConstraints: '',
-  adjoiningNorth: '',
-  adjoiningSouth: '',
-  adjoiningEast: '',
-  adjoiningWest: ''
 }
 
 interface SiteDetailsContextType {

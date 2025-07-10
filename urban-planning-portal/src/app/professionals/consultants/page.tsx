@@ -37,8 +37,8 @@ import {
 import { useJobs } from '@shared/hooks/useJobs';
 import Link from 'next/link';
 import { Alert, AlertDescription } from '@shared/components/ui/alert';
-import { Document, DOCUMENT_TYPES } from '@shared/types/consultants';
-import { DocumentWithStatus } from '@shared/types/consultants';
+import { Document, DOCUMENT_TYPES } from '@shared/types/documents';
+import { DocumentWithStatus } from '@shared/types/documents';
 import { Input } from '@shared/components/ui/input';
 import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from '@shared/components/ui/use-toast';
@@ -52,14 +52,15 @@ import {
   getReportTitle,
   getReportData,
   ReportType,
-} from '@shared/utils/consultant-report-utils';
-import { getDocumentDisplayStatus } from '@shared/utils/consultant-report-utils';
+} from '@shared/utils/report-utils';
+import { getDocumentDisplayStatus } from '@shared/utils/report-utils';
 import { Loader2 } from 'lucide-react';
 import { ConsultantProvider, useConsultants } from '@shared/contexts/consultant-context';
+import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
 import { AlertTitle } from '@shared/components/ui/alert';
 import camelcaseKeys from 'camelcase-keys';
-import { ConsultantTile } from '@shared/components/ConsultantTile';
+import { DocumentTile } from '@shared/components/DocumentTile';
 import {
   createFileInput,
   handleDocumentUpload,
@@ -263,9 +264,11 @@ export default function ConsultantsPage() {
 
         {/* Job-specific content */}
         {selectedJobId ? (
-          <SiteDetailsProvider jobId={selectedJobId}>
-            <JobConsultants jobId={selectedJobId} />
-          </SiteDetailsProvider>
+          <DocumentProvider jobId={selectedJobId}>
+            <SiteDetailsProvider jobId={selectedJobId}>
+              <JobConsultants jobId={selectedJobId} />
+            </SiteDetailsProvider>
+          </DocumentProvider>
         ) : (
           <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
             <p>Please select a job from the dropdown above to access Consultants.</p>
@@ -368,11 +371,11 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter();
   const queryClient = useQueryClient();
   const {
-    consultantDocuments: documents,
+    documents,
     isLoading: isDocsLoading,
     error: docsError,
     downloadDocument,
-  } = useConsultants();
+  } = useDocuments();
   const {
     siteDetails,
     updateSiteDetails,
@@ -973,6 +976,30 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
   };
 
   // Fix type issues in renderRequiredDocuments
+  // Add missing handler functions for DocumentTile
+  const handleUpload = (docId: string) => {
+    // TODO: Implement upload functionality
+    console.log('Upload document:', docId);
+  };
+
+  const handleDelete = (docId: string) => {
+    // TODO: Implement delete functionality
+    console.log('Delete document:', docId);
+  };
+
+  // Add back handleDownload for document download
+  const handleDownload = (docId: string) => {
+    if (!jobId) {
+      toast({
+        title: 'Error',
+        description: 'Please select a job before downloading documents',
+        variant: 'destructive',
+      });
+      return;
+    }
+    downloadDocument(jobId, docId);
+  };
+
   const renderRequiredDocuments = () => {
     if (!currentJob) return null;
 
@@ -1069,10 +1096,14 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       }
 
       return (
-        <ConsultantTile
+        <DocumentTile
           key={doc.id}
           document={doc}
+          isReport={isReport}
+          reportStatus={reportStatus}
+          onUpload={() => handleUpload(doc.id)}
           onDownload={() => handleDownload(doc.id)}
+          onDelete={() => handleDelete(doc.id)}
         />
       );
     };
@@ -1151,19 +1182,6 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
   console.log('DEBUG propertyData:', currentJob.propertyData);
 
-  // Add back handleDownload for document download
-  const handleDownload = (docId: string) => {
-    if (!jobId) {
-      toast({
-        title: 'Error',
-        description: 'Please select a job before downloading documents',
-        variant: 'destructive',
-      });
-      return;
-    }
-    downloadDocument(jobId, docId);
-  };
-
   return (
     <div className="space-y-6">
       {/* Loading States - Removed as handled above */}
@@ -1237,7 +1255,13 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
               <ChevronDown className="h-5 w-5" />
             )}
           </button>
-          {isDocumentsOpen && <div className="mt-4">{renderRequiredDocuments()}</div>}
+          {isDocumentsOpen && (
+            <div className="mt-4">
+              {' '}
+              {/* Removed extra grid classes here */}
+              {renderRequiredDocuments()} {/* Uses documents from useDocuments() */}
+            </div>
+          )}
         </div>
 
         {/* Category Tiles Section */}

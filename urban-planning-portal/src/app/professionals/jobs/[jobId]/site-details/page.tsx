@@ -5,28 +5,43 @@ import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
-import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails';
+import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
+import { SiteDetails } from '@shared/types/site-details';
 import { toast } from '@shared/components/ui/use-toast'; // Import toast
 
 // Add normalization helper
 function normalizeSiteDetails(data: any): SiteDetails {
   return {
+    // Site Characteristics
+    lotType: data?.lotType || '',
     siteArea: data?.siteArea || '',
-    frontage: data?.frontage || '',
-    depth: data?.depth || '',
-    slope: data?.slope || '',
-    orientation: data?.orientation || '',
-    soilType: data?.soilType || '',
-    vegetation: data?.vegetation || '',
+    primaryStreetWidth: data?.primaryStreetWidth || '',
+    siteDepth: data?.siteDepth || '',
+    secondaryStreetWidth: data?.secondaryStreetWidth || '',
+    gradient: data?.gradient || '',
+    highestRL: data?.highestRL || '',
+    lowestRL: data?.lowestRL || '',
+    fallAmount: data?.fallAmount || '',
+
+    // Existing Development
+    currentLandUse: data?.currentLandUse || '',
+    existingDevelopmentDetails: data?.existingDevelopmentDetails || '',
+
+    // Surrounding Development
+    northDevelopment: data?.northDevelopment || '',
+    southDevelopment: data?.southDevelopment || '',
+    eastDevelopment: data?.eastDevelopment || '',
+    westDevelopment: data?.westDevelopment || '',
+
+    // Site Constraints
+    bushfireProne: data?.bushfireProne ?? false,
+    floodProne: data?.floodProne ?? false,
+    acidSulfateSoils: data?.acidSulfateSoils ?? false,
+    biodiversity: data?.biodiversity ?? false,
+    salinity: data?.salinity ?? false,
+    landslip: data?.landslip ?? false,
     heritage: data?.heritage || '',
-    floodProne: data?.floodProne || '',
-    bushfireProne: data?.bushfireProne || '',
-    contamination: data?.contamination || '',
     otherConstraints: data?.otherConstraints || '',
-    adjoiningNorth: data?.adjoiningNorth || '',
-    adjoiningSouth: data?.adjoiningSouth || '',
-    adjoiningEast: data?.adjoiningEast || '',
-    adjoiningWest: data?.adjoiningWest || '',
   };
 }
 

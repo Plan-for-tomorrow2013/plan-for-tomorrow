@@ -85,11 +85,11 @@ export default function DevelopmentDetailsPage() {
     defaultValues: {
       // Development Description
       developmentDescription:
-        "Alterations and additions to the existing dwelling house, including a first floor addition and ground floor extension to the rear.",
+        "Construction of a new single dwelling house.",
 
       // Demolition
       demolitionRequired: true,
-      demolitionDetails: "Partial demolition of the rear portion of the existing dwelling and internal walls.",
+      demolitionDetails: "Demolition of the existing dwelling house.",
 
       // Construction
       storeys: "2",

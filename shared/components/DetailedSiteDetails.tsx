@@ -22,11 +22,19 @@ export function DetailedSiteDetails({
   readOnly = false
 }: DetailedSiteDetailsProps) {
   const handleChange = (field: keyof SiteDetails, value: any) => {
-    onSiteDetailsChange({
-      ...siteDetails,
-      [field]: value
-    })
-  }
+    let updatedDetails = { ...siteDetails, [field]: value };
+    // Automatically calculate fallAmount if highestRL or lowestRL changes
+    if (field === 'highestRL' || field === 'lowestRL') {
+      const highest = parseFloat(field === 'highestRL' ? value : siteDetails.highestRL || '');
+      const lowest = parseFloat(field === 'lowestRL' ? value : siteDetails.lowestRL || '');
+      if (!isNaN(highest) && !isNaN(lowest)) {
+        updatedDetails.fallAmount = (highest - lowest).toFixed(2);
+      } else {
+        updatedDetails.fallAmount = '';
+      }
+    }
+    onSiteDetailsChange(updatedDetails);
+  };
 
   return (
     <Card className={`shadow-sm border border-gray-200 ${className}`}>
@@ -136,11 +144,13 @@ export function DetailedSiteDetails({
             </div>
             <div className="space-y-2">
               <Label htmlFor="fallAmount">Fall Amount (m)</Label>
+              {/* Calculated field: visually distinct, not tabbable */}
               <Input
                 id="fallAmount"
                 value={siteDetails.fallAmount}
-                onChange={(e) => handleChange('fallAmount', e.target.value)}
-                readOnly={readOnly}
+                readOnly
+                className="bg-gray-50 text-gray-700"
+                tabIndex={-1}
               />
               <p className="text-xs text-muted-foreground">
                 Automatically calculated from highest and lowest RL values

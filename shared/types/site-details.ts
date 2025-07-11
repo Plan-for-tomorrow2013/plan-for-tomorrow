@@ -2,6 +2,12 @@ export interface SiteDetails {
   // Site Characteristics
   lotType: string;
   siteArea: string;
+  frontage: string;
+  depth: string;
+  slope: string;
+  orientation: string;
+  soilType: string;
+  vegetation: string;
   primaryStreetWidth: string;
   siteDepth: string;
   secondaryStreetWidth?: string;
@@ -28,5 +34,6 @@ export interface SiteDetails {
   salinity?: boolean;
   landslip?: boolean;
   heritage?: string;
+  contamination?: string;
   otherConstraints?: string;
 }

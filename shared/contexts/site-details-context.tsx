@@ -1,8 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { SiteDetails } from "../types/site-details"
-import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from "../components/ui/use-toast"
 
 // Create an empty site details object with default values
@@ -10,6 +10,13 @@ const emptySiteDetails: SiteDetails = {
   // Site Characteristics
   lotType: '',
   siteArea: '',
+  frontage: '',
+  depth: '',
+  slope: '',
+  orientation: '',
+  soilType: '',
+  vegetation: '',
+  heritage: '',
   primaryStreetWidth: '',
   siteDepth: '',
   secondaryStreetWidth: '',
@@ -35,8 +42,44 @@ const emptySiteDetails: SiteDetails = {
   biodiversity: false,
   salinity: false,
   landslip: false,
-  heritage: '',
+  contamination: '',
   otherConstraints: '',
+}
+
+// Helper to normalize site details from job data
+function normalizeSiteDetails(data: any): SiteDetails {
+  return {
+    lotType: data?.lotType || '',
+    siteArea: data?.siteArea || '',
+    frontage: data?.frontage || '',
+    depth: data?.depth || '',
+    slope: data?.slope || '',
+    orientation: data?.orientation || '',
+    soilType: data?.soilType || '',
+    vegetation: data?.vegetation || '',
+    heritage: data?.heritage || '',
+    primaryStreetWidth: data?.primaryStreetWidth || '',
+    siteDepth: data?.siteDepth || '',
+    secondaryStreetWidth: data?.secondaryStreetWidth || '',
+    gradient: data?.gradient || '',
+    highestRL: data?.highestRL || '',
+    lowestRL: data?.lowestRL || '',
+    fallAmount: data?.fallAmount || '',
+    currentLandUse: data?.currentLandUse || '',
+    existingDevelopmentDetails: data?.existingDevelopmentDetails || '',
+    northDevelopment: data?.northDevelopment || '',
+    southDevelopment: data?.southDevelopment || '',
+    eastDevelopment: data?.eastDevelopment || '',
+    westDevelopment: data?.westDevelopment || '',
+    bushfireProne: data?.bushfireProne || false,
+    floodProne: data?.floodProne || false,
+    acidSulfateSoils: data?.acidSulfateSoils || false,
+    biodiversity: data?.biodiversity || false,
+    salinity: data?.salinity || false,
+    landslip: data?.landslip || false,
+    contamination: data?.contamination || '',
+    otherConstraints: data?.otherConstraints || '',
+  };
 }
 
 interface SiteDetailsContextType {
@@ -60,6 +103,27 @@ export function SiteDetailsProvider({ children, jobId, initialSiteDetails = {} }
   const queryClient = useQueryClient()
   const [siteDetails, setSiteDetails] = useState<SiteDetails>({ ...emptySiteDetails, ...initialSiteDetails })
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // Fetch job data to get initial site details
+  const { data: jobData, isLoading: isJobLoading } = useQuery({
+    queryKey: ['job', jobId],
+    queryFn: async () => {
+      const response = await fetch(`/api/jobs/${jobId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch job data')
+      }
+      return response.json()
+    },
+    enabled: !!jobId,
+  })
+
+  // Update site details when job data is loaded
+  useEffect(() => {
+    if (jobData?.siteDetails && !hasUnsavedChanges) {
+      const normalizedSiteDetails = normalizeSiteDetails(jobData.siteDetails)
+      setSiteDetails(normalizedSiteDetails)
+    }
+  }, [jobData, hasUnsavedChanges])
 
   // Save mutation
   const saveMutation = useMutation({
@@ -104,7 +168,7 @@ export function SiteDetailsProvider({ children, jobId, initialSiteDetails = {} }
     <SiteDetailsContext.Provider
       value={{
         siteDetails,
-        isLoading: saveMutation.isPending,
+        isLoading: isJobLoading || saveMutation.isPending,
         error: saveMutation.error ? saveMutation.error.message : null,
         hasUnsavedChanges,
         updateSiteDetails,

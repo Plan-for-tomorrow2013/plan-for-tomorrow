@@ -293,6 +293,19 @@ export const DOCUMENT_TYPES: Document[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true
+  },
+  {
+    id: 'soee',
+    title: 'Statement of Environmental Effects',
+    category: 'PLANNING',
+    path: '/soee',
+    type: 'document',
+    versions: [],
+    currentVersion: 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    purchasable: false
   }
 ]
 

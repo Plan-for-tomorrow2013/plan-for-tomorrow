@@ -23,6 +23,8 @@ export default function PreviewPage() {
   const { toast } = useToast()
   const [isGenerating, setIsGenerating] = useState(false)
   const [isGenerated, setIsGenerated] = useState(false)
+  const [generatedDocId, setGeneratedDocId] = useState<string | null>(null)
+  const [generatedVersion, setGeneratedVersion] = useState<number | null>(null)
 
   // Get development type display name
   const getDevelopmentTypeDisplay = (type: string) => {
@@ -51,30 +53,69 @@ export default function PreviewPage() {
   }
 
   // Handle generate document
-  const handleGenerateDocument = () => {
+  const handleGenerateDocument = async () => {
     setIsGenerating(true)
-
-    // Simulate document generation
-    setTimeout(() => {
-      setIsGenerating(false)
-      setIsGenerated(true)
-
-      toast({
-        title: "Document Generated",
-        description: "Your Statement of Environmental Effects has been generated successfully.",
+    try {
+      const response = await fetch('/api/documents/generate-soee', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          uploadedBy: 'currentUser', // TODO: Replace with actual user info
+          formData,
+        }),
       })
-    }, 2000)
+      const data = await response.json()
+      if (data.success) {
+        setIsGenerated(true)
+        setGeneratedDocId(data.documentId)
+        setGeneratedVersion(data.version)
+        toast({
+          title: 'Document Generated',
+          description: 'Your Statement of Environmental Effects has been generated successfully.',
+        })
+      } else {
+        toast({
+          title: 'Error',
+          description: data.error || 'Failed to generate document.',
+          variant: 'destructive',
+        })
+      }
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to generate document.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   // Handle download document
-  const handleDownloadDocument = () => {
-    // In a real implementation, this would download the generated document
-    console.log("Downloading document...")
-
-    toast({
-      title: "Document Downloaded",
-      description: "Your Statement of Environmental Effects has been downloaded.",
-    })
+  const handleDownloadDocument = async () => {
+    if (!generatedDocId) return
+    try {
+      const url = `/api/documents/${generatedDocId}/download?jobId=${jobId}`
+      const response = await fetch(url)
+      if (!response.ok) throw new Error('Download failed')
+      const blob = await response.blob()
+      const a = document.createElement('a')
+      a.href = window.URL.createObjectURL(blob)
+      a.download = 'SoEE.docx'
+      a.click()
+      window.URL.revokeObjectURL(a.href)
+      toast({
+        title: 'Document Downloaded',
+        description: 'Your Statement of Environmental Effects has been downloaded.',
+      })
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to download document.',
+        variant: 'destructive',
+      })
+    }
   }
 
   // Handle save and exit
@@ -86,7 +127,7 @@ export default function PreviewPage() {
       description: "Your progress has been saved. You can continue later.",
     })
 
-    router.push(`/professionals/report-writer?job=${jobId}`)
+    router.push(`/professionals/report-writer?job=${jobId}&soeeGenerated=true`)
   }
 
   return (

@@ -18,8 +18,9 @@ export async function GET(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    // Get the file path
+    // Log the document object and file path
     const filePath = join(process.cwd(), 'data', 'jobs', params.id, 'documents', document.fileName);
+    console.log('Job document download:', { filePath, document });
 
     // Read the file
     const fileBuffer = await readFile(filePath);

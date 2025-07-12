@@ -73,6 +73,9 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
   };
 
   const renderDocumentUpload = (doc: DocumentWithStatus) => {
+    if (doc.id === 'soee' && !(job?.documents?.soee && job.documents.soee.fileName)) {
+      return null;
+    }
     if (isReportType(doc.id)) {
       const reportStatus = job
         ? getReportStatus(doc, job)
@@ -197,7 +200,7 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
                   <FileText className="h-4 w-4 mr-2" />
                   Download
                 </Button>
-                {doc.path !== '/pre-prepared-assessment' && (
+                {doc.path !== '/pre-prepared-assessment' && doc.id !== 'soee' && (
                   <Button variant="destructive" size="icon" onClick={() => handleDelete(doc.id)}>
                     <X className="h-4 w-4" />
                   </Button>
@@ -236,7 +239,15 @@ function DocumentStoreContent({ params }: { params: { jobId: string } }) {
         <div>Loading documents...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {documents.map(doc => renderDocumentUpload(doc))}
+          {documents
+            .filter(doc => {
+              if (doc.id === 'soee') {
+                // Only show if the job has a real SoEE document with a fileName
+                return !!(job?.documents?.soee && job.documents.soee.fileName);
+              }
+              return true;
+            })
+            .map(doc => renderDocumentUpload(doc))}
         </div>
       )}
     </div>

@@ -75,6 +75,7 @@ import {
 } from '@shared/components/DetailedInitialAssessment';
 import { LEPFilter } from '@shared/components/LEPFilter';
 import SoEELanding from "../SoEE/components/SoEELanding";
+import { useSearchParams } from 'next/navigation';
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -237,6 +238,8 @@ function normalizeSiteDetails(data: any): SiteDetails {
 
 function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [showSoeeGenerated, setShowSoeeGenerated] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const {
     documents,
@@ -370,124 +373,6 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   useEffect(() => {
     setIsOverlayVisible(getOverlayStateForJob(jobId));
   }, [jobId]);
-
-  // Add loadFormData function inside component
-  const loadFormData = (formType: keyof ReportWriterFormState): CustomAssessmentForm => {
-    const storedData = localStorage.getItem(`formData_${jobId}_${formType}`);
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        return {
-          developmentType: parsedData.developmentType || '',
-          additionalInfo: parsedData.additionalInfo || '',
-          uploadedDocuments: parsedData.uploadedDocuments || {},
-          documents: {
-            certificateOfTitle: parsedData.documents?.certificateOfTitle,
-            surveyPlan: parsedData.documents?.surveyPlan,
-            certificate107: parsedData.documents?.certificate107,
-          },
-          selectedTab: parsedData.selectedTab || 'details',
-        };
-      } catch (error) {
-        console.error('Error parsing stored form data:', error);
-      }
-    }
-    return {
-      developmentType: '',
-      additionalInfo: '',
-      uploadedDocuments: {},
-      documents: {
-        certificateOfTitle: undefined,
-        surveyPlan: undefined,
-        certificate107: undefined,
-      },
-      selectedTab: 'details',
-    };
-  };
-
-  // Effect to load form data from local storage
-  useEffect(() => {
-    if (!jobId) {
-      // Reset state including purchaseInitiated
-      setFormState({
-        customAssessment: {
-          formData: {
-            developmentType: '',
-            additionalInfo: '',
-            uploadedDocuments: {},
-            documents: {
-              certificateOfTitle: undefined,
-              surveyPlan: undefined,
-              certificate107: undefined,
-            },
-            selectedTab: 'details',
-          },
-          paymentComplete: false,
-          showPaymentButton: false,
-          hasUnsavedChanges: false,
-          purchaseInitiated: false,
-        },
-        statementOfEnvironmentalEffects: {
-          formData: {
-            developmentType: '',
-            additionalInfo: '',
-            uploadedDocuments: {},
-            documents: {
-              certificateOfTitle: undefined,
-              surveyPlan: undefined,
-              certificate107: undefined,
-            },
-            selectedTab: 'details',
-          },
-          paymentComplete: false,
-          showPaymentButton: false,
-          hasUnsavedChanges: false,
-          purchaseInitiated: false,
-        },
-        complyingDevelopmentCertificate: {
-          formData: {
-            developmentType: '',
-            additionalInfo: '',
-            uploadedDocuments: {},
-            documents: {
-              certificateOfTitle: undefined,
-              surveyPlan: undefined,
-              certificate107: undefined,
-            },
-            selectedTab: 'details',
-          },
-          paymentComplete: false,
-          showPaymentButton: false,
-          hasUnsavedChanges: false,
-          purchaseInitiated: false,
-        },
-      });
-      return;
-    }
-
-    // Correctly update form state by spreading previous state
-    setFormState(prev => ({
-      ...prev, // Spread previous state
-      customAssessment: {
-        ...prev['customAssessment'], // Spread specific form type state
-        formData: loadFormData('customAssessment'),
-        hasUnsavedChanges: false,
-        purchaseInitiated: false, // Reset on load
-      },
-      statementOfEnvironmentalEffects: {
-        ...prev['statementOfEnvironmentalEffects'], // Spread specific form type state
-        formData: loadFormData('statementOfEnvironmentalEffects'),
-        hasUnsavedChanges: false,
-        purchaseInitiated: false, // Reset on load
-      },
-      complyingDevelopmentCertificate: {
-        ...prev['complyingDevelopmentCertificate'], // Spread specific form type state
-        formData: loadFormData('complyingDevelopmentCertificate'),
-        hasUnsavedChanges: false,
-        purchaseInitiated: false, // Reset on load
-      },
-    }));
-  }, [jobId]); // Depend on jobId prop
 
   // --- React Query for fetching selected job details ---
   const {
@@ -1351,19 +1236,23 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     }
 
     // Show filtered documents
-    const mappedDocuments = documents.map(doc => ({
-      ...doc,
-      displayStatus: getDocumentDisplayStatus(doc, currentJob || ({} as Job)),
-    }));
+    const mappedDocuments = documents
+      .filter(doc => {
+        if (doc.id === 'soee') {
+          return !!(currentJob?.documents?.soee && currentJob.documents.soee.fileName);
+        }
+        return true;
+      })
+      .map(doc => ({
+        ...doc,
+        displayStatus: getDocumentDisplayStatus(doc, currentJob || ({} as Job)),
+      }));
 
     const renderDocumentCard = (doc: DocumentWithStatus) => {
       const isReport = isReportType(doc.id);
       const reportStatus = isReport ? getReportStatus(doc, currentJob || ({} as Job)) : undefined;
 
       // Determine if this specific document tile should have a "Download Report" button
-      // that we are interested in debugging.
-      // This is based on the logic from the old report-writer page:
-      // reportStatus.isCompleted && reportStatus.hasFile
       const shouldBeDownloadableReport =
         isReport && reportStatus?.isCompleted && reportStatus?.hasFile;
 
@@ -1413,6 +1302,9 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
         );
       }
 
+      // Hide delete button for SoEE tile
+      const hideDelete = doc.id === 'soee';
+
       return (
         <DocumentTile
           key={doc.id}
@@ -1421,7 +1313,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           reportStatus={reportStatus}
           onUpload={() => handleUpload(doc.id)}
           onDownload={() => handleDownload(doc.id)}
-          onDelete={() => handleDelete(doc.id)}
+          onDelete={hideDelete ? undefined : () => handleDelete(doc.id)}
         />
       );
     };
@@ -1940,26 +1832,36 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   // --- Main Render Logic for JobReportWriter ---
   const isLoading = isDocsLoading || isJobLoading; // Combined loading state
 
-  // Corrected: Refined loading/error handling
-  if (isLoading) return <div>Loading job details and documents...</div>; // Handle combined loading
+  // Place debug useEffect hooks here, before any conditional returns!
+  useEffect(() => {
+    console.log('DEBUG: currentJob.documents:', currentJob?.documents);
+    const soeeExists = currentJob?.documents?.soee;
+    if (soeeExists) {
+      setShowSoeeGenerated(true);
+    } else {
+      setShowSoeeGenerated(false);
+    }
+  }, [jobId, currentJob]);
 
-  // Handle specific errors in JSX below
-  if (isJobError)
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>Error Loading Job</AlertTitle>
-        <AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription>
-      </Alert>
-    );
-  if (!currentJob && !isJobLoading)
-    return <div>Job data not available. Select a job or check for errors.</div>; // Refined check
-  // We need currentJob for the rest of the render, so ensure it exists if not loading/error
-  if (!currentJob) return <div>Loading...</div>; // Fallback if somehow still null
+  useEffect(() => {
+    console.log('DEBUG: showSoeeGenerated:', showSoeeGenerated);
+  }, [showSoeeGenerated]);
 
-  console.log('DEBUG propertyData:', currentJob.propertyData);
+  if (isLoading) return <div>Loading job details and documents...</div>;
+  if (isJobError) return (
+    <Alert variant="destructive">
+      <AlertTitle>Error Loading Job</AlertTitle>
+      <AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription>
+    </Alert>
+  );
+  if (!currentJob && !isJobLoading) return <div>Job data not available. Select a job or check for errors.</div>;
+  if (!currentJob) return <div>Loading...</div>;
+
+  console.log('DEBUG propertyData:', currentJob?.propertyData);
 
   return (
     <div className="space-y-6">
+
       {/* Loading States - Removed as handled above */}
       {/* {isJobLoading && <div>Loading job details...</div>} */}
       {isPrePreparedLoading && <div>Loading assessments...</div>}
@@ -2085,11 +1987,20 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
       <div className="h-1 bg-yellow-400 w-full my-2"></div>
       <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
         <p className="text-lg mb-4">
-        Statement of Environmental Effects Generator. Generate a basic Statement of Environmental Effects for your development application by answering a series of questions for small, simple and 
+          Statement of Environmental Effects Generator. Generate a basic Statement of Environmental Effects for your development application by answering a series of questions for small, simple and 
           of course, completely complying developments, formatted to NSW Environmental Planning and Assessment Act 1979 requirements.
         </p>
       </div>
 
+      {showSoeeGenerated && (
+        <Alert variant="default">
+          <AlertTitle>Report Generated</AlertTitle>
+          <AlertDescription>
+            A Statement of Environmental Effects report has been generated for this job. You can download it from the Document Store. If you need to make an amendment, start here.
+          </AlertDescription>
+        </Alert>
+      )}
+      
         {/* Statement of Environmental Effects Generator Section */}
         <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
           <SoEELanding jobId={jobId} />

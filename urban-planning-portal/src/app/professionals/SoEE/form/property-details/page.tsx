@@ -14,9 +14,11 @@ import { Checkbox } from "@shared/components/ui/checkbox"
 import { ArrowLeft, ArrowRight, Save, Plus, Trash2, Loader2 } from "lucide-react"
 import { FormProgress } from "@/app/professionals/SoEE/components/form-progress"
 import Link from "next/link"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
+import CouncilFilter from '@shared/components/CouncilFilter';
+import { Job } from '@shared/types/jobs';
 
 // Form validation schema
 const formSchema = z.object({
@@ -33,37 +35,6 @@ const formSchema = z.object({
   secondaryStreetName: z.string().optional(),
   suburb: z.string().min(1, { message: "Suburb is required" }),
   postcode: z.string().min(4, { message: "Valid postcode is required" }),
-
-  // Site Characteristics
-  lotType: z.string().min(1, { message: "Lot type is required" }),
-  siteArea: z.string().min(1, { message: "Site area is required" }),
-  primaryStreetWidth: z.string().min(1, { message: "Primary street width is required" }),
-  siteDepth: z.string().min(1, { message: "Site depth is required" }),
-  secondaryStreetWidth: z.string().optional(),
-  gradient: z.string().min(1, { message: "Gradient is required" }),
-  highestRL: z.string().optional(),
-  lowestRL: z.string().optional(),
-  fallAmount: z.string().optional(),
-
-  // Existing Development
-  currentLandUse: z.string().min(1, { message: "Current land use is required" }),
-  existingDevelopmentDetails: z.string().optional(),
-
-  // Surrounding Development
-  northDevelopment: z.string().optional(),
-  southDevelopment: z.string().optional(),
-  eastDevelopment: z.string().optional(),
-  westDevelopment: z.string().optional(),
-
-  // Site Constraints
-  bushfireProne: z.boolean().optional(),
-  floodProne: z.boolean().optional(),
-  acidSulfateSoils: z.boolean().optional(),
-  biodiversity: z.boolean().optional(),
-  salinity: z.boolean().optional(),
-  landslip: z.boolean().optional(),
-  heritage: z.string().optional(),
-  otherConstraints: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -111,6 +82,26 @@ function PropertyDetailsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("job");
+  const [jobData, setJobData] = useState<Job | null>(null);
+
+  // Fetch job data to get property data (which contains LEP)
+  useEffect(() => {
+    const fetchJobData = async () => {
+      if (jobId) {
+        try {
+          const response = await fetch(`/api/jobs/${jobId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setJobData(data);
+          }
+        } catch (error) {
+          console.error('Error fetching job data:', error);
+        }
+      }
+    };
+    
+    fetchJobData();
+  }, [jobId]);
 
   // SoEE-specific form state (address, lot identification)
   const form = useForm<FormValues>({
@@ -131,52 +122,66 @@ function PropertyDetailsPage() {
       secondaryStreetName: "",
       suburb: "Greystanes",
       postcode: "2145",
-
-      // Site Characteristics
-      lotType: "standard",
-      siteArea: "500.00",
-      primaryStreetWidth: "15.24",
-      siteDepth: "32.80",
-      secondaryStreetWidth: "",
-      gradient: "rear-to-front",
-      highestRL: "50.00",
-      lowestRL: "48.50",
-      fallAmount: "1.50",
-
-      // Existing Development
-      currentLandUse: "residential",
-      existingDevelopmentDetails: "Single-storey dwelling house with associated structures",
-
-      // Surrounding Development
-      northDevelopment: "Single-storey dwelling house at 11 Viola Place",
-      southDevelopment: "Double-storey dwelling house at 7 Viola Place",
-      eastDevelopment: "Rear yards of properties fronting Carnation Avenue",
-      westDevelopment: "Viola Place and single-storey dwelling houses opposite",
-
-      // Site Constraints
-      bushfireProne: false,
-      floodProne: false,
-      acidSulfateSoils: false,
-      biodiversity: false,
-      salinity: false,
-      landslip: false,
-      heritage: "",
-      otherConstraints: "",
     },
   })
+
+  // Load form data from job when it's fetched
+  useEffect(() => {
+    if (jobData?.formData) {
+      form.reset({
+        // Lot Identification
+        lotIdentifications: jobData.formData.lotIdentifications || [
+          {
+            lotNumber: "53",
+            sectionNumber: "N/A",
+            dpNumber: "231533",
+          }
+        ],
+
+        // Address Details
+        streetNumber: jobData.formData.addressDetails?.streetNumber || "9",
+        streetName: jobData.formData.addressDetails?.streetName || "Viola Place",
+        secondaryStreetName: jobData.formData.addressDetails?.secondaryStreetName || "",
+        suburb: jobData.formData.addressDetails?.suburb || "Greystanes",
+        postcode: jobData.formData.addressDetails?.postcode || "2145",
+      });
+    }
+  }, [jobData, form]);
 
   // Use site details context for real-time sync
   const { siteDetails, updateSiteDetails, saveSiteDetails, isLoading } = useSiteDetails();
 
   // Handle form submission
-  const onSubmit = (data: any) => {
-    // Combine SoEE-specific fields and siteDetails
-    const payload = {
-      ...data, // SoEE-specific fields
-      siteDetails, // all site characteristics and below
-    };
-    // Save or send payload as needed
-    router.push(`/professionals/SoEE/form/development-details?job=${jobId}`);
+  const onSubmit = async (data: any) => {
+    try {
+      // Save the form data to the job
+      const response = await fetch(`/api/jobs/${jobId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          formData: {
+            lotIdentifications: data.lotIdentifications,
+            addressDetails: {
+              streetNumber: data.streetNumber,
+              streetName: data.streetName,
+              secondaryStreetName: data.secondaryStreetName,
+              suburb: data.suburb,
+              postcode: data.postcode,
+            }
+          },
+          // siteDetails are saved separately by the site details context
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save property details');
+      }
+
+      // Navigate to next page
+      router.push(`/professionals/SoEE/form/development-details?job=${jobId}`);
+    } catch (error) {
+      console.error('Error saving property details:', error);
+    }
   };
 
   // Save handler for site details
@@ -275,10 +280,7 @@ function PropertyDetailsPage() {
                     )}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="council">Council</Label>
-                  <Input id="council" value="Cumberland Council" disabled className="bg-gray-50" />
-                </div>
+                <CouncilFilter propertyData={jobData?.propertyData} showDCP={false} showCouncil={true} />
               </div>
               
               {/* Lot Identification */}

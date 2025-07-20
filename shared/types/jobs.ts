@@ -115,6 +115,20 @@ export interface Job {
     zoningInfo?: string;
     siteConstraints?: string;
   } | null;
+  formData?: {
+    lotIdentifications?: Array<{
+      lotNumber: string;
+      sectionNumber?: string;
+      dpNumber: string;
+    }>;
+    addressDetails?: {
+      streetNumber: string;
+      streetName: string;
+      secondaryStreetName?: string;
+      suburb: string;
+      postcode: string;
+    };
+  } | null;
   manualSubmission?: (Record<string, any> & { updatedAt: string }) | null;
 }
 

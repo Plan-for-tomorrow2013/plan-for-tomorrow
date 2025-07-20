@@ -405,16 +405,21 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   });
 
   uniqueTickets.forEach(ticket => {
+    // Check if there's already a work order for this ticket (quote accepted)
+    const hasWorkOrder = workOrders.some(wo => 
+      wo.consultantId === ticket.consultantId && 
+      wo.category === ticket.category
+    );
+    
+    // If there's a work order, skip showing the ticket tile
+    if (hasWorkOrder) {
+      return;
+    }
+
     const doc = documents.find(
       (doc: DocumentWithStatus) => doc.category === ticket.category && doc.consultantId === ticket.consultantId
     );
     if (!doc) {
-      // Check if there's a work order for this ticket (quote accepted)
-      const hasWorkOrder = workOrders.some(wo => 
-        wo.consultantId === ticket.consultantId && 
-        wo.category === ticket.category
-      );
-      
       // Show pending consultant ticket
       tiles.push({
         key: `ticket-pending-${ticket.id}`,
@@ -446,10 +451,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 </svg>
                 <p className="font-semibold text-lg">Report In Progress</p>
                 <p className="text-sm text-gray-600 px-4">
-                  {hasWorkOrder 
-                    ? `Thank you for accepting your quote for a "${ticket.category}" Report from ${ticket.consultantName}. We are requesting your report. You will be notified once it's ready.`
-                    : `We are requesting a quote for your "${ticket.category}" Report for ${ticket.consultantName}. You will be notified once it's ready.`
-                  }
+                  We are requesting a quote for your "{ticket.category}" Report for {ticket.consultantName}. You will be notified once it's ready.
                 </p>
               </div>
             </CardContent>

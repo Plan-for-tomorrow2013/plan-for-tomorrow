@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/
 import { Skeleton } from '@shared/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Job } from '@shared/types/jobs';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 interface PaginatedResponse {
   data: Job[];
@@ -20,37 +21,57 @@ interface PaginatedResponse {
   };
 }
 
-async function getJobs(): Promise<Job[]> {
-  const response = await fetch('/api/jobs');
+async function getJobs(page: number = 1, limit: number = 10, search: string = ''): Promise<PaginatedResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  
+  if (search) {
+    params.append('search', search);
+  }
+  
+  const response = await fetch(`/api/jobs?${params}`);
   if (!response.ok) {
     throw new Error('Failed to fetch jobs');
   }
-  const data: PaginatedResponse = await response.json();
-  return data.data;
+  return response.json();
 }
 
 export default function JobsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+      setCurrentPage(1); // Reset to first page when searching
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const {
-    data: jobs = [],
+    data: paginatedData,
     isLoading,
     error,
-  } = useQuery<Job[]>({
-    queryKey: ['jobs'],
-    queryFn: getJobs,
+  } = useQuery<PaginatedResponse>({
+    queryKey: ['jobs', currentPage, debouncedSearchQuery],
+    queryFn: () => getJobs(currentPage, 10, debouncedSearchQuery),
+    // keepPreviousData: true, // Not supported in v4, remove this line
   });
 
-  // Filter jobs based on search query
-  const filteredJobs = jobs.filter(job => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      job.address.toLowerCase().includes(searchLower) ||
-      job.council?.toLowerCase().includes(searchLower) ||
-      job.currentStage.toLowerCase().includes(searchLower)
-    );
-  });
+  const jobs = paginatedData?.data || [];
+  const pagination = paginatedData?.pagination;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   if (error) {
     return (
@@ -78,7 +99,7 @@ export default function JobsPage() {
         <Input
           placeholder="Search jobs..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="max-w-md"
         />
       </div>
@@ -97,7 +118,7 @@ export default function JobsPage() {
             </Card>
           ))}
         </div>
-      ) : filteredJobs.length === 0 ? (
+      ) : jobs.length === 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>No Jobs Found</CardTitle>
@@ -107,27 +128,104 @@ export default function JobsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {filteredJobs.map(job => (
-            <Card
-              key={job.id}
-              className="cursor-pointer hover:bg-gray-50"
-              onClick={() => router.push(`/professionals/jobs/${job.id}`)}
-            >
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>{job.address}</CardTitle>
+        <>
+          <div className="space-y-4 mb-6">
+            {jobs.map((job: Job) => (
+              <Card
+                key={job.id}
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => router.push(`/professionals/jobs/${job.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>{job.address}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">{job.council}</p>
+                  <p className="text-sm text-gray-500">
+                    Created: {new Date(job.createdAt).toLocaleDateString()}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing {((pagination.currentPage - 1) * 10) + 1} - {Math.min(pagination.currentPage * 10, pagination.totalItems)} of{' '}
+                {pagination.totalItems} jobs
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(1)}
+                  disabled={!pagination.hasPreviousPage}
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={!pagination.hasPreviousPage}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                
+                <div className="flex items-center space-x-1">
+                  {Array.from(Array(Math.min(5, pagination.totalPages)), (_, i) => {
+                    let pageNum;
+                    if (pagination.totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (pagination.currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                      pageNum = pagination.totalPages - 4 + i;
+                    } else {
+                      pageNum = pagination.currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={pagination.currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">{job.council}</p>
-                <p className="text-sm text-gray-500">
-                  Created: {new Date(job.createdAt).toLocaleDateString()}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(pagination.totalPages)}
+                  disabled={!pagination.hasNextPage}
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

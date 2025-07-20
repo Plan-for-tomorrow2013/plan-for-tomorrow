@@ -11,16 +11,86 @@ import { Switch } from "@/app/professionals/account/components/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@shared/components/ui/tabs"
 import { useToast } from "@shared/components/ui/use-toast"
 
+interface AccountData {
+  // Personal Information
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  
+  // Company Information
+  companyName: string
+  abn: string
+  companyAddress: string
+  
+  // Notification Settings
+  emailUpdates: boolean
+  jobStatusChanges: boolean
+  reportReadyNotifications: boolean
+  marketingCommunications: boolean
+  
+  // Security
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+  
+  // Social Media
+  linkedin: string
+  facebook: string
+  twitter: string
+  instagram: string
+}
+
 export default function AccountPage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const { toast } = useToast()
+  
+  const [accountData, setAccountData] = useState<AccountData>({
+    // Personal Information
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@example.com",
+    phone: "+61 400 000 000",
+    
+    // Company Information
+    companyName: "",
+    abn: "",
+    companyAddress: "",
+    
+    // Notification Settings
+    emailUpdates: true,
+    jobStatusChanges: true,
+    reportReadyNotifications: true,
+    marketingCommunications: true,
+    
+    // Security
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    
+    // Social Media
+    linkedin: "",
+    facebook: "",
+    twitter: "",
+    instagram: "",
+  })
 
-  const handleUpdate = async (formData: FormData) => {
+  const handleInputChange = (field: keyof AccountData, value: string | boolean) => {
+    setAccountData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSaveAll = async () => {
     setIsUpdating(true)
     try {
       const response = await fetch("/api/account/update", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(accountData),
       })
 
       if (!response.ok) throw new Error("Update failed")
@@ -49,7 +119,6 @@ export default function AccountPage() {
           <TabsList className="flex w-full border-b bg-grey-100 p-0">
             <TabsTrigger value="personal" className="flex-1">Personal</TabsTrigger>
             <TabsTrigger value="company" className="flex-1">Company</TabsTrigger>
-            <TabsTrigger value="billing" className="flex-1">Billing</TabsTrigger>
             <TabsTrigger value="notifications" className="flex-1">Notifications</TabsTrigger>
             <TabsTrigger value="security" className="flex-1">Security</TabsTrigger>
             <TabsTrigger value="social" className="flex-1">Social</TabsTrigger>
@@ -65,25 +134,39 @@ export default function AccountPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="John" />
+                    <Input 
+                      id="firstName" 
+                      value={accountData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Doe" />
+                    <Input 
+                      id="lastName" 
+                      value={accountData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="john@example.com" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={accountData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" type="tel" defaultValue="+61 400 000 000" />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    value={accountData.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                  />
                 </div>
-                <Button disabled={isUpdating}>
-                  {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Save Changes
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -97,44 +180,33 @@ export default function AccountPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Company Name</Label>
-                  <Input id="companyName" />
+                  <Input 
+                    id="companyName" 
+                    value={accountData.companyName}
+                    onChange={(e) => handleInputChange("companyName", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="abn">ABN</Label>
-                  <Input id="abn" />
+                  <Input 
+                    id="abn" 
+                    value={accountData.abn}
+                    onChange={(e) => handleInputChange("abn", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="companyAddress">Address</Label>
-                  <Input id="companyAddress" />
+                  <Input 
+                    id="companyAddress" 
+                    value={accountData.companyAddress}
+                    onChange={(e) => handleInputChange("companyAddress", e.target.value)}
+                  />
                 </div>
-                <Button>Save Changes</Button>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="billing">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Methods</CardTitle>
-                <CardDescription>Manage your payment methods</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <CreditCard className="h-6 w-6" />
-                      <div>
-                        <p className="font-medium">•••• •••• •••• 4242</p>
-                        <p className="text-sm text-muted-foreground">Expires 12/24</p>
-                      </div>
-                    </div>
-                    <Button variant="outline">Remove</Button>
-                  </div>
-                  <Button className="w-full">Add New Payment Method</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+
 
           <TabsContent value="notifications">
             <Card>
@@ -145,14 +217,18 @@ export default function AccountPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   {[
-                    { id: "email-updates", label: "Email Updates" },
-                    { id: "job-status", label: "Job Status Changes" },
-                    { id: "report-ready", label: "Report Ready Notifications" },
-                    { id: "marketing", label: "Marketing Communications" },
+                    { id: "email-updates", label: "Email Updates", field: "emailUpdates" as keyof AccountData },
+                    { id: "job-status", label: "Job Status Changes", field: "jobStatusChanges" as keyof AccountData },
+                    { id: "report-ready", label: "Report Ready Notifications", field: "reportReadyNotifications" as keyof AccountData },
+                    { id: "marketing", label: "Marketing Communications", field: "marketingCommunications" as keyof AccountData },
                   ].map((item) => (
                     <div key={item.id} className="flex items-center justify-between">
                       <Label htmlFor={item.id}>{item.label}</Label>
-                      <Switch id={item.id} defaultChecked />
+                      <Switch 
+                        id={item.id} 
+                        checked={accountData[item.field] as boolean}
+                        onCheckedChange={(checked) => handleInputChange(item.field, checked)}
+                      />
                     </div>
                   ))}
                 </div>
@@ -170,17 +246,31 @@ export default function AccountPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input id="currentPassword" type="password" />
+                    <Input 
+                      id="currentPassword" 
+                      type="password" 
+                      value={accountData.currentPassword}
+                      onChange={(e) => handleInputChange("currentPassword", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
-                    <Input id="newPassword" type="password" />
+                    <Input 
+                      id="newPassword" 
+                      type="password" 
+                      value={accountData.newPassword}
+                      onChange={(e) => handleInputChange("newPassword", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input id="confirmPassword" type="password" />
+                    <Input 
+                      id="confirmPassword" 
+                      type="password" 
+                      value={accountData.confirmPassword}
+                      onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                    />
                   </div>
-                  <Button>Update Password</Button>
                 </div>
               </CardContent>
             </Card>
@@ -195,22 +285,38 @@ export default function AccountPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   {[
-                    { id: "linkedin", label: "LinkedIn" },
-                    { id: "facebook", label: "Facebook" },
-                    { id: "twitter", label: "Twitter" },
-                    { id: "instagram", label: "Instagram" },
+                    { id: "linkedin", label: "LinkedIn", field: "linkedin" as keyof AccountData },
+                    { id: "facebook", label: "Facebook", field: "facebook" as keyof AccountData },
+                    { id: "twitter", label: "Twitter", field: "twitter" as keyof AccountData },
+                    { id: "instagram", label: "Instagram", field: "instagram" as keyof AccountData },
                   ].map((platform) => (
                     <div key={platform.id} className="space-y-2">
                       <Label htmlFor={platform.id}>{platform.label}</Label>
-                      <Input id={platform.id} placeholder={`Your ${platform.label} profile URL`} />
+                      <Input 
+                        id={platform.id} 
+                        placeholder={`Your ${platform.label} profile URL`}
+                        value={accountData[platform.field] as string}
+                        onChange={(e) => handleInputChange(platform.field, e.target.value)}
+                      />
                     </div>
                   ))}
-                  <Button>Save Social Links</Button>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Single Save Button */}
+        <div className="mt-6 flex justify-end">
+          <Button 
+            onClick={handleSaveAll} 
+            disabled={isUpdating}
+            className="px-8"
+          >
+            {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Save All Changes
+          </Button>
+        </div>
       </div>
     </div>
   )

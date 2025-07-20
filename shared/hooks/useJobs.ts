@@ -5,7 +5,7 @@ export type Job = JobType
 
 // Define the fetch function outside the hook for clarity
 const fetchJobs = async (): Promise<Job[]> => {
-  const response = await fetch('/api/jobs')
+  const response = await fetch('/api/jobs?limit=1000') // Fetch up to 10jobs to ensure all jobs are available
 
   if (!response.ok) {
     // Try to get error details from response body

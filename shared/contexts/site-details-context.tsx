@@ -119,11 +119,12 @@ export function SiteDetailsProvider({ children, jobId, initialSiteDetails = {} }
 
   // Update site details when job data is loaded
   useEffect(() => {
-    if (jobData?.siteDetails && !hasUnsavedChanges) {
+    if (jobData?.siteDetails) {
       const normalizedSiteDetails = normalizeSiteDetails(jobData.siteDetails)
       setSiteDetails(normalizedSiteDetails)
+      setHasUnsavedChanges(false) // Reset unsaved changes when loading from server
     }
-  }, [jobData, hasUnsavedChanges])
+  }, [jobData]) // Remove hasUnsavedChanges from dependencies
 
   // Save mutation
   const saveMutation = useMutation({

@@ -36,8 +36,11 @@ const formSchema = z.object({
   secondaryFrontSetback: z.string().optional(),
   rearSetbackGround: z.string().min(1, { message: "Ground level rear setback is required" }),
   rearSetbackUpper: z.string().optional(),
-  sideSetbackOne: z.string().min(1, { message: "Side setback is required" }),
-  sideSetbackTwo: z.string().min(1, { message: "Side setback is required" }),
+  sideSetbackGroundOne: z.string().min(1, { message: "Side setback is required" }),
+  sideSetbackGroundTwo: z.string().min(1, { message: "Side setback is required" }),
+  sideSetbackUpperOne: z.string().min(1, { message: "Side setback is required" }),
+  sideSetbackUpperTwo: z.string().min(1, { message: "Side setback is required" }),
+  garageSetback: z.string().min(1, { message: "Garage setback is required" }),
 
   // Floor Area
   existingGFA: z.string().optional(),
@@ -53,6 +56,19 @@ const formSchema = z.object({
   existingLandscapedArea: z.string().optional(),
   proposedLandscapedArea: z.string().min(1, { message: "Proposed landscaped area is required" }),
   landscapedAreaPercentage: z.string().min(1, { message: "Landscaped area percentage is required" }),
+
+  // Deep soil
+  existingDeepSoilArea: z.string().optional(),
+  proposedDeepSoilArea: z.string().min(1, { message: "Proposed deep soil area is required" }),
+  deepSoilAreaPercentage: z.string().min(1, { message: "Deep soil area percentage is required" }),
+
+  // Private open space
+  existingPrivateOpenSpaceArea: z.string().optional(),
+  proposedPrivateOpenSpaceArea: z.string().min(1, { message: "Proposed private open space area is required" }),
+
+  // Excavation and Fill
+  maxCut: z.string().min(1, { message: "Max cut is required" }),
+  maxFill: z.string().min(1, { message: "Max fill is required" }),
 
   // Materials and Finishes
   externalWalls: z.string().min(1, { message: "External walls material is required" }),
@@ -85,56 +101,72 @@ export default function DevelopmentDetailsPage() {
     defaultValues: {
       // Development Description
       developmentDescription:
-        "Construction of a new single dwelling house.",
+        "",
 
       // Demolition
       demolitionRequired: true,
-      demolitionDetails: "Demolition of the existing dwelling house.",
+      demolitionDetails: "",
 
       // Construction
-      storeys: "2",
-      buildingHeight: "7.2",
-      wallHeight: "6.0",
+      storeys: "",
+      buildingHeight: "",
+      wallHeight: "",
 
       // Setbacks
-      frontSetback: "6.5",
+      frontSetback: "",
       secondaryFrontSetback: "",
-      rearSetbackGround: "8.0",
-      rearSetbackUpper: "10.0",
-      sideSetbackOne: "1.5",
-      sideSetbackTwo: "1.0",
-
+      rearSetbackGround: "",
+      rearSetbackUpper: "",
+      sideSetbackGroundOne: "",
+      sideSetbackGroundTwo: "",
+      sideSetbackUpperOne: "",
+      sideSetbackUpperTwo: "",
+      garageSetback: "",
+      
       // Floor Area
-      existingGFA: "150.0",
-      proposedGFA: "100.0",
-      totalGFA: "250.0",
-      floorSpaceRatio: "0.5",
+      existingGFA: "",
+      proposedGFA: "",
+      totalGFA: "",
+      floorSpaceRatio: "",
 
       // Site Coverage
-      existingSiteCoverage: "30",
-      proposedSiteCoverage: "40",
+      existingSiteCoverage: "",
+      proposedSiteCoverage: "",
 
       // Landscaping
-      existingLandscapedArea: "200.0",
-      proposedLandscapedArea: "180.0",
-      landscapedAreaPercentage: "36",
+      existingLandscapedArea: "",
+      proposedLandscapedArea: "",
+      landscapedAreaPercentage: "",
 
+      // Deep soil
+      existingDeepSoilArea: "",
+      proposedDeepSoilArea: "",
+      deepSoilAreaPercentage: "",
+
+      // Private open space
+      existingPrivateOpenSpaceArea: "",
+      proposedPrivateOpenSpaceArea: "",
+      
+      // Excavation and Fill
+      maxCut: "",
+      maxFill: "",
+      
       // Materials and Finishes
-      externalWalls: "Brick veneer with rendered finish",
-      roof: "Colorbond steel in Monument (dark grey)",
-      windows: "Aluminum framed in black",
-      otherMaterials: "Timber cladding to feature walls",
+      externalWalls: "",
+      roof: "",
+      windows: "",
+      otherMaterials: "",
 
       // Access and Parking
-      vehicleAccess: "Existing driveway from Viola Place",
-      carParkingSpaces: "2",
-      pedestrianAccess: "Existing pathway from Viola Place",
+      vehicleAccess: "",
+      carParkingSpaces: "",
+      pedestrianAccess: "",
 
       // Stormwater
-      stormwaterDisposal: "Connected to existing stormwater system",
+      stormwaterDisposal: "",
 
       // Waste Management
-      wasteManagement: "Waste to be stored in council bins at the side of the dwelling",
+      wasteManagement: "",
     },
   })
 
@@ -170,6 +202,18 @@ export default function DevelopmentDetailsPage() {
     }
   }
 
+  const calculateDeepSoilAreaPercentage = () => {
+    const proposedDeepSoilArea = Number.parseFloat(form.getValues("proposedDeepSoilArea") || "0")
+    // Using a default site area of 500m²
+    // In a real application, this would come from the property details form
+    const defaultSiteArea = 500
+
+    if (!isNaN(proposedDeepSoilArea) && defaultSiteArea > 0) {
+      const percentage = Math.round((proposedDeepSoilArea / defaultSiteArea) * 100)
+      form.setValue("deepSoilAreaPercentage", percentage.toString())
+    }
+  }
+
   // Handle form submission
   const onSubmit = (data: FormValues) => {
     console.log(data)
@@ -190,6 +234,7 @@ export default function DevelopmentDetailsPage() {
   useEffect(() => {
     calculateTotalGFAAndFSR()
     calculateLandscapedAreaPercentage()
+    calculateDeepSoilAreaPercentage()
   }, [])
 
   return (
@@ -211,7 +256,9 @@ export default function DevelopmentDetailsPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Development Description</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="developmentDescription">Detailed Description</Label>
+                <p className="text-sm text-muted-foreground">
+                    Describe what you are proposing to build or modify on the site
+                  </p>
                   <Textarea
                     id="developmentDescription"
                     placeholder="Provide a detailed description of the proposed development"
@@ -221,9 +268,6 @@ export default function DevelopmentDetailsPage() {
                   {form.formState.errors.developmentDescription && (
                     <p className="text-sm text-red-500">{form.formState.errors.developmentDescription.message}</p>
                   )}
-                  <p className="text-sm text-muted-foreground">
-                    Describe what you are proposing to build or modify on the site
-                  </p>
                 </div>
               </div>
 
@@ -267,14 +311,14 @@ export default function DevelopmentDetailsPage() {
                         <span className="sr-only">Height measurement info</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
                       <div className="space-y-2">
-                        <h4 className="font-medium">How to Measure Building Height</h4>
-                        <p className="text-sm text-muted-foreground">
+                        <h4 className="font-medium text-black">How to Measure Building Height</h4>
+                        <p className="text-sm text-gray-700">
                           Building height is measured from the natural ground level to the highest point of the
                           building.
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-700">
                           Wall height is measured from the natural ground level to the underside of the eaves.
                         </p>
                         <div className="mt-2">
@@ -298,11 +342,11 @@ export default function DevelopmentDetailsPage() {
                       <SelectTrigger id="storeys">
                         <SelectValue placeholder="Select number of storeys" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4+">4+</SelectItem>
+                      <SelectContent className="bg-white text-black border border-gray-200">
+                        <SelectItem value="1" className="text-black hover:bg-gray-100">1</SelectItem>
+                        <SelectItem value="2" className="text-black hover:bg-gray-100">2</SelectItem>
+                        <SelectItem value="3" className="text-black hover:bg-gray-100">3</SelectItem>
+                        <SelectItem value="4+" className="text-black hover:bg-gray-100">4+</SelectItem>
                       </SelectContent>
                     </Select>
                     {form.formState.errors.storeys && (
@@ -311,14 +355,14 @@ export default function DevelopmentDetailsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="buildingHeight">Maximum Building Height (m)</Label>
-                    <Input id="buildingHeight" placeholder="e.g. 7.2" {...form.register("buildingHeight")} />
+                    <Input id="buildingHeight" placeholder="e.g. 8.5" {...form.register("buildingHeight")} />
                     {form.formState.errors.buildingHeight && (
                       <p className="text-sm text-red-500">{form.formState.errors.buildingHeight.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="wallHeight">Wall Height (m)</Label>
-                    <Input id="wallHeight" placeholder="e.g. 6.0" {...form.register("wallHeight")} />
+                    <Input id="wallHeight" placeholder="e.g. 7.0" {...form.register("wallHeight")} />
                     {form.formState.errors.wallHeight && (
                       <p className="text-sm text-red-500">{form.formState.errors.wallHeight.message}</p>
                     )}
@@ -337,14 +381,14 @@ export default function DevelopmentDetailsPage() {
                         <span className="sr-only">Floor area measurement info</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
                       <div className="space-y-2">
-                        <h4 className="font-medium">How to Calculate Floor Area</h4>
-                        <p className="text-sm text-muted-foreground">
+                        <h4 className="font-medium text-black">How to Calculate Floor Area</h4>
+                        <p className="text-sm text-gray-700">
                           Gross Floor Area (GFA) is the sum of the floor area of each floor of a building measured from
                           the internal face of external walls.
                         </p>
-                        <p className="text-sm text-muted-foreground">Floor Space Ratio (FSR) = Total GFA ÷ Site Area</p>
+                        <p className="text-sm text-gray-700">Floor Space Ratio (FSR) = Total GFA ÷ Site Area</p>
                         <div className="mt-2">
                           <img
                             src="/placeholder.svg?height=150&width=300"
@@ -361,7 +405,7 @@ export default function DevelopmentDetailsPage() {
                     <Label htmlFor="existingGFA">Existing Gross Floor Area (m²)</Label>
                     <Input
                       id="existingGFA"
-                      placeholder="e.g. 150.0"
+                      placeholder="e.g. 100.0"
                       {...form.register("existingGFA")}
                       onChange={(e) => {
                         form.setValue("existingGFA", e.target.value)
@@ -370,10 +414,10 @@ export default function DevelopmentDetailsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="proposedGFA">Proposed Additional GFA (m²)</Label>
+                    <Label htmlFor="proposedGFA">Proposed Gross Floor Area (m²)</Label>
                     <Input
                       id="proposedGFA"
-                      placeholder="e.g. 100.0"
+                      placeholder="e.g. 150.0"
                       {...form.register("proposedGFA")}
                       onChange={(e) => {
                         form.setValue("proposedGFA", e.target.value)
@@ -400,7 +444,7 @@ export default function DevelopmentDetailsPage() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="floorSpaceRatio">Floor Space Ratio</Label>
+                    <Label htmlFor="floorSpaceRatio">Floor Space Ratio (FSR)</Label>
                     <Input
                       id="floorSpaceRatio"
                       placeholder="e.g. 0.5"
@@ -427,13 +471,13 @@ export default function DevelopmentDetailsPage() {
                         <span className="sr-only">Setback measurement info</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
                       <div className="space-y-2">
-                        <h4 className="font-medium">How to Measure Setbacks</h4>
-                        <p className="text-sm text-muted-foreground">
+                        <h4 className="font-medium text-black">How to Measure Setbacks</h4>
+                        <p className="text-sm text-gray-700">
                           Setbacks are measured from the property boundary to the external wall of the building.
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-700">
                           For upper levels, measure from the property boundary to the external wall of the upper floor.
                         </p>
                         <div className="mt-2">
@@ -450,7 +494,7 @@ export default function DevelopmentDetailsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="frontSetback">Front Setback (m)</Label>
-                    <Input id="frontSetback" placeholder="e.g. 6.5" {...form.register("frontSetback")} />
+                    <Input id="frontSetback" placeholder="e.g. 5.5" {...form.register("frontSetback")} />
                     {form.formState.errors.frontSetback && (
                       <p className="text-sm text-red-500">{form.formState.errors.frontSetback.message}</p>
                     )}
@@ -459,7 +503,7 @@ export default function DevelopmentDetailsPage() {
                     <Label htmlFor="secondaryFrontSetback">Secondary Front Setback (m) (if corner lot)</Label>
                     <Input
                       id="secondaryFrontSetback"
-                      placeholder="e.g. 3.0"
+                      placeholder="e.g. 2.0"
                       {...form.register("secondaryFrontSetback")}
                     />
                   </div>
@@ -467,30 +511,58 @@ export default function DevelopmentDetailsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="rearSetbackGround">Rear Setback (Ground Level) (m)</Label>
-                    <Input id="rearSetbackGround" placeholder="e.g. 8.0" {...form.register("rearSetbackGround")} />
+                    <Input id="rearSetbackGround" placeholder="e.g. 3.0" {...form.register("rearSetbackGround")} />
                     {form.formState.errors.rearSetbackGround && (
                       <p className="text-sm text-red-500">{form.formState.errors.rearSetbackGround.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="rearSetbackUpper">Rear Setback (Upper Level) (m)</Label>
-                    <Input id="rearSetbackUpper" placeholder="e.g. 10.0" {...form.register("rearSetbackUpper")} />
+                    <Input id="rearSetbackUpper" placeholder="e.g. 8.0" {...form.register("rearSetbackUpper")} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="sideSetbackOne">Side Setback 1 (m)</Label>
-                    <Input id="sideSetbackOne" placeholder="e.g. 1.5" {...form.register("sideSetbackOne")} />
-                    {form.formState.errors.sideSetbackOne && (
-                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackOne.message}</p>
+                    <Label htmlFor="sideSetbackGroundOne">Side Setback Ground Level RHS (m)</Label>
+                    <Input id="sideSetbackGroundOne" placeholder="e.g. 900" {...form.register("sideSetbackGroundOne")} />
+                    {form.formState.errors.sideSetbackGroundOne && (
+                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackGroundOne.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="sideSetbackTwo">Side Setback 2 (m)</Label>
-                    <Input id="sideSetbackTwo" placeholder="e.g. 1.0" {...form.register("sideSetbackTwo")} />
-                    {form.formState.errors.sideSetbackTwo && (
-                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackTwo.message}</p>
+                    <Label htmlFor="sideSetbackGroundTwo">Side Setback Ground Level LHS (m)</Label>
+                    <Input id="sideSetbackGroundTwo" placeholder="e.g. 900" {...form.register("sideSetbackGroundTwo")} />
+                    {form.formState.errors.sideSetbackGroundTwo && (
+                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackGroundTwo.message}</p>
                     )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sideSetbackUpperOne">Side Setback Upper Level RHS (m)</Label>
+                    <Input id="sideSetbackUpperOne" placeholder="e.g. 1.5" {...form.register("sideSetbackUpperOne")} />
+                    {form.formState.errors.sideSetbackUpperOne && (
+                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackUpperOne.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sideSetbackUpperTwo">Side Setback Upper Level LHS (m)</Label>
+                    <Input id="sideSetbackUpperTwo" placeholder="e.g. 1.5" {...form.register("sideSetbackUpperTwo")} />
+                    {form.formState.errors.sideSetbackUpperTwo && (
+                      <p className="text-sm text-red-500">{form.formState.errors.sideSetbackUpperTwo.message}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="garageSetback">Garage Setback (m)</Label>
+                    <Input id="garageSetback" placeholder="e.g. 1.5" {...form.register("garageSetback")} />
+                    {form.formState.errors.garageSetback && (
+                      <p className="text-sm text-red-500">{form.formState.errors.garageSetback.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {/* Empty div to maintain grid layout */}
                   </div>
                 </div>
               </div>
@@ -506,14 +578,14 @@ export default function DevelopmentDetailsPage() {
                         <span className="sr-only">Site coverage info</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
                       <div className="space-y-2">
-                        <h4 className="font-medium">How to Calculate Site Coverage</h4>
-                        <p className="text-sm text-muted-foreground">
+                        <h4 className="font-medium text-black">How to Calculate Site Coverage</h4>
+                        <p className="text-sm text-gray-700">
                           Site coverage is the percentage of the site area covered by buildings, measured as the area of
                           the site covered by roofed areas.
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-700">
                           Site Coverage (%) = (Building Footprint Area ÷ Site Area) × 100
                         </p>
                         <div className="mt-2">
@@ -553,14 +625,13 @@ export default function DevelopmentDetailsPage() {
                         <span className="sr-only">Landscaping info</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
                       <div className="space-y-2">
-                        <h4 className="font-medium">How to Calculate Landscaped Area</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Landscaped area is the part of a site used for growing plants, grasses and trees, but does not
-                          include any building, structure or hard paved area.
+                        <h4 className="font-medium text-black">How to Calculate Landscaped Area</h4>
+                        <p className="text-sm text-gray-700">
+                          Landscaped area is the areas of soil used for growing plants, grasses and trees, but does not include any building, structure or hard paved area.
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-700">
                           Landscaped Area (%) = (Landscaped Area ÷ Site Area) × 100
                         </p>
                         <div className="mt-2">
@@ -614,6 +685,106 @@ export default function DevelopmentDetailsPage() {
                   <p className="text-sm text-muted-foreground">
                     Proposed landscaped area as a percentage of the site area
                   </p>
+                </div>
+              </div>
+
+              {/* Deep soil */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-medium">Deep Soil</h3>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-5 w-5">
+                        <Info className="h-4 w-4" />
+                        <span className="sr-only">Deep soil info</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 bg-white text-black border border-gray-200">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-black">How to Calculate Deep Soil Area</h4>
+                        <p className="text-sm text-gray-700">
+                          Deep soil area is the areas of soil not covered by buildings or structures within a development.
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          Deep Soil Area (%) = (Deep Soil Area ÷ Site Area) × 100
+                        </p>
+                        <div className="mt-2">
+                          <img
+                            src="/placeholder.svg?height=150&width=300"
+                            alt="Deep soil area calculation diagram"
+                            className="border rounded"
+                          />
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="existingDeepSoilArea">Existing Deep Soil Area (m²)</Label>
+                    <Input
+                      id="existingDeepSoilArea"
+                      placeholder="e.g. 200.0"
+                      {...form.register("existingDeepSoilArea")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="proposedDeepSoilArea">Proposed Deep Soil Area (m²)</Label>
+                    <Input
+                      id="proposedDeepSoilArea"
+                      placeholder="e.g. 180.0"
+                      {...form.register("proposedDeepSoilArea")}
+                      onChange={(e) => {
+                        form.setValue("proposedDeepSoilArea", e.target.value)
+                        calculateDeepSoilAreaPercentage()
+                      }}
+                    />
+                    {form.formState.errors.proposedDeepSoilArea && (
+                      <p className="text-sm text-red-500">{form.formState.errors.proposedDeepSoilArea.message}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deepSoilAreaPercentage">Deep Soil Area Percentage (%)</Label>
+                  <Input
+                    id="deepSoilAreaPercentage"
+                    placeholder="e.g. 36"
+                    {...form.register("deepSoilAreaPercentage")}
+                    readOnly
+                    className="bg-gray-50"
+                  />
+                  {form.formState.errors.deepSoilAreaPercentage && (
+                    <p className="text-sm text-red-500">{form.formState.errors.deepSoilAreaPercentage.message}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Proposed deep soil area as a percentage of the site area
+                  </p>
+                </div>
+              </div>
+
+              {/* Private open space */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Private Open Space</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="existingPrivateOpenSpaceArea">Existing Private Open Space Area (m²)</Label>
+                  <Input id="existingPrivateOpenSpaceArea" placeholder="e.g. 200.0" {...form.register("existingPrivateOpenSpaceArea")} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="proposedPrivateOpenSpaceArea">Proposed Private Open Space Area (m²)</Label>
+                  <Input id="proposedPrivateOpenSpaceArea" placeholder="e.g. 180.0" {...form.register("proposedPrivateOpenSpaceArea")} />
+                </div>
+              </div>
+
+              {/* Excavation and Fill */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Excavation and Fill</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="maxCut">Max Cut (m)</Label>
+                  <Input id="maxCut" placeholder="e.g. 1m" {...form.register("maxCut")} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maxFill">Max Fill (m)</Label>
+                  <Input id="maxFill" placeholder="e.g. 1m" {...form.register("maxFill")} />
                 </div>
               </div>
 
@@ -682,13 +853,10 @@ export default function DevelopmentDetailsPage() {
                     <SelectTrigger id="carParkingSpaces">
                       <SelectValue placeholder="Select number of car spaces" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">0</SelectItem>
-                      <SelectItem value="1">1</SelectItem>
-                      <SelectItem value="2">2</SelectItem>
-                      <SelectItem value="3">3</SelectItem>
-                      <SelectItem value="4">4</SelectItem>
-                      <SelectItem value="5+">5+</SelectItem>
+                    <SelectContent className="bg-white text-black border border-gray-200">
+                      <SelectItem value="0" className="text-black hover:bg-gray-100">0</SelectItem>
+                      <SelectItem value="1" className="text-black hover:bg-gray-100">1</SelectItem>
+                      <SelectItem value="2" className="text-black hover:bg-gray-100">2</SelectItem>
                     </SelectContent>
                   </Select>
                   {form.formState.errors.carParkingSpaces && (
@@ -720,14 +888,14 @@ export default function DevelopmentDetailsPage() {
                     <SelectTrigger id="stormwaterDisposal">
                       <SelectValue placeholder="Select stormwater disposal method" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Connected to existing stormwater system">
+                    <SelectContent className="bg-white text-black border border-gray-200">
+                      <SelectItem value="Connected to existing stormwater system" className="text-black hover:bg-gray-100">
                         Connected to existing stormwater system
                       </SelectItem>
-                      <SelectItem value="Connected to street gutter">Connected to street gutter</SelectItem>
-                      <SelectItem value="Connected to rainwater tank">Connected to rainwater tank</SelectItem>
-                      <SelectItem value="On-site absorption trench">On-site absorption trench</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value="Connected to street gutter" className="text-black hover:bg-gray-100">Connected to street gutter</SelectItem>
+                      <SelectItem value="Connected to rainwater tank" className="text-black hover:bg-gray-100">Connected to rainwater tank</SelectItem>
+                      <SelectItem value="On-site absorption trench" className="text-black hover:bg-gray-100">On-site absorption trench</SelectItem>
+                      <SelectItem value="Other" className="text-black hover:bg-gray-100">Other</SelectItem>
                     </SelectContent>
                   </Select>
                   {form.formState.errors.stormwaterDisposal && (
@@ -750,12 +918,11 @@ export default function DevelopmentDetailsPage() {
                   {form.formState.errors.wasteManagement && (
                     <p className="text-sm text-red-500">{form.formState.errors.wasteManagement.message}</p>
                   )}
-                  <p className="text-sm text-muted-foreground">Include details about waste storage and collection</p>
                 </div>
               </div>
 
               <div className="flex justify-between pt-4">
-                <Link href="/professionals/SoEE/form/property-details?job=${jobId}">
+                <Link href={`/professionals/SoEE/form/property-details?job=${jobId}`}>
                   <Button variant="outline" type="button" className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> Back
                   </Button>

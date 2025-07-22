@@ -16,6 +16,7 @@ import { FormProgress } from "@/app/professionals/SoEE/components/form-progress"
 import Link from "next/link"
 import { Popover, PopoverContent, PopoverTrigger } from "@shared/components/ui/popover"
 import { useEffect } from "react"
+import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 
 // Form validation schema
 const formSchema = z.object({
@@ -94,49 +95,49 @@ export default function DevelopmentDetailsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const jobId = searchParams.get("job")
+  const { formData, updateFormData, saveDraft } = useFormData()
 
   // Initialize form with default values
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       // Development Description
-      developmentDescription:
-        "",
+      developmentDescription: formData.development.developmentDescription || "",
 
       // Demolition
-      demolitionRequired: true,
-      demolitionDetails: "",
+      demolitionRequired: formData.development.demolitionRequired || false,
+      demolitionDetails: formData.development.demolitionDetails || "",
 
       // Construction
-      storeys: "",
-      buildingHeight: "",
-      wallHeight: "",
+      storeys: formData.development.storeys || "",
+      buildingHeight: formData.development.buildingHeight || "",
+      wallHeight: formData.development.wallHeight || "",
 
       // Setbacks
-      frontSetback: "",
-      secondaryFrontSetback: "",
-      rearSetbackGround: "",
-      rearSetbackUpper: "",
-      sideSetbackGroundOne: "",
-      sideSetbackGroundTwo: "",
-      sideSetbackUpperOne: "",
-      sideSetbackUpperTwo: "",
+      frontSetback: formData.development.frontSetback || "",
+      secondaryFrontSetback: formData.development.secondaryFrontSetback || "",
+      rearSetbackGround: formData.development.rearSetbackGround || "",
+      rearSetbackUpper: formData.development.rearSetbackUpper || "",
+      sideSetbackGroundOne: formData.development.sideSetbackGroundOne || "",
+      sideSetbackGroundTwo: formData.development.sideSetbackGroundTwo || "",
+      sideSetbackUpperOne: formData.development.sideSetbackUpperOne || "",
+      sideSetbackUpperTwo: formData.development.sideSetbackUpperTwo || "",
       garageSetback: "",
       
       // Floor Area
-      existingGFA: "",
-      proposedGFA: "",
-      totalGFA: "",
-      floorSpaceRatio: "",
+      existingGFA: formData.development.existingGFA || "",
+      proposedGFA: formData.development.proposedGFA || "",
+      totalGFA: formData.development.totalGFA || "",
+      floorSpaceRatio: formData.development.floorSpaceRatio || "",
 
       // Site Coverage
-      existingSiteCoverage: "",
-      proposedSiteCoverage: "",
+      existingSiteCoverage: formData.development.existingSiteCoverage || "",
+      proposedSiteCoverage: formData.development.proposedSiteCoverage || "",
 
       // Landscaping
-      existingLandscapedArea: "",
-      proposedLandscapedArea: "",
-      landscapedAreaPercentage: "",
+      existingLandscapedArea: formData.development.existingLandscapedArea || "",
+      proposedLandscapedArea: formData.development.proposedLandscapedArea || "",
+      landscapedAreaPercentage: formData.development.landscapedAreaPercentage || "",
 
       // Deep soil
       existingDeepSoilArea: "",
@@ -152,23 +153,96 @@ export default function DevelopmentDetailsPage() {
       maxFill: "",
       
       // Materials and Finishes
-      externalWalls: "",
-      roof: "",
-      windows: "",
-      otherMaterials: "",
+      externalWalls: formData.development.externalWalls || "",
+      roof: formData.development.roof || "",
+      windows: formData.development.windows || "",
+      otherMaterials: formData.development.otherMaterials || "",
 
       // Access and Parking
-      vehicleAccess: "",
-      carParkingSpaces: "",
-      pedestrianAccess: "",
+      vehicleAccess: formData.development.vehicleAccess || "",
+      carParkingSpaces: formData.development.carParkingSpaces || "",
+      pedestrianAccess: formData.development.pedestrianAccess || "",
 
       // Stormwater
-      stormwaterDisposal: "",
+      stormwaterDisposal: formData.development.stormwaterDisposal || "",
 
       // Waste Management
-      wasteManagement: "",
+      wasteManagement: formData.development.wasteManagement || "",
     },
   })
+
+  // Reset form when formData changes (after loading from localStorage)
+  useEffect(() => {
+    form.reset({
+      // Development Description
+      developmentDescription: formData.development.developmentDescription || "",
+
+      // Demolition
+      demolitionRequired: formData.development.demolitionRequired || false,
+      demolitionDetails: formData.development.demolitionDetails || "",
+
+      // Construction
+      storeys: formData.development.storeys || "",
+      buildingHeight: formData.development.buildingHeight || "",
+      wallHeight: formData.development.wallHeight || "",
+
+      // Setbacks
+      frontSetback: formData.development.frontSetback || "",
+      secondaryFrontSetback: formData.development.secondaryFrontSetback || "",
+      rearSetbackGround: formData.development.rearSetbackGround || "",
+      rearSetbackUpper: formData.development.rearSetbackUpper || "",
+      sideSetbackGroundOne: formData.development.sideSetbackGroundOne || "",
+      sideSetbackGroundTwo: formData.development.sideSetbackGroundTwo || "",
+      sideSetbackUpperOne: formData.development.sideSetbackUpperOne || "",
+      sideSetbackUpperTwo: formData.development.sideSetbackUpperTwo || "",
+      garageSetback: "",
+      
+      // Floor Area
+      existingGFA: formData.development.existingGFA || "",
+      proposedGFA: formData.development.proposedGFA || "",
+      totalGFA: formData.development.totalGFA || "",
+      floorSpaceRatio: formData.development.floorSpaceRatio || "",
+
+      // Site Coverage
+      existingSiteCoverage: formData.development.existingSiteCoverage || "",
+      proposedSiteCoverage: formData.development.proposedSiteCoverage || "",
+
+      // Landscaping
+      existingLandscapedArea: formData.development.existingLandscapedArea || "",
+      proposedLandscapedArea: formData.development.proposedLandscapedArea || "",
+      landscapedAreaPercentage: formData.development.landscapedAreaPercentage || "",
+
+      // Deep soil
+      existingDeepSoilArea: "",
+      proposedDeepSoilArea: "",
+      deepSoilAreaPercentage: "",
+
+      // Private open space
+      existingPrivateOpenSpaceArea: "",
+      proposedPrivateOpenSpaceArea: "",
+      
+      // Excavation and Fill
+      maxCut: "",
+      maxFill: "",
+      
+      // Materials and Finishes
+      externalWalls: formData.development.externalWalls || "",
+      roof: formData.development.roof || "",
+      windows: formData.development.windows || "",
+      otherMaterials: formData.development.otherMaterials || "",
+
+      // Access and Parking
+      vehicleAccess: formData.development.vehicleAccess || "",
+      carParkingSpaces: formData.development.carParkingSpaces || "",
+      pedestrianAccess: formData.development.pedestrianAccess || "",
+
+      // Stormwater
+      stormwaterDisposal: formData.development.stormwaterDisposal || "",
+
+      // Waste Management
+      wasteManagement: formData.development.wasteManagement || "",
+    })
+  }, [formData.development, form])
 
   // Add calculation functions
   const calculateTotalGFAAndFSR = () => {
@@ -217,7 +291,42 @@ export default function DevelopmentDetailsPage() {
   // Handle form submission
   const onSubmit = (data: FormValues) => {
     console.log(data)
-    // Save form data to state/localStorage/backend
+    // Save form data to context
+    updateFormData("development", {
+      developmentDescription: data.developmentDescription,
+      demolitionRequired: data.demolitionRequired,
+      demolitionDetails: data.demolitionDetails,
+      storeys: data.storeys,
+      buildingHeight: data.buildingHeight,
+      wallHeight: data.wallHeight,
+      frontSetback: data.frontSetback,
+      secondaryFrontSetback: data.secondaryFrontSetback,
+      rearSetbackGround: data.rearSetbackGround,
+      rearSetbackUpper: data.rearSetbackUpper,
+      sideSetbackGroundOne: data.sideSetbackGroundOne,
+      sideSetbackGroundTwo: data.sideSetbackGroundTwo,
+      sideSetbackUpperOne: data.sideSetbackUpperOne,
+      sideSetbackUpperTwo: data.sideSetbackUpperTwo,
+      garageSetback: data.garageSetback,
+      existingGFA: data.existingGFA,
+      proposedGFA: data.proposedGFA,
+      totalGFA: data.totalGFA,
+      floorSpaceRatio: data.floorSpaceRatio,
+      existingSiteCoverage: data.existingSiteCoverage,
+      proposedSiteCoverage: data.proposedSiteCoverage,
+      existingLandscapedArea: data.existingLandscapedArea,
+      proposedLandscapedArea: data.proposedLandscapedArea,
+      landscapedAreaPercentage: data.landscapedAreaPercentage,
+      externalWalls: data.externalWalls,
+      roof: data.roof,
+      windows: data.windows,
+      otherMaterials: data.otherMaterials,
+      vehicleAccess: data.vehicleAccess,
+      carParkingSpaces: data.carParkingSpaces,
+      pedestrianAccess: data.pedestrianAccess,
+      stormwaterDisposal: data.stormwaterDisposal,
+      wasteManagement: data.wasteManagement,
+    })
     // Then navigate to the next step
     router.push(`/professionals/SoEE/form/planning?job=${jobId}`)
   }
@@ -225,7 +334,44 @@ export default function DevelopmentDetailsPage() {
   // Handle save draft functionality
   const handleSaveDraft = () => {
     const currentValues = form.getValues()
-    // Save draft logic here
+    // Save form data to context
+    updateFormData("development", {
+      developmentDescription: currentValues.developmentDescription,
+      demolitionRequired: currentValues.demolitionRequired,
+      demolitionDetails: currentValues.demolitionDetails,
+      storeys: currentValues.storeys,
+      buildingHeight: currentValues.buildingHeight,
+      wallHeight: currentValues.wallHeight,
+      frontSetback: currentValues.frontSetback,
+      secondaryFrontSetback: currentValues.secondaryFrontSetback,
+      rearSetbackGround: currentValues.rearSetbackGround,
+      rearSetbackUpper: currentValues.rearSetbackUpper,
+      sideSetbackGroundOne: currentValues.sideSetbackGroundOne,
+      sideSetbackGroundTwo: currentValues.sideSetbackGroundTwo,
+      sideSetbackUpperOne: currentValues.sideSetbackUpperOne,
+      sideSetbackUpperTwo: currentValues.sideSetbackUpperTwo,
+      garageSetback: currentValues.garageSetback,
+      existingGFA: currentValues.existingGFA,
+      proposedGFA: currentValues.proposedGFA,
+      totalGFA: currentValues.totalGFA,
+      floorSpaceRatio: currentValues.floorSpaceRatio,
+      existingSiteCoverage: currentValues.existingSiteCoverage,
+      proposedSiteCoverage: currentValues.proposedSiteCoverage,
+      existingLandscapedArea: currentValues.existingLandscapedArea,
+      proposedLandscapedArea: currentValues.proposedLandscapedArea,
+      landscapedAreaPercentage: currentValues.landscapedAreaPercentage,
+      externalWalls: currentValues.externalWalls,
+      roof: currentValues.roof,
+      windows: currentValues.windows,
+      otherMaterials: currentValues.otherMaterials,
+      vehicleAccess: currentValues.vehicleAccess,
+      carParkingSpaces: currentValues.carParkingSpaces,
+      pedestrianAccess: currentValues.pedestrianAccess,
+      stormwaterDisposal: currentValues.stormwaterDisposal,
+      wasteManagement: currentValues.wasteManagement,
+    })
+    // Save to localStorage
+    saveDraft()
     console.log("Saving draft:", currentValues)
     // Show success message
   }
@@ -772,6 +918,9 @@ export default function DevelopmentDetailsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="proposedPrivateOpenSpaceArea">Proposed Private Open Space Area (m²)</Label>
                   <Input id="proposedPrivateOpenSpaceArea" placeholder="e.g. 180.0" {...form.register("proposedPrivateOpenSpaceArea")} />
+                  {form.formState.errors.proposedPrivateOpenSpaceArea && (
+                    <p className="text-sm text-red-500">{form.formState.errors.proposedPrivateOpenSpaceArea.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -781,10 +930,16 @@ export default function DevelopmentDetailsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="maxCut">Max Cut (m)</Label>
                   <Input id="maxCut" placeholder="e.g. 1m" {...form.register("maxCut")} />
+                  {form.formState.errors.maxCut && (
+                    <p className="text-sm text-red-500">{form.formState.errors.maxCut.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="maxFill">Max Fill (m)</Label>
                   <Input id="maxFill" placeholder="e.g. 1m" {...form.register("maxFill")} />
+                  {form.formState.errors.maxFill && (
+                    <p className="text-sm text-red-500">{form.formState.errors.maxFill.message}</p>
+                  )}
                 </div>
               </div>
 

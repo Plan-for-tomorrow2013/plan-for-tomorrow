@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { FormData } from "@/app/professionals/SoEE/lib/types"
 
 interface FormContextType {
@@ -67,8 +67,11 @@ const initialFormData: FormData = {
     secondaryFrontSetback: "",
     rearSetbackGround: "",
     rearSetbackUpper: "",
-    sideSetbackOne: "",
-    sideSetbackTwo: "",
+    sideSetbackGroundOne: "",
+    sideSetbackGroundTwo: "",
+    sideSetbackUpperOne: "",
+    sideSetbackUpperTwo: "",
+    garageSetback: "",
     existingGFA: "",
     proposedGFA: "",
     totalGFA: "",
@@ -78,6 +81,13 @@ const initialFormData: FormData = {
     existingLandscapedArea: "",
     proposedLandscapedArea: "",
     landscapedAreaPercentage: "",
+    existingDeepSoilArea: "",
+    proposedDeepSoilArea: "",
+    deepSoilAreaPercentage: "",
+    existingPrivateOpenSpaceArea: "",
+    proposedPrivateOpenSpaceArea: "",
+    maxCut: "",
+    maxFill: "",
     externalWalls: "",
     roof: "",
     windows: "",
@@ -187,12 +197,39 @@ const initialFormData: FormData = {
 
 interface FormProviderProps {
   children: ReactNode
+  jobId?: string
 }
 
-export function FormProvider({ children }: FormProviderProps) {
+export function FormProvider({ children, jobId }: FormProviderProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData)
 
-  const updateFormData = <T extends keyof FormData>(section: T, data: Partial<FormData[T]>) => {
+  // Create job-specific localStorage key
+  const getStorageKey = useCallback(() => {
+    return jobId ? `see-generator-draft-${jobId}` : "see-generator-draft"
+  }, [jobId])
+
+  // Auto-load draft when jobId changes
+  useEffect(() => {
+    if (jobId && typeof window !== "undefined") {
+      const storageKey = getStorageKey()
+      console.log(`Auto-loading draft for job ${jobId} with key: ${storageKey}`)
+      const draft = localStorage.getItem(storageKey)
+      if (draft) {
+        try {
+          const parsedDraft = JSON.parse(draft)
+          console.log(`Auto-loaded draft data for job ${jobId}:`, parsedDraft)
+          setFormData(parsedDraft)
+        } catch (error) {
+          console.error("Error auto-loading draft:", error)
+        }
+      } else {
+        console.log(`No draft found for job ${jobId}, using initial data`)
+        setFormData(initialFormData)
+      }
+    }
+  }, [jobId, getStorageKey])
+
+  const updateFormData = useCallback(<T extends keyof FormData>(section: T, data: Partial<FormData[T]>) => {
     setFormData((prev) => ({
       ...prev,
       [section]: {
@@ -200,34 +237,42 @@ export function FormProvider({ children }: FormProviderProps) {
         ...data,
       },
     }))
-  }
+  }, [])
 
-  const saveDraft = () => {
+  const saveDraft = useCallback(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("see-generator-draft", JSON.stringify(formData))
+      const storageKey = getStorageKey()
+      console.log(`Saving draft for job ${jobId} with key: ${storageKey}`)
+      localStorage.setItem(storageKey, JSON.stringify(formData))
     }
-  }
+  }, [formData, getStorageKey, jobId])
 
-  const loadDraft = () => {
+  const loadDraft = useCallback(() => {
     if (typeof window !== "undefined") {
-      const draft = localStorage.getItem("see-generator-draft")
+      const storageKey = getStorageKey()
+      console.log(`Loading draft for job ${jobId} with key: ${storageKey}`)
+      const draft = localStorage.getItem(storageKey)
       if (draft) {
         try {
           const parsedDraft = JSON.parse(draft)
+          console.log(`Loaded draft data for job ${jobId}:`, parsedDraft)
           setFormData(parsedDraft)
         } catch (error) {
           console.error("Error loading draft:", error)
         }
+      } else {
+        console.log(`No draft found for job ${jobId}`)
       }
     }
-  }
+  }, [getStorageKey, jobId])
 
-  const clearForm = () => {
+  const clearForm = useCallback(() => {
     setFormData(initialFormData)
     if (typeof window !== "undefined") {
-      localStorage.removeItem("see-generator-draft")
+      const storageKey = getStorageKey()
+      localStorage.removeItem(storageKey)
     }
-  }
+  }, [getStorageKey])
 
   return (
     <FormContext.Provider

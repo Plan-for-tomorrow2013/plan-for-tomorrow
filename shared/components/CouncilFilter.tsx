@@ -68,7 +68,13 @@ const PLANNING_MAPPINGS: PlanningMapping[] = [
     lep: "Sydney Local Environmental Plan 2012",
     dcp: "Sydney Development Control Plan 2012",
     council: "City of Sydney"
-  }
+  },
+  {
+    lep: "Inner West Local Environmental Plan 2022",
+    dcp: "3 DCP",
+    council: "Inner West Council"
+  },
+
 ]
 
 export default function CouncilFilter({ propertyData, showDCP = true, showCouncil = true }: CouncilFilterProps) {

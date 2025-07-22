@@ -54,8 +54,11 @@ export interface ProjectData {
     secondaryFrontSetback?: string
     rearSetbackGround: string
     rearSetbackUpper?: string
-    sideSetbackOne: string
-    sideSetbackTwo: string
+    sideSetbackGroundOne: string
+    sideSetbackGroundTwo: string
+    sideSetbackUpperOne: string
+    sideSetbackUpperTwo: string
+    garageSetback: string
     existingGFA?: string
     proposedGFA: string
     totalGFA: string
@@ -65,6 +68,13 @@ export interface ProjectData {
     existingLandscapedArea?: string
     proposedLandscapedArea: string
     landscapedAreaPercentage: string
+    existingDeepSoilArea?: string
+    proposedDeepSoilArea: string
+    deepSoilAreaPercentage: string
+    existingPrivateOpenSpaceArea?: string
+    proposedPrivateOpenSpaceArea: string
+    maxCut: string
+    maxFill: string
     externalWalls: string
     roof: string
     windows: string
@@ -105,7 +115,7 @@ export interface ProjectData {
     sideSetbackNorthGroundProposed: string
     sideSetbackNorthGroundCompliance: boolean
     sideSetbackNorthUpperControl?: string
-    sideSetbackNorthUpperProposed?: string
+    sideSetbackNorthUpperProposed: string
     sideSetbackNorthUpperCompliance: boolean
     sideSetbackSouthGroundControl: string
     sideSetbackSouthGroundProposed: string

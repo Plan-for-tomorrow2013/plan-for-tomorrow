@@ -6,13 +6,17 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "@shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
+import { Input } from "@shared/components/ui/input"
 import { Label } from "@shared/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
 import { Textarea } from "@shared/components/ui/textarea"
 import { Checkbox } from "@shared/components/ui/checkbox"
 import { ArrowLeft, ArrowRight, Save } from "lucide-react"
 import { FormProgress } from "@/app/professionals/SoEE/components/form-progress"
 import Link from "next/link"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@shared/components/ui/accordion"
+import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
+import { useEffect } from "react"
 
 // Form validation schema
 const formSchema = z.object({
@@ -100,6 +104,7 @@ export default function EnvironmentalFactorsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const jobId = searchParams.get("job")
+  const { formData, updateFormData, saveDraft } = useFormData()
 
   // Initialize form with default values
   const form = useForm<FormValues>({
@@ -107,108 +112,213 @@ export default function EnvironmentalFactorsPage() {
     defaultValues: {
       // Context and Setting
       contextAndSetting: {
-        noise:
-          "The proposed development has been designed to minimize noise impacts on neighboring properties. The location of living areas and windows has been considered to reduce potential noise transmission.",
-        overlooking:
-          "The proposed development has been designed to minimize privacy impacts on neighboring properties. Windows on the upper level have been positioned to avoid direct overlooking of neighboring private open spaces and living areas.",
-        overshadowing:
-          "Shadow diagrams have been prepared which demonstrate that the proposed development will not result in unreasonable overshadowing of neighboring properties. The adjoining property to the south will receive at least 3 hours of solar access to private open space between 9am and 3pm on June 21 (winter solstice).",
-        buildingHeight:
-          "The proposed building height is consistent with the desired future character of the area and complies with Council's building height controls.",
-        setbacksAndLandscaping:
-          "The proposed setbacks and landscaping are consistent with the requirements of the DCP and provide adequate separation from neighboring properties.",
-        architecturalStyle:
-          "The architectural style and materials are compatible with the existing streetscape character. The front facade has been designed to complement the existing dwelling and surrounding development.",
+        noise: formData.environmental.contextAndSetting.noise || "The proposed development has been designed to minimize noise impacts on neighboring properties. The location of living areas and windows has been considered to reduce potential noise transmission.",
+        overlooking: formData.environmental.contextAndSetting.overlooking || "The proposed development has been designed to minimize privacy impacts on neighboring properties. Windows on the upper level have been positioned to avoid direct overlooking of neighboring private open spaces and living areas.",
+        overshadowing: formData.environmental.contextAndSetting.overshadowing || "Shadow diagrams have been prepared which demonstrate that the proposed development will not result in unreasonable overshadowing of neighboring properties. The adjoining property to the south will receive at least 3 hours of solar access to private open space between 9am and 3pm on June 21 (winter solstice).",
+        buildingHeight: formData.environmental.contextAndSetting.buildingHeight || "The proposed building height is consistent with the desired future character of the area and complies with Council's building height controls.",
+        setbacksAndLandscaping: formData.environmental.contextAndSetting.setbacksAndLandscaping || "The proposed setbacks and landscaping are consistent with the requirements of the DCP and provide adequate separation from neighboring properties.",
+        architecturalStyle: formData.environmental.contextAndSetting.architecturalStyle || "The architectural style and materials are compatible with the existing streetscape character. The front facade has been designed to complement the existing dwelling and surrounding development.",
       },
 
       // Access, Transport and Traffic
-      accessTransportTraffic:
-        "The site has frontage to Viola Place. The development is not expected to result in significant additional vehicle movements with the current road network being suitably designed for the current road construction. The development does not require a change to the vehicle access to the site.",
+      accessTransportTraffic: formData.environmental.accessTransportTraffic || "The site has frontage to Viola Place. The development is not expected to result in significant additional vehicle movements with the current road network being suitably designed for the current road construction. The development does not require a change to the vehicle access to the site.",
 
       // Public Domain
-      publicDomain: "A contribution under the S.7.12 contribution plan is payable given the proposed development type.",
+      publicDomain: formData.environmental.publicDomain || "A contribution under the S.7.12 contribution plan is payable given the proposed development type.",
 
       // Utilities
-      utilities:
-        "The development includes the augmentation or upgrading of essential services required for the development.",
+      utilities: formData.environmental.utilities || "The development includes the augmentation or upgrading of essential services required for the development.",
 
       // Heritage
-      heritage:
-        "The site is not identified as a heritage item, adjoining or adjacent a heritage item or within a heritage conservation area.",
+      heritage: formData.environmental.heritage || "The site is not identified as a heritage item, adjoining or adjacent a heritage item or within a heritage conservation area.",
 
       // Other Land Resources
-      otherLandResources: "The development seeks a residential use on the land.",
+      otherLandResources: formData.environmental.otherLandResources || "The development seeks a residential use on the land.",
 
       // Water
-      water: "The development site has provision of Council's water services to the development site.",
+      water: formData.environmental.water || "The development site has provision of Council's water services to the development site.",
 
       // Soils
-      soils:
-        "There is no previous history of usage on the site that could potentially lead to a risk in site contamination. It is considered that the sites soils are adequate for the development.",
+      soils: formData.environmental.soils || "There is no previous history of usage on the site that could potentially lead to a risk in site contamination. It is considered that the sites soils are adequate for the development.",
 
       // Air and Microclimate
-      airAndMicroclimate:
-        "The proposed development is considered to have minimal impact on the existing microclimate in the area.",
+      airAndMicroclimate: formData.environmental.airAndMicroclimate || "The proposed development is considered to have minimal impact on the existing microclimate in the area.",
 
       // Flora and Fauna
-      floraAndFauna:
-        "The development site is not expected to contain any critical habitats or threatened or endangered ecological communities. The development does not prevent access of any species to the site and does not require the removal of any remnant vegetation. The development will retain vegetation to the allotment boundaries. The lot does not appear on the NSW Biodiversity Values Map as a lot identified as containing areas of biodiversity value.",
-      treeRemoval: false,
-      treeRemovalCount: "0",
+      floraAndFauna: formData.environmental.floraAndFauna || "The development site is not expected to contain any critical habitats or threatened or endangered ecological communities. The development does not prevent access of any species to the site and does not require the removal of any remnant vegetation. The development will retain vegetation to the allotment boundaries. The lot does not appear on the NSW Biodiversity Values Map as a lot identified as containing areas of biodiversity value.",
+      treeRemoval: formData.environmental.treeRemoval ?? false,
+      treeRemovalCount: formData.environmental.treeRemovalCount || "0",
 
       // Waste
-      waste:
-        "Minimal waste will be generated from the operation of the development. Waste from the development may be managed on site.",
+      waste: formData.environmental.waste || "Minimal waste will be generated from the operation of the development. Waste from the development may be managed on site.",
 
       // Energy
-      energy:
-        "The development includes eco-friendly practices such as rainwater harvesting and renewable energy utilization or as suitable water and energy rated fittings.",
+      energy: formData.environmental.energy || "The development includes eco-friendly practices such as rainwater harvesting and renewable energy utilization or as suitable water and energy rated fittings.",
 
       // Noise and Vibration
-      noiseAndVibration:
-        "The development will not result in any noise and vibration with the exception of the construction phase. Council's standard hours of operation will be imposed during construction works.",
+      noiseAndVibration: formData.environmental.noiseAndVibration || "The development will not result in any noise and vibration with the exception of the construction phase. Council's standard hours of operation will be imposed during construction works.",
 
       // Natural Hazards
-      naturalHazards: "The site is not identified as being subject to bushfire or flooding.",
-      bushfireProne: false,
-      floodProne: false,
+      naturalHazards: formData.environmental.naturalHazards || "The site is not identified as being subject to bushfire or flooding.",
+      bushfireProne: formData.environmental.bushfireProne ?? false,
+      floodProne: formData.environmental.floodProne ?? false,
 
       // Technological Hazards
-      technologicalHazards: "Previously addressed throughout the report – natural hazards, soils, etc.",
+      technologicalHazards: formData.environmental.technologicalHazards || "Previously addressed throughout the report – natural hazards, soils, etc.",
 
       // Safety, Security and Crime Prevention
-      safetySecurity:
-        "The development will not result in any decrease in safety, security and prevention of crime in the surrounding area. The new development on the site will provide an increase in passive surveillance of the surrounding environment.",
+      safetySecurity: formData.environmental.safetySecurity || "The development will not result in any decrease in safety, security and prevention of crime in the surrounding area. The new development on the site will provide an increase in passive surveillance of the surrounding environment.",
 
       // Social and Economic Impact
-      socialEconomicImpact:
-        "The development will have a positive social impact on the surrounding area. The development will be consistent with development on the existing and adjoining allotments.",
+      socialEconomicImpact: formData.environmental.socialEconomicImpact || "The development will have a positive social impact on the surrounding area. The development will be consistent with development on the existing and adjoining allotments.",
 
       // Site Design and Internal Design
-      siteDesign: "The proposed development will be located with adequate setbacks from all lot boundaries.",
+      siteDesign: formData.environmental.siteDesign || "The proposed development will be located with adequate setbacks from all lot boundaries.",
 
       // Construction
-      construction: "Any construction works must be compliant with the Building Code of Australia.",
-      constructionHours:
-        "Construction will be limited to standard hours: 7am-5pm Monday to Friday, 8am-1pm Saturday, no work on Sundays or public holidays.",
-      erosionControl:
-        "Sediment control fencing will be installed prior to commencement of works and maintained throughout construction.",
-      dustControl:
-        "Water sprays will be used as needed during construction to minimize dust. Construction areas will be screened with appropriate dust control measures.",
+      construction: formData.environmental.construction || "The development will be constructed in accordance with the Building Code of Australia and relevant Australian Standards.",
+
+      // Construction Hours
+      constructionHours: formData.environmental.constructionHours || "Construction will be carried out during standard construction hours (7:00am to 6:00pm Monday to Friday, 8:00am to 1:00pm Saturday).",
+
+      // Erosion Control
+      erosionControl: formData.environmental.erosionControl || "Erosion control measures will be implemented during construction in accordance with Council's requirements.",
+
+      // Dust Control
+      dustControl: formData.environmental.dustControl || "Dust control measures will be implemented during construction in accordance with Council's requirements.",
 
       // Cumulative Impacts
-      cumulativeImpacts:
-        "The proposed development is considered to be compliant with surrounding land uses and approval of the application is not expected to result in any unacceptable land use conflicts. Pertinent matters have been addressed in detail in this report, which demonstrates that the development is consistent with applicable planning legislation.",
+      cumulativeImpacts: formData.environmental.cumulativeImpacts || "The development is considered to have minimal cumulative impacts on the surrounding environment.",
 
       // Additional Information
-      additionalInformation: "",
+      additionalInformation: formData.environmental.additionalInformation || "",
     },
   })
+
+  // Reset form when formData changes (after loading from localStorage)
+  useEffect(() => {
+    form.reset({
+      // Context and Setting
+      contextAndSetting: {
+        noise: formData.environmental.contextAndSetting.noise || "The proposed development has been designed to minimize noise impacts on neighboring properties. The location of living areas and windows has been considered to reduce potential noise transmission.",
+        overlooking: formData.environmental.contextAndSetting.overlooking || "The proposed development has been designed to minimize privacy impacts on neighboring properties. Windows on the upper level have been positioned to avoid direct overlooking of neighboring private open spaces and living areas.",
+        overshadowing: formData.environmental.contextAndSetting.overshadowing || "Shadow diagrams have been prepared which demonstrate that the proposed development will not result in unreasonable overshadowing of neighboring properties. The adjoining property to the south will receive at least 3 hours of solar access to private open space between 9am and 3pm on June 21 (winter solstice).",
+        buildingHeight: formData.environmental.contextAndSetting.buildingHeight || "The proposed building height is consistent with the desired future character of the area and complies with Council's building height controls.",
+        setbacksAndLandscaping: formData.environmental.contextAndSetting.setbacksAndLandscaping || "The proposed setbacks and landscaping are consistent with the requirements of the DCP and provide adequate separation from neighboring properties.",
+        architecturalStyle: formData.environmental.contextAndSetting.architecturalStyle || "The architectural style and materials are compatible with the existing streetscape character. The front facade has been designed to complement the existing dwelling and surrounding development.",
+      },
+
+      // Access, Transport and Traffic
+      accessTransportTraffic: formData.environmental.accessTransportTraffic || "The site has frontage to Viola Place. The development is not expected to result in significant additional vehicle movements with the current road network being suitably designed for the current road construction. The development does not require a change to the vehicle access to the site.",
+
+      // Public Domain
+      publicDomain: formData.environmental.publicDomain || "A contribution under the S.7.12 contribution plan is payable given the proposed development type.",
+
+      // Utilities
+      utilities: formData.environmental.utilities || "The development includes the augmentation or upgrading of essential services required for the development.",
+
+      // Heritage
+      heritage: formData.environmental.heritage || "The site is not identified as a heritage item, adjoining or adjacent a heritage item or within a heritage conservation area.",
+
+      // Other Land Resources
+      otherLandResources: formData.environmental.otherLandResources || "The development seeks a residential use on the land.",
+
+      // Water
+      water: formData.environmental.water || "The development site has provision of Council's water services to the development site.",
+
+      // Soils
+      soils: formData.environmental.soils || "There is no previous history of usage on the site that could potentially lead to a risk in site contamination. It is considered that the sites soils are adequate for the development.",
+
+      // Air and Microclimate
+      airAndMicroclimate: formData.environmental.airAndMicroclimate || "The proposed development is considered to have minimal impact on the existing microclimate in the area.",
+
+      // Flora and Fauna
+      floraAndFauna: formData.environmental.floraAndFauna || "The development site is not expected to contain any critical habitats or threatened or endangered ecological communities. The development does not prevent access of any species to the site and does not require the removal of any remnant vegetation. The development will retain vegetation to the allotment boundaries. The lot does not appear on the NSW Biodiversity Values Map as a lot identified as containing areas of biodiversity value.",
+      treeRemoval: formData.environmental.treeRemoval ?? false,
+      treeRemovalCount: formData.environmental.treeRemovalCount || "0",
+
+      // Waste
+      waste: formData.environmental.waste || "Minimal waste will be generated from the operation of the development. Waste from the development may be managed on site.",
+
+      // Energy
+      energy: formData.environmental.energy || "The development includes eco-friendly practices such as rainwater harvesting and renewable energy utilization or as suitable water and energy rated fittings.",
+
+      // Noise and Vibration
+      noiseAndVibration: formData.environmental.noiseAndVibration || "The development will not result in any noise and vibration with the exception of the construction phase. Council's standard hours of operation will be imposed during construction works.",
+
+      // Natural Hazards
+      naturalHazards: formData.environmental.naturalHazards || "The site is not identified as being subject to bushfire or flooding.",
+      bushfireProne: formData.environmental.bushfireProne ?? false,
+      floodProne: formData.environmental.floodProne ?? false,
+
+      // Technological Hazards
+      technologicalHazards: formData.environmental.technologicalHazards || "Previously addressed throughout the report – natural hazards, soils, etc.",
+
+      // Safety, Security and Crime Prevention
+      safetySecurity: formData.environmental.safetySecurity || "The development will not result in any decrease in safety, security and prevention of crime in the surrounding area. The new development on the site will provide an increase in passive surveillance of the surrounding environment.",
+
+      // Social and Economic Impact
+      socialEconomicImpact: formData.environmental.socialEconomicImpact || "The development will have a positive social impact on the surrounding area. The development will be consistent with development on the existing and adjoining allotments.",
+
+      // Site Design and Internal Design
+      siteDesign: formData.environmental.siteDesign || "The proposed development will be located with adequate setbacks from all lot boundaries.",
+
+      // Construction
+      construction: formData.environmental.construction || "The development will be constructed in accordance with the Building Code of Australia and relevant Australian Standards.",
+
+      // Construction Hours
+      constructionHours: formData.environmental.constructionHours || "Construction will be carried out during standard construction hours (7:00am to 6:00pm Monday to Friday, 8:00am to 1:00pm Saturday).",
+
+      // Erosion Control
+      erosionControl: formData.environmental.erosionControl || "Erosion control measures will be implemented during construction in accordance with Council's requirements.",
+
+      // Dust Control
+      dustControl: formData.environmental.dustControl || "Dust control measures will be implemented during construction in accordance with Council's requirements.",
+
+      // Cumulative Impacts
+      cumulativeImpacts: formData.environmental.cumulativeImpacts || "The development is considered to have minimal cumulative impacts on the surrounding environment.",
+
+      // Additional Information
+      additionalInformation: formData.environmental.additionalInformation || "",
+    })
+  }, [formData.environmental, form])
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
     console.log(data)
-    // Save form data to state/localStorage/backend
+    
+    // Save form data to context
+    updateFormData("environmental", {
+      contextAndSetting: data.contextAndSetting,
+      accessTransportTraffic: data.accessTransportTraffic,
+      publicDomain: data.publicDomain,
+      utilities: data.utilities,
+      heritage: data.heritage,
+      otherLandResources: data.otherLandResources,
+      water: data.water,
+      soils: data.soils,
+      airAndMicroclimate: data.airAndMicroclimate,
+      floraAndFauna: data.floraAndFauna,
+      treeRemoval: data.treeRemoval,
+      treeRemovalCount: data.treeRemovalCount,
+      waste: data.waste,
+      energy: data.energy,
+      noiseAndVibration: data.noiseAndVibration,
+      naturalHazards: data.naturalHazards,
+      bushfireProne: data.bushfireProne,
+      floodProne: data.floodProne,
+      technologicalHazards: data.technologicalHazards,
+      safetySecurity: data.safetySecurity,
+      socialEconomicImpact: data.socialEconomicImpact,
+      siteDesign: data.siteDesign,
+      construction: data.construction,
+      constructionHours: data.constructionHours,
+      erosionControl: data.erosionControl,
+      dustControl: data.dustControl,
+      cumulativeImpacts: data.cumulativeImpacts,
+      additionalInformation: data.additionalInformation,
+    })
+    
     // Then navigate to the next step
     router.push(`/professionals/SoEE/form/preview?job=${jobId}`)
   }
@@ -216,7 +326,41 @@ export default function EnvironmentalFactorsPage() {
   // Handle save draft functionality
   const handleSaveDraft = () => {
     const currentValues = form.getValues()
-    // Save draft logic here
+    
+    // Save form data to context
+    updateFormData("environmental", {
+      contextAndSetting: currentValues.contextAndSetting,
+      accessTransportTraffic: currentValues.accessTransportTraffic,
+      publicDomain: currentValues.publicDomain,
+      utilities: currentValues.utilities,
+      heritage: currentValues.heritage,
+      otherLandResources: currentValues.otherLandResources,
+      water: currentValues.water,
+      soils: currentValues.soils,
+      airAndMicroclimate: currentValues.airAndMicroclimate,
+      floraAndFauna: currentValues.floraAndFauna,
+      treeRemoval: currentValues.treeRemoval,
+      treeRemovalCount: currentValues.treeRemovalCount,
+      waste: currentValues.waste,
+      energy: currentValues.energy,
+      noiseAndVibration: currentValues.noiseAndVibration,
+      naturalHazards: currentValues.naturalHazards,
+      bushfireProne: currentValues.bushfireProne,
+      floodProne: currentValues.floodProne,
+      technologicalHazards: currentValues.technologicalHazards,
+      safetySecurity: currentValues.safetySecurity,
+      socialEconomicImpact: currentValues.socialEconomicImpact,
+      siteDesign: currentValues.siteDesign,
+      construction: currentValues.construction,
+      constructionHours: currentValues.constructionHours,
+      erosionControl: currentValues.erosionControl,
+      dustControl: currentValues.dustControl,
+      cumulativeImpacts: currentValues.cumulativeImpacts,
+      additionalInformation: currentValues.additionalInformation,
+    })
+    
+    // Save to localStorage
+    saveDraft()
     console.log("Saving draft:", currentValues)
     // Show success message
   }
@@ -758,7 +902,7 @@ export default function EnvironmentalFactorsPage() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <Link href="/professionals/SoEE/form/planning?job=${jobId}">
+                <Link href={`/professionals/SoEE/form/planning?job=${jobId}`}>
                   <Button variant="outline" type="button" className="gap-2">
                     <ArrowLeft className="h-4 w-4" /> Back
                   </Button>

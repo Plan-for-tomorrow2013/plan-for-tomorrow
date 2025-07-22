@@ -8,13 +8,14 @@ import { Button } from "@shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
 import { Input } from "@shared/components/ui/input"
 import { Label } from "@shared/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@shared/components/ui/select"
 import { Textarea } from "@shared/components/ui/textarea"
 import { Checkbox } from "@shared/components/ui/checkbox"
-import { ArrowLeft, ArrowRight, Save, Info, Plus, Trash } from "lucide-react"
+import { ArrowLeft, ArrowRight, Save, Plus, Trash2 } from "lucide-react"
 import { FormProgress } from "@/app/professionals/SoEE/components/form-progress"
 import Link from "next/link"
-import { Popover, PopoverContent, PopoverTrigger } from "@shared/components/ui/popover"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@shared/components/ui/table"
 
 // Form validation schema
@@ -112,6 +113,7 @@ export default function PlanningPage() {
   const searchParams = useSearchParams()
   const jobId = searchParams.get("job")
   const [showSeppFields, setShowSeppFields] = useState(false)
+  const { formData, updateFormData, saveDraft } = useFormData()
 
   // State for additional planning controls
   const [additionalControls, setAdditionalControls] = useState<
@@ -136,100 +138,248 @@ export default function PlanningPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       // Zoning and Permissibility
-      zoning: "R2 Low Density Residential",
-      landUsePermissibility: "Dwelling houses are permitted with consent in the R2 Low Density Residential zone.",
+      zoning: formData.planning.zoning || "R2 Low Density Residential",
+      landUsePermissibility: formData.planning.landUsePermissibility || "Dwelling houses are permitted with consent in the R2 Low Density Residential zone.",
 
       // LEP Compliance
-      lepName: "Cumberland Local Environmental Plan 2021",
-      lepCompliance:
-        "The proposed development complies with the relevant provisions of the Cumberland Local Environmental Plan 2021.",
+      lepName: formData.planning.lepName || "Cumberland Local Environmental Plan 2021",
+      lepCompliance: formData.planning.lepCompliance || "The proposed development complies with the relevant provisions of the Cumberland Local Environmental Plan 2021.",
 
       // Height of Buildings
-      heightControl: "8.5m",
-      heightProposed: "7.2m",
-      heightCompliance: true,
+      heightControl: formData.planning.heightControl || "8.5m",
+      heightProposed: formData.planning.heightProposed || "7.2m",
+      heightCompliance: formData.planning.heightCompliance ?? true,
 
       // Floor Space Ratio
-      fsrControl: "0.5:1",
-      fsrProposed: "0.5:1",
-      fsrCompliance: true,
+      fsrControl: formData.planning.fsrControl || "0.5:1",
+      fsrProposed: formData.planning.fsrProposed || "0.5:1",
+      fsrCompliance: formData.planning.fsrCompliance ?? true,
 
       // DCP Compliance
-      dcpName: "Cumberland Development Control Plan 2021",
-      dcpCompliance:
-        "The proposed development generally complies with the relevant provisions of the Cumberland Development Control Plan 2021.",
+      dcpName: formData.planning.dcpName || "Cumberland Development Control Plan 2021",
+      dcpCompliance: formData.planning.dcpCompliance || "The proposed development generally complies with the relevant provisions of the Cumberland Development Control Plan 2021.",
 
       // Updated Setbacks
-      frontSetbackControl: "Average of adjoining dwellings or 6m minimum",
-      frontSetbackProposed: "6.5m",
-      frontSetbackCompliance: true,
+      frontSetbackControl: formData.planning.frontSetbackControl || "Average of adjoining dwellings or 6m minimum",
+      frontSetbackProposed: formData.planning.frontSetbackProposed || "6.5m",
+      frontSetbackCompliance: formData.planning.frontSetbackCompliance ?? true,
 
-      secondaryFrontSetbackControl: "3m minimum (if corner lot)",
-      secondaryFrontSetbackProposed: "N/A",
-      secondaryFrontSetbackCompliance: true,
+      secondaryFrontSetbackControl: formData.planning.secondaryFrontSetbackControl || "3m minimum (if corner lot)",
+      secondaryFrontSetbackProposed: formData.planning.secondaryFrontSetbackProposed || "N/A",
+      secondaryFrontSetbackCompliance: formData.planning.secondaryFrontSetbackCompliance ?? true,
 
-      rearSetbackGroundControl: "6m minimum",
-      rearSetbackGroundProposed: "8.0m",
-      rearSetbackGroundCompliance: true,
+      rearSetbackGroundControl: formData.planning.rearSetbackGroundControl || "6m minimum",
+      rearSetbackGroundProposed: formData.planning.rearSetbackGroundProposed || "8.0m",
+      rearSetbackGroundCompliance: formData.planning.rearSetbackGroundCompliance ?? true,
 
-      rearSetbackUpperControl: "8m minimum",
-      rearSetbackUpperProposed: "10.0m",
-      rearSetbackUpperCompliance: true,
+      rearSetbackUpperControl: formData.planning.rearSetbackUpperControl || "8m minimum",
+      rearSetbackUpperProposed: formData.planning.rearSetbackUpperProposed || "10.0m",
+      rearSetbackUpperCompliance: formData.planning.rearSetbackUpperCompliance ?? true,
 
-      sideSetbackNorthGroundControl: "0.9m minimum",
-      sideSetbackNorthGroundProposed: "1.5m",
-      sideSetbackNorthGroundCompliance: true,
+      sideSetbackNorthGroundControl: formData.planning.sideSetbackNorthGroundControl || "0.9m minimum",
+      sideSetbackNorthGroundProposed: formData.planning.sideSetbackNorthGroundProposed || "1.5m",
+      sideSetbackNorthGroundCompliance: formData.planning.sideSetbackNorthGroundCompliance ?? true,
 
-      sideSetbackNorthUpperControl: "1.2m minimum",
-      sideSetbackNorthUpperProposed: "1.5m",
-      sideSetbackNorthUpperCompliance: true,
+      sideSetbackNorthUpperControl: formData.planning.sideSetbackNorthUpperControl || "1.2m minimum",
+      sideSetbackNorthUpperProposed: formData.planning.sideSetbackNorthUpperProposed || "1.5m",
+      sideSetbackNorthUpperCompliance: formData.planning.sideSetbackNorthUpperCompliance ?? true,
 
-      sideSetbackSouthGroundControl: "0.9m minimum",
-      sideSetbackSouthGroundProposed: "1.0m",
-      sideSetbackSouthGroundCompliance: true,
+      sideSetbackSouthGroundControl: formData.planning.sideSetbackSouthGroundControl || "0.9m minimum",
+      sideSetbackSouthGroundProposed: formData.planning.sideSetbackSouthGroundProposed || "1.0m",
+      sideSetbackSouthGroundCompliance: formData.planning.sideSetbackSouthGroundCompliance ?? true,
 
-      sideSetbackSouthUpperControl: "1.2m minimum",
-      sideSetbackSouthUpperProposed: "1.2m",
-      sideSetbackSouthUpperCompliance: true,
+      sideSetbackSouthUpperControl: formData.planning.sideSetbackSouthUpperControl || "1.2m minimum",
+      sideSetbackSouthUpperProposed: formData.planning.sideSetbackSouthUpperProposed || "1.2m",
+      sideSetbackSouthUpperCompliance: formData.planning.sideSetbackSouthUpperCompliance ?? true,
 
       // Site Coverage
-      siteCoverageControl: "50% maximum",
-      siteCoverageProposed: "40%",
-      siteCoverageCompliance: true,
+      siteCoverageControl: formData.planning.siteCoverageControl || "50% maximum",
+      siteCoverageProposed: formData.planning.siteCoverageProposed || "40%",
+      siteCoverageCompliance: formData.planning.siteCoverageCompliance ?? true,
 
       // Landscaped Area
-      landscapedAreaControl: "35% minimum",
-      landscapedAreaProposed: "36%",
-      landscapedAreaCompliance: true,
+      landscapedAreaControl: formData.planning.landscapedAreaControl || "35% minimum",
+      landscapedAreaProposed: formData.planning.landscapedAreaProposed || "36%",
+      landscapedAreaCompliance: formData.planning.landscapedAreaCompliance ?? true,
 
       // Car Parking
-      parkingControl: "2 spaces minimum",
-      parkingProposed: "2 spaces",
-      parkingCompliance: true,
+      parkingControl: formData.planning.parkingControl || "2 spaces minimum",
+      parkingProposed: formData.planning.parkingProposed || "2 spaces",
+      parkingCompliance: formData.planning.parkingCompliance ?? true,
 
       // SEPP Compliance
-      seppBiodiversity: false,
-      seppBiodiversityTreeRemoval: false,
-      seppResilience: true,
-      seppBasix: true,
-      seppTransport: false,
-      seppTransportClassifiedRoad: false,
-      seppHousing: false,
-      seppHousingSecondaryDwelling: false,
-      secondaryDwellingFloorArea: "",
-      maxFloorAreaByLEP: "",
+      seppBiodiversity: formData.planning.seppBiodiversity ?? false,
+      seppBiodiversityTreeRemoval: formData.planning.seppBiodiversityTreeRemoval ?? false,
+      seppResilience: formData.planning.seppResilience ?? true,
+      seppBasix: formData.planning.seppBasix ?? true,
+      seppTransport: formData.planning.seppTransport ?? false,
+      seppTransportClassifiedRoad: formData.planning.seppTransportClassifiedRoad ?? false,
+      seppHousing: formData.planning.seppHousing ?? false,
+      seppHousingSecondaryDwelling: formData.planning.seppHousingSecondaryDwelling ?? false,
+      secondaryDwellingFloorArea: formData.planning.secondaryDwellingFloorArea || "",
+      maxFloorAreaByLEP: formData.planning.maxFloorAreaByLEP || "",
 
       // Additional Planning Considerations
-      additionalPlanning: "",
+      additionalPlanning: formData.planning.additionalPlanning || "",
     },
   })
+
+  // Reset form when formData changes (after loading from localStorage)
+  useEffect(() => {
+    form.reset({
+      // Zoning and Permissibility
+      zoning: formData.planning.zoning || "R2 Low Density Residential",
+      landUsePermissibility: formData.planning.landUsePermissibility || "Dwelling houses are permitted with consent in the R2 Low Density Residential zone.",
+
+      // LEP Compliance
+      lepName: formData.planning.lepName || "Cumberland Local Environmental Plan 2021",
+      lepCompliance: formData.planning.lepCompliance || "The proposed development complies with the relevant provisions of the Cumberland Local Environmental Plan 2021.",
+
+      // Height of Buildings
+      heightControl: formData.planning.heightControl || "8.5m",
+      heightProposed: formData.planning.heightProposed || "7.2m",
+      heightCompliance: formData.planning.heightCompliance ?? true,
+
+      // Floor Space Ratio
+      fsrControl: formData.planning.fsrControl || "0.5:1",
+      fsrProposed: formData.planning.fsrProposed || "0.5:1",
+      fsrCompliance: formData.planning.fsrCompliance ?? true,
+
+      // DCP Compliance
+      dcpName: formData.planning.dcpName || "Cumberland Development Control Plan 2021",
+      dcpCompliance: formData.planning.dcpCompliance || "The proposed development generally complies with the relevant provisions of the Cumberland Development Control Plan 2021.",
+
+      // Updated Setbacks
+      frontSetbackControl: formData.planning.frontSetbackControl || "Average of adjoining dwellings or 6m minimum",
+      frontSetbackProposed: formData.planning.frontSetbackProposed || "6.5m",
+      frontSetbackCompliance: formData.planning.frontSetbackCompliance ?? true,
+
+      secondaryFrontSetbackControl: formData.planning.secondaryFrontSetbackControl || "3m minimum (if corner lot)",
+      secondaryFrontSetbackProposed: formData.planning.secondaryFrontSetbackProposed || "N/A",
+      secondaryFrontSetbackCompliance: formData.planning.secondaryFrontSetbackCompliance ?? true,
+
+      rearSetbackGroundControl: formData.planning.rearSetbackGroundControl || "6m minimum",
+      rearSetbackGroundProposed: formData.planning.rearSetbackGroundProposed || "8.0m",
+      rearSetbackGroundCompliance: formData.planning.rearSetbackGroundCompliance ?? true,
+
+      rearSetbackUpperControl: formData.planning.rearSetbackUpperControl || "8m minimum",
+      rearSetbackUpperProposed: formData.planning.rearSetbackUpperProposed || "10.0m",
+      rearSetbackUpperCompliance: formData.planning.rearSetbackUpperCompliance ?? true,
+
+      sideSetbackNorthGroundControl: formData.planning.sideSetbackNorthGroundControl || "0.9m minimum",
+      sideSetbackNorthGroundProposed: formData.planning.sideSetbackNorthGroundProposed || "1.5m",
+      sideSetbackNorthGroundCompliance: formData.planning.sideSetbackNorthGroundCompliance ?? true,
+
+      sideSetbackNorthUpperControl: formData.planning.sideSetbackNorthUpperControl || "1.2m minimum",
+      sideSetbackNorthUpperProposed: formData.planning.sideSetbackNorthUpperProposed || "1.5m",
+      sideSetbackNorthUpperCompliance: formData.planning.sideSetbackNorthUpperCompliance ?? true,
+
+      sideSetbackSouthGroundControl: formData.planning.sideSetbackSouthGroundControl || "0.9m minimum",
+      sideSetbackSouthGroundProposed: formData.planning.sideSetbackSouthGroundProposed || "1.0m",
+      sideSetbackSouthGroundCompliance: formData.planning.sideSetbackSouthGroundCompliance ?? true,
+
+      sideSetbackSouthUpperControl: formData.planning.sideSetbackSouthUpperControl || "1.2m minimum",
+      sideSetbackSouthUpperProposed: formData.planning.sideSetbackSouthUpperProposed || "1.2m",
+      sideSetbackSouthUpperCompliance: formData.planning.sideSetbackSouthUpperCompliance ?? true,
+
+      // Site Coverage
+      siteCoverageControl: formData.planning.siteCoverageControl || "50% maximum",
+      siteCoverageProposed: formData.planning.siteCoverageProposed || "40%",
+      siteCoverageCompliance: formData.planning.siteCoverageCompliance ?? true,
+
+      // Landscaped Area
+      landscapedAreaControl: formData.planning.landscapedAreaControl || "35% minimum",
+      landscapedAreaProposed: formData.planning.landscapedAreaProposed || "36%",
+      landscapedAreaCompliance: formData.planning.landscapedAreaCompliance ?? true,
+
+      // Car Parking
+      parkingControl: formData.planning.parkingControl || "2 spaces minimum",
+      parkingProposed: formData.planning.parkingProposed || "2 spaces",
+      parkingCompliance: formData.planning.parkingCompliance ?? true,
+
+      // SEPP Compliance
+      seppBiodiversity: formData.planning.seppBiodiversity ?? false,
+      seppBiodiversityTreeRemoval: formData.planning.seppBiodiversityTreeRemoval ?? false,
+      seppResilience: formData.planning.seppResilience ?? true,
+      seppBasix: formData.planning.seppBasix ?? true,
+      seppTransport: formData.planning.seppTransport ?? false,
+      seppTransportClassifiedRoad: formData.planning.seppTransportClassifiedRoad ?? false,
+      seppHousing: formData.planning.seppHousing ?? false,
+      seppHousingSecondaryDwelling: formData.planning.seppHousingSecondaryDwelling ?? false,
+      secondaryDwellingFloorArea: formData.planning.secondaryDwellingFloorArea || "",
+      maxFloorAreaByLEP: formData.planning.maxFloorAreaByLEP || "",
+
+      // Additional Planning Considerations
+      additionalPlanning: formData.planning.additionalPlanning || "",
+    })
+  }, [formData.planning, form])
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
     console.log(data)
     console.log("LEP Additional controls:", lepAdditionalControls)
     console.log("DCP Additional controls:", additionalControls)
-    // Save form data to state/localStorage/backend
+    
+    // Save form data to context
+    updateFormData("planning", {
+      zoning: data.zoning,
+      landUsePermissibility: data.landUsePermissibility,
+      lepName: data.lepName,
+      lepCompliance: data.lepCompliance,
+      heightControl: data.heightControl,
+      heightProposed: data.heightProposed,
+      heightCompliance: data.heightCompliance,
+      fsrControl: data.fsrControl,
+      fsrProposed: data.fsrProposed,
+      fsrCompliance: data.fsrCompliance,
+      dcpName: data.dcpName,
+      dcpCompliance: data.dcpCompliance,
+      frontSetbackControl: data.frontSetbackControl,
+      frontSetbackProposed: data.frontSetbackProposed,
+      frontSetbackCompliance: data.frontSetbackCompliance,
+      secondaryFrontSetbackControl: data.secondaryFrontSetbackControl,
+      secondaryFrontSetbackProposed: data.secondaryFrontSetbackProposed,
+      secondaryFrontSetbackCompliance: data.secondaryFrontSetbackCompliance,
+      rearSetbackGroundControl: data.rearSetbackGroundControl,
+      rearSetbackGroundProposed: data.rearSetbackGroundProposed,
+      rearSetbackGroundCompliance: data.rearSetbackGroundCompliance,
+      rearSetbackUpperControl: data.rearSetbackUpperControl,
+      rearSetbackUpperProposed: data.rearSetbackUpperProposed,
+      rearSetbackUpperCompliance: data.rearSetbackUpperCompliance,
+      sideSetbackNorthGroundControl: data.sideSetbackNorthGroundControl,
+      sideSetbackNorthGroundProposed: data.sideSetbackNorthGroundProposed,
+      sideSetbackNorthGroundCompliance: data.sideSetbackNorthGroundCompliance,
+      sideSetbackNorthUpperControl: data.sideSetbackNorthUpperControl,
+      sideSetbackNorthUpperProposed: data.sideSetbackNorthUpperProposed,
+      sideSetbackNorthUpperCompliance: data.sideSetbackNorthUpperCompliance,
+      sideSetbackSouthGroundControl: data.sideSetbackSouthGroundControl,
+      sideSetbackSouthGroundProposed: data.sideSetbackSouthGroundProposed,
+      sideSetbackSouthGroundCompliance: data.sideSetbackSouthGroundCompliance,
+      sideSetbackSouthUpperControl: data.sideSetbackSouthUpperControl,
+      sideSetbackSouthUpperProposed: data.sideSetbackSouthUpperProposed,
+      sideSetbackSouthUpperCompliance: data.sideSetbackSouthUpperCompliance,
+      siteCoverageControl: data.siteCoverageControl,
+      siteCoverageProposed: data.siteCoverageProposed,
+      siteCoverageCompliance: data.siteCoverageCompliance,
+      landscapedAreaControl: data.landscapedAreaControl,
+      landscapedAreaProposed: data.landscapedAreaProposed,
+      landscapedAreaCompliance: data.landscapedAreaCompliance,
+      parkingControl: data.parkingControl,
+      parkingProposed: data.parkingProposed,
+      parkingCompliance: data.parkingCompliance,
+      seppBiodiversity: data.seppBiodiversity,
+      seppBiodiversityTreeRemoval: data.seppBiodiversityTreeRemoval,
+      seppResilience: data.seppResilience,
+      seppBasix: data.seppBasix,
+      seppTransport: data.seppTransport,
+      seppTransportClassifiedRoad: data.seppTransportClassifiedRoad,
+      seppHousing: data.seppHousing,
+      seppHousingSecondaryDwelling: data.seppHousingSecondaryDwelling,
+      secondaryDwellingFloorArea: data.secondaryDwellingFloorArea,
+      maxFloorAreaByLEP: data.maxFloorAreaByLEP,
+      additionalPlanning: data.additionalPlanning,
+    })
+    
     // Then navigate to the next step
     router.push(`/professionals/SoEE/form/environmental-factors?job=${jobId}`)
   }
@@ -237,7 +387,69 @@ export default function PlanningPage() {
   // Handle save draft functionality
   const handleSaveDraft = () => {
     const currentValues = form.getValues()
-    // Save draft logic here
+    
+    // Save form data to context
+    updateFormData("planning", {
+      zoning: currentValues.zoning,
+      landUsePermissibility: currentValues.landUsePermissibility,
+      lepName: currentValues.lepName,
+      lepCompliance: currentValues.lepCompliance,
+      heightControl: currentValues.heightControl,
+      heightProposed: currentValues.heightProposed,
+      heightCompliance: currentValues.heightCompliance,
+      fsrControl: currentValues.fsrControl,
+      fsrProposed: currentValues.fsrProposed,
+      fsrCompliance: currentValues.fsrCompliance,
+      dcpName: currentValues.dcpName,
+      dcpCompliance: currentValues.dcpCompliance,
+      frontSetbackControl: currentValues.frontSetbackControl,
+      frontSetbackProposed: currentValues.frontSetbackProposed,
+      frontSetbackCompliance: currentValues.frontSetbackCompliance,
+      secondaryFrontSetbackControl: currentValues.secondaryFrontSetbackControl,
+      secondaryFrontSetbackProposed: currentValues.secondaryFrontSetbackProposed,
+      secondaryFrontSetbackCompliance: currentValues.secondaryFrontSetbackCompliance,
+      rearSetbackGroundControl: currentValues.rearSetbackGroundControl,
+      rearSetbackGroundProposed: currentValues.rearSetbackGroundProposed,
+      rearSetbackGroundCompliance: currentValues.rearSetbackGroundCompliance,
+      rearSetbackUpperControl: currentValues.rearSetbackUpperControl,
+      rearSetbackUpperProposed: currentValues.rearSetbackUpperProposed,
+      rearSetbackUpperCompliance: currentValues.rearSetbackUpperCompliance,
+      sideSetbackNorthGroundControl: currentValues.sideSetbackNorthGroundControl,
+      sideSetbackNorthGroundProposed: currentValues.sideSetbackNorthGroundProposed,
+      sideSetbackNorthGroundCompliance: currentValues.sideSetbackNorthGroundCompliance,
+      sideSetbackNorthUpperControl: currentValues.sideSetbackNorthUpperControl,
+      sideSetbackNorthUpperProposed: currentValues.sideSetbackNorthUpperProposed,
+      sideSetbackNorthUpperCompliance: currentValues.sideSetbackNorthUpperCompliance,
+      sideSetbackSouthGroundControl: currentValues.sideSetbackSouthGroundControl,
+      sideSetbackSouthGroundProposed: currentValues.sideSetbackSouthGroundProposed,
+      sideSetbackSouthGroundCompliance: currentValues.sideSetbackSouthGroundCompliance,
+      sideSetbackSouthUpperControl: currentValues.sideSetbackSouthUpperControl,
+      sideSetbackSouthUpperProposed: currentValues.sideSetbackSouthUpperProposed,
+      sideSetbackSouthUpperCompliance: currentValues.sideSetbackSouthUpperCompliance,
+      siteCoverageControl: currentValues.siteCoverageControl,
+      siteCoverageProposed: currentValues.siteCoverageProposed,
+      siteCoverageCompliance: currentValues.siteCoverageCompliance,
+      landscapedAreaControl: currentValues.landscapedAreaControl,
+      landscapedAreaProposed: currentValues.landscapedAreaProposed,
+      landscapedAreaCompliance: currentValues.landscapedAreaCompliance,
+      parkingControl: currentValues.parkingControl,
+      parkingProposed: currentValues.parkingProposed,
+      parkingCompliance: currentValues.parkingCompliance,
+      seppBiodiversity: currentValues.seppBiodiversity,
+      seppBiodiversityTreeRemoval: currentValues.seppBiodiversityTreeRemoval,
+      seppResilience: currentValues.seppResilience,
+      seppBasix: currentValues.seppBasix,
+      seppTransport: currentValues.seppTransport,
+      seppTransportClassifiedRoad: currentValues.seppTransportClassifiedRoad,
+      seppHousing: currentValues.seppHousing,
+      seppHousingSecondaryDwelling: currentValues.seppHousingSecondaryDwelling,
+      secondaryDwellingFloorArea: currentValues.secondaryDwellingFloorArea,
+      maxFloorAreaByLEP: currentValues.maxFloorAreaByLEP,
+      additionalPlanning: currentValues.additionalPlanning,
+    })
+    
+    // Save to localStorage
+    saveDraft()
     console.log("Saving draft:", currentValues)
     console.log("LEP Additional controls:", lepAdditionalControls)
     console.log("DCP Additional controls:", additionalControls)
@@ -618,27 +830,7 @@ export default function PlanningPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-medium">Local Environmental Plan (LEP) Compliance</h3>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-5 w-5">
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">LEP info</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                      <div className="space-y-2">
-                        <h4 className="font-medium">LEP Information</h4>
-                        <p className="text-sm text-muted-foreground">
-                          The Local Environmental Plan (LEP) is the primary planning instrument that establishes
-                          development controls for a local government area.
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Key LEP controls typically include zoning, building height, floor space ratio, and minimum lot
-                          size.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  {/* Removed Popover as per edit hint */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lepName">LEP Name</Label>
@@ -669,27 +861,7 @@ export default function PlanningPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-medium">Zoning and Permissibility</h3>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-5 w-5">
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">Zoning info</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Zoning Information</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Zoning information can be found on the NSW Planning Portal or your council's website. Common
-                          residential zones include R1 General Residential, R2 Low Density Residential, and R3 Medium
-                          Density Residential.
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          You need to confirm that your proposed development is permitted in the zone.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  {/* Removed Popover as per edit hint */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="zoning">Zoning</Label>
@@ -808,7 +980,7 @@ export default function PlanningPage() {
                                 size="icon"
                                 onClick={() => removeLepAdditionalControl(index)}
                               >
-                                <Trash className="h-4 w-4 text-red-500" />
+                                <Trash2 className="h-4 w-4 text-red-500" />
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -823,27 +995,7 @@ export default function PlanningPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-medium">Development Control Plan (DCP) Compliance</h3>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-5 w-5">
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">DCP info</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                      <div className="space-y-2">
-                        <h4 className="font-medium">DCP Information</h4>
-                        <p className="text-sm text-muted-foreground">
-                          The Development Control Plan (DCP) provides detailed planning and design guidelines to support
-                          the LEP.
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Key DCP controls typically include setbacks, landscaped area, car parking, privacy, solar
-                          access, and building design.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  {/* Removed Popover as per edit hint */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dcpName">DCP Name</Label>
@@ -1152,7 +1304,7 @@ export default function PlanningPage() {
                                   size="icon"
                                   onClick={() => removeAdditionalControl(index)}
                                 >
-                                  <Trash className="h-4 w-4 text-red-500" />
+                                  <Trash2 className="h-4 w-4 text-red-500" />
                                 </Button>
                               </TableCell>
                             </TableRow>

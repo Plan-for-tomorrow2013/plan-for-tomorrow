@@ -19,6 +19,7 @@ import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
 import CouncilFilter from '@shared/components/CouncilFilter';
 import { Job } from '@shared/types/jobs';
+import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 
 // Form validation schema
 const formSchema = z.object({
@@ -83,6 +84,7 @@ function PropertyDetailsPage() {
   const searchParams = useSearchParams();
   const jobId = searchParams.get("job");
   const [jobData, setJobData] = useState<Job | null>(null);
+  const { formData, updateFormData, saveDraft } = useFormData();
 
   // Fetch job data to get property data (which contains LEP)
   useEffect(() => {
@@ -110,20 +112,41 @@ function PropertyDetailsPage() {
       // Lot Identification - now an array with initial entry
       lotIdentifications: [
         {
-          lotNumber: "53",
-          sectionNumber: "N/A",
-          dpNumber: "231533",
+          lotNumber: formData.property.lotNumber || "53",
+          sectionNumber: formData.property.sectionNumber || "N/A",
+          dpNumber: formData.property.dpNumber || "231533",
         }
       ],
 
       // Address Details
-      streetNumber: "9",
-      streetName: "Viola Place",
-      secondaryStreetName: "",
-      suburb: "Greystanes",
-      postcode: "2145",
+      streetNumber: formData.property.streetNumber || "9",
+      streetName: formData.property.streetName || "Viola Place",
+      secondaryStreetName: formData.property.secondaryStreetName || "",
+      suburb: formData.property.suburb || "Greystanes",
+      postcode: formData.property.postcode || "2145",
     },
   })
+
+  // Reset form when formData changes (after loading from localStorage)
+  useEffect(() => {
+    form.reset({
+      // Lot Identification - now an array with initial entry
+      lotIdentifications: [
+        {
+          lotNumber: formData.property.lotNumber || "53",
+          sectionNumber: formData.property.sectionNumber || "N/A",
+          dpNumber: formData.property.dpNumber || "231533",
+        }
+      ],
+
+      // Address Details
+      streetNumber: formData.property.streetNumber || "9",
+      streetName: formData.property.streetName || "Viola Place",
+      secondaryStreetName: formData.property.secondaryStreetName || "",
+      suburb: formData.property.suburb || "Greystanes",
+      postcode: formData.property.postcode || "2145",
+    })
+  }, [formData.property, form])
 
   // Load form data from job when it's fetched
   useEffect(() => {
@@ -132,21 +155,21 @@ function PropertyDetailsPage() {
         // Lot Identification
         lotIdentifications: jobData.formData.lotIdentifications || [
           {
-            lotNumber: "53",
-            sectionNumber: "N/A",
-            dpNumber: "231533",
+            lotNumber: formData.property.lotNumber || "53",
+            sectionNumber: formData.property.sectionNumber || "N/A",
+            dpNumber: formData.property.dpNumber || "231533",
           }
         ],
 
         // Address Details
-        streetNumber: jobData.formData.addressDetails?.streetNumber || "9",
-        streetName: jobData.formData.addressDetails?.streetName || "Viola Place",
-        secondaryStreetName: jobData.formData.addressDetails?.secondaryStreetName || "",
-        suburb: jobData.formData.addressDetails?.suburb || "Greystanes",
-        postcode: jobData.formData.addressDetails?.postcode || "2145",
+        streetNumber: jobData.formData.addressDetails?.streetNumber || formData.property.streetNumber || "9",
+        streetName: jobData.formData.addressDetails?.streetName || formData.property.streetName || "Viola Place",
+        secondaryStreetName: jobData.formData.addressDetails?.secondaryStreetName || formData.property.secondaryStreetName || "",
+        suburb: jobData.formData.addressDetails?.suburb || formData.property.suburb || "Greystanes",
+        postcode: jobData.formData.addressDetails?.postcode || formData.property.postcode || "2145",
       });
     }
-  }, [jobData, form]);
+  }, [jobData, form, formData.property]);
 
   // Use site details context for real-time sync
   const { siteDetails, updateSiteDetails, saveSiteDetails, isLoading } = useSiteDetails();
@@ -168,19 +191,30 @@ function PropertyDetailsPage() {
               suburb: data.suburb,
               postcode: data.postcode,
             }
-          },
-          // siteDetails are saved separately by the site details context
+          }
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save property details');
+      if (response.ok) {
+        // Save form data to context
+        updateFormData("property", {
+          lotNumber: data.lotIdentifications[0]?.lotNumber || "",
+          sectionNumber: data.lotIdentifications[0]?.sectionNumber || "",
+          dpNumber: data.lotIdentifications[0]?.dpNumber || "",
+          streetNumber: data.streetNumber,
+          streetName: data.streetName,
+          secondaryStreetName: data.secondaryStreetName,
+          suburb: data.suburb,
+          postcode: data.postcode,
+        });
+        
+        // Navigate to the next step
+        router.push(`/professionals/SoEE/form/development-details?job=${jobId}`);
+      } else {
+        console.error('Failed to save form data');
       }
-
-      // Navigate to next page
-      router.push(`/professionals/SoEE/form/development-details?job=${jobId}`);
     } catch (error) {
-      console.error('Error saving property details:', error);
+      console.error('Error saving form data:', error);
     }
   };
 

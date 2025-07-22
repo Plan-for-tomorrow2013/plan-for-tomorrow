@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { FormProvider } from "@/app/professionals/SoEE/lib/form-context"
 import { Toaster } from "@shared/components/ui/toaster"
+import { JobAwareFormProvider } from "@/app/professionals/SoEE/components/job-aware-form-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,9 +18,9 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <FormProvider>
+    <JobAwareFormProvider>
       {children}
       <Toaster />
-    </FormProvider>
+    </JobAwareFormProvider>
   )
 }

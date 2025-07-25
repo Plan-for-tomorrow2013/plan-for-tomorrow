@@ -20,25 +20,8 @@ import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-detai
 import CouncilFilter from '@shared/components/CouncilFilter';
 import { Job } from '@shared/types/jobs';
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
-
-// Form validation schema
-const formSchema = z.object({
-  // Lot Identification - now supports multiple lots
-  lotIdentifications: z.array(z.object({
-    lotNumber: z.string().min(1, { message: "Lot number is required" }),
-    sectionNumber: z.string().optional(),
-    dpNumber: z.string().min(1, { message: "DP/SP number is required" }),
-  })).min(1, { message: "At least one lot identification is required" }),
-
-  // Address Details (pre-filled from previous step)
-  streetNumber: z.string().min(1, { message: "Street number is required" }),
-  streetName: z.string().min(1, { message: "Street name is required" }),
-  secondaryStreetName: z.string().optional(),
-  suburb: z.string().min(1, { message: "Suburb is required" }),
-  postcode: z.string().min(4, { message: "Valid postcode is required" }),
-})
-
-type FormValues = z.infer<typeof formSchema>
+import { PropertyDataSchema } from "@/app/professionals/SoEE/lib/schemas";
+type FormValues = z.infer<typeof PropertyDataSchema>;
 
 const defaultSiteDetails = {
   lotType: '',
@@ -107,7 +90,7 @@ function PropertyDetailsPage() {
 
   // SoEE-specific form state (address, lot identification)
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(PropertyDataSchema),
     defaultValues: {
       // Lot Identification - now an array with initial entry
       lotIdentifications: [

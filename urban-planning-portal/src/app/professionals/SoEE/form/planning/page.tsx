@@ -17,96 +17,8 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@shared/components/ui/table"
-
-// Form validation schema
-const formSchema = z.object({
-  // Zoning and Permissibility
-  zoning: z.string().min(1, { message: "Zoning information is required" }),
-  landUsePermissibility: z.string().min(1, { message: "Land use permissibility assessment is required" }),
-
-  // LEP Compliance
-  lepName: z.string().min(1, { message: "LEP name is required" }),
-  lepCompliance: z.string().min(1, { message: "LEP compliance assessment is required" }),
-
-  // Height of Buildings
-  heightControl: z.string().min(1, { message: "Height control is required" }),
-  heightProposed: z.string().min(1, { message: "Proposed height is required" }),
-  heightCompliance: z.boolean().default(true),
-
-  // Floor Space Ratio
-  fsrControl: z.string().min(1, { message: "FSR control is required" }),
-  fsrProposed: z.string().min(1, { message: "Proposed FSR is required" }),
-  fsrCompliance: z.boolean().default(true),
-
-  // DCP Compliance
-  dcpName: z.string().min(1, { message: "DCP name is required" }),
-  dcpCompliance: z.string().min(1, { message: "DCP compliance assessment is required" }),
-
-  // Updated Setbacks
-  frontSetbackControl: z.string().min(1, { message: "Front setback control is required" }),
-  frontSetbackProposed: z.string().min(1, { message: "Proposed front setback is required" }),
-  frontSetbackCompliance: z.boolean().default(true),
-
-  secondaryFrontSetbackControl: z.string().optional(),
-  secondaryFrontSetbackProposed: z.string().optional(),
-  secondaryFrontSetbackCompliance: z.boolean().default(true),
-
-  rearSetbackGroundControl: z.string().min(1, { message: "Rear setback (ground) control is required" }),
-  rearSetbackGroundProposed: z.string().min(1, { message: "Proposed rear setback (ground) is required" }),
-  rearSetbackGroundCompliance: z.boolean().default(true),
-
-  rearSetbackUpperControl: z.string().optional(),
-  rearSetbackUpperProposed: z.string().optional(),
-  rearSetbackUpperCompliance: z.boolean().default(true),
-
-  sideSetbackNorthGroundControl: z.string().min(1, { message: "Side setback (north, ground) control is required" }),
-  sideSetbackNorthGroundProposed: z.string().min(1, { message: "Proposed side setback (north, ground) is required" }),
-  sideSetbackNorthGroundCompliance: z.boolean().default(true),
-
-  sideSetbackNorthUpperControl: z.string().optional(),
-  sideSetbackNorthUpperProposed: z.string().optional(),
-  sideSetbackNorthUpperCompliance: z.boolean().default(true),
-
-  sideSetbackSouthGroundControl: z.string().min(1, { message: "Side setback (south, ground) control is required" }),
-  sideSetbackSouthGroundProposed: z.string().min(1, { message: "Proposed side setback (south, ground) is required" }),
-  sideSetbackSouthGroundCompliance: z.boolean().default(true),
-
-  sideSetbackSouthUpperControl: z.string().optional(),
-  sideSetbackSouthUpperProposed: z.string().optional(),
-  sideSetbackSouthUpperCompliance: z.boolean().default(true),
-
-  // Site Coverage
-  siteCoverageControl: z.string().min(1, { message: "Site coverage control is required" }),
-  siteCoverageProposed: z.string().min(1, { message: "Proposed site coverage is required" }),
-  siteCoverageCompliance: z.boolean().default(true),
-
-  // Landscaped Area
-  landscapedAreaControl: z.string().min(1, { message: "Landscaped area control is required" }),
-  landscapedAreaProposed: z.string().min(1, { message: "Proposed landscaped area is required" }),
-  landscapedAreaCompliance: z.boolean().default(true),
-
-  // Car Parking
-  parkingControl: z.string().min(1, { message: "Parking control is required" }),
-  parkingProposed: z.string().min(1, { message: "Proposed parking is required" }),
-  parkingCompliance: z.boolean().default(true),
-
-  // SEPP Compliance
-  seppBiodiversity: z.boolean().default(false),
-  seppBiodiversityTreeRemoval: z.boolean().default(false),
-  seppResilience: z.boolean().default(true),
-  seppBasix: z.boolean().default(true),
-  seppTransport: z.boolean().default(false),
-  seppTransportClassifiedRoad: z.boolean().default(false),
-  seppHousing: z.boolean().default(false),
-  seppHousingSecondaryDwelling: z.boolean().default(false),
-  secondaryDwellingFloorArea: z.string().optional(),
-  maxFloorAreaByLEP: z.string().optional(),
-
-  // Additional Planning Considerations
-  additionalPlanning: z.string().optional(),
-})
-
-type FormValues = z.infer<typeof formSchema>
+import { PlanningDataSchema } from "@/app/professionals/SoEE/lib/schemas";
+type FormValues = z.infer<typeof PlanningDataSchema>;
 
 export default function PlanningPage() {
   const router = useRouter()
@@ -135,7 +47,7 @@ export default function PlanningPage() {
 
   // Initialize form with default values
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(PlanningDataSchema),
     defaultValues: {
       // Zoning and Permissibility
       zoning: formData.planning.zoning || "R2 Low Density Residential",

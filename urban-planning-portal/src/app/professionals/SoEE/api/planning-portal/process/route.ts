@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getDcpStandards } from "@/app/professionals/SoEE/lib/dcp-standards"
+import { ProjectDataSchema } from "@/app/professionals/SoEE/lib/schemas";
 
 interface ProcessedFormData {
   lepName: string
@@ -30,8 +31,17 @@ interface ProcessResponse {
 
 export async function POST(request: NextRequest): Promise<NextResponse<ProcessResponse>> {
   try {
-    const body = await request.json()
-    const { address, councilArea } = body
+    const body = await request.json();
+    // Validate with Zod
+    const result = ProjectDataSchema.pick({ address: true, councilArea: true }).safeParse(body);
+    if (!result.success) {
+      return NextResponse.json({
+        success: false,
+        error: "Invalid data",
+        details: result.error.errors,
+      }, { status: 400 });
+    }
+    const { address, councilArea } = result.data;
 
     if (!address || !councilArea) {
       return NextResponse.json({

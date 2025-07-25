@@ -17,88 +17,8 @@ import Link from "next/link"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@shared/components/ui/accordion"
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 import { useEffect } from "react"
-
-// Form validation schema
-const formSchema = z.object({
-  // Context and Setting
-  contextAndSetting: z.object({
-    noise: z.string().min(1, { message: "Noise assessment is required" }),
-    overlooking: z.string().min(1, { message: "Overlooking assessment is required" }),
-    overshadowing: z.string().min(1, { message: "Overshadowing assessment is required" }),
-    buildingHeight: z.string().min(1, { message: "Building height assessment is required" }),
-    setbacksAndLandscaping: z.string().min(1, { message: "Setbacks and landscaping assessment is required" }),
-    architecturalStyle: z.string().min(1, { message: "Architectural style assessment is required" }),
-  }),
-
-  // Access, Transport and Traffic
-  accessTransportTraffic: z.string().min(1, { message: "Access, transport and traffic assessment is required" }),
-
-  // Public Domain
-  publicDomain: z.string().min(1, { message: "Public domain assessment is required" }),
-
-  // Utilities
-  utilities: z.string().min(1, { message: "Utilities assessment is required" }),
-
-  // Heritage
-  heritage: z.string().min(1, { message: "Heritage assessment is required" }),
-
-  // Other Land Resources
-  otherLandResources: z.string().min(1, { message: "Other land resources assessment is required" }),
-
-  // Water
-  water: z.string().min(1, { message: "Water assessment is required" }),
-
-  // Soils
-  soils: z.string().min(1, { message: "Soils assessment is required" }),
-
-  // Air and Microclimate
-  airAndMicroclimate: z.string().min(1, { message: "Air and microclimate assessment is required" }),
-
-  // Flora and Fauna
-  floraAndFauna: z.string().min(1, { message: "Flora and fauna assessment is required" }),
-  treeRemoval: z.boolean().default(false),
-  treeRemovalCount: z.string().optional(),
-
-  // Waste
-  waste: z.string().min(1, { message: "Waste assessment is required" }),
-
-  // Energy
-  energy: z.string().min(1, { message: "Energy assessment is required" }),
-
-  // Noise and Vibration
-  noiseAndVibration: z.string().min(1, { message: "Noise and vibration assessment is required" }),
-
-  // Natural Hazards
-  naturalHazards: z.string().min(1, { message: "Natural hazards assessment is required" }),
-  bushfireProne: z.boolean().default(false),
-  floodProne: z.boolean().default(false),
-
-  // Technological Hazards
-  technologicalHazards: z.string().min(1, { message: "Technological hazards assessment is required" }),
-
-  // Safety, Security and Crime Prevention
-  safetySecurity: z.string().min(1, { message: "Safety, security and crime prevention assessment is required" }),
-
-  // Social and Economic Impact
-  socialEconomicImpact: z.string().min(1, { message: "Social and economic impact assessment is required" }),
-
-  // Site Design and Internal Design
-  siteDesign: z.string().min(1, { message: "Site design assessment is required" }),
-
-  // Construction
-  construction: z.string().min(1, { message: "Construction assessment is required" }),
-  constructionHours: z.string().min(1, { message: "Construction hours information is required" }),
-  erosionControl: z.string().min(1, { message: "Erosion control measures are required" }),
-  dustControl: z.string().min(1, { message: "Dust control measures are required" }),
-
-  // Cumulative Impacts
-  cumulativeImpacts: z.string().min(1, { message: "Cumulative impacts assessment is required" }),
-
-  // Additional Information
-  additionalInformation: z.string().optional(),
-})
-
-type FormValues = z.infer<typeof formSchema>
+import { EnvironmentalDataSchema } from "@/app/professionals/SoEE/lib/schemas";
+type FormValues = z.infer<typeof EnvironmentalDataSchema>;
 
 export default function EnvironmentalFactorsPage() {
   const router = useRouter()
@@ -108,7 +28,7 @@ export default function EnvironmentalFactorsPage() {
 
   // Initialize form with default values
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(EnvironmentalDataSchema),
     defaultValues: {
       // Context and Setting
       contextAndSetting: {

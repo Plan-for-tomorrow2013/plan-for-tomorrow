@@ -14,6 +14,7 @@ import { useState } from "react"
 import { Alert, AlertDescription, AlertTitle } from "@shared/components/ui/alert"
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 import { useToast } from "@/app/professionals/SoEE/hooks/use-toast"
+import type { DevelopmentData } from "@/app/professionals/SoEE/lib/types";
 
 export default function PreviewPage() {
   const router = useRouter()

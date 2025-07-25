@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { FormData } from "@/app/professionals/SoEE/lib/types"
+import type { DevelopmentData } from "./types";
 
 interface FormContextType {
   formData: FormData

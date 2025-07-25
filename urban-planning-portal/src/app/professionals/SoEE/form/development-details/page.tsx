@@ -17,79 +17,9 @@ import Link from "next/link"
 import { Popover, PopoverContent, PopoverTrigger } from "@shared/components/ui/popover"
 import { useEffect } from "react"
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
+import { DevelopmentDataSchema } from "@/app/professionals/SoEE/lib/schemas";
 
-// Form validation schema
-const formSchema = z.object({
-  // Development Description
-  developmentDescription: z.string().min(10, { message: "Please provide a detailed description" }),
-
-  // Demolition
-  demolitionRequired: z.boolean().default(false),
-  demolitionDetails: z.string().optional(),
-
-  // Height
-  storeys: z.string().min(1, { message: "Number of storeys is required" }),
-  buildingHeight: z.string().min(1, { message: "Building height is required" }),
-  wallHeight: z.string().min(1, { message: "Wall height is required" }),
-
-  // Setbacks
-  frontSetback: z.string().min(1, { message: "Front setback is required" }),
-  secondaryFrontSetback: z.string().optional(),
-  rearSetbackGround: z.string().min(1, { message: "Ground level rear setback is required" }),
-  rearSetbackUpper: z.string().optional(),
-  sideSetbackGroundOne: z.string().min(1, { message: "Side setback is required" }),
-  sideSetbackGroundTwo: z.string().min(1, { message: "Side setback is required" }),
-  sideSetbackUpperOne: z.string().min(1, { message: "Side setback is required" }),
-  sideSetbackUpperTwo: z.string().min(1, { message: "Side setback is required" }),
-  garageSetback: z.string().min(1, { message: "Garage setback is required" }),
-
-  // Floor Area
-  existingGFA: z.string().optional(),
-  proposedGFA: z.string().min(1, { message: "Proposed GFA is required" }),
-  totalGFA: z.string().min(1, { message: "Total GFA is required" }),
-  floorSpaceRatio: z.string().min(1, { message: "FSR is required" }),
-
-  // Site Coverage
-  existingSiteCoverage: z.string().optional(),
-  proposedSiteCoverage: z.string().min(1, { message: "Proposed site coverage is required" }),
-
-  // Landscaping
-  existingLandscapedArea: z.string().optional(),
-  proposedLandscapedArea: z.string().min(1, { message: "Proposed landscaped area is required" }),
-  landscapedAreaPercentage: z.string().min(1, { message: "Landscaped area percentage is required" }),
-
-  // Deep soil
-  existingDeepSoilArea: z.string().optional(),
-  proposedDeepSoilArea: z.string().min(1, { message: "Proposed deep soil area is required" }),
-  deepSoilAreaPercentage: z.string().min(1, { message: "Deep soil area percentage is required" }),
-
-  // Private open space
-  existingPrivateOpenSpaceArea: z.string().optional(),
-  proposedPrivateOpenSpaceArea: z.string().min(1, { message: "Proposed private open space area is required" }),
-
-  // Excavation and Fill
-  maxCut: z.string().min(1, { message: "Max cut is required" }),
-  maxFill: z.string().min(1, { message: "Max fill is required" }),
-
-  // Materials and Finishes
-  externalWalls: z.string().min(1, { message: "External walls material is required" }),
-  roof: z.string().min(1, { message: "Roof material is required" }),
-  windows: z.string().min(1, { message: "Windows material is required" }),
-  otherMaterials: z.string().optional(),
-
-  // Access and Parking
-  vehicleAccess: z.string().min(1, { message: "Vehicle access information is required" }),
-  carParkingSpaces: z.string().min(1, { message: "Car parking spaces information is required" }),
-  pedestrianAccess: z.string().min(1, { message: "Pedestrian access information is required" }),
-
-  // Stormwater
-  stormwaterDisposal: z.string().min(1, { message: "Stormwater disposal information is required" }),
-
-  // Waste Management
-  wasteManagement: z.string().min(1, { message: "Waste management information is required" }),
-})
-
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof DevelopmentDataSchema>
 
 export default function DevelopmentDetailsPage() {
   const router = useRouter()
@@ -99,7 +29,7 @@ export default function DevelopmentDetailsPage() {
 
   // Initialize form with default values
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(DevelopmentDataSchema),
     defaultValues: {
       // Development Description
       developmentDescription: formData.development.developmentDescription || "",

@@ -41,7 +41,8 @@ import { Input } from '@shared/components/ui/input';
 import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from '@shared/components/ui/use-toast';
 import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo';
-import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails';
+import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
+import { SiteDetails } from '@shared/types/site-details';
 import { DocumentStatus } from '@shared/components/DocumentStatus'; // Keep this one
 import { Job, Assessment, PurchasedPrePreparedAssessments } from '@shared/types/jobs';
 import {
@@ -188,6 +189,7 @@ const formatDate = (dateString: string) => {
 // Helper to normalize any site details object to SiteDetails shape
 function normalizeSiteDetails(data: any): SiteDetails {
   return {
+    lotType: data?.lotType || '',
     siteArea: data?.siteArea || '',
     frontage: data?.frontage || '',
     depth: data?.depth || '',
@@ -195,15 +197,28 @@ function normalizeSiteDetails(data: any): SiteDetails {
     orientation: data?.orientation || '',
     soilType: data?.soilType || '',
     vegetation: data?.vegetation || '',
+    primaryStreetWidth: data?.primaryStreetWidth || '',
+    siteDepth: data?.siteDepth || '',
+    secondaryStreetWidth: data?.secondaryStreetWidth || '',
+    gradient: data?.gradient || '',
+    highestRL: data?.highestRL || '',
+    lowestRL: data?.lowestRL || '',
+    fallAmount: data?.fallAmount || '',
+    currentLandUse: data?.currentLandUse || '',
+    existingDevelopmentDetails: data?.existingDevelopmentDetails || '',
+    northDevelopment: data?.northDevelopment || '',
+    southDevelopment: data?.southDevelopment || '',
+    eastDevelopment: data?.eastDevelopment || '',
+    westDevelopment: data?.westDevelopment || '',
+    bushfireProne: data?.bushfireProne || false,
+    floodProne: data?.floodProne || false,
+    acidSulfateSoils: data?.acidSulfateSoils || false,
+    biodiversity: data?.biodiversity || false,
+    salinity: data?.salinity || false,
+    landslip: data?.landslip || false,
     heritage: data?.heritage || '',
-    floodProne: data?.floodProne || '',
-    bushfireProne: data?.bushfireProne || '',
     contamination: data?.contamination || '',
     otherConstraints: data?.otherConstraints || '',
-    adjoiningNorth: data?.adjoiningNorth || '',
-    adjoiningSouth: data?.adjoiningSouth || '',
-    adjoiningEast: data?.adjoiningEast || '',
-    adjoiningWest: data?.adjoiningWest || '',
   };
 }
 
@@ -1116,10 +1131,17 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     }
 
     // Show filtered documents
-    const mappedDocuments = documents.map(doc => ({
-      ...doc,
-      displayStatus: getDocumentDisplayStatus(doc, currentJob || ({} as Job)),
-    }));
+    const mappedDocuments = documents
+      .filter(doc => {
+        if (doc.id === 'soee') {
+          return !!(currentJob?.documents?.soee && currentJob.documents.soee.fileName);
+        }
+        return true;
+      })
+      .map(doc => ({
+        ...doc,
+        displayStatus: getDocumentDisplayStatus(doc, currentJob || ({} as Job)),
+      }));
 
     const renderDocumentCard = (doc: DocumentWithStatus) => {
       const isReport = isReportType(doc.id);

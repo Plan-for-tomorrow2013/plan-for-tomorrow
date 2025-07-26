@@ -17,8 +17,8 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@shared/components/ui/table"
-import { PlanningDataSchema } from "@/app/professionals/SoEE/lib/schemas";
-type FormValues = z.infer<typeof PlanningDataSchema>;
+import { PlanningFormSchema } from "@/app/professionals/SoEE/lib/schemas";
+type FormValues = z.infer<typeof PlanningFormSchema>;
 
 export default function PlanningPage() {
   const router = useRouter()
@@ -27,27 +27,11 @@ export default function PlanningPage() {
   const [showSeppFields, setShowSeppFields] = useState(false)
   const { formData, updateFormData, saveDraft } = useFormData()
 
-  // State for additional planning controls
-  const [additionalControls, setAdditionalControls] = useState<
-    Array<{
-      name: string
-      control: string
-      proposed: string
-    }>
-  >([])
 
-  // Add a new state for LEP additional controls after the existing additionalControls state
-  const [lepAdditionalControls, setLepAdditionalControls] = useState<
-    Array<{
-      name: string
-      control: string
-      proposed: string
-    }>
-  >([])
 
   // Initialize form with default values
   const form = useForm<FormValues>({
-    resolver: zodResolver(PlanningDataSchema),
+    resolver: zodResolver(PlanningFormSchema),
     defaultValues: {
       // Zoning and Permissibility
       zoning: formData.planning.zoning || "R2 Low Density Residential",
@@ -133,6 +117,10 @@ export default function PlanningPage() {
 
       // Additional Planning Considerations
       additionalPlanning: formData.planning.additionalPlanning || "",
+      
+      // Dynamic arrays for additional controls
+      additionalControls: [],
+      lepAdditionalControls: [],
     },
   })
 
@@ -223,14 +211,18 @@ export default function PlanningPage() {
 
       // Additional Planning Considerations
       additionalPlanning: formData.planning.additionalPlanning || "",
+      
+      // Dynamic arrays for additional controls
+      additionalControls: formData.planning.additionalControls || [],
+      lepAdditionalControls: formData.planning.lepAdditionalControls || [],
     })
   }, [formData.planning, form])
 
   // Handle form submission
   const onSubmit = (data: FormValues) => {
     console.log(data)
-    console.log("LEP Additional controls:", lepAdditionalControls)
-    console.log("DCP Additional controls:", additionalControls)
+    console.log("LEP Additional controls:", data.lepAdditionalControls)
+    console.log("DCP Additional controls:", data.additionalControls)
     
     // Save form data to context
     updateFormData("planning", {
@@ -290,6 +282,8 @@ export default function PlanningPage() {
       secondaryDwellingFloorArea: data.secondaryDwellingFloorArea,
       maxFloorAreaByLEP: data.maxFloorAreaByLEP,
       additionalPlanning: data.additionalPlanning,
+      additionalControls: data.additionalControls,
+      lepAdditionalControls: data.lepAdditionalControls,
     })
     
     // Then navigate to the next step
@@ -363,44 +357,52 @@ export default function PlanningPage() {
     // Save to localStorage
     saveDraft()
     console.log("Saving draft:", currentValues)
-    console.log("LEP Additional controls:", lepAdditionalControls)
-    console.log("DCP Additional controls:", additionalControls)
+    console.log("LEP Additional controls:", currentValues.lepAdditionalControls)
+    console.log("DCP Additional controls:", currentValues.additionalControls)
     // Show success message
   }
 
   // Add a new additional control
   const addAdditionalControl = () => {
-    setAdditionalControls([...additionalControls, { name: "", control: "", proposed: "" }])
+    const currentControls = form.getValues("additionalControls") || []
+    form.setValue("additionalControls", [...currentControls, { name: "", control: "", proposed: "" }])
   }
 
   // Remove an additional control
   const removeAdditionalControl = (index: number) => {
-    setAdditionalControls(additionalControls.filter((_, i) => i !== index))
+    const currentControls = form.getValues("additionalControls") || []
+    const updatedControls = currentControls.filter((_, i) => i !== index)
+    form.setValue("additionalControls", updatedControls)
   }
 
   // Update an additional control
   const updateAdditionalControl = (index: number, field: string, value: string) => {
-    const updatedControls = [...additionalControls]
+    const currentControls = form.getValues("additionalControls") || []
+    const updatedControls = [...currentControls]
     updatedControls[index] = { ...updatedControls[index], [field]: value }
-    setAdditionalControls(updatedControls)
+    form.setValue("additionalControls", updatedControls)
   }
 
   // Add these functions after the existing additionalControl functions
   // Add a new LEP additional control
   const addLepAdditionalControl = () => {
-    setLepAdditionalControls([...lepAdditionalControls, { name: "", control: "", proposed: "" }])
+    const currentControls = form.getValues("lepAdditionalControls") || []
+    form.setValue("lepAdditionalControls", [...currentControls, { name: "", control: "", proposed: "" }])
   }
 
   // Remove a LEP additional control
   const removeLepAdditionalControl = (index: number) => {
-    setLepAdditionalControls(lepAdditionalControls.filter((_, i) => i !== index))
+    const currentControls = form.getValues("lepAdditionalControls") || []
+    const updatedControls = currentControls.filter((_, i) => i !== index)
+    form.setValue("lepAdditionalControls", updatedControls)
   }
 
   // Update a LEP additional control
   const updateLepAdditionalControl = (index: number, field: string, value: string) => {
-    const updatedControls = [...lepAdditionalControls]
+    const currentControls = form.getValues("lepAdditionalControls") || []
+    const updatedControls = [...currentControls]
     updatedControls[index] = { ...updatedControls[index], [field]: value }
-    setLepAdditionalControls(updatedControls)
+    form.setValue("lepAdditionalControls", updatedControls)
   }
 
   return (
@@ -850,7 +852,7 @@ export default function PlanningPage() {
                   </Button>
                 </div>
 
-                {lepAdditionalControls.length > 0 && (
+                {(form.watch("lepAdditionalControls") || [])?.length > 0 && (
                   <div className="border rounded-md">
                     <Table>
                       <TableHeader>
@@ -862,7 +864,7 @@ export default function PlanningPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {lepAdditionalControls.map((control, index) => (
+                        {(form.watch("lepAdditionalControls") || [])?.map((control, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Input
@@ -1174,7 +1176,7 @@ export default function PlanningPage() {
                     </Button>
                   </div>
 
-                  {additionalControls.length > 0 && (
+                  {(form.watch("additionalControls") || [])?.length > 0 && (
                     <div className="border rounded-md">
                       <Table>
                         <TableHeader>
@@ -1186,7 +1188,7 @@ export default function PlanningPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {additionalControls.map((control, index) => (
+                          {(form.watch("additionalControls") || [])?.map((control, index) => (
                             <TableRow key={index}>
                               <TableCell>
                                 <Input

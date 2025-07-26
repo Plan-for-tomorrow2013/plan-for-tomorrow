@@ -13,28 +13,22 @@ interface DetailedSiteDetailsProps {
   onSiteDetailsChange: (details: SiteDetails) => void
   className?: string
   readOnly?: boolean
+  isLoading?: boolean
 }
 
 export function DetailedSiteDetails({
   siteDetails,
   onSiteDetailsChange,
   className = "",
-  readOnly = false
+  readOnly = false,
+  isLoading = false
 }: DetailedSiteDetailsProps) {
   const handleChange = (field: keyof SiteDetails, value: any) => {
-    let updatedDetails = { ...siteDetails, [field]: value };
-    // Automatically calculate fallAmount if highestRL or lowestRL changes
-    if (field === 'highestRL' || field === 'lowestRL') {
-      const highest = parseFloat(field === 'highestRL' ? value : siteDetails.highestRL || '');
-      const lowest = parseFloat(field === 'lowestRL' ? value : siteDetails.lowestRL || '');
-      if (!isNaN(highest) && !isNaN(lowest)) {
-        updatedDetails.fallAmount = (highest - lowest).toFixed(2);
-      } else {
-        updatedDetails.fallAmount = '';
-      }
-    }
-    onSiteDetailsChange(updatedDetails);
-  };
+    onSiteDetailsChange({
+      ...siteDetails,
+      [field]: value
+    })
+  }
 
   return (
     <Card className={`shadow-sm border border-gray-200 ${className}`}>
@@ -46,9 +40,9 @@ export function DetailedSiteDetails({
           <div className="space-y-2">
             <Label htmlFor="lotType">Lot Type</Label>
             <Select
-              value={siteDetails.lotType}
+              value={isLoading ? undefined : siteDetails.lotType}
               onValueChange={(value) => handleChange('lotType', value)}
-              disabled={readOnly}
+              disabled={readOnly || isLoading}
             >
               <SelectTrigger id="lotType">
                 <SelectValue placeholder="Select lot type" />
@@ -107,9 +101,9 @@ export function DetailedSiteDetails({
           <div className="space-y-2">
             <Label htmlFor="gradient">Site Gradient</Label>
             <Select
-              value={siteDetails.gradient}
+              value={isLoading ? undefined : siteDetails.gradient}
               onValueChange={(value) => handleChange('gradient', value)}
-              disabled={readOnly}
+              disabled={readOnly || isLoading}
             >
               <SelectTrigger id="gradient">
                 <SelectValue placeholder="Select gradient" />
@@ -144,17 +138,12 @@ export function DetailedSiteDetails({
             </div>
             <div className="space-y-2">
               <Label htmlFor="fallAmount">Fall Amount (m)</Label>
-              {/* Calculated field: visually distinct, not tabbable */}
               <Input
                 id="fallAmount"
                 value={siteDetails.fallAmount}
-                readOnly
-                className="bg-gray-50 text-gray-700"
-                tabIndex={-1}
+                onChange={(e) => handleChange('fallAmount', e.target.value)}
+                readOnly={readOnly}
               />
-              <p className="text-xs text-muted-foreground">
-                Automatically calculated from highest and lowest RL values
-              </p>
             </div>
           </div>
         </div>
@@ -165,9 +154,9 @@ export function DetailedSiteDetails({
           <div className="space-y-2">
             <Label htmlFor="currentLandUse">Current Land Use</Label>
             <Select
-              value={siteDetails.currentLandUse}
+              value={isLoading ? undefined : siteDetails.currentLandUse}
               onValueChange={(value) => handleChange('currentLandUse', value)}
-              disabled={readOnly}
+              disabled={readOnly || isLoading}
             >
               <SelectTrigger id="currentLandUse">
                 <SelectValue placeholder="Select current land use" />
@@ -293,7 +282,7 @@ export function DetailedSiteDetails({
                 onCheckedChange={(checked) => handleChange('landslip', checked === true)}
                 disabled={readOnly}
               />
-              <Label htmlFor="landslip">Prone to Landslide</Label>
+              <Label htmlFor="landslip">Landslip</Label>
             </div>
           </div>
           <div className="space-y-2">
@@ -303,7 +292,15 @@ export function DetailedSiteDetails({
               value={siteDetails.heritage}
               onChange={(e) => handleChange('heritage', e.target.value)}
               readOnly={readOnly}
-              placeholder="e.g. Adjoining, adjacent to a heritage-listed property or heritage-listed conservation area"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contamination">Contamination</Label>
+            <Input
+              id="contamination"
+              value={siteDetails.contamination}
+              onChange={(e) => handleChange('contamination', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
@@ -312,9 +309,8 @@ export function DetailedSiteDetails({
               id="otherConstraints"
               value={siteDetails.otherConstraints}
               onChange={(e) => handleChange('otherConstraints', e.target.value)}
-              rows={2}
+              rows={3}
               readOnly={readOnly}
-              placeholder="Describe any other site constraints not listed above"
             />
           </div>
         </div>

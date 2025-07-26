@@ -20,8 +20,8 @@ import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-detai
 import CouncilFilter from '@shared/components/CouncilFilter';
 import { Job } from '@shared/types/jobs';
 import { useFormData } from "@/app/professionals/SoEE/lib/form-context"
-import { PropertyDataSchema } from "@/app/professionals/SoEE/lib/schemas";
-type FormValues = z.infer<typeof PropertyDataSchema>;
+import { PropertyDetailsFormSchema } from "@/app/professionals/SoEE/lib/schemas";
+type FormValues = z.infer<typeof PropertyDetailsFormSchema>;
 
 const defaultSiteDetails = {
   lotType: '',
@@ -90,7 +90,7 @@ function PropertyDetailsPage() {
 
   // SoEE-specific form state (address, lot identification)
   const form = useForm<FormValues>({
-    resolver: zodResolver(PropertyDataSchema),
+    resolver: zodResolver(PropertyDetailsFormSchema),
     defaultValues: {
       // Lot Identification - now an array with initial entry
       lotIdentifications: [
@@ -375,6 +375,7 @@ function PropertyDetailsPage() {
               <DetailedSiteDetails
                 siteDetails={siteDetails}
                 onSiteDetailsChange={updateSiteDetails}
+                isLoading={isLoading}
               />
 
               <div className="flex justify-end pt-4">

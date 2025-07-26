@@ -1,3 +1,5 @@
+import { SiteDetails } from "./site-details";
+
 export type ConsultantCategory =
   | "NatHERS & BASIX"
   | "Waste Management"
@@ -108,13 +110,7 @@ export interface Job {
       localProvisionsLayers: Array<{ layer: string; attributes: Record<string, any> }>;
     };
   } | null;
-  siteDetails?: {
-    siteAddressDetails?: string;
-    siteArea?: string;
-    currentLandUse?: string;
-    zoningInfo?: string;
-    siteConstraints?: string;
-  } | null;
+  siteDetails?: SiteDetails | null;
   formData?: {
     lotIdentifications?: Array<{
       lotNumber: string;

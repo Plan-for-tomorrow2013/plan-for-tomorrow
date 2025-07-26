@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { Job } from '@shared/types/jobs';
+import { SiteDetails } from '@shared/types/site-details';
 import { saveJob } from '@shared/lib/jobStorage';
 
 interface EpiLayer {
@@ -109,6 +110,47 @@ export async function POST(request: NextRequest) {
         }) || [],
     };
 
+    // Create empty site details with proper structure
+    const emptySiteDetails: SiteDetails = {
+      // Site Characteristics
+      lotType: '',
+      siteArea: '',
+      frontage: '',
+      depth: '',
+      slope: '',
+      orientation: '',
+      soilType: '',
+      vegetation: '',
+      primaryStreetWidth: '',
+      siteDepth: '',
+      secondaryStreetWidth: '',
+      gradient: '',
+      highestRL: '',
+      lowestRL: '',
+      fallAmount: '',
+
+      // Existing Development
+      currentLandUse: '',
+      existingDevelopmentDetails: '',
+
+      // Surrounding Development
+      northDevelopment: '',
+      southDevelopment: '',
+      eastDevelopment: '',
+      westDevelopment: '',
+
+      // Site Constraints
+      bushfireProne: false,
+      floodProne: false,
+      acidSulfateSoils: false,
+      biodiversity: false,
+      salinity: false,
+      landslip: false,
+      heritage: '',
+      contamination: '',
+      otherConstraints: '',
+    };
+
     // Create a new job with the property search data
     const job: Job = {
       id: jobId,
@@ -123,13 +165,7 @@ export async function POST(request: NextRequest) {
         coordinates: data.coordinates,
         planningLayers: filteredPlanningLayers,
       },
-      siteDetails: {
-        siteAddressDetails: '',
-        siteArea: '',
-        currentLandUse: '',
-        zoningInfo: '',
-        siteConstraints: '',
-      },
+      siteDetails: emptySiteDetails,
     };
 
     // Store the job

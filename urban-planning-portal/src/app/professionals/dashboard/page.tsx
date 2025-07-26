@@ -145,16 +145,12 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        console.log('Fetching announcements...');
         const response = await fetch('/api/announcements');
-        console.log('API Response status:', response.status);
         if (!response.ok) throw new Error('Failed to fetch announcements');
         const data = await response.json();
-        console.log('API Response data:', data);
         if (data.error) {
           throw new Error(data.error.message);
         }
-        console.log('Setting announcements:', data.data);
         setAnnouncements(data.data || []);
       } catch (error) {
         console.error('Error fetching announcements:', error);

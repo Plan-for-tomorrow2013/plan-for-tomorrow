@@ -156,6 +156,8 @@ const initialFormData: FormData = {
     secondaryDwellingFloorArea: "",
     maxFloorAreaByLEP: "",
     additionalPlanning: "",
+    additionalControls: [],
+    lepAdditionalControls: [],
   },
   environmental: {
     contextAndSetting: {

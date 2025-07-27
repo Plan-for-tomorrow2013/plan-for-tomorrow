@@ -408,28 +408,29 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       'nathers-basix': 'NatHERS & BASIX',
       'waste-management': 'Waste Management',
       'cost-estimate': 'Cost Estimate',
-      'stormwater': 'Stormwater',
-      'traffic': 'Traffic',
-      'surveyor': 'Surveyor',
-      'bushfire': 'Bushfire',
-      'flooding': 'Flooding',
-      'acoustic': 'Acoustic',
-      'landscaping': 'Landscaping',
-      'heritage': 'Heritage',
-      'biodiversity': 'Biodiversity',
-      'lawyer': 'Lawyer',
-      'certifiers': 'Certifiers',
-      'arborist': 'Arborist',
-      'geotechnical': 'Geotechnical',
+      stormwater: 'Stormwater',
+      traffic: 'Traffic',
+      surveyor: 'Surveyor',
+      bushfire: 'Bushfire',
+      flooding: 'Flooding',
+      acoustic: 'Acoustic',
+      landscaping: 'Landscaping',
+      heritage: 'Heritage',
+      biodiversity: 'Biodiversity',
+      lawyer: 'Lawyer',
+      certifiers: 'Certifiers',
+      arborist: 'Arborist',
+      geotechnical: 'Geotechnical',
     };
 
     const categoryName = categoryIdToName[categoryId];
     if (!categoryName) return false;
 
     // Check if there are any tickets for this category with status 'pending', 'in-progress', 'paid', or 'completed'
-    return consultantTickets.some((ticket: any) => 
-      ticket.category === categoryName && 
-      ['pending', 'in-progress', 'paid', 'completed'].includes(ticket.status)
+    return consultantTickets.some(
+      (ticket: any) =>
+        ticket.category === categoryName &&
+        ['pending', 'in-progress', 'paid', 'completed'].includes(ticket.status)
     );
   };
 
@@ -741,7 +742,9 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
       return;
     }
 
-    const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
+    const certificate107 = documents.find(
+      (doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate'
+    );
     if (!certificate107?.uploadedFile) {
       toast({
         title: 'Missing Document',
@@ -896,10 +899,16 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
 
     const currentFormData = formState[formType].formData;
 
-    const certificateOfTitle = documents.find((doc: DocumentWithStatus) => doc.id === 'certificateOfTitle');
+    const certificateOfTitle = documents.find(
+      (doc: DocumentWithStatus) => doc.id === 'certificateOfTitle'
+    );
     const surveyPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'surveyPlan');
-    const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
-    const architecturalPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'architecturalPlan');
+    const certificate107 = documents.find(
+      (doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate'
+    );
+    const architecturalPlan = documents.find(
+      (doc: DocumentWithStatus) => doc.id === 'architecturalPlan'
+    );
 
     const workTicketPayload = {
       jobId: jobId,

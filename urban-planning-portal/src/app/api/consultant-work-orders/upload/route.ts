@@ -32,10 +32,7 @@ export async function POST(request: Request) {
     const type = formData.get('type') as 'report' | 'invoice';
 
     if (!file || !orderId || !type) {
-      return NextResponse.json(
-        { error: 'File, order ID, and type are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'File, order ID, and type are required' }, { status: 400 });
     }
 
     // Read work orders

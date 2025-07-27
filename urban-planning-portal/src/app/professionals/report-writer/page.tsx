@@ -74,7 +74,7 @@ import {
   InitialAssessment,
 } from '@shared/components/DetailedInitialAssessment';
 import { LEPFilter } from '@shared/components/LEPFilter';
-import SoEELanding from "../SoEE/components/SoEELanding";
+import SoEELanding from '../SoEE/components/SoEELanding';
 import { useSearchParams } from 'next/navigation';
 
 interface CustomAssessmentForm {
@@ -1848,20 +1848,21 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
   }, [showSoeeGenerated]);
 
   if (isLoading) return <div>Loading job details and documents...</div>;
-  if (isJobError) return (
-    <Alert variant="destructive">
-      <AlertTitle>Error Loading Job</AlertTitle>
-      <AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription>
-    </Alert>
-  );
-  if (!currentJob && !isJobLoading) return <div>Job data not available. Select a job or check for errors.</div>;
+  if (isJobError)
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Error Loading Job</AlertTitle>
+        <AlertDescription>{jobError?.message || 'Failed to load job data.'}</AlertDescription>
+      </Alert>
+    );
+  if (!currentJob && !isJobLoading)
+    return <div>Job data not available. Select a job or check for errors.</div>;
   if (!currentJob) return <div>Loading...</div>;
 
   console.log('DEBUG propertyData:', currentJob?.propertyData);
 
   return (
     <div className="space-y-6">
-
       {/* Loading States - Removed as handled above */}
       {/* {isJobLoading && <div>Loading job details...</div>} */}
       {isPrePreparedLoading && <div>Loading assessments...</div>}
@@ -1886,18 +1887,17 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           <AlertDescription>{documentError}</AlertDescription>
         </Alert>
       )}
-
       {/* Main Content */}
-
       <h1 className="text-3xl font-bold">Job Details</h1>
       <div className="h-1 bg-yellow-400 w-full my-2"></div>
       <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
         <p className="text-lg mb-4">
-          Here you can find the details of the job you have selected. You can view property information, and view and edit site details and documents.
-          You can also view the initial assessment for the job, if you have one (hot tip: you can purchase an assessment and we will work with you to complete the report).
+          Here you can find the details of the job you have selected. You can view property
+          information, and view and edit site details and documents. You can also view the initial
+          assessment for the job, if you have one (hot tip: you can purchase an assessment and we
+          will work with you to complete the report).
         </p>
       </div>
-
       <div className="space-y-6">
         {/* Property Info Section */}
         <div className="border rounded-lg p-4">
@@ -1983,24 +1983,27 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           )}
         </div>
 
-      <h1 className="text-3xl font-bold">Do It Yourself</h1>
-      <div className="h-1 bg-yellow-400 w-full my-2"></div>
-      <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
-        <p className="text-lg mb-4">
-          Statement of Environmental Effects Generator. Generate a basic Statement of Environmental Effects for your development application by answering a series of questions for small, simple and 
-          of course, completely complying developments, formatted to NSW Environmental Planning and Assessment Act 1979 requirements.
-        </p>
-      </div>
+        <h1 className="text-3xl font-bold">Do It Yourself</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            Statement of Environmental Effects Generator. Generate a basic Statement of
+            Environmental Effects for your development application by answering a series of
+            questions for small, simple and of course, completely complying developments, formatted
+            to NSW Environmental Planning and Assessment Act 1979 requirements.
+          </p>
+        </div>
 
-      {showSoeeGenerated && (
-        <Alert variant="default">
-          <AlertTitle>Report Generated</AlertTitle>
-          <AlertDescription>
-            A Statement of Environmental Effects report has been generated for this job. You can download it from the Document Store. If you need to make an amendment, start here.
-          </AlertDescription>
-        </Alert>
-      )}
-      
+        {showSoeeGenerated && (
+          <Alert variant="default">
+            <AlertTitle>Report Generated</AlertTitle>
+            <AlertDescription>
+              A Statement of Environmental Effects report has been generated for this job. You can
+              download it from the Document Store. If you need to make an amendment, start here.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Statement of Environmental Effects Generator Section */}
         <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
           <SoEELanding jobId={jobId} />
@@ -2011,15 +2014,15 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           <LEPFilter propertyData={currentJob.propertyData} onLEPChange={handleLEPChange} />
         )}
 
-<h1 className="text-3xl font-bold">Do It With You</h1>
-      <div className="h-1 bg-yellow-400 w-full my-2"></div>
-      <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
-        <p className="text-lg mb-4">
-          We do the hard work with you. You have a development that is a bit more 
-          complicated than a standard development, but you know we have a template for that.
-          Purchase one of our pre-prepared assessments and we will work with you to complete the report.
-        </p>
-      </div>
+        <h1 className="text-3xl font-bold">Do It With You</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            We do the hard work with you. You have a development that is a bit more complicated than
+            a standard development, but you know we have a template for that. Purchase one of our
+            pre-prepared assessments and we will work with you to complete the report.
+          </p>
+        </div>
 
         {/* Pre-prepared Assessments Section */}
         <div className="border rounded-lg p-4">
@@ -2044,15 +2047,15 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
           )}
         </div>
 
-      <h1 className="text-3xl font-bold">Do It For You</h1>
-      <div className="h-1 bg-yellow-400 w-full my-2"></div>
-      <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
-        <p className="text-lg mb-4">
-          We do the hard work for you. Let us prepare your Statement of Environmental Effects
-          or Complying Development Certificate Report for you.
-          Purchase an assessment and we will work with you to complete the report.
-        </p>
-      </div>
+        <h1 className="text-3xl font-bold">Do It For You</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            We do the hard work for you. Let us prepare your Statement of Environmental Effects or
+            Complying Development Certificate Report for you. Purchase an assessment and we will
+            work with you to complete the report.
+          </p>
+        </div>
 
         {/* Statement of Environmental Effects Section */}
         <div className="border rounded-lg p-4">

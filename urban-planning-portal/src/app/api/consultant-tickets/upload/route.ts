@@ -37,7 +37,9 @@ export async function POST(request: Request) {
     const consultantTickets: ConsultantTicket[] = JSON.parse(consultantTicketsData);
 
     // Find the ticket to update
-    const ticketIndex = consultantTickets.findIndex((ticket: ConsultantTicket) => ticket.id === ticketId);
+    const ticketIndex = consultantTickets.findIndex(
+      (ticket: ConsultantTicket) => ticket.id === ticketId
+    );
     if (ticketIndex === -1) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }

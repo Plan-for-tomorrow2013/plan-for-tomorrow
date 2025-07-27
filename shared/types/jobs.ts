@@ -1,4 +1,5 @@
 import { SiteDetails } from "./site-details";
+import { DevelopmentData } from "../../urban-planning-portal/src/app/professionals/SoEE/lib/types";
 
 export type ConsultantCategory =
   | "NatHERS & BASIX"
@@ -124,6 +125,7 @@ export interface Job {
       suburb: string;
       postcode: string;
     };
+    development?: DevelopmentData;
   } | null;
   manualSubmission?: (Record<string, any> & { updatedAt: string }) | null;
 }

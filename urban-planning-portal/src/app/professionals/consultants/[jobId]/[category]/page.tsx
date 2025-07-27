@@ -76,7 +76,7 @@ export default function QuoteCategoryPage({
     staleTime: 0,
   });
   const { quoteRequests, updateQuoteRequestStatus } = useQuoteRequests(params.jobId);
-  
+
   // Fetch consultant tickets using React Query
   const {
     data: consultantTickets = [],
@@ -130,7 +130,9 @@ export default function QuoteCategoryPage({
       (order: ConsultantWorkOrder) =>
         order.jobId === params.jobId &&
         normalizeCategory(order.category) === normalizeCategory(params.category) &&
-        (order.status === 'in-progress' || order.status === 'completed' || order.status === 'pending')
+        (order.status === 'in-progress' ||
+          order.status === 'completed' ||
+          order.status === 'pending')
     );
   }, [workOrders, params.jobId, params.category]);
 
@@ -206,9 +208,7 @@ function ConsultantDocumentsContent({
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">
-          {categoryTitles[params.category] || params.category}
-        </h1>
+        <h1 className="text-2xl font-bold">{categoryTitles[params.category] || params.category}</h1>
       </div>
 
       <div className="relative mb-6">
@@ -233,17 +233,18 @@ function ConsultantDocumentsContent({
         </div>
       ) : (
         <>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredConsultants.map((consultant: any) => {
               // Find ticket for this consultant (match by consultantId as string, trimmed)
               const ticket = ticketsForCategory.find(
-                (t: ConsultantTicket) => String(t.consultantId).trim() === String(consultant.id).trim()
+                (t: ConsultantTicket) =>
+                  String(t.consultantId).trim() === String(consultant.id).trim()
               );
-              
+
               // Find work order for this consultant (match by consultantId as string, trimmed)
               const workOrder = workOrdersForCategory.find(
-                (wo: ConsultantWorkOrder) => String(wo.consultantId).trim() === String(consultant.id).trim()
+                (wo: ConsultantWorkOrder) =>
+                  String(wo.consultantId).trim() === String(consultant.id).trim()
               );
 
               return (

@@ -132,8 +132,14 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     onMutate: async (quoteTicketId: string) => {
       await queryClient.cancelQueries({ queryKey: ['consultant-tickets', params.jobId] });
       await queryClient.cancelQueries({ queryKey: ['consultant-work-orders', params.jobId] });
-      const previousTickets = queryClient.getQueryData<ConsultantTicket[]>(['consultant-tickets', params.jobId]);
-      const previousWorkOrders = queryClient.getQueryData<ConsultantWorkOrder[]>(['consultant-work-orders', params.jobId]);
+      const previousTickets = queryClient.getQueryData<ConsultantTicket[]>([
+        'consultant-tickets',
+        params.jobId,
+      ]);
+      const previousWorkOrders = queryClient.getQueryData<ConsultantWorkOrder[]>([
+        'consultant-work-orders',
+        params.jobId,
+      ]);
       // Optimistically remove the ticket and add a placeholder work order
       if (previousTickets && previousWorkOrders) {
         const ticket = previousTickets.find(t => t.id === quoteTicketId);
@@ -164,7 +170,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
       }
       return { previousTickets, previousWorkOrders };
     },
-    onSuccess: (newWorkOrder) => {
+    onSuccess: newWorkOrder => {
       // Invalidate and refetch the relevant queries
       queryClient.invalidateQueries({ queryKey: ['consultant-tickets', params.jobId] });
       queryClient.invalidateQueries({ queryKey: ['consultant-work-orders', params.jobId] });
@@ -180,7 +186,10 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
         queryClient.setQueryData(['consultant-tickets', params.jobId], context.previousTickets);
       }
       if (context?.previousWorkOrders) {
-        queryClient.setQueryData(['consultant-work-orders', params.jobId], context.previousWorkOrders);
+        queryClient.setQueryData(
+          ['consultant-work-orders', params.jobId],
+          context.previousWorkOrders
+        );
       }
       console.error('Error accepting quote:', error);
       toast({
@@ -192,7 +201,9 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   });
 
   // Filter documents to only show consultant-generated assessment documents
-  const filteredDocuments = documents.filter((doc: DocumentWithStatus) => CONSULTANT_CATEGORIES.includes(doc.category));
+  const filteredDocuments = documents.filter((doc: DocumentWithStatus) =>
+    CONSULTANT_CATEGORIES.includes(doc.category)
+  );
 
   const isLoading = isDocsLoading || isJobLoading || isTicketsLoading || isWorkOrdersLoading;
   const error = docsError || jobError?.message || ticketsError?.message || workOrdersError?.message;
@@ -224,10 +235,13 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
     }
   };
 
-  const handleDownloadWorkOrderDocument = async (orderId: string, documentType: 'report' | 'invoice') => {
+  const handleDownloadWorkOrderDocument = async (
+    orderId: string,
+    documentType: 'report' | 'invoice'
+  ) => {
     try {
       // Find the work order
-      const workOrder = workOrders.find((wo) => wo.id === orderId);
+      const workOrder = workOrders.find(wo => wo.id === orderId);
       if (!workOrder) throw new Error('Work order not found');
       // Get the correct fileName
       let fileName = '';
@@ -283,7 +297,7 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
   );
 
   // Add completed work orders
-  workOrders.forEach((workOrder) => {
+  workOrders.forEach(workOrder => {
     if (workOrder.status === 'completed' && workOrder.completedDocument && workOrder.invoice) {
       tiles.push({
         key: `work-order-${workOrder.id}`,
@@ -308,7 +322,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                   <span>Final Report</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Completed: {workOrder.completedDocument.returnedAt 
+                  Completed:{' '}
+                  {workOrder.completedDocument.returnedAt
                     ? new Date(workOrder.completedDocument.returnedAt).toLocaleDateString()
                     : new Date(workOrder.completedDocument.uploadedAt).toLocaleDateString()}
                 </p>
@@ -328,7 +343,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                   <span>Invoice</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Generated: {workOrder.invoice.returnedAt 
+                  Generated:{' '}
+                  {workOrder.invoice.returnedAt
                     ? new Date(workOrder.invoice.returnedAt).toLocaleDateString()
                     : new Date(workOrder.invoice.uploadedAt).toLocaleDateString()}
                 </p>
@@ -390,10 +406,12 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 </svg>
                 <p className="font-semibold text-lg">Work In Progress</p>
                 <p className="text-sm text-gray-600 px-4">
-                  Thank you for accepting your quote for {workOrder.category} assessment. You will be notified once it's ready.
+                  Thank you for accepting your quote for {workOrder.category} assessment. You will
+                  be notified once it's ready.
                 </p>
                 <p className="text-xs text-gray-500">
-                  Accepted: {new Date(workOrder.acceptedAt || workOrder.createdAt).toLocaleDateString()}
+                  Accepted:{' '}
+                  {new Date(workOrder.acceptedAt || workOrder.createdAt).toLocaleDateString()}
                 </p>
               </div>
             </CardContent>
@@ -406,18 +424,18 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
 
   uniqueTickets.forEach(ticket => {
     // Check if there's already a work order for this ticket (quote accepted)
-    const hasWorkOrder = workOrders.some(wo => 
-      wo.consultantId === ticket.consultantId && 
-      wo.category === ticket.category
+    const hasWorkOrder = workOrders.some(
+      wo => wo.consultantId === ticket.consultantId && wo.category === ticket.category
     );
-    
+
     // If there's a work order, skip showing the ticket tile
     if (hasWorkOrder) {
       return;
     }
 
     const doc = documents.find(
-      (doc: DocumentWithStatus) => doc.category === ticket.category && doc.consultantId === ticket.consultantId
+      (doc: DocumentWithStatus) =>
+        doc.category === ticket.category && doc.consultantId === ticket.consultantId
     );
     if (!doc) {
       // Show pending consultant ticket
@@ -451,7 +469,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 </svg>
                 <p className="font-semibold text-lg">Report In Progress</p>
                 <p className="text-sm text-gray-600 px-4">
-                  We are requesting a quote for your "{ticket.category}" Report for {ticket.consultantName}. You will be notified once it's ready.
+                  We are requesting a quote for your "{ticket.category}" Report for{' '}
+                  {ticket.consultantName}. You will be notified once it's ready.
                 </p>
               </div>
             </CardContent>
@@ -489,7 +508,10 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
                 <div className="flex items-center gap-2 text-sm text-[#323A40]">
                   <FileText className="h-4 w-4" />
                   <span>
-                    {doc.title || (getReportTitle(doc.id) !== 'Unknown Report' ? getReportTitle(doc.id) : '') || doc.category || 'Consultant Report'}
+                    {doc.title ||
+                      (getReportTitle(doc.id) !== 'Unknown Report' ? getReportTitle(doc.id) : '') ||
+                      doc.category ||
+                      'Consultant Report'}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -603,8 +625,8 @@ function ConsultantStoreContent({ params }: { params: { jobId: string } }) {
               </svg>
               <p className="font-semibold text-lg">Report In Progress</p>
               <p className="text-sm text-gray-600 px-4">
-                Thank you for accepting your quote for "{ticket.category}" Report for {ticket.consultantName}. You
-                will be notified once it's ready.
+                Thank you for accepting your quote for "{ticket.category}" Report for{' '}
+                {ticket.consultantName}. You will be notified once it's ready.
               </p>
             </div>
           </CardContent>

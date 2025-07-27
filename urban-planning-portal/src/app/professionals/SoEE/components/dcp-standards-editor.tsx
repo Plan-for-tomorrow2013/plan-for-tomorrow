@@ -1,49 +1,62 @@
-"use client"
-
-import { useState } from "react"
-import { Button } from "@shared/components/ui/button"
-import { Input } from "@shared/components/ui/input"
-import { Label } from "@shared/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@shared/components/ui/accordion"
-import { Alert, AlertDescription } from "@shared/components/ui/alert"
-import { Info } from "lucide-react"
+import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@shared/components/ui/accordion';
+import { Alert, AlertDescription } from '@shared/components/ui/alert';
+import { Info } from 'lucide-react';
 
 interface DCPStandardsValues {
-  frontSetbackControl: string
-  secondaryFrontSetbackControl: string
-  rearSetbackGroundControl: string
-  rearSetbackUpperControl: string
-  sideSetbackNorthGroundControl: string
-  sideSetbackNorthUpperControl: string
-  sideSetbackSouthGroundControl: string
-  sideSetbackSouthUpperControl: string
-  siteCoverageControl: string
-  landscapedAreaControl: string
-  parkingControl: string
+  frontSetbackControl: string;
+  secondaryFrontSetbackControl: string;
+  rearSetbackGroundControl: string;
+  rearSetbackUpperControl: string;
+  sideSetbackNorthGroundControl: string;
+  sideSetbackNorthUpperControl: string;
+  sideSetbackSouthGroundControl: string;
+  sideSetbackSouthUpperControl: string;
+  siteCoverageControl: string;
+  landscapedAreaControl: string;
+  parkingControl: string;
 }
 
 interface DCPStandardsEditorProps {
-  councilName: string
-  initialValues: DCPStandardsValues
-  onUpdate: (values: DCPStandardsValues) => void
+  councilName: string;
+  initialValues: DCPStandardsValues;
+  onUpdate: (values: DCPStandardsValues) => void;
 }
 
-export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCPStandardsEditorProps) {
-  const [values, setValues] = useState<DCPStandardsValues>(initialValues)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
+export function DCPStandardsEditor({
+  councilName,
+  initialValues,
+  onUpdate,
+}: DCPStandardsEditorProps) {
+  const [values, setValues] = useState<DCPStandardsValues>(initialValues);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const handleChange = (field: keyof DCPStandardsValues, value: string): void => {
-    setValues((prev) => ({
+    setValues(prev => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSave = (): void => {
-    onUpdate(values)
-    setIsEditing(false)
-  }
+    onUpdate(values);
+    setIsEditing(false);
+  };
 
   return (
     <Card className="mt-4">
@@ -136,7 +149,8 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Edit the DCP standards below if they don't match the current requirements for {councilName}
+                Edit the DCP standards below if they don't match the current requirements for{' '}
+                {councilName}
               </AlertDescription>
             </Alert>
 
@@ -146,7 +160,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="frontSetbackControl"
                   value={values.frontSetbackControl}
-                  onChange={(e) => handleChange("frontSetbackControl", e.target.value)}
+                  onChange={e => handleChange('frontSetbackControl', e.target.value)}
                 />
               </div>
 
@@ -155,7 +169,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="secondaryFrontSetbackControl"
                   value={values.secondaryFrontSetbackControl}
-                  onChange={(e) => handleChange("secondaryFrontSetbackControl", e.target.value)}
+                  onChange={e => handleChange('secondaryFrontSetbackControl', e.target.value)}
                 />
               </div>
 
@@ -164,7 +178,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="rearSetbackGroundControl"
                   value={values.rearSetbackGroundControl}
-                  onChange={(e) => handleChange("rearSetbackGroundControl", e.target.value)}
+                  onChange={e => handleChange('rearSetbackGroundControl', e.target.value)}
                 />
               </div>
 
@@ -173,7 +187,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="rearSetbackUpperControl"
                   value={values.rearSetbackUpperControl}
-                  onChange={(e) => handleChange("rearSetbackUpperControl", e.target.value)}
+                  onChange={e => handleChange('rearSetbackUpperControl', e.target.value)}
                 />
               </div>
 
@@ -182,7 +196,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="sideSetbackNorthGroundControl"
                   value={values.sideSetbackNorthGroundControl}
-                  onChange={(e) => handleChange("sideSetbackNorthGroundControl", e.target.value)}
+                  onChange={e => handleChange('sideSetbackNorthGroundControl', e.target.value)}
                 />
               </div>
 
@@ -191,7 +205,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="sideSetbackNorthUpperControl"
                   value={values.sideSetbackNorthUpperControl}
-                  onChange={(e) => handleChange("sideSetbackNorthUpperControl", e.target.value)}
+                  onChange={e => handleChange('sideSetbackNorthUpperControl', e.target.value)}
                 />
               </div>
 
@@ -200,7 +214,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="sideSetbackSouthGroundControl"
                   value={values.sideSetbackSouthGroundControl}
-                  onChange={(e) => handleChange("sideSetbackSouthGroundControl", e.target.value)}
+                  onChange={e => handleChange('sideSetbackSouthGroundControl', e.target.value)}
                 />
               </div>
 
@@ -209,7 +223,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="sideSetbackSouthUpperControl"
                   value={values.sideSetbackSouthUpperControl}
-                  onChange={(e) => handleChange("sideSetbackSouthUpperControl", e.target.value)}
+                  onChange={e => handleChange('sideSetbackSouthUpperControl', e.target.value)}
                 />
               </div>
 
@@ -218,7 +232,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="siteCoverageControl"
                   value={values.siteCoverageControl}
-                  onChange={(e) => handleChange("siteCoverageControl", e.target.value)}
+                  onChange={e => handleChange('siteCoverageControl', e.target.value)}
                 />
               </div>
 
@@ -227,7 +241,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="landscapedAreaControl"
                   value={values.landscapedAreaControl}
-                  onChange={(e) => handleChange("landscapedAreaControl", e.target.value)}
+                  onChange={e => handleChange('landscapedAreaControl', e.target.value)}
                 />
               </div>
 
@@ -236,7 +250,7 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
                 <Input
                   id="parkingControl"
                   value={values.parkingControl}
-                  onChange={(e) => handleChange("parkingControl", e.target.value)}
+                  onChange={e => handleChange('parkingControl', e.target.value)}
                 />
               </div>
             </div>
@@ -244,6 +258,5 @@ export function DCPStandardsEditor({ councilName, initialValues, onUpdate }: DCP
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
-

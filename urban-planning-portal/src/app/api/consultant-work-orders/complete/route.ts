@@ -67,7 +67,9 @@ export async function POST(request: NextRequest) {
 
     // Update the job's consultant assessment status
     if (workOrder.category && job.consultants) {
-      let consultantsArray = job.consultants[workOrder.category] as ConsultantReference[] | undefined;
+      let consultantsArray = job.consultants[workOrder.category] as
+        | ConsultantReference[]
+        | undefined;
       if (!consultantsArray) {
         consultantsArray = [];
         job.consultants[workOrder.category] = consultantsArray;
@@ -75,7 +77,7 @@ export async function POST(request: NextRequest) {
         consultantsArray = [consultantsArray as ConsultantReference];
         job.consultants[workOrder.category] = consultantsArray;
       }
-      
+
       const consultantIndex = consultantsArray.findIndex(
         c => c.consultantId === workOrder.consultantId
       );
@@ -121,11 +123,13 @@ export async function POST(request: NextRequest) {
       const documents = JSON.parse(metadataData);
 
       // Find and update the documents
-      const reportDocIndex = documents.findIndex((doc: any) => 
-        doc.metadata?.workOrderId === orderId && doc.metadata?.documentType === 'report'
+      const reportDocIndex = documents.findIndex(
+        (doc: any) =>
+          doc.metadata?.workOrderId === orderId && doc.metadata?.documentType === 'report'
       );
-      const invoiceDocIndex = documents.findIndex((doc: any) => 
-        doc.metadata?.workOrderId === orderId && doc.metadata?.documentType === 'invoice'
+      const invoiceDocIndex = documents.findIndex(
+        (doc: any) =>
+          doc.metadata?.workOrderId === orderId && doc.metadata?.documentType === 'invoice'
       );
 
       if (reportDocIndex !== -1) {
@@ -138,7 +142,7 @@ export async function POST(request: NextRequest) {
           documents[invoiceDocIndex].metadata!.returnedAt = new Date().toISOString();
         }
       }
-      
+
       await fs.writeFile(metadataPath, JSON.stringify(documents, null, 2));
     } catch (readError) {
       if ((readError as NodeJS.ErrnoException).code !== 'ENOENT') {
@@ -168,4 +172,4 @@ export async function POST(request: NextRequest) {
     console.error('Error completing work order:', error);
     return NextResponse.json({ error: 'Failed to complete work order' }, { status: 500 });
   }
-} 
+}

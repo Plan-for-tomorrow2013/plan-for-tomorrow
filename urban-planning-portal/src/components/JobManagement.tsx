@@ -144,24 +144,27 @@ export function JobManagement() {
         attributes: layer.attributes,
       }));
 
-      const transformedProtectionLayers = data.planningLayers.protectionLayers.map((layer: any) => ({
-        layerId: 0,
-        layerName: layer.layer,
-        source: 'Protection',
-        attributes: layer.attributes,
-      }));
+      const transformedProtectionLayers = data.planningLayers.protectionLayers.map(
+        (layer: any) => ({
+          layerId: 0,
+          layerName: layer.layer,
+          source: 'Protection',
+          attributes: layer.attributes,
+        })
+      );
 
-      const transformedLocalProvisionsLayers = data.planningLayers.localProvisionsLayers.map((layer: any) => ({
-        layerId: 0,
-        layerName: layer.layer,
-        source: 'Local Provisions',
-        attributes: layer.attributes,
-      }));
+      const transformedLocalProvisionsLayers = data.planningLayers.localProvisionsLayers.map(
+        (layer: any) => ({
+          layerId: 0,
+          layerName: layer.layer,
+          source: 'Local Provisions',
+          attributes: layer.attributes,
+        })
+      );
 
       setLayersInfo(transformedEpiLayers);
       setProtectionLayersInfo(transformedProtectionLayers);
       setLocalProvisionsInfo(transformedLocalProvisionsLayers);
-
     } catch (error) {
       console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'Failed to fetch property information');
@@ -176,7 +179,6 @@ export function JobManagement() {
     source: string,
     isProtection = false
   ) => {
-
     // Define layers based on the source
     let layersToQuery: LayerQuery[] = [];
     if (source === 'Principal Planning Layers') {
@@ -200,7 +202,6 @@ export function JobManagement() {
         { id: 17, name: 'Minimum Dwelling Density Area' },
         { id: 18, name: 'Foreshore Building Line' },
       ];
-
     } else if (source === 'Protection') {
       layersToQuery = [
         { id: 1, name: 'Acid Sulfate Soils' },
@@ -216,7 +217,6 @@ export function JobManagement() {
         { id: 11, name: 'Wetlands' },
         { id: 12, name: 'Environmentally Sensitive Land' },
       ];
-
     } else if (source === 'Local Provisions') {
       layersToQuery = [
         { id: 2, name: 'Greenfield Housing Code Area' },
@@ -533,7 +533,9 @@ export function JobManagement() {
           )}
 
           {/* Create Job Button */}
-          {(layersInfo.length > 0 || protectionLayersInfo.length > 0 || localProvisionsInfo.length > 0) && (
+          {(layersInfo.length > 0 ||
+            protectionLayersInfo.length > 0 ||
+            localProvisionsInfo.length > 0) && (
             <div className="flex justify-end mt-6">
               <Button onClick={handleCreateJob} disabled={loading}>
                 Create Job
@@ -579,7 +581,7 @@ function LayersTable({ title, layers }: { title: string; layers: LayerInfo[] }) 
                     attributes: layerInfo.attributes,
                     layerName: layerInfo.layerName,
                     renderRow,
-                    className: ""
+                    className: '',
                   })}
                 </TableBody>
               </Table>

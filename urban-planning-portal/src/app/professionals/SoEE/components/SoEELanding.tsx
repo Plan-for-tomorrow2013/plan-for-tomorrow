@@ -1,8 +1,14 @@
-import React from "react";
-import Link from "next/link";
-import { Button } from "@shared/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@shared/components/ui/card";
-import { ArrowRight, FileText, ClipboardList } from "lucide-react";
+import React from 'react';
+import Link from 'next/link';
+import { Button } from '@shared/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@shared/components/ui/card';
+import { ArrowRight, FileText, ClipboardList } from 'lucide-react';
 
 interface SoEELandingProps {
   jobId?: string;
@@ -17,7 +23,6 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
   return (
     <div className="bg-gray-50">
       <div className="container mx-auto max-w-5xl py-10">
-        
         <Card className="mb-10">
           <CardHeader>
             <CardTitle>How It Works</CardTitle>
@@ -31,7 +36,8 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
                 <div>
                   <h3 className="font-medium">Check Property Details</h3>
                   <p className="text-sm text-muted-foreground">
-                    Provide information about the property including address, lot details, and site characteristics.
+                    Provide information about the property including address, lot details, and site
+                    characteristics.
                   </p>
                 </div>
               </div>
@@ -42,13 +48,14 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
                 <div>
                   <h3 className="font-medium">Describe Your Development</h3>
                   <p className="text-sm text-muted-foreground">
-                    Detail the proposed development including any demolition, construction, or alterations.
+                    Detail the proposed development including any demolition, construction, or
+                    alterations.
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    3
+                  3
                 </div>
                 <div>
                   <h3 className="font-medium">Planning Controls</h3>
@@ -59,12 +66,13 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
               </div>
               <div className="flex items-start gap-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    4
+                  4
                 </div>
                 <div>
                   <h3 className="font-medium">Environmental Considerations</h3>
                   <p className="text-sm text-muted-foreground">
-                    Answer questions about environmental impacts, privacy, overshadowing, and other factors.
+                    Answer questions about environmental impacts, privacy, overshadowing, and other
+                    factors.
                   </p>
                 </div>
               </div>
@@ -75,8 +83,8 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
                 <div>
                   <h3 className="font-medium">Generate & Download</h3>
                   <p className="text-sm text-muted-foreground">
-                    Review your document, make any final adjustments, and download the completed Statement of
-                    Environmental Effects.
+                    Review your document, make any final adjustments, and download the completed
+                    Statement of Environmental Effects.
                   </p>
                 </div>
               </div>
@@ -94,4 +102,4 @@ export default function SoEELanding({ jobId }: SoEELandingProps) {
       </div>
     </div>
   );
-} 
+}

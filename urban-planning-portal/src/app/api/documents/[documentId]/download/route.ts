@@ -15,7 +15,8 @@ export async function GET(request: Request, { params }: { params: { documentId: 
       return NextResponse.json({ error: 'Job ID is required' }, { status: 400 });
     }
 
-    const metadataPath = '/home/tania/urban-planning-professionals-portal/urban-planning-portal/data/documents/metadata.json';
+    const metadataPath =
+      '/home/tania/urban-planning-professionals-portal/urban-planning-portal/data/documents/metadata.json';
     if (!existsSync(metadataPath)) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }

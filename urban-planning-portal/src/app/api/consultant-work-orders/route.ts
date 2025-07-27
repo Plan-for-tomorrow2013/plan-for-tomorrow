@@ -129,47 +129,46 @@ async function createDocumentFromConsultantTicket(
 export async function POST(request: Request) {
   try {
     console.log('=== CONSULTANT WORK ORDER CREATION START ===');
-    
+
     // Log the raw request
     const requestBody = await request.text();
     console.log('Raw request body:', requestBody);
-    
+
     // Try to parse JSON first
     let quoteTicketId, jobId;
     let metadata: any;
     let file: File | null = null;
-    
+
     try {
       const jsonData = JSON.parse(requestBody);
       quoteTicketId = jsonData.quoteTicketId;
       jobId = jsonData.jobId;
       console.log('Parsed JSON data:', { quoteTicketId, jobId });
-      
+
       // For JSON requests, metadata should be in the JSON body
       metadata = jsonData.metadata || jsonData;
       console.log('Using JSON metadata:', metadata);
-      
     } catch (jsonError) {
       console.log('Failed to parse JSON, trying form data approach');
       console.log('JSON parse error:', jsonError);
-      
+
       // Reset request for form data parsing
       const newRequest = new Request(request.url, {
         method: request.method,
         body: requestBody,
         headers: request.headers,
       });
-      
+
       const formData = await newRequest.formData();
       file = formData.get('file') as File | null;
       const metadataString = formData.get('metadata') as string | null;
-      
+
       console.log('Form data parsed:', {
         hasFile: !!file,
         fileSize: file?.size,
         fileName: file?.name,
         hasMetadata: !!metadataString,
-        metadataLength: metadataString?.length
+        metadataLength: metadataString?.length,
       });
 
       if (!metadataString) {
@@ -196,7 +195,10 @@ export async function POST(request: Request) {
     const missingFields = requiredFields.filter(field => !metadata[field]);
     if (missingFields.length > 0) {
       console.log('Missing required fields:', missingFields, 'in metadata:', metadata);
-      return NextResponse.json({ error: `Missing required fields: ${missingFields.join(', ')}` }, { status: 400 });
+      return NextResponse.json(
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
     }
 
     console.log('Final metadata being used:', metadata);

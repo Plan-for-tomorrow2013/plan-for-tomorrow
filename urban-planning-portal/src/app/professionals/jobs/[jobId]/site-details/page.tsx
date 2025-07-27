@@ -9,7 +9,13 @@ import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
 import { SiteDetails } from '@shared/types/site-details';
 import { toast } from '@shared/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 
 // Add normalization helper
 function normalizeSiteDetails(data: any): SiteDetails {
@@ -65,15 +71,51 @@ interface SiteImage {
 }
 
 const SITE_IMAGE_CATEGORIES = [
-  { value: 'front-of-site', label: 'Front of Site', description: 'View from the street showing the front of the property' },
-  { value: 'rear-of-site', label: 'Rear of Site', description: 'View from the back of the property' },
-  { value: 'left-adjoining', label: 'Left Adjoining Property', description: 'View of the property to the left' },
-  { value: 'right-adjoining', label: 'Right Adjoining Property', description: 'View of the property to the right' },
-  { value: 'across-street', label: 'Development Across Street', description: 'View of development directly across the street' },
-  { value: 'street-scene', label: 'Street Scene', description: 'General street view showing the neighborhood context' },
-  { value: 'site-overview', label: 'Site Overview', description: 'Aerial or elevated view of the entire site' },
-  { value: 'existing-development', label: 'Existing Development', description: 'Current buildings or structures on site' },
-  { value: 'site-constraints', label: 'Site Constraints', description: 'Photos showing site constraints (trees, slopes, etc.)' },
+  {
+    value: 'front-of-site',
+    label: 'Front of Site',
+    description: 'View from the street showing the front of the property',
+  },
+  {
+    value: 'rear-of-site',
+    label: 'Rear of Site',
+    description: 'View from the back of the property',
+  },
+  {
+    value: 'left-adjoining',
+    label: 'Left Adjoining Property',
+    description: 'View of the property to the left',
+  },
+  {
+    value: 'right-adjoining',
+    label: 'Right Adjoining Property',
+    description: 'View of the property to the right',
+  },
+  {
+    value: 'across-street',
+    label: 'Development Across Street',
+    description: 'View of development directly across the street',
+  },
+  {
+    value: 'street-scene',
+    label: 'Street Scene',
+    description: 'General street view showing the neighborhood context',
+  },
+  {
+    value: 'site-overview',
+    label: 'Site Overview',
+    description: 'Aerial or elevated view of the entire site',
+  },
+  {
+    value: 'existing-development',
+    label: 'Existing Development',
+    description: 'Current buildings or structures on site',
+  },
+  {
+    value: 'site-constraints',
+    label: 'Site Constraints',
+    description: 'Photos showing site constraints (trees, slopes, etc.)',
+  },
   { value: 'other', label: 'Other', description: 'Other relevant site images' },
 ];
 
@@ -85,7 +127,7 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
+
   // Image upload states
   const [siteImages, setSiteImages] = useState<SiteImage[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -105,10 +147,10 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
         }
         const jobData = await response.json();
         setJobData(jobData);
-        
+
         // Set the site details state from the job data
         setSiteDetailsData(normalizeSiteDetails(jobData.siteDetails));
-        
+
         // Extract site images from job documents
         const images: SiteImage[] = [];
         if (jobData.documents) {
@@ -188,17 +230,30 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
   // Image upload handlers
   const handleImageUpload = async (file: File) => {
     if (!selectedCategory) {
-      toast({ title: 'Error', description: 'Please select an image category first', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Please select an image category first',
+        variant: 'destructive',
+      });
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      toast({ title: 'Error', description: 'Please select a valid image file (JPG or PNG)', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Please select a valid image file (JPG or PNG)',
+        variant: 'destructive',
+      });
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      toast({ title: 'Error', description: 'Image size must be less than 10MB', variant: 'destructive' });
+    if (file.size > 10 * 1024 * 1024) {
+      // 10MB limit
+      toast({
+        title: 'Error',
+        description: 'Image size must be less than 10MB',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -220,7 +275,7 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
       }
 
       const result = await response.json();
-      
+
       // Add the new image to the list
       const newImage: SiteImage = {
         id: imageId,
@@ -231,18 +286,18 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
         type: result.document.type,
         category: selectedCategory,
       };
-      
+
       setSiteImages(prev => [...prev, newImage]);
       toast({ title: 'Success', description: 'Image uploaded successfully' });
-      
+
       // Reset category selection
       setSelectedCategory('');
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({ 
-        title: 'Error', 
-        description: error instanceof Error ? error.message : 'Failed to upload image', 
-        variant: 'destructive' 
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload image',
+        variant: 'destructive',
       });
     } finally {
       setIsUploadingImage(false);
@@ -263,10 +318,10 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
       toast({ title: 'Success', description: 'Image deleted successfully' });
     } catch (error) {
       console.error('Error deleting image:', error);
-      toast({ 
-        title: 'Error', 
-        description: error instanceof Error ? error.message : 'Failed to delete image', 
-        variant: 'destructive' 
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to delete image',
+        variant: 'destructive',
       });
     }
   };
@@ -284,7 +339,11 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
 
   const triggerFileInput = () => {
     if (!selectedCategory) {
-      toast({ title: 'Error', description: 'Please select an image category first', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Please select an image category first',
+        variant: 'destructive',
+      });
       return;
     }
     fileInputRef.current?.click();
@@ -298,14 +357,17 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
     return SITE_IMAGE_CATEGORIES.find(cat => cat.value === category)?.description || '';
   };
 
-  const groupedImages = siteImages.reduce((groups, image) => {
-    const category = image.category;
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(image);
-    return groups;
-  }, {} as Record<string, SiteImage[]>);
+  const groupedImages = siteImages.reduce(
+    (groups, image) => {
+      const category = image.category;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(image);
+      return groups;
+    },
+    {} as Record<string, SiteImage[]>
+  );
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -370,7 +432,7 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
             siteDetails={siteDetailsData as SiteDetails}
             onSiteDetailsChange={handleDataChange}
           />
-          
+
           {/* Site Images Section */}
           <Card className="mt-8">
             <CardHeader>
@@ -390,7 +452,7 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
                         Upload site images by category (JPG or PNG, max 10MB)
                       </p>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                       <div className="w-full sm:w-64">
                         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -398,18 +460,20 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
                             <SelectValue placeholder="Select image category" />
                           </SelectTrigger>
                           <SelectContent>
-                            {SITE_IMAGE_CATEGORIES.map((category) => (
+                            {SITE_IMAGE_CATEGORIES.map(category => (
                               <SelectItem key={category.value} value={category.value}>
                                 <div>
                                   <div className="font-medium">{category.label}</div>
-                                  <div className="text-xs text-gray-500">{category.description}</div>
+                                  <div className="text-xs text-gray-500">
+                                    {category.description}
+                                  </div>
                                 </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -417,9 +481,9 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
                         onChange={handleFileSelect}
                         className="hidden"
                       />
-                      
-                      <Button 
-                        variant="outline" 
+
+                      <Button
+                        variant="outline"
                         onClick={triggerFileInput}
                         disabled={isUploadingImage || !selectedCategory}
                       >
@@ -442,18 +506,14 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
                     {Object.entries(groupedImages).map(([category, images]) => (
                       <div key={category} className="space-y-3">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-medium">
-                            {getCategoryLabel(category)}
-                          </h3>
+                          <h3 className="text-lg font-medium">{getCategoryLabel(category)}</h3>
                           <span className="text-sm text-gray-500">
                             ({images.length} image{images.length !== 1 ? 's' : ''})
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          {getCategoryDescription(category)}
-                        </p>
+                        <p className="text-sm text-gray-600">{getCategoryDescription(category)}</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {images.map((image) => (
+                          {images.map(image => (
                             <div key={image.id} className="relative group">
                               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                                 <img
@@ -490,7 +550,9 @@ export default function SiteDetailsPage({ params }: { params: { jobId: string } 
                   <div className="text-center py-8 text-gray-500">
                     <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>No site images uploaded yet</p>
-                    <p className="text-sm">Upload images by category to document the site conditions</p>
+                    <p className="text-sm">
+                      Upload images by category to document the site conditions
+                    </p>
                   </div>
                 )}
               </div>

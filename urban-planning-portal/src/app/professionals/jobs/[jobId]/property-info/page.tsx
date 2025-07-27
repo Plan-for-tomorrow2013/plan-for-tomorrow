@@ -76,7 +76,7 @@ export default function PropertyInfoPage({ params }: { params: { jobId: string }
       attributes,
       layerName,
       renderRow,
-      className: "space-y-2"
+      className: 'space-y-2',
     });
   };
 

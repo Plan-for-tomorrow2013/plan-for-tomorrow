@@ -6,10 +6,10 @@ import { Assessment, Job } from '@shared/types/jobs';
 import { ConsultantWorkOrder } from '@shared/types/consultantsWorkOrder';
 
 type ConsultantReference = {
-    name: string;
-    notes: string;
-    consultantId: string;
-    assessment?: Assessment;
+  name: string;
+  notes: string;
+  consultantId: string;
+  assessment?: Assessment;
 };
 
 export async function POST(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const consultantWorkOrders: ConsultantWorkOrder[] = JSON.parse(consultantWorkOrdersData);
 
     // Find the ticket to update
-    const ticketIndex = consultantWorkOrders.findIndex((ticket) => ticket.id === ticketId);
+    const ticketIndex = consultantWorkOrders.findIndex(ticket => ticket.id === ticketId);
     if (ticketIndex === -1) {
       return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     }
@@ -113,7 +113,9 @@ export async function POST(request: NextRequest) {
       // Initialize the consultants array for this category if it doesn't exist
       if (!Array.isArray(job.consultants[ticket.category])) {
         // If it exists but is not an array, convert it to an array
-        job.consultants[ticket.category] = [job.consultants[ticket.category] as unknown as ConsultantReference];
+        job.consultants[ticket.category] = [
+          job.consultants[ticket.category] as unknown as ConsultantReference,
+        ];
       }
 
       // Ensure the array exists and find the consultant by consultantId

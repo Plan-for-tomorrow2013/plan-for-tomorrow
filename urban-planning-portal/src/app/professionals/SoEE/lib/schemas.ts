@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const DevelopmentDataSchema = z.object({
   developmentDescription: z.string(),
@@ -75,29 +75,35 @@ export const PropertyDataSchema = z.object({
   southDevelopment: z.string().optional(),
   eastDevelopment: z.string().optional(),
   westDevelopment: z.string().optional(),
-  constraints: z.object({
-    bushfireProne: z.boolean().optional(),
-    floodProne: z.boolean().optional(),
-    acidSulfateSoils: z.boolean().optional(),
-    biodiversity: z.boolean().optional(),
-    heritageItem: z.boolean().optional(),
-    heritageConservationArea: z.boolean().optional(),
-    contaminatedLand: z.boolean().optional(),
-  }).optional(),
+  constraints: z
+    .object({
+      bushfireProne: z.boolean().optional(),
+      floodProne: z.boolean().optional(),
+      acidSulfateSoils: z.boolean().optional(),
+      biodiversity: z.boolean().optional(),
+      heritageItem: z.boolean().optional(),
+      heritageConservationArea: z.boolean().optional(),
+      contaminatedLand: z.boolean().optional(),
+    })
+    .optional(),
   otherConstraints: z.string().optional(),
 });
 
 export const PropertyDetailsFormSchema = z.object({
-  lotIdentifications: z.array(z.object({
-    lotNumber: z.string().min(1, "Lot number is required"),
-    sectionNumber: z.string().optional(),
-    dpNumber: z.string().min(1, "DP/SP number is required"),
-  })).min(1, "At least one lot identification is required"),
-  streetNumber: z.string().min(1, "Street number is required"),
-  streetName: z.string().min(1, "Street name is required"),
+  lotIdentifications: z
+    .array(
+      z.object({
+        lotNumber: z.string().min(1, 'Lot number is required'),
+        sectionNumber: z.string().optional(),
+        dpNumber: z.string().min(1, 'DP/SP number is required'),
+      })
+    )
+    .min(1, 'At least one lot identification is required'),
+  streetNumber: z.string().min(1, 'Street number is required'),
+  streetName: z.string().min(1, 'Street name is required'),
   secondaryStreetName: z.string().optional(),
-  suburb: z.string().min(1, "Suburb is required"),
-  postcode: z.string().min(1, "Postcode is required"),
+  suburb: z.string().min(1, 'Suburb is required'),
+  postcode: z.string().min(1, 'Postcode is required'),
 });
 
 export const PlanningDataSchema = z.object({
@@ -161,16 +167,24 @@ export const PlanningDataSchema = z.object({
   variationDetails: z.string().optional(),
   variationJustification: z.string().optional(),
   // Add the dynamic arrays to match PlanningFormSchema
-  additionalControls: z.array(z.object({
-    name: z.string(),
-    control: z.string(),
-    proposed: z.string(),
-  })).optional(),
-  lepAdditionalControls: z.array(z.object({
-    name: z.string(),
-    control: z.string(),
-    proposed: z.string(),
-  })).optional(),
+  additionalControls: z
+    .array(
+      z.object({
+        name: z.string(),
+        control: z.string(),
+        proposed: z.string(),
+      })
+    )
+    .optional(),
+  lepAdditionalControls: z
+    .array(
+      z.object({
+        name: z.string(),
+        control: z.string(),
+        proposed: z.string(),
+      })
+    )
+    .optional(),
 });
 
 export const PlanningFormSchema = z.object({
@@ -234,16 +248,24 @@ export const PlanningFormSchema = z.object({
   variationDetails: z.string().optional(),
   variationJustification: z.string().optional(),
   // Add the dynamic arrays
-  additionalControls: z.array(z.object({
-    name: z.string(),
-    control: z.string(),
-    proposed: z.string(),
-  })).optional(),
-  lepAdditionalControls: z.array(z.object({
-    name: z.string(),
-    control: z.string(),
-    proposed: z.string(),
-  })).optional(),
+  additionalControls: z
+    .array(
+      z.object({
+        name: z.string(),
+        control: z.string(),
+        proposed: z.string(),
+      })
+    )
+    .optional(),
+  lepAdditionalControls: z
+    .array(
+      z.object({
+        name: z.string(),
+        control: z.string(),
+        proposed: z.string(),
+      })
+    )
+    .optional(),
 });
 
 export const EnvironmentalDataSchema = z.object({
@@ -290,4 +312,4 @@ export const FormDataSchema = z.object({
   development: DevelopmentDataSchema,
   planning: PlanningDataSchema,
   environmental: EnvironmentalDataSchema,
-}); 
+});

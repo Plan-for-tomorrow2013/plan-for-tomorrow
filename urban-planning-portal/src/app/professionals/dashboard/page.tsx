@@ -240,7 +240,7 @@ export default function DashboardPage() {
       attributes,
       layerName,
       renderRow,
-      className: "space-y-3"
+      className: 'space-y-3',
     });
   };
 

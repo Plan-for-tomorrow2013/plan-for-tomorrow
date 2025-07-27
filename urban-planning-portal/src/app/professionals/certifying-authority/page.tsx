@@ -192,12 +192,15 @@ function CertifyingAuthorityPageContent(): JSX.Element {
             <AlertDescription>Failed to load jobs.</AlertDescription>
           </Alert>
         ) : (
-          <Select value={currentJob?.id} onValueChange={(jobId) => {
-            const job = jobs?.find(j => j.id === jobId);
-            if (job) {
-              setCurrentJob(job);
-            }
-          }}>
+          <Select
+            value={currentJob?.id}
+            onValueChange={jobId => {
+              const job = jobs?.find(j => j.id === jobId);
+              if (job) {
+                setCurrentJob(job);
+              }
+            }}
+          >
             <SelectTrigger className="w-[280px]">
               <SelectValue placeholder="Select a job" />
             </SelectTrigger>

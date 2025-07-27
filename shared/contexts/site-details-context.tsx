@@ -143,7 +143,6 @@ export function SiteDetailsProvider({ children, jobId, initialSiteDetails = {} }
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['job', jobId] })
       setHasUnsavedChanges(false)
       toast({ title: "Success", description: "Site details saved successfully" })
     },

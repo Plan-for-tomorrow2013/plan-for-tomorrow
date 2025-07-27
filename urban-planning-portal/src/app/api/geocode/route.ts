@@ -41,8 +41,8 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          },
-        )}`,
+          }
+        )}`
       ),
 
       // Protection Layers
@@ -57,8 +57,8 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          },
-        )}`,
+          }
+        )}`
       ),
 
       // Local Provisions Layers
@@ -73,11 +73,11 @@ export async function GET(request: Request) {
             imageDisplay: '400,400,96',
             returnGeometry: 'false',
             f: 'json',
-          },
-        )}`,
+          }
+        )}`
       ),
     ]);
-    
+
     if (!epiResponse.ok) {
       const errorText = await epiResponse.text();
       throw new Error(`EPI Service Error: ${epiResponse.status} - ${errorText}`);

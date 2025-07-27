@@ -4,6 +4,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { Job } from '@shared/types/jobs';
+import { SiteDetails } from '@shared/types/site-details';
 import { getJobPath, getJobsPath, getDocumentsPath } from '@shared/utils/paths'; // Import path utilities
 
 // Ensure directories exist using path utilities
@@ -17,6 +18,47 @@ async function ensureDirectoriesExist() {
     await mkdir(documentsDir, { recursive: true });
   }
 }
+
+// Default site details structure
+const defaultSiteDetails: SiteDetails = {
+  // Site Characteristics
+  lotType: '',
+  siteArea: '',
+  frontage: '',
+  depth: '',
+  slope: '',
+  orientation: '',
+  soilType: '',
+  vegetation: '',
+  primaryStreetWidth: '',
+  siteDepth: '',
+  secondaryStreetWidth: '',
+  gradient: '',
+  highestRL: '',
+  lowestRL: '',
+  fallAmount: '',
+
+  // Existing Development
+  currentLandUse: '',
+  existingDevelopmentDetails: '',
+
+  // Surrounding Development
+  northDevelopment: '',
+  southDevelopment: '',
+  eastDevelopment: '',
+  westDevelopment: '',
+
+  // Site Constraints
+  bushfireProne: false,
+  floodProne: false,
+  acidSulfateSoils: false,
+  biodiversity: false,
+  salinity: false,
+  landslip: false,
+  heritage: '',
+  contamination: '',
+  otherConstraints: '',
+};
 
 export async function POST(request: Request) {
   try {
@@ -39,6 +81,19 @@ export async function POST(request: Request) {
           epiLayers: data.planningLayers?.epiLayers || [],
           protectionLayers: data.planningLayers?.protectionLayers || [],
           localProvisionsLayers: data.planningLayers?.localProvisionsLayers || [],
+        },
+      },
+      // Initialize site details with default values
+      siteDetails: defaultSiteDetails,
+      // Initialize form data with default values
+      formData: {
+        lotIdentifications: [],
+        addressDetails: {
+          streetNumber: '',
+          streetName: '',
+          secondaryStreetName: '',
+          suburb: '',
+          postcode: '',
         },
       },
       // Initialize empty documents object - documents will be added when uploaded

@@ -21,16 +21,20 @@ interface PaginatedResponse {
   };
 }
 
-async function getJobs(page: number = 1, limit: number = 10, search: string = ''): Promise<PaginatedResponse> {
+async function getJobs(
+  page: number = 1,
+  limit: number = 10,
+  search: string = ''
+): Promise<PaginatedResponse> {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
-  
+
   if (search) {
     params.append('search', search);
   }
-  
+
   const response = await fetch(`/api/jobs?${params}`);
   if (!response.ok) {
     throw new Error('Failed to fetch jobs');
@@ -155,10 +159,11 @@ export default function JobsPage() {
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-700">
-                Showing {((pagination.currentPage - 1) * 10) + 1} - {Math.min(pagination.currentPage * 10, pagination.totalItems)} of{' '}
+                Showing {(pagination.currentPage - 1) * 10 + 1} -{' '}
+                {Math.min(pagination.currentPage * 10, pagination.totalItems)} of{' '}
                 {pagination.totalItems} jobs
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -168,7 +173,7 @@ export default function JobsPage() {
                 >
                   <ChevronsLeft className="h-4 w-4" />
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -177,7 +182,7 @@ export default function JobsPage() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                
+
                 <div className="flex items-center space-x-1">
                   {Array.from(Array(Math.min(5, pagination.totalPages)), (_, i) => {
                     let pageNum;
@@ -190,11 +195,11 @@ export default function JobsPage() {
                     } else {
                       pageNum = pagination.currentPage - 2 + i;
                     }
-                    
+
                     return (
                       <Button
                         key={pageNum}
-                        variant={pagination.currentPage === pageNum ? "default" : "outline"}
+                        variant={pagination.currentPage === pageNum ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => handlePageChange(pageNum)}
                         className="w-8 h-8 p-0"
@@ -204,7 +209,7 @@ export default function JobsPage() {
                     );
                   })}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -213,7 +218,7 @@ export default function JobsPage() {
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

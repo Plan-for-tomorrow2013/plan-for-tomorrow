@@ -19,7 +19,11 @@ import { Label } from '@shared/components/ui/label';
 import { useToast } from '@shared/components/ui/use-toast';
 import { updateConsultantNotes } from '../actions';
 import { ConsultantCategory } from '@shared/types/jobs';
-import { getReportStatus, isReportType, getReportTitle } from '@shared/utils/consultant-report-utils';
+import {
+  getReportStatus,
+  isReportType,
+  getReportTitle,
+} from '@shared/utils/consultant-report-utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { DocumentWithStatus } from '@shared/types/consultants';
 import { ConsultantTicket } from '@shared/types/consultantsTickets';
@@ -83,10 +87,16 @@ export function ConsultantCard({
   const queryClient = useQueryClient();
 
   // Make these available to the dialog JSX as well as handleRequestQuote
-  const certificateOfTitle = documents.find((doc: DocumentWithStatus) => doc.id === 'certificateOfTitle');
+  const certificateOfTitle = documents.find(
+    (doc: DocumentWithStatus) => doc.id === 'certificateOfTitle'
+  );
   const surveyPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'surveyPlan');
-  const certificate107 = documents.find((doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate');
-  const architecturalPlan = documents.find((doc: DocumentWithStatus) => doc.id === 'architecturalPlan');
+  const certificate107 = documents.find(
+    (doc: DocumentWithStatus) => doc.id === 'tenSevenCertificate'
+  );
+  const architecturalPlan = documents.find(
+    (doc: DocumentWithStatus) => doc.id === 'architecturalPlan'
+  );
 
   // Read consultant status from job object
   const job = jobs[0];
@@ -98,14 +108,13 @@ export function ConsultantCard({
     consultantList = [rawConsultants];
   }
 
-  const consultantObj = consultantList.find(
-    (c: any) => c.consultantId === consultant.id
-  );
+  const consultantObj = consultantList.find((c: any) => c.consultantId === consultant.id);
   const consultantStatus = consultantObj?.assessment?.status;
 
   // Find the relevant document for this consultant/category
   const relevantDoc = documents.find(
-    (doc: DocumentWithStatus) => doc.category === consultant.category && doc.consultantId === consultant.id
+    (doc: DocumentWithStatus) =>
+      doc.category === consultant.category && doc.consultantId === consultant.id
   );
 
   // Type guard for Job (add more fields as needed)
@@ -126,22 +135,25 @@ export function ConsultantCard({
   const hasFile = relevantDoc && relevantDoc.uploadedFile && !!relevantDoc.uploadedFile.fileName;
 
   const completedDocument = consultantObj?.assessment?.completedDocument;
-  const isCompletedFromAssessment = consultantObj?.assessment?.status === 'completed' && !!completedDocument?.fileName && !!completedDocument?.returnedAt;
+  const isCompletedFromAssessment =
+    consultantObj?.assessment?.status === 'completed' &&
+    !!completedDocument?.fileName &&
+    !!completedDocument?.returnedAt;
 
   // Determine the current status based on ticket and work order
   const hasTicket = !!ticket;
   const hasWorkOrder = !!workOrder;
   // Treat 'pending' as in-progress for work orders for backward compatibility
   const isWorkOrderCompleted = workOrder?.status === 'completed';
-  const isWorkOrderInProgress = workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
+  const isWorkOrderInProgress =
+    workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
   // Only check for valid ConsultantTicket.status values to avoid TypeScript error
-  const hasActiveTicket = ticket && (
-    ticket.status === 'pending' ||
-    ticket.status === 'in-progress' ||
-    ticket.status === 'paid'
-  );
+  const hasActiveTicket =
+    ticket &&
+    (ticket.status === 'pending' || ticket.status === 'in-progress' || ticket.status === 'paid');
   // If 'paid' is needed, update the ConsultantTicket.status type in shared/types/consultantsTickets.ts
-  const hasActiveWorkOrder = workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
+  const hasActiveWorkOrder =
+    workOrder && (workOrder.status === 'in-progress' || workOrder.status === 'pending');
 
   const handleSaveNotes = async () => {
     try {
@@ -340,7 +352,8 @@ export function ConsultantCard({
                 <h4 className="font-medium text-green-800">Work Completed</h4>
               </div>
               <p className="text-sm text-green-700">
-                Your work order has been completed. Check the consultant store for final reports and invoices.
+                Your work order has been completed. Check the consultant store for final reports and
+                invoices.
               </p>
             </div>
           ) : isWorkOrderInProgress ? (
@@ -350,7 +363,9 @@ export function ConsultantCard({
                 <h4 className="font-medium text-blue-800">Work In Progress</h4>
               </div>
               <p className="text-sm text-blue-700">
-                Thank you for accepting your quote for a "{consultant.category}" Report from "{consultant.name}". We are requesting your report. You will be notified once it's ready.
+                Thank you for accepting your quote for a "{consultant.category}" Report from "
+                {consultant.name}". We are requesting your report. You will be notified once it's
+                ready.
               </p>
             </div>
           ) : hasActiveTicket ? (
@@ -363,7 +378,7 @@ export function ConsultantCard({
                 Quote request has been sent. You will be notified when the quote is ready.
               </p>
             </div>
-          ) : (ticket && ticket.status === 'completed') ? (
+          ) : ticket && ticket.status === 'completed' ? (
             <div className="mt-4 p-4 bg-green-50 rounded-md">
               <h4 className="font-medium mb-2">Quote Returned</h4>
               <p className="text-sm text-gray-600">

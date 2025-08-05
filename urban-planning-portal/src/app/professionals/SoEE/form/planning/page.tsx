@@ -28,6 +28,140 @@ import { FormProgress } from '@/app/professionals/SoEE/components/form-progress'
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useFormData } from '@/app/professionals/SoEE/lib/form-context';
+
+// Helper functions to extract planning data from property data
+const extractPlanningData = (propertyData: any) => {
+  if (!propertyData?.planningLayers?.epiLayers) {
+    return null;
+  }
+
+  const epiLayers = propertyData.planningLayers.epiLayers;
+  
+  // Extract LEP Name
+  const lepLayer = epiLayers.find((layer: any) => layer.layer === 'Local Environmental Plan');
+  const lepName = lepLayer?.attributes?.['EPI_NAME'] || lepLayer?.attributes?.['EPI Name'];
+  
+  // Extract Zoning
+  const zoningLayer = epiLayers.find((layer: any) => layer.layer === 'Land Zoning');
+  const zoning = zoningLayer?.attributes?.['ZONE'] || zoningLayer?.attributes?.['Zone'];
+  
+  // Extract Height of Buildings
+  const heightLayer = epiLayers.find((layer: any) => 
+    layer.layer === 'Height of Building' || layer.layer === 'Height of Building Additional Controls'
+  );
+  const heightControl = heightLayer?.attributes?.['MAX_B_H_M'] || heightLayer?.attributes?.['Maximum Building Height'];
+  
+  // Extract Floor Space Ratio
+  const fsrLayer = epiLayers.find((layer: any) => 
+    layer.layer === 'Floor Space Ratio' || layer.layer === 'Floor Space Ratio (n:1)'
+  );
+  const fsrControl = fsrLayer?.attributes?.['FSR'] || fsrLayer?.attributes?.['Floor Space Ratio'];
+  
+  return {
+    lepName,
+    zoning,
+    heightControl,
+    fsrControl,
+  };
+};
+
+// Helper function to determine DCP Name based on LEP Name
+const getDcpNameFromLep = (lepName: string) => {
+  const planningMappings = [
+    { lep: "Cumberland Local Environmental Plan 2021", dcp: "Cumberland Development Control Plan 2023" },
+    { lep: "Parramatta Local Environmental Plan 2011", dcp: "Parramatta Development Control Plan 2011" },
+    { lep: "Blacktown Local Environmental Plan 2015", dcp: "Blacktown Development Control Plan 2015" },
+    { lep: "Liverpool Local Environmental Plan 2008", dcp: "Liverpool Development Control Plan 2008" },
+    { lep: "Fairfield Local Environmental Plan 2013", dcp: "Fairfield Development Control Plan 2013" },
+    { lep: "Campbelltown Local Environmental Plan 2015", dcp: "Campbelltown Development Control Plan 2015" },
+    { lep: "Penrith Local Environmental Plan 2010", dcp: "Penrith Development Control Plan 2014" },
+    { lep: "The Hills Local Environmental Plan 2019", dcp: "The Hills Development Control Plan 2012" },
+    { lep: "Canterbury-Bankstown Local Environmental Plan 2021", dcp: "Canterbury-Bankstown Development Control Plan 2021" },
+    { lep: "Sydney Local Environmental Plan 2012", dcp: "Sydney Development Control Plan 2012" },
+    { lep: "Inner West Local Environmental Plan 2022", dcp: "3 DCP" },
+  ];
+  
+  const mapping = planningMappings.find(m => m.lep === lepName);
+  return mapping?.dcp || '';
+};
+
+// Helper function to extract DCP proposed values from development data
+const extractDcpProposedValues = (developmentData: any) => {
+  if (!developmentData) {
+    return null;
+  }
+
+  return {
+    frontSetbackProposed: developmentData.frontSetback || '',
+    secondaryFrontSetbackProposed: developmentData.secondaryFrontSetback || '',
+    rearSetbackGroundProposed: developmentData.rearSetbackGround || '',
+    rearSetbackUpperProposed: developmentData.rearSetbackUpper || '',
+    sideSetbackNorthGroundProposed: developmentData.sideSetbackGroundOne || '',
+    sideSetbackNorthUpperProposed: developmentData.sideSetbackUpperOne || '',
+    sideSetbackSouthGroundProposed: developmentData.sideSetbackGroundTwo || '',
+    sideSetbackSouthUpperProposed: developmentData.sideSetbackUpperTwo || '',
+    siteCoverageProposed: developmentData.proposedSiteCoverage || '',
+    landscapedAreaProposed: developmentData.proposedLandscapedArea || '',
+    parkingProposed: developmentData.carParkingSpaces || '',
+  };
+};
+
+// Helper function to extract numeric values from strings
+const extractNumericValue = (value: string): number | null => {
+  if (!value) return null;
+  const match = value.match(/(\d+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1]) : null;
+};
+
+// Helper function to check compliance
+const checkCompliance = (control: string, proposed: string): boolean => {
+  if (!control || !proposed) return true; // Assume compliant if missing data
+  
+  const controlNum = extractNumericValue(control);
+  const proposedNum = extractNumericValue(proposed);
+  
+  if (controlNum === null || proposedNum === null) return true; // Can't compare non-numeric values
+  
+  // Check for different types of controls
+  if (control.toLowerCase().includes('minimum')) {
+    return proposedNum >= controlNum;
+  } else if (control.toLowerCase().includes('maximum')) {
+    return proposedNum <= controlNum;
+  } else if (control.toLowerCase().includes('spaces')) {
+    // For parking spaces, check if proposed meets or exceeds requirement
+    return proposedNum >= controlNum;
+  }
+  
+  return true; // Default to compliant if we can't determine the comparison
+};
+
+// Helper function to generate compliance comments
+const generateComplianceComments = (formData: any) => {
+  const comments: string[] = [];
+  
+  // Check each field for compliance
+  const complianceChecks = [
+    { control: formData.frontSetbackControl, proposed: formData.frontSetbackProposed, name: 'Front Setback' },
+    { control: formData.secondaryFrontSetbackControl, proposed: formData.secondaryFrontSetbackProposed, name: 'Secondary Front Setback' },
+    { control: formData.rearSetbackGroundControl, proposed: formData.rearSetbackGroundProposed, name: 'Rear Setback Ground' },
+    { control: formData.rearSetbackUpperControl, proposed: formData.rearSetbackUpperProposed, name: 'Rear Setback Upper' },
+    { control: formData.sideSetbackNorthGroundControl, proposed: formData.sideSetbackNorthGroundProposed, name: 'Side Setback North Ground' },
+    { control: formData.sideSetbackNorthUpperControl, proposed: formData.sideSetbackNorthUpperProposed, name: 'Side Setback North Upper' },
+    { control: formData.sideSetbackSouthGroundControl, proposed: formData.sideSetbackSouthGroundProposed, name: 'Side Setback South Ground' },
+    { control: formData.sideSetbackSouthUpperControl, proposed: formData.sideSetbackSouthUpperProposed, name: 'Side Setback South Upper' },
+    { control: formData.siteCoverageControl, proposed: formData.siteCoverageProposed, name: 'Site Coverage' },
+    { control: formData.landscapedAreaControl, proposed: formData.landscapedAreaProposed, name: 'Landscaped Area' },
+    { control: formData.parkingControl, proposed: formData.parkingProposed, name: 'Car Parking' },
+  ];
+  
+  complianceChecks.forEach(({ control, proposed, name }) => {
+    if (control && proposed && !checkCompliance(control, proposed)) {
+      comments.push(`${name}: see variation attached`);
+    }
+  });
+  
+  return comments;
+};
 import {
   Table,
   TableBody,
@@ -44,6 +178,9 @@ export default function PlanningPage() {
   const searchParams = useSearchParams();
   const jobId = searchParams.get('job');
   const [showSeppFields, setShowSeppFields] = useState(false);
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
+  const [isLoadingPropertyData, setIsLoadingPropertyData] = useState(false);
+  const [complianceComments, setComplianceComments] = useState<string[]>([]);
   const { formData, updateFormData, saveDraft } = useFormData();
 
   // Initialize form with default values
@@ -155,6 +292,9 @@ export default function PlanningPage() {
 
   // Reset form when formData changes (after loading from localStorage)
   useEffect(() => {
+    console.log('🔄 Form reset useEffect triggered');
+    console.log('📊 formData.planning:', formData.planning);
+    
     form.reset({
       // Zoning and Permissibility
       zoning: formData.planning.zoning || 'R2 Low Density Residential',
@@ -259,11 +399,164 @@ export default function PlanningPage() {
     });
   }, [formData.planning, form]);
 
+  // Fetch job data and populate property data if not already available
+  useEffect(() => {
+    console.log('🔄 Fetch job data useEffect triggered');
+    console.log('📊 jobId:', jobId);
+    console.log('📊 formData.propertyData:', formData.propertyData);
+    
+    const fetchJobData = async () => {
+      if (!formData.propertyData && jobId) {
+        console.log('📡 Fetching job data...');
+        setIsLoadingPropertyData(true);
+        try {
+          const response = await fetch(`/api/jobs/${jobId}`);
+          if (response.ok) {
+            const jobData = await response.json();
+            console.log('📊 Received job data:', jobData);
+            if (jobData.propertyData) {
+              console.log('✅ Updating property data in form context');
+              updateFormData('propertyData', jobData.propertyData);
+            }
+          } else {
+            console.error('❌ Failed to fetch job data:', response.status, response.statusText);
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch job data:', error);
+        } finally {
+          setIsLoadingPropertyData(false);
+        }
+      } else {
+        console.log('⏭️ Skipping job data fetch - already has property data or no jobId');
+      }
+    };
+
+    fetchJobData();
+  }, [jobId, formData.propertyData, updateFormData]);
+
+  // Auto-fill planning data from property data if available
+  useEffect(() => {
+    console.log('🔄 Property data auto-fill useEffect triggered');
+    console.log('📊 formData.propertyData:', formData.propertyData);
+    console.log('📊 formData.planning.lepName:', formData.planning.lepName);
+    
+    if (formData.propertyData && !formData.planning.lepName) {
+      const planningData = extractPlanningData(formData.propertyData);
+      console.log('📝 Extracted planning data:', planningData);
+      
+      if (planningData) {
+        const newAutoFilledFields = new Set<string>();
+        
+        // Auto-fill LEP Name
+        if (planningData.lepName) {
+          console.log(`✅ Auto-filling lepName with ${planningData.lepName}`);
+          form.setValue('lepName', planningData.lepName);
+          newAutoFilledFields.add('lepName');
+        }
+        
+        // Auto-fill Zoning
+        if (planningData.zoning) {
+          console.log(`✅ Auto-filling zoning with ${planningData.zoning}`);
+          form.setValue('zoning', planningData.zoning);
+          newAutoFilledFields.add('zoning');
+        }
+        
+        // Auto-fill Height Control
+        if (planningData.heightControl) {
+          console.log(`✅ Auto-filling heightControl with ${planningData.heightControl}`);
+          form.setValue('heightControl', planningData.heightControl);
+          newAutoFilledFields.add('heightControl');
+        }
+        
+        // Auto-fill FSR Control
+        if (planningData.fsrControl) {
+          console.log(`✅ Auto-filling fsrControl with ${planningData.fsrControl}`);
+          form.setValue('fsrControl', planningData.fsrControl);
+          newAutoFilledFields.add('fsrControl');
+        }
+        
+        // Auto-fill DCP Name based on LEP
+        if (planningData.lepName) {
+          const dcpName = getDcpNameFromLep(planningData.lepName);
+          if (dcpName) {
+            console.log(`✅ Auto-filling dcpName with ${dcpName}`);
+            form.setValue('dcpName', dcpName);
+            newAutoFilledFields.add('dcpName');
+          }
+        }
+        
+        console.log('📝 New auto-filled fields:', newAutoFilledFields);
+        setAutoFilledFields(newAutoFilledFields);
+        
+        // Update form data in context
+        updateFormData('planning', {
+          lepName: planningData.lepName || formData.planning.lepName,
+          zoning: planningData.zoning || formData.planning.zoning,
+          heightControl: planningData.heightControl || formData.planning.heightControl,
+          fsrControl: planningData.fsrControl || formData.planning.fsrControl,
+          dcpName: planningData.lepName ? getDcpNameFromLep(planningData.lepName) : formData.planning.dcpName,
+        });
+      }
+    }
+  }, [formData.propertyData, formData.planning.lepName, form, updateFormData]);
+
+  // Auto-fill DCP proposed values from development data
+  useEffect(() => {
+    console.log('🔄 DCP auto-fill useEffect triggered');
+    console.log('📊 formData.development:', formData.development);
+    console.log('📊 autoFilledFields:', autoFilledFields);
+    
+    if (formData.development) {
+      const dcpProposedData = extractDcpProposedValues(formData.development);
+      console.log('📝 Extracted DCP proposed data:', dcpProposedData);
+      
+      if (dcpProposedData) {
+        const newAutoFilledFields = new Set<string>(autoFilledFields);
+        
+        // Auto-fill DCP proposed values
+        Object.entries(dcpProposedData).forEach(([fieldName, value]) => {
+          if (value && !form.getValues(fieldName as keyof FormValues)) {
+            console.log(`✅ Auto-filling ${fieldName} with ${value}`);
+            form.setValue(fieldName as keyof FormValues, value);
+            newAutoFilledFields.add(fieldName);
+          }
+        });
+        
+        console.log('📝 New auto-filled fields:', newAutoFilledFields);
+        setAutoFilledFields(newAutoFilledFields);
+        
+        // Update form data in context
+        updateFormData('planning', dcpProposedData);
+      }
+    }
+  }, [formData.development, form, updateFormData]);
+
+  // Check compliance when form values change
+  useEffect(() => {
+    console.log('🔄 Compliance check useEffect triggered');
+    const currentValues = form.getValues();
+    console.log('📊 Current form values:', currentValues);
+    const comments = generateComplianceComments(currentValues);
+    console.log('📝 Generated compliance comments:', comments);
+    setComplianceComments(comments);
+  }, [form.watch('frontSetbackControl'), form.watch('frontSetbackProposed'), 
+      form.watch('secondaryFrontSetbackControl'), form.watch('secondaryFrontSetbackProposed'),
+      form.watch('rearSetbackGroundControl'), form.watch('rearSetbackGroundProposed'),
+      form.watch('rearSetbackUpperControl'), form.watch('rearSetbackUpperProposed'),
+      form.watch('sideSetbackNorthGroundControl'), form.watch('sideSetbackNorthGroundProposed'),
+      form.watch('sideSetbackNorthUpperControl'), form.watch('sideSetbackNorthUpperProposed'),
+      form.watch('sideSetbackSouthGroundControl'), form.watch('sideSetbackSouthGroundProposed'),
+      form.watch('sideSetbackSouthUpperControl'), form.watch('sideSetbackSouthUpperProposed'),
+      form.watch('siteCoverageControl'), form.watch('siteCoverageProposed'),
+      form.watch('landscapedAreaControl'), form.watch('landscapedAreaProposed'),
+      form.watch('parkingControl'), form.watch('parkingProposed')]);
+
   // Handle form submission
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-    console.log('LEP Additional controls:', data.lepAdditionalControls);
-    console.log('DCP Additional controls:', data.additionalControls);
+    console.log('🎉 Form submitted successfully!');
+    console.log('📊 Form data:', data);
+    console.log('📊 LEP Additional controls:', data.lepAdditionalControls);
+    console.log('📊 DCP Additional controls:', data.additionalControls);
 
     // Save form data to context
     updateFormData('planning', {
@@ -331,9 +624,16 @@ export default function PlanningPage() {
     router.push(`/professionals/SoEE/form/environmental-factors?job=${jobId}`);
   };
 
+  // Handle form submission errors
+  const onError = (errors: any) => {
+    console.error('❌ Form validation errors:', errors);
+  };
+
   // Handle save draft functionality
   const handleSaveDraft = () => {
+    console.log('💾 Save draft button clicked');
     const currentValues = form.getValues();
+    console.log('📊 Current form values:', currentValues);
 
     // Save form data to context
     updateFormData('planning', {
@@ -452,6 +752,98 @@ export default function PlanningPage() {
     form.setValue('lepAdditionalControls', updatedControls);
   };
 
+  // Helper component for input fields with auto-fill indicator
+  const AutoFillInput = ({ 
+    fieldName, 
+    placeholder, 
+    register, 
+    error, 
+    className = "" 
+  }: {
+    fieldName: string;
+    placeholder: string;
+    register: any;
+    error?: any;
+    className?: string;
+  }) => {
+    const isAutoFilled = autoFilledFields.has(fieldName);
+    
+    return (
+      <div className="relative">
+        <Input
+          placeholder={placeholder}
+          {...register}
+          className={`${className} ${isAutoFilled ? 'border-green-500 bg-green-50' : ''}`}
+        />
+        {isAutoFilled && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+              Auto-filled
+            </span>
+          </div>
+        )}
+        {error && (
+          <p className="text-sm text-red-500">{error.message}</p>
+        )}
+      </div>
+    );
+  };
+
+  // Helper component for DCP proposed fields with compliance checking
+  const DcpProposedInput = ({ 
+    fieldName, 
+    controlFieldName,
+    placeholder, 
+    register, 
+    error, 
+    className = "" 
+  }: {
+    fieldName: string;
+    controlFieldName: string;
+    placeholder: string;
+    register: any;
+    error?: any;
+    className?: string;
+  }) => {
+    const isAutoFilled = autoFilledFields.has(fieldName);
+    const currentValues = form.getValues();
+    const isNonCompliant = !checkCompliance(
+      currentValues[controlFieldName as keyof FormValues] as string,
+      currentValues[fieldName as keyof FormValues] as string
+    );
+    
+    return (
+      <div className="relative">
+        <Input
+          placeholder={placeholder}
+          {...register}
+          className={`${className} ${
+            isAutoFilled ? 'border-green-500 bg-green-50' : ''
+          } ${
+            isNonCompliant ? 'border-red-500 bg-red-50' : ''
+          }`}
+        />
+        {isAutoFilled && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+              Auto-filled
+            </span>
+          </div>
+        )}
+        {isNonCompliant && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">
+              Non-compliant
+            </span>
+          </div>
+        )}
+        {error && (
+          <p className="text-sm text-red-500">{error.message}</p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-10 px-4 max-w-3xl">
@@ -465,9 +857,27 @@ export default function PlanningPage() {
               Assess your development against relevant planning controls for your Statement of
               Environmental Effects
             </CardDescription>
+            {isLoadingPropertyData && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                Loading property data...
+              </div>
+            )}
+            {autoFilledFields.size > 0 && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <span>✓</span>
+                Auto-filled {autoFilledFields.size} field{autoFilledFields.size > 1 ? 's' : ''} from property and development data
+              </div>
+            )}
+            {complianceComments.length > 0 && (
+              <div className="flex items-center gap-2 text-sm text-red-600">
+                <span>⚠</span>
+                {complianceComments.length} non-compliance issue{complianceComments.length > 1 ? 's' : ''} detected
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
               {/* SEPP Compliance */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">
@@ -786,7 +1196,7 @@ export default function PlanningPage() {
                               52. (b) The total floor area of the principal dwelling and the
                               secondary dwelling is no more than the maximum floor area permitted
                               for a dwelling house permitted by{' '}
-                              {form.watch('lepName').split(' ').pop()}{' '}
+                              {form.watch('lepName')?.split(' ').pop() || ''}{' '}
                               {form.watch('maxFloorAreaByLEP')
                                 ? `(${form.watch('maxFloorAreaByLEP')}m²)`
                                 : '(none identified)'}
@@ -794,7 +1204,7 @@ export default function PlanningPage() {
                             </p>
                             <p className="mb-2">
                               52. (c) The total floor area of the secondary dwelling permitted by{' '}
-                              {form.watch('lepName').split(' ').pop()} is{' '}
+                              {form.watch('lepName')?.split(' ').pop() || ''} is{' '}
                               {form.watch('maxFloorAreaByLEP') || '60'}m² or 25% of the total floor
                               area of the principal dwelling, whichever is the greater. The
                               secondary dwelling proposes a floor area of{' '}
@@ -828,14 +1238,12 @@ export default function PlanningPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lepName">LEP Name</Label>
-                  <Input
-                    id="lepName"
+                  <AutoFillInput
+                    fieldName="lepName"
                     placeholder="e.g. Cumberland Local Environmental Plan 2021"
-                    {...form.register('lepName')}
+                    register={form.register('lepName')}
+                    error={form.formState.errors.lepName}
                   />
-                  {form.formState.errors.lepName && (
-                    <p className="text-sm text-red-500">{form.formState.errors.lepName.message}</p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lepCompliance">General LEP Compliance</Label>
@@ -861,14 +1269,12 @@ export default function PlanningPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="zoning">Zoning</Label>
-                  <Input
-                    id="zoning"
+                  <AutoFillInput
+                    fieldName="zoning"
                     placeholder="e.g. R2 Low Density Residential"
-                    {...form.register('zoning')}
+                    register={form.register('zoning')}
+                    error={form.formState.errors.zoning}
                   />
-                  {form.formState.errors.zoning && (
-                    <p className="text-sm text-red-500">{form.formState.errors.zoning.message}</p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="landUsePermissibility">Land Use Permissibility</Label>
@@ -903,11 +1309,21 @@ export default function PlanningPage() {
                       <TableRow>
                         <TableCell className="font-medium">Height of Buildings</TableCell>
                         <TableCell>
-                          <Input
-                            id="heightControl"
-                            placeholder="e.g. 8.5m"
-                            {...form.register('heightControl')}
-                          />
+                          <div className="relative">
+                            <Input
+                              id="heightControl"
+                              placeholder="e.g. 8.5m"
+                              {...form.register('heightControl')}
+                              className={autoFilledFields.has('heightControl') ? 'border-green-500 bg-green-50' : ''}
+                            />
+                            {autoFilledFields.has('heightControl') && (
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                                  Auto-filled
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Input
@@ -922,11 +1338,21 @@ export default function PlanningPage() {
                       <TableRow>
                         <TableCell className="font-medium">Floor Space Ratio</TableCell>
                         <TableCell>
-                          <Input
-                            id="fsrControl"
-                            placeholder="e.g. 0.5:1"
-                            {...form.register('fsrControl')}
-                          />
+                          <div className="relative">
+                            <Input
+                              id="fsrControl"
+                              placeholder="e.g. 0.5:1"
+                              {...form.register('fsrControl')}
+                              className={autoFilledFields.has('fsrControl') ? 'border-green-500 bg-green-50' : ''}
+                            />
+                            {autoFilledFields.has('fsrControl') && (
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                                  Auto-filled
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Input
@@ -1023,14 +1449,12 @@ export default function PlanningPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dcpName">DCP Name</Label>
-                  <Input
-                    id="dcpName"
+                  <AutoFillInput
+                    fieldName="dcpName"
                     placeholder="e.g. Cumberland Development Control Plan 2021"
-                    {...form.register('dcpName')}
+                    register={form.register('dcpName')}
+                    error={form.formState.errors.dcpName}
                   />
-                  {form.formState.errors.dcpName && (
-                    <p className="text-sm text-red-500">{form.formState.errors.dcpName.message}</p>
-                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dcpCompliance">General DCP Compliance</Label>
@@ -1071,10 +1495,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="frontSetbackProposed"
+                            <DcpProposedInput
+                              fieldName="frontSetbackProposed"
+                              controlFieldName="frontSetbackControl"
                               placeholder="e.g. 6.5m"
-                              {...form.register('frontSetbackProposed')}
+                              register={form.register('frontSetbackProposed')}
+                              error={form.formState.errors.frontSetbackProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1092,10 +1518,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="secondaryFrontSetbackProposed"
+                            <DcpProposedInput
+                              fieldName="secondaryFrontSetbackProposed"
+                              controlFieldName="secondaryFrontSetbackControl"
                               placeholder="e.g. 3.5m or N/A"
-                              {...form.register('secondaryFrontSetbackProposed')}
+                              register={form.register('secondaryFrontSetbackProposed')}
+                              error={form.formState.errors.secondaryFrontSetbackProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1111,10 +1539,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="rearSetbackGroundProposed"
+                            <DcpProposedInput
+                              fieldName="rearSetbackGroundProposed"
+                              controlFieldName="rearSetbackGroundControl"
                               placeholder="e.g. 8.0m"
-                              {...form.register('rearSetbackGroundProposed')}
+                              register={form.register('rearSetbackGroundProposed')}
+                              error={form.formState.errors.rearSetbackGroundProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1130,10 +1560,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="rearSetbackUpperProposed"
+                            <DcpProposedInput
+                              fieldName="rearSetbackUpperProposed"
+                              controlFieldName="rearSetbackUpperControl"
                               placeholder="e.g. 10.0m"
-                              {...form.register('rearSetbackUpperProposed')}
+                              register={form.register('rearSetbackUpperProposed')}
+                              error={form.formState.errors.rearSetbackUpperProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1151,10 +1583,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="sideSetbackNorthGroundProposed"
+                            <DcpProposedInput
+                              fieldName="sideSetbackNorthGroundProposed"
+                              controlFieldName="sideSetbackNorthGroundControl"
                               placeholder="e.g. 1.5m"
-                              {...form.register('sideSetbackNorthGroundProposed')}
+                              register={form.register('sideSetbackNorthGroundProposed')}
+                              error={form.formState.errors.sideSetbackNorthGroundProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1172,10 +1606,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="sideSetbackNorthUpperProposed"
+                            <DcpProposedInput
+                              fieldName="sideSetbackNorthUpperProposed"
+                              controlFieldName="sideSetbackNorthUpperControl"
                               placeholder="e.g. 1.5m"
-                              {...form.register('sideSetbackNorthUpperProposed')}
+                              register={form.register('sideSetbackNorthUpperProposed')}
+                              error={form.formState.errors.sideSetbackNorthUpperProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1193,10 +1629,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="sideSetbackSouthGroundProposed"
+                            <DcpProposedInput
+                              fieldName="sideSetbackSouthGroundProposed"
+                              controlFieldName="sideSetbackSouthGroundControl"
                               placeholder="e.g. 1.0m"
-                              {...form.register('sideSetbackSouthGroundProposed')}
+                              register={form.register('sideSetbackSouthGroundProposed')}
+                              error={form.formState.errors.sideSetbackSouthGroundProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1214,10 +1652,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="sideSetbackSouthUpperProposed"
+                            <DcpProposedInput
+                              fieldName="sideSetbackSouthUpperProposed"
+                              controlFieldName="sideSetbackSouthUpperControl"
                               placeholder="e.g. 1.2m"
-                              {...form.register('sideSetbackSouthUpperProposed')}
+                              register={form.register('sideSetbackSouthUpperProposed')}
+                              error={form.formState.errors.sideSetbackSouthUpperProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1233,10 +1673,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="siteCoverageProposed"
+                            <DcpProposedInput
+                              fieldName="siteCoverageProposed"
+                              controlFieldName="siteCoverageControl"
                               placeholder="e.g. 40%"
-                              {...form.register('siteCoverageProposed')}
+                              register={form.register('siteCoverageProposed')}
+                              error={form.formState.errors.siteCoverageProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1252,10 +1694,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="landscapedAreaProposed"
+                            <DcpProposedInput
+                              fieldName="landscapedAreaProposed"
+                              controlFieldName="landscapedAreaControl"
                               placeholder="e.g. 36%"
-                              {...form.register('landscapedAreaProposed')}
+                              register={form.register('landscapedAreaProposed')}
+                              error={form.formState.errors.landscapedAreaProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1271,10 +1715,12 @@ export default function PlanningPage() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Input
-                              id="parkingProposed"
+                            <DcpProposedInput
+                              fieldName="parkingProposed"
+                              controlFieldName="parkingControl"
                               placeholder="e.g. 2 spaces"
-                              {...form.register('parkingProposed')}
+                              register={form.register('parkingProposed')}
+                              error={form.formState.errors.parkingProposed}
                             />
                           </TableCell>
                         </TableRow>
@@ -1282,6 +1728,23 @@ export default function PlanningPage() {
                     </Table>
                   </div>
                 </div>
+
+                {/* Compliance Comments */}
+                {complianceComments.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-red-600">Non-Compliance Issues</h4>
+                    <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                      <p className="text-sm text-red-800 mb-2">
+                        The following items require variation applications:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-red-700">
+                        {complianceComments.map((comment, index) => (
+                          <li key={index}>{comment}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
 
                 {/* Additional Controls */}
                 <div className="space-y-2">
@@ -1377,17 +1840,26 @@ export default function PlanningPage() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <Link href={`/professionals/SoEE/form/development-details?job=${jobId}`}>
-                  <Button variant="outline" type="button" className="gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Back
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  className="gap-2"
+                  onClick={() => {
+                    console.log('Back button clicked');
+                    router.push(`/professionals/SoEE/form/development-details?job=${jobId}`);
+                  }}
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </Button>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     type="button"
                     className="gap-2"
-                    onClick={handleSaveDraft}
+                    onClick={() => {
+                      console.log('Save draft button clicked');
+                      handleSaveDraft();
+                    }}
                   >
                     <Save className="h-4 w-4" /> Save Draft
                   </Button>

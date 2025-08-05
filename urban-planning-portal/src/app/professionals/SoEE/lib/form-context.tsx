@@ -196,6 +196,7 @@ const initialFormData: FormData = {
     cumulativeImpacts: '',
     additionalInformation: '',
   },
+  propertyData: undefined,
 };
 
 interface FormProviderProps {

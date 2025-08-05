@@ -74,6 +74,7 @@ import {
   InitialAssessment,
 } from '@shared/components/DetailedInitialAssessment';
 import { LEPFilter } from '@shared/components/LEPFilter';
+import { FeedbackForm } from '@shared/components/FeedbackForm';
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -1753,8 +1754,29 @@ export default function InitialAssessmentPage() {
           </SiteDetailsProvider>
         </DocumentProvider>
       ) : (
-        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to access Initial Assessment.</p>
+                <div className="space-y-6">
+          <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
+            <p>Please select a job from the dropdown above to access Initial Assessment.</p>
+          </div>
+
+          {/* Feedback Form Section */}
+          <div className="border rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-4">Feedback</h2>
+            <FeedbackForm
+              title="Help Us Improve"
+              description="We value your feedback! Let us know how we can improve the application."
+              showJobSelection={true}
+              onSubmit={async (data) => {
+                // Handle feedback submission here
+                console.log('Feedback submitted:', data);
+                // You can add API call here to save feedback
+                toast({
+                  title: 'Feedback Submitted',
+                  description: 'Thank you for your feedback! We appreciate your input.',
+                });
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

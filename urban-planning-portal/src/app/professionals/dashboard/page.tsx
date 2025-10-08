@@ -266,107 +266,103 @@ export default function DashboardPage() {
       {/* Property Search Section */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Search a property to create a new job</h2>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Enter address (e.g., 9 Viola Place, Greystanes)"
-                value={address}
-                onChange={e => setAddress(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                className="flex-1"
-              />
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="Enter address (e.g., 9 Viola Place, Greystanes)"
+            value={address}
+            onChange={e => setAddress(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            className="flex-1"
+          />
+          <Button
+            onClick={handleSearch}
+            disabled={loading}
+            className="bg-[#323A40] hover:bg-[#323A40]/90 text-white"
+          >
+            {loading ? <Loader2 className="animate-spin" /> : 'Search'}
+          </Button>
+        </div>
+
+        {error && <div className="mt-4 text-red-500">{error}</div>}
+
+        {results && (
+          <div className="mt-6 space-y-6">
+            {/* Principal Planning Layers */}
+            {results.planningLayers.epiLayers.length > 0 && (
+              <Card className="border border-gray-200">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <h3 className="font-semibold">Principal Planning Layers</h3>
+                </CardHeader>
+                <CardContent className="divide-y pt-4">
+                  {results.planningLayers.epiLayers.map((result, index) => (
+                    <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
+                      <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
+                      {renderAttributes(result.attributes, result.layer)}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Protection Layers */}
+            {results.planningLayers.protectionLayers.length > 0 && (
+              <Card className="border border-gray-200">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <h3 className="font-semibold">Protection Layers</h3>
+                </CardHeader>
+                <CardContent className="divide-y pt-4">
+                  {results.planningLayers.protectionLayers.map((result, index) => (
+                    <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
+                      <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
+                      {renderAttributes(result.attributes, result.layer)}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Local Provisions */}
+            {results.planningLayers.localProvisionsLayers.length > 0 && (
+              <Card className="border border-gray-200">
+                <CardHeader className="bg-[#323A40] text-white">
+                  <h3 className="font-semibold">Local Provisions</h3>
+                </CardHeader>
+                <CardContent className="divide-y pt-4">
+                  {results.planningLayers.localProvisionsLayers.map((result, index) => (
+                    <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
+                      <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
+                      {renderAttributes(result.attributes, result.layer)}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Create Job Button */}
+            <div className="flex justify-end">
               <Button
-                onClick={handleSearch}
-                disabled={loading}
-                className="bg-[#323A40] hover:bg-[#323A40]/90 text-white"
+                onClick={handleCreateJob}
+                disabled={isCreatingJob}
+                className="bg-[#532200] hover:bg-[#532200]/90 text-white"
               >
-                {loading ? <Loader2 className="animate-spin" /> : 'Search'}
+                {isCreatingJob ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Job...
+                  </>
+                ) : (
+                  'Create Job'
+                )}
               </Button>
             </div>
-
-            {error && <div className="mt-4 text-red-500">{error}</div>}
-
-            {results && (
-              <div className="mt-6 space-y-6">
-                {/* Principal Planning Layers */}
-                {results.planningLayers.epiLayers.length > 0 && (
-                  <Card className="border border-gray-200">
-                    <CardHeader className="bg-[#323A40] text-white">
-                      <h3 className="font-semibold">Principal Planning Layers</h3>
-                    </CardHeader>
-                    <CardContent className="divide-y pt-4">
-                      {results.planningLayers.epiLayers.map((result, index) => (
-                        <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
-                          <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
-                          {renderAttributes(result.attributes, result.layer)}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Protection Layers */}
-                {results.planningLayers.protectionLayers.length > 0 && (
-                  <Card className="border border-gray-200">
-                    <CardHeader className="bg-[#323A40] text-white">
-                      <h3 className="font-semibold">Protection Layers</h3>
-                    </CardHeader>
-                    <CardContent className="divide-y pt-4">
-                      {results.planningLayers.protectionLayers.map((result, index) => (
-                        <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
-                          <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
-                          {renderAttributes(result.attributes, result.layer)}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Local Provisions */}
-                {results.planningLayers.localProvisionsLayers.length > 0 && (
-                  <Card className="border border-gray-200">
-                    <CardHeader className="bg-[#323A40] text-white">
-                      <h3 className="font-semibold">Local Provisions</h3>
-                    </CardHeader>
-                    <CardContent className="divide-y pt-4">
-                      {results.planningLayers.localProvisionsLayers.map((result, index) => (
-                        <div key={`${result.layer}-${index}`} className="py-4 first:pt-0 last:pb-0">
-                          <h4 className="font-medium text-[#532200] mb-2">{result.layer}</h4>
-                          {renderAttributes(result.attributes, result.layer)}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Create Job Button */}
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleCreateJob}
-                    disabled={isCreatingJob}
-                    className="bg-[#532200] hover:bg-[#532200]/90 text-white"
-                  >
-                    {isCreatingJob ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Job...
-                      </>
-                    ) : (
-                      'Create Job'
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
 
       {/* Job status section */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Job Status</h2>
+        <h2 className="text-2xl font-bold">Select a Job to see its Status</h2>
         {jobs.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center">

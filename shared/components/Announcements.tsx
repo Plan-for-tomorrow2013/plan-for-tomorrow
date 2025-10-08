@@ -84,18 +84,15 @@ export function Announcements({
 
   return (
     <Card className={className}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Announcements</CardTitle>
-          {isAdmin && onAddAnnouncement && (
+      <CardContent className="pt-6">
+        {isAdmin && onAddAnnouncement && (
+          <div className="flex items-center justify-end mb-4">
             <Button variant="outline" size="sm" onClick={onAddAnnouncement}>
               <Plus className="h-4 w-4 mr-2" />
               New
             </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
+          </div>
+        )}
         <div className="space-y-4">
           {announcements
             .slice() // copy array
@@ -104,7 +101,6 @@ export function Announcements({
             .map((announcement) => (
             <div key={announcement.id} className="border-b pb-4 last:border-0 last:pb-0">
               <div className="flex items-start justify-between">
-                <h3 className="font-medium">{announcement.title}</h3>
                 <span className="text-sm text-muted-foreground">
                   {new Date(announcement.date).toLocaleDateString()}
                 </span>

@@ -25,7 +25,27 @@ import {
   ChevronLeft,
   ChevronRight,
 } from '@shared/components/ui/icons';
-import { ShoppingCart } from 'lucide-react';
+import { 
+  ShoppingCart,
+  Loader2,
+  DollarSign,
+  Leaf,
+  Recycle,
+  Calculator,
+  Droplets,
+  Car,
+  MapPin,
+  Flame,
+  Waves,
+  Volume2,
+  TreePine,
+  Building,
+  TreePine as TreeIcon,
+  Mountain,
+  Scale,
+  Shield,
+  Search
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
 import {
   Select,
@@ -35,7 +55,6 @@ import {
   SelectValue,
 } from '@shared/components/ui/select';
 import { useJobs } from '@shared/hooks/useJobs';
-import Link from 'next/link';
 import { Alert, AlertDescription } from '@shared/components/ui/alert';
 import { Document, DOCUMENT_TYPES } from '@shared/types/documents';
 import { DocumentWithStatus } from '@shared/types/documents';
@@ -43,7 +62,8 @@ import { Input } from '@shared/components/ui/input';
 import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from '@shared/components/ui/use-toast';
 import { PropertyInfo, PropertyDataShape } from '@shared/components/PropertyInfo';
-import { DetailedSiteDetails, SiteDetails } from '@shared/components/DetailedSiteDetails';
+import { DetailedSiteDetails } from '@shared/components/DetailedSiteDetails';
+import { SiteDetails } from '@shared/types/site-details';
 import { ConsultantStatus } from '@shared/components/ConsultantStatus';
 import { Job } from '@shared/types/jobs';
 import {
@@ -54,7 +74,6 @@ import {
   ReportType,
 } from '@shared/utils/report-utils';
 import { getDocumentDisplayStatus } from '@shared/utils/report-utils';
-import { Loader2 } from 'lucide-react';
 import { ConsultantProvider, useConsultants } from '@shared/contexts/consultant-context';
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context';
@@ -69,7 +88,6 @@ import {
   downloadDocumentFromApi,
 } from '@shared/utils/document-utils';
 import { LEPFilter } from '@shared/components/LEPFilter';
-import { DollarSign } from 'lucide-react';
 import { CategoryCard } from '@shared/components/CategoryCard';
 import { SearchBar } from '@shared/components/SearchBar';
 
@@ -77,112 +95,112 @@ const categories = [
   {
     id: 'nathers-basix',
     title: 'NatHERS & BASIX',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Leaf,
     href: '/professionals/consultants/nathers-basix',
     description: 'Energy efficiency and sustainability consultants',
   },
   {
     id: 'waste-management',
     title: 'Waste Management',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Recycle,
     href: '/professionals/consultants/waste-management',
     description: 'Waste management consultants and services',
   },
   {
     id: 'cost-estimate',
     title: 'Cost Estimate',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Calculator,
     href: '/professionals/consultants/cost-estimate',
     description: 'Cost estimation and quantity surveying',
   },
   {
     id: 'stormwater',
     title: 'Stormwater',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Droplets,
     href: '/professionals/consultants/stormwater',
     description: 'Stormwater management consultants',
   },
   {
     id: 'traffic',
     title: 'Traffic',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Car,
     href: '/professionals/consultants/traffic',
     description: 'Traffic impact assessment consultants',
   },
   {
     id: 'surveyor',
     title: 'Surveyor',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: MapPin,
     href: '/professionals/consultants/surveyor',
     description: 'Land and construction surveyors',
   },
   {
     id: 'bushfire',
     title: 'Bushfire',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Flame,
     href: '/professionals/consultants/bushfire',
     description: 'Bushfire assessment consultants',
   },
   {
     id: 'flooding',
     title: 'Flooding',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Waves,
     href: '/professionals/consultants/flooding',
     description: 'Flood assessment consultants',
   },
   {
     id: 'acoustic',
     title: 'Acoustic',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Volume2,
     href: '/professionals/consultants/acoustic',
     description: 'Acoustic assessment consultants',
   },
   {
     id: 'landscaping',
     title: 'Landscaping',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: TreePine,
     href: '/professionals/consultants/landscaping',
     description: 'Landscape architects and consultants',
   },
   {
     id: 'heritage',
     title: 'Heritage',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Building,
     href: '/professionals/consultants/heritage',
     description: 'Heritage impact consultants',
   },
   {
     id: 'biodiversity',
     title: 'Biodiversity',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: TreeIcon,
     href: '/professionals/consultants/biodiversity',
     description: 'Biodiversity assessment consultants',
   },
   {
     id: 'lawyer',
     title: 'Lawyer',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Scale,
     href: '/professionals/consultants/lawyer',
     description: 'Planning and property lawyers',
   },
   {
     id: 'certifiers',
     title: 'Certifiers',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Shield,
     href: '/professionals/consultants/certifiers',
     description: 'Building certifiers and inspectors',
   },
   {
     id: 'arborist',
     title: 'Arborist',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: TreeIcon,
     href: '/professionals/consultants/arborist',
     description: 'Tree assessment and arborist services',
   },
   {
     id: 'geotechnical',
     title: 'Geotechnical',
-    icon: '/placeholder.svg?height=100&width=100',
+    icon: Mountain,
     href: '/professionals/consultants/geotechnical',
     description: 'Geotechnical assessment consultants',
   },
@@ -348,6 +366,7 @@ const formatDate = (dateString: string) => {
 
 function normalizeSiteDetails(data: any): SiteDetails {
   return {
+    lotType: data?.lotType || '',
     siteArea: data?.siteArea || '',
     frontage: data?.frontage || '',
     depth: data?.depth || '',
@@ -355,15 +374,28 @@ function normalizeSiteDetails(data: any): SiteDetails {
     orientation: data?.orientation || '',
     soilType: data?.soilType || '',
     vegetation: data?.vegetation || '',
+    primaryStreetWidth: data?.primaryStreetWidth || '',
+    siteDepth: data?.siteDepth || '',
+    secondaryStreetWidth: data?.secondaryStreetWidth || '',
+    gradient: data?.gradient || '',
+    highestRL: data?.highestRL || '',
+    lowestRL: data?.lowestRL || '',
+    fallAmount: data?.fallAmount || '',
+    currentLandUse: data?.currentLandUse || '',
+    existingDevelopmentDetails: data?.existingDevelopmentDetails || '',
+    northDevelopment: data?.northDevelopment || '',
+    southDevelopment: data?.southDevelopment || '',
+    eastDevelopment: data?.eastDevelopment || '',
+    westDevelopment: data?.westDevelopment || '',
+    bushfireProne: data?.bushfireProne || false,
+    floodProne: data?.floodProne || false,
+    acidSulfateSoils: data?.acidSulfateSoils || false,
+    biodiversity: data?.biodiversity || false,
+    salinity: data?.salinity || false,
+    landslip: data?.landslip || false,
     heritage: data?.heritage || '',
-    floodProne: data?.floodProne || '',
-    bushfireProne: data?.bushfireProne || '',
     contamination: data?.contamination || '',
     otherConstraints: data?.otherConstraints || '',
-    adjoiningNorth: data?.adjoiningNorth || '',
-    adjoiningSouth: data?.adjoiningSouth || '',
-    adjoiningEast: data?.adjoiningEast || '',
-    adjoiningWest: data?.adjoiningWest || '',
   };
 }
 
@@ -1276,20 +1308,15 @@ function JobConsultants({ jobId }: { jobId: string }): JSX.Element {
         {/* Category Tiles Section */}
         <div className="max-w-6xl mx-auto my-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/*
-              If you see a linter error on the Link component below, it is likely due to a mismatch between your Next.js, React, and @types/react versions. 
-              Ensure you are using compatible versions. The code below is correct for Next.js 13+ app directory.
-            */}
             {jobCategories.map(category => (
-              <Link key={category.id} href={category.href}>
-                <CategoryCard
-                  title={category.title}
-                  icon={category.icon}
-                  href={category.href}
-                  description={category.description}
-                  quoteRequested={hasQuoteRequestForCategory(category.id)}
-                />
-              </Link>
+              <CategoryCard
+                key={category.id}
+                title={category.title}
+                icon={category.icon}
+                href={category.href}
+                description={category.description}
+                quoteRequested={hasQuoteRequestForCategory(category.id)}
+              />
             ))}
           </div>
         </div>

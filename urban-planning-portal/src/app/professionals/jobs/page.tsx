@@ -101,10 +101,9 @@ export default function JobsPage() {
 
       <div className="mb-6">
         <Input
-          placeholder="Search jobs..."
+          placeholder="Start typing to find a job..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="max-w-md"
         />
       </div>
 

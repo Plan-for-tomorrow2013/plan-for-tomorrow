@@ -1518,6 +1518,14 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         </Alert>
       )}
       {/* Main Content */}
+      <h1 className="text-3xl font-bold">Job Details</h1>
+      <div className="h-1 bg-yellow-400 w-full my-2"></div>
+      <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+        <p className="text-lg mb-4">
+          Here you can find the details of the job you have selected. You can view property
+          information, and view and edit site details and documents. 
+        </p>
+      </div>
       <div className="space-y-6">
         {/* Property Info Section */}
         <div className="border rounded-lg p-4">
@@ -1580,6 +1588,14 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         </div>
 
         {/* Initial Assessment Section */}
+        <h1 className="text-3xl font-bold">Do It Yourself</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            Fill in the below fields to ensure you have all of the required details to start your design. <br>
+            </br>If you are feeling brave, you can also use our chatbot to assist you in creating your Initial Assessment.
+          </p>
+        </div>
         <div className="border rounded-lg p-4">
           <button
             onClick={toggleInitialAssessment}
@@ -1603,7 +1619,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
           )}
         </div>
 
-        {/* Statement of Environmental Effects Generator Section */}
+        {/* Initial Assessment Generator Section */}
         <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
           {/* The actual content that will be revealed */}
           <div
@@ -1649,6 +1665,16 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         )}
 
         {/* Pre-prepared Assessments Section */}
+        <h1 className="text-3xl font-bold">Do It With You</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            We do the hard work with you. You have a development that is a bit more complicated than
+            a standard development, but you know we have a template for that. Purchase one of our
+            pre-prepared assessments and we will work with you to complete the report.
+          </p>
+        </div>
+
         <div className="border rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-4">Pre-prepared Assessments</h2>
           {isPrePreparedLoading ? (
@@ -1672,6 +1698,14 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
           )}
         </div>
 
+        <h1 className="text-3xl font-bold">Do It For You</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+            We do the hard work for you. Let us prepare an Initial Assessment for you. Purchase an assessment and we will
+            give you all you need to get started. 
+          </p>
+        </div>
         {/* Custom Assessment Section */}
         <div className="border rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-4">Custom Assessment</h2>

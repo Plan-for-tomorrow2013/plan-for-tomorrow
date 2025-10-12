@@ -4,18 +4,26 @@ import { Input } from "@shared/components/ui/input"
 import { Label } from "@shared/components/ui/label"
 
 export interface InitialAssessment {
-  frontSetbackR: string
-  frontSetbackP: string
-  sideSetback1R: string
-  sideSetback1P: string
-  sideSetback2R: string
-  sideSetback2P: string
-  rearSetbackR: string
-  rearSetbackP: string
+  maxHeightR: string
+  maxGFAR: string
+  frontSetbackN1R: string
+  frontSetbackN2R: string
+  frontSetbackSRR: string
+  frontSetbackPRR: string
+  sideSetbackGF1R: string
+  sideSetbackGF2R: string
+  sideSetbackU1R: string
+  sideSetbackU2R: string
+  rearSetbackGFR: string
+  rearSetbackUFR: string
   siteCoverageR: string
-  siteCoverageP: string
   landscapeAreaR: string
-  landscapeAreaP: string
+  deepSoilAreaR: string
+  privateOpenSpaceR: string
+  maxCutR: string
+  maxFillR: string
+  garageSetbackR: string
+  OtherRequirementsR: string
 }
 
 interface DetailedInitialAssessmentProps {
@@ -46,111 +54,183 @@ export function DetailedInitialAssessment({
       <CardContent className="p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="frontSetbackR">Front Setback (Required)</Label>
+            <Label htmlFor="maxHeightR">Max Height</Label>
             <Input
-              id="frontSetbackR"
-              value={initialAssessment.frontSetbackR}
-              onChange={(e) => handleChange('frontSetbackR', e.target.value)}
+              id="maxHeightR"
+              value={initialAssessment.maxHeightR}
+              onChange={(e) => handleChange('maxHeightR', e.target.value)}
               readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="frontSetbackP">Front Setback (Proposed)</Label>
+            <Label htmlFor="maxGFAR">Max Gross Floor Area</Label>
             <Input
-              id="frontSetbackP"
-              value={initialAssessment.frontSetbackP}
-              onChange={(e) => handleChange('frontSetbackP', e.target.value)}
+              id="maxGFAR"
+              value={initialAssessment.maxGFAR}
+              onChange={(e) => handleChange('maxGFAR', e.target.value)}
               readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sideSetback1R">Side Setback 1 (Required)</Label>
+            <Label htmlFor="frontSetbackN1R">Front Setback Neighbour 1</Label>
             <Input
-              id="sideSetback1R"
-              value={initialAssessment.sideSetback1R}
-              onChange={(e) => handleChange('sideSetback1R', e.target.value)}
+              id="frontSetbackN1R"
+              value={initialAssessment.frontSetbackN1R}
+              onChange={(e) => handleChange('frontSetbackN1R', e.target.value)}
               readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sideSetback1P">Side Setback 1 (Proposed)</Label>
+            <Label htmlFor="frontSetbackN2R">Front Setback Neighbour 2</Label>
             <Input
-              id="sideSetback1P"
-              value={initialAssessment.sideSetback1P}
-              onChange={(e) => handleChange('sideSetback1P', e.target.value)}
+              id="frontSetbackN2R"
+              value={initialAssessment.frontSetbackN2R}
+              onChange={(e) => handleChange('frontSetbackN2R', e.target.value)}
               readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sideSetback2R">Side Setback 2 (Required)</Label>
+            <Label htmlFor="frontSetbackPRR">Front Setback Primary Road</Label>
             <Input
-              id="sideSetback2R"
-              value={initialAssessment.sideSetback2R}
-              onChange={(e) => handleChange('sideSetback2R', e.target.value)}
-              disabled={readOnly}
+              id="frontSetbackPRR"
+              value={initialAssessment.frontSetbackSRR}
+              onChange={(e) => handleChange('frontSetbackPRR', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sideSetback2P">Side Setback 2 (Proposed)</Label>
+            <Label htmlFor="frontSetbackSRR">Front Setback Secondary Road</Label>
             <Input
-              id="sideSetback2P"
-              value={initialAssessment.sideSetback2P}
-              onChange={(e) => handleChange('sideSetback2P', e.target.value)}
-              disabled={readOnly}
+              id="frontSetbackSRR"
+              value={initialAssessment.frontSetbackPRR}
+              onChange={(e) => handleChange('frontSetbackSRR', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rearSetbackR">Rear Setback (Required)</Label>
+            <Label htmlFor="sideSetbackGF1R">Side Setback Ground Floor 1</Label>
             <Input
-              id="rearSetbackR"
-              value={initialAssessment.rearSetbackR}
-              onChange={(e) => handleChange('rearSetbackR', e.target.value)}
-              disabled={readOnly}
+              id="sideSetbackGF1R"
+              value={initialAssessment.sideSetbackGF1R}
+              onChange={(e) => handleChange('sideSetbackGF1R', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rearSetbackP">Rear Setback (Proposed)</Label>
+            <Label htmlFor="sideSetbackGF2R">Side Setback Ground Floor 2</Label>
             <Input
-              id="rearSetbackP"
-              value={initialAssessment.rearSetbackP}
-              onChange={(e) => handleChange('rearSetbackP', e.target.value)}
-              disabled={readOnly}
+              id="sideSetbackGF2R"
+              value={initialAssessment.sideSetbackGF2R}
+              onChange={(e) => handleChange('sideSetbackGF2R', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="siteCoverageR">Site Coverage (Required)</Label>
+            <Label htmlFor="sideSetbackU1R">Side Setback Upper Floor 1</Label>
+            <Input
+              id="sideSetbackU1R"
+              value={initialAssessment.sideSetbackU1R}
+              onChange={(e) => handleChange('sideSetbackU1R', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sideSetbackU2R">Side Setback Upper Floor 2</Label>
+            <Input
+              id="sideSetbackU2R"
+              value={initialAssessment.sideSetbackU2R}
+              onChange={(e) => handleChange('sideSetbackU2R', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rearSetbackGFR">Rear Setback Ground Floor</Label>
+            <Input
+              id="rearSetbackGFR"
+              value={initialAssessment.rearSetbackGFR}
+              onChange={(e) => handleChange('rearSetbackGFR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rearSetbackUFR">Rear Setback Upper Floor</Label>
+            <Input
+              id="rearSetbackUFR"
+              value={initialAssessment.rearSetbackUFR}
+              onChange={(e) => handleChange('rearSetbackUFR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="siteCoverageR">Site Coverage</Label>
             <Input
               id="siteCoverageR"
               value={initialAssessment.siteCoverageR}
               onChange={(e) => handleChange('siteCoverageR', e.target.value)}
-              disabled={readOnly}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="siteCoverageP">Site Coverage (Proposed)</Label>
-            <Input
-              id="siteCoverageP"
-              value={initialAssessment.siteCoverageP}
-              onChange={(e) => handleChange('siteCoverageP', e.target.value)}
-              disabled={readOnly}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="landscapeAreaR">Landscape Area (Required)</Label>
+            <Label htmlFor="landscapeAreaR">Landscape Area</Label>
             <Input
               id="landscapeAreaR"
               value={initialAssessment.landscapeAreaR}
               onChange={(e) => handleChange('landscapeAreaR', e.target.value)}
-              disabled={readOnly}
+              readOnly={readOnly}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="landscapeAreaP">Landscape Area (Proposed)</Label>
+            <Label htmlFor="deepSoilAreaR">Deep Soil Area</Label>
             <Input
-              id="landscapeAreaP"
-              value={initialAssessment.landscapeAreaP}
-              onChange={(e) => handleChange('landscapeAreaP', e.target.value)}
-              disabled={readOnly}
+              id="deepSoilAreaR"
+              value={initialAssessment.deepSoilAreaR}
+              onChange={(e) => handleChange('deepSoilAreaR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+              <Label htmlFor="privateOpenSpaceR">Private Open Space</Label>
+            <Input
+              id="privateOpenSpaceR"
+              value={initialAssessment.privateOpenSpaceR}
+              onChange={(e) => handleChange('privateOpenSpaceR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="maxCutR">Max Cut</Label>
+            <Input
+              id="maxCutR"
+              value={initialAssessment.maxCutR}
+              onChange={(e) => handleChange('maxCutR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="maxFillR">Max Fill</Label>
+            <Input
+              id="maxFillR"
+              value={initialAssessment.maxFillR}
+              onChange={(e) => handleChange('maxFillR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="garageSetbackR">Garage Setback</Label>
+            <Input
+              id="garageSetbackR"
+              value={initialAssessment.garageSetbackR}
+              onChange={(e) => handleChange('garageSetbackR', e.target.value)}
+              readOnly={readOnly}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="OtherRequirementsR">Other Requirements</Label>
+            <Input
+              id="OtherRequirementsR"
+              value={initialAssessment.OtherRequirementsR}
+              onChange={(e) => handleChange('OtherRequirementsR', e.target.value)}
+              readOnly={readOnly}
             />
           </div>
         </div>

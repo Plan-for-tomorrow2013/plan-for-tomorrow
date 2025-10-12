@@ -41,15 +41,16 @@ export function Navigation({ role, className }: NavigationProps) {
       href: `${prefix}/dashboard`,
       icon: Home
     },
-    {
-      title: "Jobs",
-      icon: Briefcase,
-      href: `${prefix}/jobs`,
-    },
+
     {
       title: "Knowledge Base",
       href: `${prefix}/knowledge-base`,
       icon: BookOpen
+    },
+    {
+      title: "Jobs",
+      icon: Briefcase,
+      href: `${prefix}/jobs`,
     },
     {
       title: "Initial Assessment",
@@ -57,15 +58,16 @@ export function Navigation({ role, className }: NavigationProps) {
       icon: ClipboardCheck
     },
     {
-      title: "Report Writer",
-      href: `${prefix}/report-writer`,
-      icon: FileText
-    },
-    {
       title: "Design Check",
       icon: FileCheck,
       href: `${prefix}/design-check`,
     },
+    {
+      title: "Report Writer",
+      href: `${prefix}/report-writer`,
+      icon: FileText
+    },
+
     {
       title: "Consultants",
       icon: Calculator,

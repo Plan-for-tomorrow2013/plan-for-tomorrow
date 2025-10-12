@@ -59,6 +59,7 @@ import { Loader2 } from 'lucide-react';
 import { DocumentUpload } from '@shared/components/DocumentUpload';
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'; // Import SiteDetailsProvider and useSiteDetails
+import { InitialAssessmentProvider, useInitialAssessment } from '@shared/contexts/initial-assessment-context';
 import { AlertTitle } from '@shared/components/ui/alert';
 import camelcaseKeys from 'camelcase-keys';
 import { DocumentTile } from '@shared/components/DocumentTile';
@@ -240,28 +241,13 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     saveSiteDetails,
     hasUnsavedChanges: hasUnsavedSiteDetails,
   } = useSiteDetails();
+  const {
+    initialAssessment,
+    updateInitialAssessment,
+    saveInitialAssessment,
+    hasUnsavedChanges: hasUnsavedInitialAssessment,
+  } = useInitialAssessment();
   const [documentError, setDocumentError] = useState<string | null>(null);
-
-  // Add initialAssessment state with other state declarations
-  const [initialAssessment, setInitialAssessment] = useState<InitialAssessment>({
-    frontSetbackR: '',
-    frontSetbackP: '',
-    sideSetback1R: '',
-    sideSetback1P: '',
-    sideSetback2R: '',
-    sideSetback2P: '',
-    rearSetbackR: '',
-    rearSetbackP: '',
-    siteCoverageR: '',
-    siteCoverageP: '',
-    landscapeAreaR: '',
-    landscapeAreaP: '',
-  });
-
-  // Add handleInitialAssessmentChange with other handlers
-  const handleInitialAssessmentChange = (details: InitialAssessment) => {
-    setInitialAssessment(details);
-  };
 
   // Add transformUploadedDocuments function inside component
   const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
@@ -870,6 +856,16 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
     saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails }); // Use jobId prop
   };
 
+  // Save function for Initial Assessment
+  const handleSaveInitialAssessment = () => {
+    if (!jobId) {
+      toast({ title: 'Error', description: 'No job selected.', variant: 'destructive' });
+      return;
+    }
+    console.log('Saving Initial Assessment:', initialAssessment);
+    saveInitialAssessment();
+  };
+
   // --- Mutation for Purchasing Pre-prepared Initial Assessments ---
   const purchasePrePreparedInitialMutation = useMutation<
     any,
@@ -1444,6 +1440,10 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
       handleSaveSiteDetails(); // Triggers mutation (uses jobId prop internally)
       changesSaved = true;
     }
+    if (hasUnsavedInitialAssessment) {
+      handleSaveInitialAssessment(); // Triggers save for initial assessment
+      changesSaved = true;
+    }
 
     if (changesSaved) {
       setFormState(updatedFormState);
@@ -1593,7 +1593,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
           <p className="text-lg mb-4">
             Fill in the below fields to ensure you have all of the required details to start your design. <br>
-            </br>If you are feeling brave, you can also use our chatbot to assist you in creating your Initial Assessment.
+            </br>If you are feeling brave, you can also use our chatbot to assist you in creating your Initial Assessment. <br></br> PS, its the same as navigating to the Councils website and searching a key word in the DCP. Just all in the one spot!
           </p>
         </div>
         <div className="border rounded-lg p-4">
@@ -1612,7 +1612,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
             <div className="mt-4">
               <DetailedInitialAssessment
                 initialAssessment={initialAssessment}
-                onInitialAssessmentChange={handleInitialAssessmentChange}
+                onInitialAssessmentChange={updateInitialAssessment}
                 readOnly={isReadOnly}
               />
             </div>
@@ -1713,7 +1713,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
         </div>
 
         {/* Save Changes Button */}
-        {(Object.values(formState).some(s => s.hasUnsavedChanges) || hasUnsavedSiteDetails) && (
+        {(Object.values(formState).some(s => s.hasUnsavedChanges) || hasUnsavedSiteDetails || hasUnsavedInitialAssessment) && (
           <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
             Save Changes
           </Button>
@@ -1728,6 +1728,7 @@ function JobInitialAssessment({ jobId }: { jobId: string }): JSX.Element {
 export default function InitialAssessmentPage() {
   const { jobs, isLoading: isLoadingJobs, error: jobsError } = useJobs();
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>(undefined);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const router = useRouter();
 
   // Effect to set initial job ID from URL query param
@@ -1751,6 +1752,10 @@ export default function InitialAssessmentPage() {
     // Optional: handle case where selection is cleared
     // else { router.push('/professionals/initial-assessment', { scroll: false }); }
   }, [selectedJobId, router]);
+
+  const toggleFeedback = () => {
+    setIsFeedbackOpen(prev => !prev);
+  };
 
   return (
     <div className="space-y-6">
@@ -1784,32 +1789,70 @@ export default function InitialAssessmentPage() {
         // *** Wrap the JobReportWriter with Providers ***
         <DocumentProvider jobId={selectedJobId}>
           <SiteDetailsProvider jobId={selectedJobId}>
-            <JobInitialAssessment jobId={selectedJobId} />
+            <InitialAssessmentProvider jobId={selectedJobId}>
+              <JobInitialAssessment jobId={selectedJobId} />
+            </InitialAssessmentProvider>
           </SiteDetailsProvider>
         </DocumentProvider>
       ) : (
                 <div className="space-y-6">
           <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-            <p>Please select a job from the dropdown above to access Initial Assessment.</p>
+            <p>Please select a job from the dropdown above to access the Initial Assessment for your Job.</p>
           </div>
+
+   {/* About Initial Assessment Section */}
+          <h1 className="text-3xl font-bold">About Initial Assessments</h1>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+        <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+          <p className="text-lg mb-4">
+          <p>An initial assessment of a site and the rules for development is important because it ensures that the proposed development is feasible, compliant, and sustainable before significant time and resources are invested.</p>
+          <br></br>
+          <p> An initial assessment is essential for:</p>
+          <br></br>
+          <p>1. Identifying Development Constraints</p>
+          <p>The site may have zoning restrictions, heritage overlays, bushfire risk, or flood hazards that could limit development options. This can immediately decide between the application of a CDC or DA pathway.</p>
+          <br></br>
+          <p>2. Ensuring Compliance with Planning Regulations</p>
+          <p>Different Councils have different planning controls that dictate what can be built, how large it can be, and how it must be designed. A review of the LEPs (Local Environmental Plans), DCPs (Development Control Plans), and SEPPs (State Environmental Planning Policies) ensures compliance right from the start.</p>
+          <br></br>
+          <p>4. Evaluating Development Potential and Feasibility</p>
+          <p>An initial assessment helps determine the permissible land uses, maximum allowable height and floor space, setbacks, landscaping and parking requirements (and more!).</p>
+          <br></br>
+          <p>5. Avoiding Costly Delays and Redesigns</p>
+          <p>Identifying what you details need to provide early in the process helps streamline the development application (DA) or complying development certificate (CDC) process by addressing potential objections upfront.</p>
+          <br></br>
+          <p>To assist you with the preparation of your development, we have prepared a BRIEF guide to the most common relevant building controls and a questionnaire to use as a checklist (it doesn’t cover every situation!). If your development does not “fit” within these guidelines or you have further questions, then please email us and we will be happy to have a look at your site for you. This checklist, however, should be your first “check”.</p>
+        </p>
+        </div>
 
           {/* Feedback Form Section */}
           <div className="border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">Feedback</h2>
-            <FeedbackForm
-              title="Help Us Improve"
-              description="We value your feedback! Let us know how we can improve the application."
-              showJobSelection={true}
-              onSubmit={async (data) => {
-                // Handle feedback submission here
-                console.log('Feedback submitted:', data);
-                // You can add API call here to save feedback
-                toast({
-                  title: 'Feedback Submitted',
-                  description: 'Thank you for your feedback! We appreciate your input.',
-                });
-              }}
-            />
+            <button onClick={toggleFeedback} className="flex items-center justify-between w-full">
+              <h2 className="text-xl font-semibold">Feedback</h2>
+              {isFeedbackOpen ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
+            </button>
+            {isFeedbackOpen && (
+              <div className="mt-4">
+                <FeedbackForm
+                  title="Help Us Improve"
+                  description="We value your feedback! Let us know how we can improve the application."
+                  showJobSelection={true}
+                  onSubmit={async (data) => {
+                    // Handle feedback submission here
+                    console.log('Feedback submitted:', data);
+                    // You can add API call here to save feedback
+                    toast({
+                      title: 'Feedback Submitted',
+                      description: 'Thank you for your feedback! We appreciate your input.',
+                    });
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

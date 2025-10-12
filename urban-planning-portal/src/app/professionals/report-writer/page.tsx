@@ -59,6 +59,7 @@ import { Loader2 } from 'lucide-react';
 import { DocumentUpload } from '@shared/components/DocumentUpload';
 import { DocumentProvider, useDocuments } from '@shared/contexts/document-context';
 import { SiteDetailsProvider, useSiteDetails } from '@shared/contexts/site-details-context'; // Import SiteDetailsProvider and useSiteDetails
+import { InitialAssessmentProvider, useInitialAssessment } from '@shared/contexts/initial-assessment-context';
 import { AlertTitle } from '@shared/components/ui/alert';
 import camelcaseKeys from 'camelcase-keys';
 import { DocumentTile } from '@shared/components/DocumentTile';
@@ -255,28 +256,13 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     saveSiteDetails,
     hasUnsavedChanges: hasUnsavedSiteDetails,
   } = useSiteDetails();
+  const {
+    initialAssessment,
+    updateInitialAssessment,
+    saveInitialAssessment,
+    hasUnsavedChanges: hasUnsavedInitialAssessment,
+  } = useInitialAssessment();
   const [documentError, setDocumentError] = useState<string | null>(null);
-
-  // Add initialAssessment state with other state declarations
-  const [initialAssessment, setInitialAssessment] = useState<InitialAssessment>({
-    frontSetbackR: '',
-    frontSetbackP: '',
-    sideSetback1R: '',
-    sideSetback1P: '',
-    sideSetback2R: '',
-    sideSetback2P: '',
-    rearSetbackR: '',
-    rearSetbackP: '',
-    siteCoverageR: '',
-    siteCoverageP: '',
-    landscapeAreaR: '',
-    landscapeAreaP: '',
-  });
-
-  // Add handleInitialAssessmentChange with other handlers
-  const handleInitialAssessmentChange = (details: InitialAssessment) => {
-    setInitialAssessment(details);
-  };
 
   // Add transformUploadedDocuments function inside component
   const transformUploadedDocuments = (documents?: Record<string, any>): Record<string, boolean> => {
@@ -951,6 +937,16 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
     saveSiteDetailsMutation.mutate({ jobId: jobId, details: siteDetails }); // Use jobId prop
   };
 
+  // Save function for Initial Assessment
+  const handleSaveInitialAssessment = () => {
+    if (!jobId) {
+      toast({ title: 'Error', description: 'No job selected.', variant: 'destructive' });
+      return;
+    }
+    console.log('Saving Initial Assessment:', initialAssessment);
+    saveInitialAssessment();
+  };
+
   // --- Mutation for Purchasing Pre-prepared Assessments ---
   const purchasePrePreparedMutation = useMutation<
     any,
@@ -1618,6 +1614,10 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
       handleSaveSiteDetails(); // Triggers mutation (uses jobId prop internally)
       changesSaved = true;
     }
+    if (hasUnsavedInitialAssessment) {
+      handleSaveInitialAssessment(); // Triggers save for initial assessment
+      changesSaved = true;
+    }
 
     if (changesSaved) {
       setFormState(updatedFormState);
@@ -1976,7 +1976,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
             <div className="mt-4">
               <DetailedInitialAssessment
                 initialAssessment={initialAssessment}
-                onInitialAssessmentChange={handleInitialAssessmentChange}
+                onInitialAssessmentChange={updateInitialAssessment}
                 readOnly={isReadOnly}
               />
             </div>
@@ -2070,7 +2070,7 @@ function JobReportWriter({ jobId }: { jobId: string }): JSX.Element {
         </div>
 
         {/* Save Changes Button */}
-        {(Object.values(formState).some(s => s.hasUnsavedChanges) || hasUnsavedSiteDetails) && (
+        {(Object.values(formState).some(s => s.hasUnsavedChanges) || hasUnsavedSiteDetails || hasUnsavedInitialAssessment) && (
           <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
             Save Changes
           </Button>
@@ -2141,7 +2141,9 @@ export default function ReportWriterPage() {
         // *** Wrap the JobReportWriter with Providers ***
         <DocumentProvider jobId={selectedJobId}>
           <SiteDetailsProvider jobId={selectedJobId}>
-            <JobReportWriter jobId={selectedJobId} />
+            <InitialAssessmentProvider jobId={selectedJobId}>
+              <JobReportWriter jobId={selectedJobId} />
+            </InitialAssessmentProvider>
           </SiteDetailsProvider>
         </DocumentProvider>
       ) : (

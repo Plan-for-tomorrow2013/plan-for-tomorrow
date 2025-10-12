@@ -1,5 +1,6 @@
 import { SiteDetails } from "./site-details";
 import { DevelopmentData } from "../../urban-planning-portal/src/app/professionals/SoEE/lib/types";
+import { InitialAssessment } from "../components/DetailedInitialAssessment";
 
 export type ConsultantCategory =
   | "NatHERS & BASIX"
@@ -112,6 +113,7 @@ export interface Job {
     };
   } | null;
   siteDetails?: SiteDetails | null;
+  initialAssessment?: InitialAssessment | null;
   formData?: {
     lotIdentifications?: Array<{
       lotNumber: string;

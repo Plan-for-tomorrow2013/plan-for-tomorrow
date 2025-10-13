@@ -24,7 +24,7 @@ import {
 import { Checkbox } from '@shared/components/ui/checkbox';
 import { Alert, AlertDescription } from '@shared/components/ui/alert';
 import { toast } from '@shared/components/ui/use-toast';
-import { Star, Send, AlertCircle } from 'lucide-react';
+import { Send, AlertCircle } from 'lucide-react';
 import { FeedbackFormSchema, type FeedbackFormData } from '@shared/types/feedback';
 import { useJobs } from '@shared/hooks/useJobs';
 import { Job } from '@shared/types/jobs';
@@ -47,8 +47,6 @@ export function FeedbackForm({
   defaultJobId,
 }: FeedbackFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rating, setRating] = useState<number>(0);
-  const [hoveredRating, setHoveredRating] = useState<number>(0);
   const { jobs, isLoading: isLoadingJobs } = useJobs();
 
   const form = useForm<FeedbackFormData>({
@@ -56,10 +54,8 @@ export function FeedbackForm({
     defaultValues: {
       jobId: defaultJobId || 'none',
       feedbackType: undefined,
-      rating: 0,
       title: '',
       description: '',
-      email: '',
       allowContact: false,
     },
   });
@@ -69,14 +65,11 @@ export function FeedbackForm({
 
     setIsSubmitting(true);
     try {
-      // Update the form data with the current rating
-      const formData = { ...data, rating };
-      
       if (onSubmit) {
-        await onSubmit(formData);
+        await onSubmit(data);
       } else {
         // Default submission behavior - you can customize this
-        console.log('Feedback submitted:', formData);
+        console.log('Feedback submitted:', data);
         toast({
           title: 'Feedback Submitted',
           description: 'Thank you for your feedback! We appreciate your input.',
@@ -85,7 +78,6 @@ export function FeedbackForm({
 
       // Reset form
       form.reset();
-      setRating(0);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       toast({
@@ -96,31 +88,6 @@ export function FeedbackForm({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const renderStars = () => {
-    return Array.from({ length: 5 }, (_, index) => {
-      const starValue = index + 1;
-      const isFilled = starValue <= (hoveredRating || rating);
-      
-      return (
-        <button
-          key={starValue}
-          type="button"
-          className={`p-1 transition-colors ${
-            isFilled ? 'text-yellow-400' : 'text-gray-300'
-          } hover:text-yellow-400`}
-          onClick={() => {
-            setRating(starValue);
-            form.setValue('rating', starValue);
-          }}
-          onMouseEnter={() => setHoveredRating(starValue)}
-          onMouseLeave={() => setHoveredRating(0)}
-        >
-          <Star className="h-6 w-6 fill-current" />
-        </button>
-      );
-    });
   };
 
   const getFeedbackTypeDescription = (type: string) => {
@@ -208,20 +175,6 @@ export function FeedbackForm({
             )}
           </div>
 
-          {/* Rating */}
-          <div className="space-y-2">
-            <Label>Rating *</Label>
-            <div className="flex items-center gap-1">
-              {renderStars()}
-              <span className="ml-2 text-sm text-gray-600">
-                {rating > 0 ? `${rating}/5` : 'Click to rate'}
-              </span>
-            </div>
-            {form.formState.errors.rating && (
-              <p className="text-sm text-red-600">{form.formState.errors.rating.message}</p>
-            )}
-          </div>
-
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
@@ -253,20 +206,6 @@ export function FeedbackForm({
             )}
           </div>
 
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email (Optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              {...form.register('email')}
-            />
-            {form.formState.errors.email && (
-              <p className="text-sm text-red-600">{form.formState.errors.email.message}</p>
-            )}
-          </div>
-
           {/* Allow Contact */}
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -283,7 +222,7 @@ export function FeedbackForm({
           <Button
             type="submit"
             className="w-full"
-            disabled={isSubmitting || rating === 0}
+            disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
@@ -298,13 +237,6 @@ export function FeedbackForm({
             )}
           </Button>
 
-          {/* Help Text */}
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Your feedback helps us improve the application. We appreciate your input!
-            </AlertDescription>
-          </Alert>
         </form>
       </CardContent>
     </Card>

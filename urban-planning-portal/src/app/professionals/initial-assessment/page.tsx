@@ -1804,7 +1804,7 @@ export default function InitialAssessmentPage() {
           <h1 className="text-3xl font-bold">About Initial Assessments</h1>
         <div className="h-1 bg-yellow-400 w-full my-2"></div>
         <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
-          <p className="text-lg mb-4">
+          <div className="text-lg mb-4">
           <p>An initial assessment of a site and the rules for development is important because it ensures that the proposed development is feasible, compliant, and sustainable before significant time and resources are invested.</p>
           <br></br>
           <p> An initial assessment is essential for:</p>
@@ -1821,8 +1821,8 @@ export default function InitialAssessmentPage() {
           <p>5. Avoiding Costly Delays and Redesigns</p>
           <p>Identifying what you details need to provide early in the process helps streamline the development application (DA) or complying development certificate (CDC) process by addressing potential objections upfront.</p>
           <br></br>
-          <p>To assist you with the preparation of your development, we have prepared a BRIEF guide to the most common relevant building controls and a questionnaire to use as a checklist (it doesn’t cover every situation!). If your development does not “fit” within these guidelines or you have further questions, then please email us and we will be happy to have a look at your site for you. This checklist, however, should be your first “check”.</p>
-        </p>
+          <p>To assist you with the preparation of your development, we have prepared a BRIEF guide to the most common relevant building controls and a questionnaire to use as a checklist (it doesn't cover every situation!). If your development does not "fit" within these guidelines or you have further questions, then please email us and we will be happy to have a look at your site for you. This checklist, however, should be your first "check".</p>
+        </div>
         </div>
 
           {/* Feedback Form Section */}

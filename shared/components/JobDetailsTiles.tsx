@@ -128,5 +128,7 @@ export const jobStages: { id: JobStage; label: string; icon: LucideIcon; href: s
   { id: "initial-assessment" as JobStage, label: "Initial Assessment", icon: ClipboardCheck, href: "/initial-assessment" },
   { id: "design-check" as JobStage, label: "Design Check", icon: BarChart3, href: "/design-check" },
   { id: "report-writer" as JobStage, label: "Report Writer", icon: FileText, href: "/report-writer" },
-  { id: "consultants" as JobStage, label: "Consultants", icon: DollarSign, href: "/consultants" }
+  { id: "consultants" as JobStage, label: "Consultants", icon: DollarSign, href: "/consultants" },
+  { id: "certifying-authority" as JobStage, label: "Certifying Authority", icon: DollarSign, href: "/certifying-authority" },
+  { id: "complete" as JobStage, label: "Complete", icon: CheckCircle, href: "/complete" }
 ]

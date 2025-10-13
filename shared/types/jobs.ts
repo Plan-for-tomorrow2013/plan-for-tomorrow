@@ -130,6 +130,38 @@ export interface Job {
     development?: DevelopmentData;
   } | null;
   manualSubmission?: (Record<string, any> & { updatedAt: string }) | null;
+  clientDetails?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    company?: string;
+    address?: string;
+    notes?: string;
+    updatedAt?: string;
+  } | null;
+  messages?: Array<{
+    id: string;
+    content: string;
+    sender: string;
+    senderType: 'professional' | 'client' | 'system';
+    timestamp: string;
+    read?: boolean;
+  }>;
+  designBrief?: {
+    description?: string;
+    requirements?: string;
+    notes?: string;
+    documents?: {
+      [key: string]: {
+        fileName: string;
+        originalName: string;
+        type: string;
+        uploadedAt: string;
+        size: number;
+      };
+    };
+    updatedAt?: string;
+  } | null;
 }
 
 export interface PurchasedPrePreparedAssessments {

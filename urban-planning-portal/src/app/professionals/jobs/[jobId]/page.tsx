@@ -15,6 +15,10 @@ import {
   Building2,
   FolderOpen,
   Undo2,
+  MessageCircle,
+  User,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@shared/components/ui/alert';
 import { Button } from '@shared/components/ui/button';
@@ -67,6 +71,29 @@ export default function JobPage({ params }: Props) {
     setTickedTiles(stored ? JSON.parse(stored) : {});
   }, [tickedTilesKey]);
 
+  // Tiles that should have eye icon (all except client-details and messages)
+  const eyeIconTileIds = [
+    'design-brief',
+    'document-store',
+    'planning-layers',
+    'site-details',
+    'initial-assessment',
+    'design-check',
+    'report-writer',
+    'consultant-store',
+    'certifying-authority',
+    'complete',
+  ];
+
+  // Persistent viewed state for tiles with eye icon
+  const viewedTilesKey = `viewedTiles-${params.jobId}`;
+  const [viewedTiles, setViewedTiles] = useState<{ [tileId: string]: boolean }>({});
+
+  useEffect(() => {
+    const stored = localStorage.getItem(viewedTilesKey);
+    setViewedTiles(stored ? JSON.parse(stored) : {});
+  }, [viewedTilesKey]);
+
   const handleTickTile = (tileId: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const updated = { ...tickedTiles, [tileId]: true };
@@ -79,6 +106,13 @@ export default function JobPage({ params }: Props) {
     const updated = { ...tickedTiles, [tileId]: false };
     setTickedTiles(updated);
     localStorage.setItem(tickedTilesKey, JSON.stringify(updated));
+  };
+
+  const handleToggleEye = (tileId: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const updated = { ...viewedTiles, [tileId]: !viewedTiles[tileId] };
+    setViewedTiles(updated);
+    localStorage.setItem(viewedTilesKey, JSON.stringify(updated));
   };
 
   if (isLoading) {
@@ -115,6 +149,38 @@ export default function JobPage({ params }: Props) {
 
   const tiles = [
     {
+      name: 'Client Details',
+      id: 'client-details',
+      description: 'View client details',
+      icon: User,
+      href: `/professionals/jobs/${params.jobId}/client-details`,
+      color: '#EA6B3D',
+    },
+    {
+      name: 'Messages',
+      id: 'messages',
+      description: 'View messages',
+      icon: MessageCircle,
+      href: `/professionals/jobs/${params.jobId}/messages`,
+      color: '#EA6B3D',
+    },
+    {
+      name: 'Design Brief',
+      id: 'design-brief',
+      description: 'View design brief',
+      icon: FileText,
+      href: `/professionals/jobs/${params.jobId}/design-brief`,
+      color: '#EA6B3D',
+    },
+    {
+      name: 'Document Store',
+      id: 'document-store',
+      description: 'Access and manage documents',
+      icon: FolderOpen,
+      href: `/professionals/jobs/${params.jobId}/document-store`,
+      color: '#EEDA54',
+    },
+    {
       name: 'Planning Layers',
       id: 'planning-layers',
       description: 'View planning layer details and attributes',
@@ -130,14 +196,7 @@ export default function JobPage({ params }: Props) {
       href: `/professionals/jobs/${params.jobId}/site-details`,
       color: '#CDC532',
     },
-    {
-      name: 'Document Store',
-      id: 'document-store',
-      description: 'Access and manage documents',
-      icon: FolderOpen,
-      href: `/professionals/jobs/${params.jobId}/document-store`,
-      color: '#EEDA54',
-    },
+
     {
       name: 'Initial Assessment',
       id: 'initial-assessment',
@@ -203,6 +262,8 @@ export default function JobPage({ params }: Props) {
         {tiles.map(tile => {
           const isTickable = tickableTileIds.includes(tile.id);
           const isTicked = isTickable ? tickedTiles[tile.id] : false;
+          const hasEyeIcon = eyeIconTileIds.includes(tile.id);
+          const isViewed = hasEyeIcon ? viewedTiles[tile.id] : false;
           return (
             <div key={tile.id} className="relative">
               <a href={tile.href}>
@@ -230,6 +291,22 @@ export default function JobPage({ params }: Props) {
                           <Check className="h-5 w-5 text-green-600" />
                         </button>
                       )}
+                    </div>
+                  )}
+                  {/* Eye icon below tick icon on right side */}
+                  {hasEyeIcon && (
+                    <div className="absolute top-12 right-2 z-10">
+                      <button
+                        onClick={handleToggleEye(tile.id)}
+                        className="bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                        title={isViewed ? 'Mark as not viewable' : 'Mark as viewable'}
+                      >
+                        {isViewed ? (
+                          <Eye className="h-5 w-5 text-blue-600" />
+                        ) : (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
                     </div>
                   )}
                   <CardHeader>

@@ -1801,27 +1801,46 @@ export default function InitialAssessmentPage() {
           </div>
 
    {/* About Initial Assessment Section */}
-          <h1 className="text-3xl font-bold">About Initial Assessments</h1>
+          <h1 className="text-3xl font-bold">About Initial Assessment</h1>
         <div className="h-1 bg-yellow-400 w-full my-2"></div>
         <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
           <div className="text-lg mb-4">
-          <p>An initial assessment of a site and the rules for development is important because it ensures that the proposed development is feasible, compliant, and sustainable before significant time and resources are invested.</p>
+          <p>The Initial Assessment platform is your comprehensive toolkit for evaluating development feasibility and compliance before you begin your project. This essential step ensures your proposed development is viable, compliant, and sustainable before significant time and resources are invested.</p>
           <br></br>
-          <p> An initial assessment is essential for:</p>
+          
+          <p><strong>Why Initial Assessments Are Essential:</strong></p>
+          <p>• <strong>Identifying Development Constraints</strong> - Detect zoning restrictions, heritage overlays, bushfire risk, or flood hazards that could limit development options</p>
+          <p>• <strong>Ensuring Compliance</strong> - Review LEPs, DCPs, and SEPPs to ensure your development meets all planning regulations from the start</p>
+          <p>• <strong>Evaluating Feasibility</strong> - Determine permissible land uses, maximum height, floor space, setbacks, and parking requirements</p>
+          <p>• <strong>Avoiding Costly Delays</strong> - Identify potential issues early to streamline your DA or CDC application process</p>
           <br></br>
-          <p>1. Identifying Development Constraints</p>
-          <p>The site may have zoning restrictions, heritage overlays, bushfire risk, or flood hazards that could limit development options. This can immediately decide between the application of a CDC or DA pathway.</p>
+          
+          <p><strong>Our Platform Provides Three Approaches:</strong></p>
           <br></br>
-          <p>2. Ensuring Compliance with Planning Regulations</p>
-          <p>Different Councils have different planning controls that dictate what can be built, how large it can be, and how it must be designed. A review of the LEPs (Local Environmental Plans), DCPs (Development Control Plans), and SEPPs (State Environmental Planning Policies) ensures compliance right from the start.</p>
+          
+          <p><strong>1. Do It Yourself - Interactive Assessment Tools</strong></p>
+          <p>Use our comprehensive questionnaire and chatbot to systematically evaluate your site. Access the same information you'd find on Council websites, all in one convenient location.</p>
           <br></br>
-          <p>4. Evaluating Development Potential and Feasibility</p>
-          <p>An initial assessment helps determine the permissible land uses, maximum allowable height and floor space, setbacks, landscaping and parking requirements (and more!).</p>
+          
+          <p><strong>2. Do It With You - Pre-prepared Assessment Templates</strong></p>
+          <p>Purchase specialized assessment templates for complex developments. We provide the framework and work with you to customize it for your specific project needs.</p>
           <br></br>
-          <p>5. Avoiding Costly Delays and Redesigns</p>
-          <p>Identifying what you details need to provide early in the process helps streamline the development application (DA) or complying development certificate (CDC) process by addressing potential objections upfront.</p>
+          
+          <p><strong>3. Do It For You - Professional Assessment Service</strong></p>
+          <p>Let our experts conduct a complete initial assessment for you. Upload your documents, provide site details, and receive a comprehensive feasibility analysis.</p>
           <br></br>
-          <p>To assist you with the preparation of your development, we have prepared a BRIEF guide to the most common relevant building controls and a questionnaire to use as a checklist (it doesn't cover every situation!). If your development does not "fit" within these guidelines or you have further questions, then please email us and we will be happy to have a look at your site for you. This checklist, however, should be your first "check".</p>
+          
+          <p><strong>Key Features:</strong></p>
+          <p>• Comprehensive site details tracking and analysis</p>
+          <p>• Document management for certificates and plans</p>
+          <p>• Interactive questionnaires and checklists</p>
+          <p>• LEP (Local Environmental Plan) filtering and analysis</p>
+          <p>• Property information integration</p>
+          <p>• Progress tracking and status updates</p>
+          <p>• Integrated payment processing for professional services</p>
+          <br></br>
+          
+          <p>Select a job from the dropdown above to access all features and begin your initial assessment process.</p>
         </div>
         </div>
 

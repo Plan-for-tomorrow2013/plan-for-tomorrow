@@ -62,14 +62,68 @@ export default function JobPage({ params }: Props) {
     'complete',
   ];
 
-  // Persistent tick state for all tickable tiles per job
-  const tickedTilesKey = `tickedTiles-${params.jobId}`;
-  const [tickedTiles, setTickedTiles] = useState<{ [tileId: string]: boolean }>({});
+  // Stage completion state from job data
+  const [completedStages, setCompletedStages] = useState<string[]>(job?.completedStages || []);
+  const [currentActiveStage, setCurrentActiveStage] = useState<string>(job?.currentActiveStage || 'initial-assessment');
+  const [migrationStatus, setMigrationStatus] = useState<'pending' | 'migrating' | 'completed' | 'none'>('pending');
 
+  // Migration logic: check localStorage and migrate to job file
   useEffect(() => {
-    const stored = localStorage.getItem(tickedTilesKey);
-    setTickedTiles(stored ? JSON.parse(stored) : {});
-  }, [tickedTilesKey]);
+    if (!job) return;
+    
+    const tickedTilesKey = `tickedTiles-${params.jobId}`;
+    const storedTickedTiles = localStorage.getItem(tickedTilesKey);
+    
+    if (storedTickedTiles && (!job.completedStages || job.completedStages.length === 0)) {
+      setMigrationStatus('migrating');
+      
+      try {
+        const tickedTiles = JSON.parse(storedTickedTiles);
+        const migratedStages = Object.keys(tickedTiles).filter(tileId => tickedTiles[tileId]);
+        const lastTickedStage = migratedStages[migratedStages.length - 1] || 'initial-assessment';
+        
+        // Update job via API
+        updateJobStages(migratedStages, lastTickedStage)
+          .then(() => {
+            setCompletedStages(migratedStages);
+            setCurrentActiveStage(lastTickedStage);
+            localStorage.removeItem(tickedTilesKey);
+            setMigrationStatus('completed');
+          })
+          .catch(error => {
+            console.error('Migration failed:', error);
+            setMigrationStatus('none');
+          });
+      } catch (error) {
+        console.error('Error parsing localStorage data:', error);
+        setMigrationStatus('none');
+      }
+    } else {
+      // Use existing job data
+      setCompletedStages(job.completedStages || []);
+      setCurrentActiveStage(job.currentActiveStage || 'initial-assessment');
+      setMigrationStatus('none');
+    }
+  }, [job, params.jobId]);
+
+  // Update job stages via API
+  const updateJobStages = async (stages: string[], activeStage: string) => {
+    const response = await fetch(`/api/jobs/${params.jobId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        completedStages: stages,
+        currentActiveStage: activeStage,
+        updatedAt: new Date().toISOString()
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update job stages');
+    }
+    
+    return response.json();
+  };
 
   // Tiles that should have eye icon (all except client-details and messages)
   const eyeIconTileIds = [
@@ -94,18 +148,40 @@ export default function JobPage({ params }: Props) {
     setViewedTiles(stored ? JSON.parse(stored) : {});
   }, [viewedTilesKey]);
 
-  const handleTickTile = (tileId: string) => (e: React.MouseEvent) => {
+  const handleTickTile = (tileId: string) => async (e: React.MouseEvent) => {
     e.preventDefault();
-    const updated = { ...tickedTiles, [tileId]: true };
-    setTickedTiles(updated);
-    localStorage.setItem(tickedTilesKey, JSON.stringify(updated));
+    
+    const newCompletedStages = [...completedStages, tileId];
+    setCompletedStages(newCompletedStages);
+    setCurrentActiveStage(tileId);
+    
+    try {
+      await updateJobStages(newCompletedStages, tileId);
+    } catch (error) {
+      console.error('Failed to update stage:', error);
+      // Revert on error
+      setCompletedStages(completedStages);
+      setCurrentActiveStage(currentActiveStage);
+    }
   };
 
-  const handleUntickTile = (tileId: string) => (e: React.MouseEvent) => {
+  const handleUntickTile = (tileId: string) => async (e: React.MouseEvent) => {
     e.preventDefault();
-    const updated = { ...tickedTiles, [tileId]: false };
-    setTickedTiles(updated);
-    localStorage.setItem(tickedTilesKey, JSON.stringify(updated));
+    
+    const newCompletedStages = completedStages.filter(stage => stage !== tileId);
+    const newActiveStage = newCompletedStages.length > 0 ? newCompletedStages[newCompletedStages.length - 1] : 'initial-assessment';
+    
+    setCompletedStages(newCompletedStages);
+    setCurrentActiveStage(newActiveStage);
+    
+    try {
+      await updateJobStages(newCompletedStages, newActiveStage);
+    } catch (error) {
+      console.error('Failed to update stage:', error);
+      // Revert on error
+      setCompletedStages(completedStages);
+      setCurrentActiveStage(currentActiveStage);
+    }
   };
 
   const handleToggleEye = (tileId: string) => (e: React.MouseEvent) => {
@@ -253,6 +329,24 @@ export default function JobPage({ params }: Props) {
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
+      {migrationStatus === 'migrating' && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <AlertTitle className="text-blue-800">Migrating Data</AlertTitle>
+          <AlertDescription className="text-blue-700">
+            Migrating your stage progress to the new system...
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {migrationStatus === 'completed' && (
+        <Alert className="mb-6 bg-green-50 border-green-200">
+          <AlertTitle className="text-green-800">Migration Complete</AlertTitle>
+          <AlertDescription className="text-green-700">
+            Your stage progress has been successfully migrated!
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Alert className="mb-6 bg-[#EEDA54]/20 border-[#EEDA54]">
         <AlertTitle className="text-[#532200] font-semibold">Job Details</AlertTitle>
         <AlertDescription className="text-[#532200]">{job.address}</AlertDescription>
@@ -261,7 +355,7 @@ export default function JobPage({ params }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tiles.map(tile => {
           const isTickable = tickableTileIds.includes(tile.id);
-          const isTicked = isTickable ? tickedTiles[tile.id] : false;
+          const isTicked = isTickable ? completedStages.includes(tile.id) : false;
           const hasEyeIcon = eyeIconTileIds.includes(tile.id);
           const isViewed = hasEyeIcon ? viewedTiles[tile.id] : false;
           return (

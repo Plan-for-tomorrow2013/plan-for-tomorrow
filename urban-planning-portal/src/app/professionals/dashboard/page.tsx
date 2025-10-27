@@ -67,17 +67,14 @@ export default function DashboardPage() {
     'initial-assessment',
     'design-check',
     'report-writer',
-    'consultants',
+    'consultant-store',
     'certifying-authority',
     'complete',
   ];
 
-  // Helper to get ticked state for a job/tile from localStorage
-  function getTickedTiles(jobId: string): { [tileId: string]: boolean } {
-    if (typeof window === 'undefined') return {};
-    const key = `tickedTiles-${jobId}`;
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : {};
+  // Helper to get completed stages from job data
+  function getCompletedStages(job: Job): string[] {
+    return job.completedStages || [];
   }
 
   // Calculate UserStats counts from ticked tiles for all jobs
@@ -91,7 +88,7 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    if (!jobs || jobs.length === 0 || typeof window === 'undefined') return;
+    if (!jobs || jobs.length === 0) return;
     let initialAssessments = 0;
     let designChecks = 0;
     let reportsWritten = 0;
@@ -99,13 +96,13 @@ export default function DashboardPage() {
     let completedJobs = 0;
     let certifyingAuthority = 0;
     jobs.forEach(job => {
-      const ticked = getTickedTiles(job.id);
-      if (ticked['initial-assessment']) initialAssessments++;
-      if (ticked['design-check']) designChecks++;
-      if (ticked['report-writer']) reportsWritten++;
-      if (ticked['consultants']) consultantsSent++;
-      if (ticked['complete']) completedJobs++;
-      if (ticked['certifying-authority']) certifyingAuthority++;
+      const completedStages = getCompletedStages(job);
+      if (completedStages.includes('initial-assessment')) initialAssessments++;
+      if (completedStages.includes('design-check')) designChecks++;
+      if (completedStages.includes('report-writer')) reportsWritten++;
+      if (completedStages.includes('consultant-store')) consultantsSent++;
+      if (completedStages.includes('complete')) completedJobs++;
+      if (completedStages.includes('certifying-authority')) certifyingAuthority++;
     });
     setUserStats({
       initialAssessments,
@@ -415,7 +412,7 @@ export default function DashboardPage() {
                       },
                       {
                         name: 'Consultants',
-                        id: 'consultants',
+                        id: 'consultant-store',
                         description: 'Manage cost estimates',
                         color: '#727E86',
                       },
@@ -432,10 +429,10 @@ export default function DashboardPage() {
                         color: '#323A40',
                       },
                     ].map(tile => {
-                      // Get ticked state for this job/tile
-                      const tickedTiles = getTickedTiles(jobDetails.id);
+                      // Get completed stages for this job
+                      const completedStages = getCompletedStages(jobDetails);
                       const isTickable = tickableTileIds.includes(tile.id);
-                      const isTicked = isTickable ? tickedTiles[tile.id] : false;
+                      const isTicked = isTickable ? completedStages.includes(tile.id) : false;
                       return (
                         <Card
                           key={tile.id}

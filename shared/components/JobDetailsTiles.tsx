@@ -4,7 +4,7 @@ import React from "react"
 import { ClipboardCheck, FileText, BarChart3, DollarSign, CheckCircle, LucideIcon } from "lucide-react"
 import { cn } from "@shared/lib/utils"
 
-export type JobStage = "initial-assessment" | "design-check" | "report-writer" | "consultants" | "complete"
+export type JobStage = "initial-assessment" | "design-check" | "report-writer" | "consultants" | "certifying-authority" | "complete"
 export type StageStatus = 'completed' | 'pending'
 
 interface JobDetailsTilesProps {
@@ -12,6 +12,7 @@ interface JobDetailsTilesProps {
   address: string
   council: string
   className?: string
+  completedStages?: string[]
   customAssessment?: {
     status?: 'paid' | 'completed'
   }
@@ -30,6 +31,7 @@ export function JobDetailsTiles({
   address,
   council,
   className,
+  completedStages = [],
   customAssessment,
   statementOfEnvironmentalEffects,
   complyingDevelopmentCertificate,
@@ -42,36 +44,42 @@ export function JobDetailsTiles({
       label: "Initial Assessment",
       icon: ClipboardCheck,
       href: "/initial-assessment",
-      status: customAssessment?.status === 'completed' ? 'completed' as StageStatus : 'pending' as StageStatus
+      status: completedStages.includes('initial-assessment') ? 'completed' as StageStatus : 'pending' as StageStatus
     }] : []),
     {
       id: "design-check" as JobStage,
       label: "Design Check",
       icon: BarChart3,
       href: "/design-check",
-      status: 'pending' as StageStatus
+      status: completedStages.includes('design-check') ? 'completed' as StageStatus : 'pending' as StageStatus
     },
     {
       id: "report-writer" as JobStage,
       label: "Report Writer",
       icon: FileText,
       href: "/report-writer",
-      status: (statementOfEnvironmentalEffects?.status === 'completed' ||
-              complyingDevelopmentCertificate?.status === 'completed') ? 'completed' as StageStatus : 'pending' as StageStatus
+      status: completedStages.includes('report-writer') ? 'completed' as StageStatus : 'pending' as StageStatus
     },
     {
       id: "consultants" as JobStage,
       label: "Consultants",
       icon: DollarSign,
       href: "/consultants",
-      status: 'pending' as StageStatus
+      status: completedStages.includes('consultant-store') ? 'completed' as StageStatus : 'pending' as StageStatus
+    },
+    {
+      id: "certifying-authority" as JobStage,
+      label: "Certifying Authority",
+      icon: DollarSign,
+      href: "/certifying-authority",
+      status: completedStages.includes('certifying-authority') ? 'completed' as StageStatus : 'pending' as StageStatus
     },
     ...(showComplete ? [{
       id: "complete" as JobStage,
       label: "Complete",
       icon: CheckCircle,
       href: "/complete",
-      status: currentStage === 'complete' ? 'completed' as StageStatus : 'pending' as StageStatus
+      status: completedStages.includes('complete') ? 'completed' as StageStatus : 'pending' as StageStatus
     }] : [])
   ]
 

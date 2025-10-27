@@ -69,6 +69,8 @@ export interface Job {
   council: string;
   currentStage: string;
   status: 'pending' | 'in-progress' | 'completed';
+  completedStages?: string[];
+  currentActiveStage?: string;
   createdAt: string;
   updatedAt?: string;
   customAssessment?: Assessment;

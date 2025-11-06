@@ -71,6 +71,7 @@ import {
   downloadDocumentFromApi,
 } from '@shared/utils/document-utils';
 import { PageHeader } from '@shared/components/ui/page-header';
+import WasteCalculator from './components/waste-calculator';
 
 interface CustomAssessmentForm {
   developmentType: string;
@@ -993,10 +994,42 @@ function JobInitialAssessment({
       );
     } else {
       return (
-        <div className="flex justify-center items-center p-6">
-          <Button className="w-full max-w-xs" onClick={() => handleInitiatePurchase(formType)}>
-            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Waste Management Report
-          </Button>
+        <div className="space-y-6">
+          {/* Pricing Section */}
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Pricing</h3>
+                <p className="text-gray-700 mb-2">
+                  Our Waste Management Reports are priced based on the complexity and scope of your project:
+                </p>
+                <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                  <li><strong>Standard Residential Developments:</strong> Starting from $XXX</li>
+                  <li><strong>Multi-Unit Developments:</strong> Starting from $XXX</li>
+                  <li><strong>Commercial Developments:</strong> Starting from $XXX</li>
+                  <li><strong>Complex or Large-Scale Projects:</strong> Custom pricing available</li>
+                </ul>
+                <p className="text-gray-700 mb-4">
+                  All prices include a comprehensive report, professional review, and compliance documentation. 
+                  Contact us for a detailed quote tailored to your specific project requirements.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Processing Time</h3>
+                <p className="text-gray-700">
+                  Standard reports are typically completed within 5-10 business days upon receipt of all required 
+                  documentation and payment confirmation. Rush services may be available for urgent projects 
+                  (additional fees apply).
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-center items-center">
+            <Button className="w-full max-w-xs" onClick={() => handleInitiatePurchase(formType)}>
+              <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Waste Management Report
+            </Button>
+          </div>
         </div>
       );
     }
@@ -1049,16 +1082,10 @@ function JobInitialAssessment({
   return (
     <div className="w-full">
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Waste Management Assessment</h2>
+        <h2 className="text-xl font-semibold mb-4">Waste Management Report</h2>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
+
         {renderCustomAssessmentForm('wasteManagementAssessment')}
-        <Button
-          variant="outline"
-          onClick={() => {
-            setSelectedJobId('');
-          }}
-        >
-          Back to Resources
-        </Button>
       </div>
       {Object.values(formState).some(s => s.hasUnsavedChanges) && (
         <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
@@ -1094,16 +1121,6 @@ export default function WasteManagementPage() {
   }, [selectedJobId, router]);
 
   // --- Waste Management Resources and Calculator Section ---
-  // Extracted from JobInitialAssessment for always-on rendering
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
-  // Helper to get/set overlay state in localStorage (no jobId context)
-  useEffect(() => {
-    const stored = localStorage.getItem('soeOverlayVisible_global');
-    setIsOverlayVisible(stored === null ? true : stored === 'true');
-  }, []);
-  const setOverlayStateGlobal = (visible: boolean) => {
-    localStorage.setItem('soeOverlayVisible_global', visible ? 'true' : 'false');
-  };
 
   // --- PrePrepared Assessments (Resources) ---
   const {
@@ -1143,7 +1160,9 @@ export default function WasteManagementPage() {
         <PageHeader title="Waste Management" backHref="/professionals/knowledge-base" />
         {/* Waste Management Resources Section (always visible) */}
         <div className="border rounded-lg p-4">
+        <div className="space-y-4">
           <h2 className="text-xl font-semibold mb-4">Waste Management Resources</h2>
+            <div className="h-1 bg-yellow-400 w-full my-2"></div>
           {isPrePreparedLoading ? (
             <div>Loading Resources...</div>
           ) : (
@@ -1159,42 +1178,18 @@ export default function WasteManagementPage() {
             ))
           )}
         </div>
+        </div>
 
         {/* Waste Management Calculator Section (always visible) */}
-        <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
-          {/* The actual content that will be revealed */}
-          <div
-            className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}
-          >
-            <div className="space-y-4">
-              <p>This is the actual content that will be revealed!</p>
-              {/* Add your form elements, inputs, etc. here */}
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsOverlayVisible(true);
-                  setOverlayStateGlobal(true);
-                }}
-              >
-                Show Overlay Again
-              </Button>
-            </div>
-          </div>
-          {/* The overlay that covers the content */}
-          <div
-            className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
-              ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            onClick={() => {
-              setIsOverlayVisible(false);
-              setOverlayStateGlobal(false);
-            }}
-          >
-            <div className="flex flex-col items-center justify-center w-full p-8">
-              <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
-              <p>
-                Use our waste calculator to estimate the amount of waste generated by your project.
+        <div className="border rounded-lg p-4">
+          <div className="space-y-4">
+          <h2 className="text-xl font-semibold mb-4">Waste Management Calculator</h2>
+            <div className="h-1 bg-yellow-400 w-full my-2"></div>
+            <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+              <p className="text-lg mb-4">
+                Use our waste calculator to estimate the amount of waste generated by your project across different phases.
               </p>
-              <p className="text-[#532200] text-sm mt-2">Click to preview</p>
+              <WasteCalculator />
             </div>
           </div>
         </div>
@@ -1211,13 +1206,42 @@ export default function WasteManagementPage() {
               setSelectedJobId={setSelectedJobId}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center w-full p-8">
-              <p className="text-[#532200] font-semibold text-lg mb-2">
-                Waste Management Assessment
-              </p>
-              <p>Get a waste management report for your project.</p>
-              {/* Job Selection Dropdown */}
-              <div className="w-full max-w-md mt-4">
+            <div className="space-y-6">
+              {/* About Waste Management Reports Section */}
+              <h2 className="text-xl font-semibold mb-4">Waste Management Report</h2>
+              <div className="h-1 bg-yellow-400 w-full my-2"></div>
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">What is a Waste Management Report?</h3>
+                    <p className="text-gray-700 mb-4">
+                      A Waste Management Report is a comprehensive assessment that evaluates the waste generation, 
+                      management, and disposal requirements for your development project. Our professional reports 
+                      provide detailed analysis and recommendations to ensure compliance with local council requirements 
+                      and environmental regulations.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">What's Included?</h3>
+                    <ul className="list-disc list-inside text-gray-700 space-y-2">
+                      <li>Detailed waste generation estimates for all project phases</li>
+                      <li>Waste stream analysis and categorization</li>
+                      <li>Bin size and quantity recommendations</li>
+                      <li>Waste storage area requirements and design considerations</li>
+                      <li>Recycling and waste minimization strategies</li>
+                      <li>Compliance with local council waste management requirements</li>
+                      <li>Professional documentation suitable for development applications</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center justify-center w-full">
+                <p className="text-[#532200] font-semibold text-lg mb-2">
+                  Select a job to order a Waste Management Report
+                </p>
+                {/* Job Selection Dropdown */}
+                <div className="w-full max-w-md">
                 {isLoadingJobs ? (
                   <div>Loading jobs...</div>
                 ) : jobsError ? (
@@ -1243,6 +1267,7 @@ export default function WasteManagementPage() {
                     </SelectContent>
                   </Select>
                 )}
+                </div>
               </div>
             </div>
           )}

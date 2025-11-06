@@ -125,8 +125,10 @@ export default function JobPage({ params }: Props) {
     return response.json();
   };
 
-  // Tiles that should have eye icon (all except client-details and messages)
+  // Tiles that should have eye icon 
   const eyeIconTileIds = [
+    'client-details',
+    'messages',
     'design-brief',
     'document-store',
     'planning-layers',

@@ -188,7 +188,7 @@ export function NathersReportForm({ jobs, isLoadingJobs, jobsError }: NathersRep
           <SelectContent>
             {jobs.map(job => (
               <SelectItem key={job.id} value={job.id}>
-                {job.title}
+                {job.address}
               </SelectItem>
             ))}
           </SelectContent>

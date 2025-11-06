@@ -192,7 +192,7 @@ export function WasteManagementReportForm({
           <SelectContent>
             {jobs.map(job => (
               <SelectItem key={job.id} value={job.id}>
-                {job.title}
+                {job.address}
               </SelectItem>
             ))}
           </SelectContent>

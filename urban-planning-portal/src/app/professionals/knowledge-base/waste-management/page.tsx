@@ -1082,10 +1082,18 @@ function JobInitialAssessment({
   return (
     <div className="w-full">
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Waste Management Report</h2>
+        <h2 className="text-xl font-semibold mb-4">Purchase a Waste Management Report</h2>
         <div className="h-1 bg-yellow-400 w-full my-2"></div>
 
         {renderCustomAssessmentForm('wasteManagementAssessment')}
+        <Button
+          variant="outline"
+          onClick={() => {
+            setSelectedJobId('');
+          }}
+        >
+          Back to Resources
+        </Button>
       </div>
       {Object.values(formState).some(s => s.hasUnsavedChanges) && (
         <Button onClick={handleSaveChanges} className="fixed bottom-4 right-4 z-50">
@@ -1158,6 +1166,20 @@ export default function WasteManagementPage() {
     <DocumentProvider jobId={selectedJobId || ''}>
       <div className="space-y-6">
         <PageHeader title="Waste Management" backHref="/professionals/knowledge-base" />
+
+        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 w-full">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-2">What is a Waste Management Report?</h3>
+              <p className="text-gray-700 mb-4">
+                A Waste Management Report is a comprehensive assessment that evaluates the waste generation,
+                management, and disposal requirements for your development project. Our professional reports
+                provide detailed analysis and recommendations to ensure compliance with local council requirements
+                and environmental regulations.
+              </p>
+            </div>
+          </div>
+        </div>
         {/* Waste Management Resources Section (always visible) */}
         <div className="border rounded-lg p-4">
         <div className="space-y-4">
@@ -1206,21 +1228,11 @@ export default function WasteManagementPage() {
               setSelectedJobId={setSelectedJobId}
             />
           ) : (
-            <div className="space-y-6">
-              {/* About Waste Management Reports Section */}
-              <h2 className="text-xl font-semibold mb-4">Waste Management Report</h2>
+            <div className="space-y-6 w-full">
+              <h2 className="text-xl font-semibold mb-4">Purchase a Waste Management Report</h2>
               <div className="h-1 bg-yellow-400 w-full my-2"></div>
-              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 w-full">
                 <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">What is a Waste Management Report?</h3>
-                    <p className="text-gray-700 mb-4">
-                      A Waste Management Report is a comprehensive assessment that evaluates the waste generation, 
-                      management, and disposal requirements for your development project. Our professional reports 
-                      provide detailed analysis and recommendations to ensure compliance with local council requirements 
-                      and environmental regulations.
-                    </p>
-                  </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">What's Included?</h3>
                     <ul className="list-disc list-inside text-gray-700 space-y-2">
@@ -1236,7 +1248,7 @@ export default function WasteManagementPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center justify-center w-full">
+              <div className="flex flex-col w-full max-w-3xl mx-auto space-y-4">
                 <p className="text-[#532200] font-semibold text-lg mb-2">
                   Select a job to order a Waste Management Report
                 </p>

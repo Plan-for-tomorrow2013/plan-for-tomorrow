@@ -16,7 +16,7 @@ export default function DocumentPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Document Not Found</h1>
           <button onClick={() => router.back()} className="text-blue-600 hover:underline">
-            Return to Nathers - BASIX
+            Return to NatHERS & BASIX
           </button>
         </div>
       </div>
@@ -32,7 +32,7 @@ export default function DocumentPage() {
             className="text-[#5a3d1c] hover:underline flex items-center"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Nathers - BASIX
+            Back to NatHERS & BASIX
           </button>
         </div>
 

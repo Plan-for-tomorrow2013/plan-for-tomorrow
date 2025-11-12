@@ -613,14 +613,14 @@ function JobInitialAssessment({
 
       toast({
         title: 'Success',
-        description: `Your Nathers Report has been purchased successfully.`,
+        description: `Your NatHERS Report has been purchased successfully.`,
       });
     } catch (error) {
       console.error(`Error processing ${formType} payment sequence:`, error);
       if (!createWorkTicketMutation.isError && !updateJobMutation.isError) {
         toast({
           title: 'Payment Processing Error',
-          description: `An unexpected error occurred during payment for Nathers Report. Please try again.`,
+          description: `An unexpected error occurred during payment for NatHERS Report. Please try again.`,
           variant: 'destructive',
         });
       }
@@ -846,7 +846,7 @@ function JobInitialAssessment({
             <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <h4 className="font-medium mb-2">Report Complete</h4>
             <p className="text-sm text-gray-600 mb-4">
-              Your Nathers Report is available for download in the Documents section above.
+              Your NatHERS Report is available for download in the Documents section above.
             </p>
           </div>
         </div>
@@ -871,7 +871,7 @@ function JobInitialAssessment({
             </svg>
             <h4 className="font-medium mb-2">Report In Progress</h4>
             <p className="text-sm text-gray-600">
-              We are processing your Nathers Report. You will be notified when it's ready.
+              We are processing your NatHERS Report. You will be notified when it's ready.
             </p>
           </div>
         </div>
@@ -992,10 +992,39 @@ function JobInitialAssessment({
       );
     } else {
       return (
-        <div className="flex justify-center items-center p-6">
-          <Button className="w-full max-w-xs" onClick={() => handleInitiatePurchase(formType)}>
-            <ShoppingCart className="h-4 w-4 mr-2" /> Purchase Nathers Report
-          </Button>
+        <div className="space-y-6">
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Pricing</h3>
+                <p className="text-gray-700 mb-2">
+                  Our NatHERS assessments are scoped to match the complexity of your residential development:
+                </p>
+                <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                  <li><strong>Single Dwelling / Alterations:</strong> Starting from $XXX</li>
+                  <li><strong>Dual Occupancy / Townhouses:</strong> Starting from $XXX</li>
+                  <li><strong>Multi-Residential:</strong> Starting from $XXX</li>
+                  <li><strong>Custom or Complex Designs:</strong> Quoted individually</li>
+                </ul>
+                <p className="text-gray-700 mb-4">
+                  Pricing includes modelling by accredited assessors, compliance documentation and one revision cycle.
+                  Contact us to confirm scope or discuss bundled services.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Turnaround</h3>
+                <p className="text-gray-700">
+                  Standard assessments are delivered within 5-7 business days from receipt of complete drawings and payment.
+                  Expedited delivery may be available on request (additional fees apply).
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center items-center">
+            <Button className="w-full max-w-xs" onClick={() => handleInitiatePurchase(formType)}>
+              <ShoppingCart className="h-4 w-4 mr-2" /> Purchase NatHERS Report
+            </Button>
+          </div>
         </div>
       );
     }
@@ -1048,7 +1077,8 @@ function JobInitialAssessment({
   return (
     <div className="w-full">
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-4">Nathers Assessment</h2>
+        <h2 className="text-xl font-semibold mb-4">Purchase a NatHERS & BASIX Assessment</h2>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
         {renderCustomAssessmentForm('nathersAssessment')}
         <Button
           variant="outline"
@@ -1139,25 +1169,51 @@ export default function NathersPage() {
   return (
     <DocumentProvider jobId={selectedJobId || ''}>
       <div className="space-y-6">
-        <PageHeader title="Nathers" backHref="/professionals/knowledge-base" />
+        <PageHeader title="NatHERS & BASIX" backHref="/professionals/knowledge-base" />
+
+        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-2">What is a BASIX Assessment?</h3>
+              <p className="text-gray-700 mb-4">
+                A BASIX (Building Sustainability Index) assessment models the thermal performance of your
+                residential design to predict heating and cooling loads. Our accredited assessors analyse
+                orientation, building fabric, glazing, shading and insulation to provide a compliant energy
+                rating for your development application.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2">What is a NatHERS Assessment?</h3>
+              <p className="text-gray-700 mb-4">
+                A NatHERS (Nationwide House Energy Rating Scheme) assessment models the thermal
+                performance of your residential design to predict heating and cooling loads. Our accredited
+                assessors analyse orientation, building fabric, glazing, shading and insulation to provide a
+                compliant energy rating for your development application.
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Nathers Resources Section (always visible) */}
         <div className="border rounded-lg p-4">
-          <h2 className="text-xl font-semibold mb-4">Nathers Resources</h2>
-          {isPrePreparedLoading ? (
-            <div>Loading Resources...</div>
-          ) : (
-            filteredAssessments.map(section => (
-              <div key={section.title} className="space-y-4 mb-6">
-                <h3 className="text-lg font-medium">{section.title}</h3>
-                <div>
-                  {section.assessments.map(assessment =>
-                    renderPrePreparedAssessmentCard(assessment)
-                  )}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">NatHERS & BASIX Resources</h2>
+            <div className="h-1 bg-yellow-400 w-full my-2"></div>
+            {isPrePreparedLoading ? (
+              <div>Loading Resources...</div>
+            ) : (
+              filteredAssessments.map(section => (
+                <div key={section.title} className="space-y-4 mb-6">
+                  <h3 className="text-lg font-medium">{section.title}</h3>
+                  <div>
+                    {section.assessments.map(assessment =>
+                      renderPrePreparedAssessmentCard(assessment)
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
 
         {/* Nathers Assessment Section (only if job selected) */}
@@ -1172,36 +1228,55 @@ export default function NathersPage() {
               setSelectedJobId={setSelectedJobId}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center w-full p-8">
-              <p className="text-[#532200] font-semibold text-lg mb-2">Nathers Assessment</p>
-              <p>Get a nathers report for your project.</p>
-              {/* Job Selection Dropdown */}
-              <div className="w-full max-w-md mt-4">
-                {isLoadingJobs ? (
-                  <div>Loading jobs...</div>
-                ) : jobsError ? (
-                  <Alert variant="destructive">
-                    <AlertDescription>Failed to load jobs.</AlertDescription>
-                  </Alert>
-                ) : (
-                  <Select
-                    value={selectedJobId}
-                    onValueChange={value => {
-                      setSelectedJobId(value);
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a job" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {jobs?.map(job => (
-                        <SelectItem key={job.id} value={job.id}>
-                          {job.address}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+            <div className="space-y-6 w-full">
+              <h2 className="text-xl font-semibold mb-4">Purchase a NatHERS & BASIX Assessment</h2>
+              <div className="h-1 bg-yellow-400 w-full my-2"></div>
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 w-full">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">What&apos;s Included?</h3>
+                    <ul className="list-disc list-inside text-gray-700 space-y-2">
+                      <li>NatHERS star rating produced with accredited software and certificate</li>
+                      <li>Heating and cooling load breakdown with NCC compliance summary</li>
+                      <li>Design recommendations to improve thermal comfort and performance</li>
+                      <li>Documentation ready for council, BASIX and DA submissions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col w-full max-w-3xl mx-auto space-y-4">
+                <p className="text-[#532200] font-semibold text-lg mb-2">
+                  Select a job to order a NatHERS & BASIX Assessment
+                </p>
+                {/* Job Selection Dropdown */}
+                <div className="w-full max-w-md">
+                  {isLoadingJobs ? (
+                    <div>Loading jobs...</div>
+                  ) : jobsError ? (
+                    <Alert variant="destructive">
+                      <AlertDescription>Failed to load jobs.</AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Select
+                      value={selectedJobId}
+                      onValueChange={value => {
+                        setSelectedJobId(value);
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a job" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jobs?.map(job => (
+                          <SelectItem key={job.id} value={job.id}>
+                            {job.address}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </div>
             </div>
           )}

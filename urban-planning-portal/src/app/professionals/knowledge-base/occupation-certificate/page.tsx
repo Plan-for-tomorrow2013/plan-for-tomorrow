@@ -13,8 +13,6 @@ import {
 import Link from 'next/link';
 import camelcaseKeys from 'camelcase-keys';
 import { PageHeader } from '@shared/components/ui/page-header';
-import WollongongFSR from './components/WollongongFSR';
-import { Button } from '@shared/components/ui/button';
 
 interface PrePreparedAssessmentSection {
   title: string;
@@ -53,7 +51,7 @@ const fetchPrePreparedAssessments = async (): Promise<PrePreparedAssessmentSecti
   return camelcaseKeys(data, { deep: true });
 };
 
-export default function DevelopmentApplicationPage() {
+export default function OccupationCertificatePage() {
   const router = useRouter();
 
   const {
@@ -87,22 +85,22 @@ export default function DevelopmentApplicationPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Development Application" backHref="/professionals/knowledge-base" />
+      <PageHeader title="Occupation Certificate" backHref="/professionals/knowledge-base" />
 
       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-lg mb-2">What is a Development Application?</h3>
+            <h3 className="font-semibold text-lg mb-2">What is Occupation Certificate?</h3>
             <p className="text-gray-700 mb-4">
-              A Development Application is a document that is submitted to the council to apply for planning permission.
-              It is a comprehensive assessment of the proposed development and its impact on the surrounding area.
+              Occupation Certificate is a certificate issued by the council to confirm that the development has been completed to the required standards.
+              It is a comprehensive assessment of the proposed development and its requirements.
             </p>
           </div>
         </div>
       </div>
       {/* Development Application Resources Section */}
       <div className="border rounded-lg p-4">
-        <h2 className="text-xl font-semibold mb-4">Development Application Resources</h2>
+        <h2 className="text-xl font-semibold mb-4">Occupation Certificate Resources</h2>
         <div className="h-1 bg-yellow-400 w-full my-2"></div>
         {isPrePreparedLoading ? (
           <div>Loading Resources...</div>
@@ -118,27 +116,18 @@ export default function DevelopmentApplicationPage() {
         )}
       </div>
 
-      {/* Development Application Calculator Section */}
+      {/* Occupation Certificate Calculator Section */}
       <div className="border rounded-lg p-4">
-        <h2 className="text-xl font-semibold mb-4">Development Application Calculators</h2>
+        <h2 className="text-xl font-semibold mb-4">Occupation Certificate Calculators</h2>
         <div className="h-1 bg-yellow-400 w-full my-2"></div>
-        <div className="bg-gray-50 p-6 mb-4 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Wollongong FSR Calculator</h3>
-          <WollongongFSR />
-        </div>
-        <div className="bg-gray-50 p-6 mb-4 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Development Application Fee Calculator</h3>
-          <p>
-            Northern Beaches Council has developed a tool which allows applicants to calculate the fees payable on their Development Application. The tool is based on information relevant to the project, such as the estimated cost of works, and is in accordance with the statutory fees applying under the Environmental Planning & Assessment Regulation 2021.
+        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <p className="text-lg mb-4">
+            Use our calculators to determine the requirements for your occupation certificate project.
           </p>
-          <Link href="https://www.northernbeaches.nsw.gov.au/planning-and-development/development-applications/development-application-fee-estimator" target="_blank" className="text-blue-600 underline">
-            <Button variant="outline" className="mt-4">
-              Calculate Development Application Fees
-            </Button>
-          </Link>
         </div>
       </div>
-      {/* Assessment View Dialog for Text Content */}
+      
+      {/* Occupation Certificate View Dialog for Text Content */}
       <Dialog open={!!selectedAssessment} onOpenChange={() => setSelectedAssessment(null)}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>

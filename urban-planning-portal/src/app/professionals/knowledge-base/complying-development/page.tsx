@@ -95,9 +95,21 @@ export default function ComplyingDevelopmentPage() {
     <div className="space-y-6">
       <PageHeader title="Complying Development" backHref="/professionals/knowledge-base" />
 
+      <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-lg mb-2">What is a Complying Development?</h3>
+              <p className="text-gray-700 mb-4">
+                A Complying Development is a development that complies with the development standards set out in State Environmental Planning Policies.
+                It is a comprehensive assessment of the proposed development and its requirements.
+              </p>
+            </div>
+          </div>
+        </div>
       {/* Development Application Resources Section */}
       <div className="border rounded-lg p-4">
         <h2 className="text-xl font-semibold mb-4">Complying Development Resources</h2>
+        <div className="h-1 bg-yellow-400 w-full my-2"></div>
         {isPrePreparedLoading ? (
           <div>Loading Resources...</div>
         ) : (
@@ -110,41 +122,6 @@ export default function ComplyingDevelopmentPage() {
             </div>
           ))
         )}
-      </div>
-
-      {/* Do It Yourself Section */}
-      <div className="border rounded-lg p-4 relative min-h-[200px] flex items-center justify-center">
-        {/* The actual content that will be revealed */}
-        <div
-          className={`transition-opacity duration-300 ${isOverlayVisible ? 'opacity-0' : 'opacity-100'}`}
-        >
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold mb-4">Complying Development Calculator</h2>
-            <p className="text-gray-600">
-              Use our calculator to determine if your development qualifies as complying
-              development.
-            </p>
-            {/* Add your calculator form elements here */}
-            <Button variant="outline" onClick={() => setIsOverlayVisible(true)}>
-              Hide Calculator
-            </Button>
-          </div>
-        </div>
-        {/* The overlay that covers the content */}
-        <div
-          className={`absolute inset-0 bg-[#EEDA54]/20 border-[#EEDA54] transition-all duration-300 cursor-pointer flex items-center justify-center
-            ${isOverlayVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => setIsOverlayVisible(false)}
-        >
-          <div className="flex flex-col items-center justify-center w-full p-8">
-            <p className="text-[#532200] font-semibold text-lg mb-2">Do It Yourself</p>
-            <p>
-              Use our calculator to determine if your development qualifies as complying
-              development.
-            </p>
-            <p className="text-[#532200] text-sm mt-2">Click to preview</p>
-          </div>
-        </div>
       </div>
 
       {/* Assessment View Dialog for Text Content */}

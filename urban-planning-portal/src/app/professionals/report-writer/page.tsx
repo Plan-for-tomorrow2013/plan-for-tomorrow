@@ -2153,73 +2153,75 @@ export default function ReportWriterPage() {
           </SiteDetailsProvider>
         </DocumentProvider>
       ) : (
-        <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
-          <p>Please select a job from the dropdown above to access Report Writer.</p>
+        <div className="space-y-6">
+          <div className="text-center text-gray-500 mt-10 border rounded-lg p-8 bg-gray-50">
+            <p>Please select a job from the dropdown above to access Report Writer.</p>
+          </div>
+
+          {/* About Report Writer Section - Visible only before job selection */}
+          <h1 className="text-3xl font-bold">About Report Writer</h1>
+          <div className="h-1 bg-yellow-400 w-full my-2"></div>
+          <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
+            <div className="text-lg mb-4">
+              <p>The Report Writer is your comprehensive toolkit for managing development applications and generating required reports. This platform provides three distinct approaches to help you navigate the planning process:</p>
+              <br></br>
+              
+              <p><strong>1. Do It Yourself - Statement of Environmental Effects Generator</strong></p>
+              <p>For simple, complying developments, use our interactive generator to create a basic Statement of Environmental Effects. Answer a series of questions and we'll format it according to NSW Environmental Planning and Assessment Act 1979 requirements.</p>
+              <br></br>
+              
+              <p><strong>2. Do It With You - Pre-prepared Assessments</strong></p>
+              <p>Purchase one of our pre-prepared assessment templates for more complex developments. We provide the framework and work with you to customize it for your specific project needs.</p>
+              <br></br>
+              
+              <p><strong>3. Do It For You - Custom Reports</strong></p>
+              <p>Let our professionals prepare your Statement of Environmental Effects or Complying Development Certificate Report. Upload your documents, provide development details, and we'll handle the complete report preparation.</p>
+              <br></br>
+              
+              <p><strong>Key Features:</strong></p>
+              <p>• Document management and storage for all required certificates and plans</p>
+              <p>• Property information and site details tracking</p>
+              <p>• Initial assessment tools and questionnaires</p>
+              <p>• LEP (Local Environmental Plan) filtering for relevant assessments</p>
+              <p>• Progress tracking and status updates for all reports</p>
+              <p>• Integrated payment processing for professional services</p>
+              <br></br>
+              
+              <p>Select a job from the dropdown above to access all features and begin your development application process.</p>
+            </div>
+          </div>
+
+          {/* Feedback Form Section - Visible only before job selection */}
+          <div className="border rounded-lg p-4">
+            <button onClick={toggleFeedback} className="flex items-center justify-between w-full">
+              <h2 className="text-xl font-semibold">Feedback</h2>
+              {isFeedbackOpen ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
+            </button>
+            {isFeedbackOpen && (
+              <div className="mt-4">
+                <FeedbackForm
+                  title="Help Us Improve"
+                  description="We value your feedback! Let us know how we can improve the application."
+                  showJobSelection={true}
+                  onSubmit={async (data) => {
+                    // Handle feedback submission here
+                    console.log('Feedback submitted:', data);
+                    // You can add API call here to save feedback
+                    toast({
+                      title: 'Feedback Submitted',
+                      description: 'Thank you for your feedback! We appreciate your input.',
+                    });
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
-
-      {/* About Report Writer Section - Always visible */}
-      <h1 className="text-3xl font-bold">About Report Writer</h1>
-      <div className="h-1 bg-yellow-400 w-full my-2"></div>
-      <div className="bg-gray-50 p-6 rounded-lg mt-8 border border-gray-200">
-        <div className="text-lg mb-4">
-          <p>The Report Writer is your comprehensive toolkit for managing development applications and generating required reports. This platform provides three distinct approaches to help you navigate the planning process:</p>
-          <br></br>
-          
-          <p><strong>1. Do It Yourself - Statement of Environmental Effects Generator</strong></p>
-          <p>For simple, complying developments, use our interactive generator to create a basic Statement of Environmental Effects. Answer a series of questions and we'll format it according to NSW Environmental Planning and Assessment Act 1979 requirements.</p>
-          <br></br>
-          
-          <p><strong>2. Do It With You - Pre-prepared Assessments</strong></p>
-          <p>Purchase one of our pre-prepared assessment templates for more complex developments. We provide the framework and work with you to customize it for your specific project needs.</p>
-          <br></br>
-          
-          <p><strong>3. Do It For You - Custom Reports</strong></p>
-          <p>Let our professionals prepare your Statement of Environmental Effects or Complying Development Certificate Report. Upload your documents, provide development details, and we'll handle the complete report preparation.</p>
-          <br></br>
-          
-          <p><strong>Key Features:</strong></p>
-          <p>• Document management and storage for all required certificates and plans</p>
-          <p>• Property information and site details tracking</p>
-          <p>• Initial assessment tools and questionnaires</p>
-          <p>• LEP (Local Environmental Plan) filtering for relevant assessments</p>
-          <p>• Progress tracking and status updates for all reports</p>
-          <p>• Integrated payment processing for professional services</p>
-          <br></br>
-          
-          <p>Select a job from the dropdown above to access all features and begin your development application process.</p>
-        </div>
-      </div>
-
-      {/* Feedback Form Section - Always visible */}
-      <div className="border rounded-lg p-4">
-        <button onClick={toggleFeedback} className="flex items-center justify-between w-full">
-          <h2 className="text-xl font-semibold">Feedback</h2>
-          {isFeedbackOpen ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
-        </button>
-        {isFeedbackOpen && (
-          <div className="mt-4">
-            <FeedbackForm
-              title="Help Us Improve"
-              description="We value your feedback! Let us know how we can improve the application."
-              showJobSelection={true}
-              onSubmit={async (data) => {
-                // Handle feedback submission here
-                console.log('Feedback submitted:', data);
-                // You can add API call here to save feedback
-                toast({
-                  title: 'Feedback Submitted',
-                  description: 'Thank you for your feedback! We appreciate your input.',
-                });
-              }}
-            />
-          </div>
-        )}
-      </div>
     </div>
   );
 }

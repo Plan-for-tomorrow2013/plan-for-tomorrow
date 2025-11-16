@@ -38,7 +38,7 @@ export function WorkTicketCard({
   getStatusColor,
 }: WorkTicketCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:bg-gray-50 transition-colors cursor-pointer h-full">
       <CardHeader className="p-4">
         <div className="flex items-center justify-between">
           <div>
